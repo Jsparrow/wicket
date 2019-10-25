@@ -98,62 +98,6 @@ import org.apache.wicket.request.resource.ResourceReference;
  */
 public abstract class RatingPanel extends Panel
 {
-	/**
-	 * Renders the stars and the links necessary for rating.
-	 */
-	private final class RatingStarBar extends Loop
-	{
-		/** For serialization. */
-		private static final long serialVersionUID = 1L;
-
-		private RatingStarBar(final String id, final IModel<Integer> model)
-		{
-			super(id, model);
-		}
-
-		@Override
-		protected void populateItem(final LoopItem item)
-		{
-			// Use an AjaxFallbackLink for rating to make voting work even
-			// without Ajax.
-			AjaxFallbackLink<Void> link = new AjaxFallbackLink<Void>("link")
-			{
-				private static final long serialVersionUID = 1L;
-
-				@Override
-				public void onClick(Optional<AjaxRequestTarget> targetOptional)
-				{
-					LoopItem item = (LoopItem)getParent();
-
-					// adjust the rating, and provide the target to the subclass
-					// of our rating component, so other components can also get
-					// updated in case of an AJAX event.
-
-					onRated(item.getIndex() + 1, targetOptional);
-
-					// if we process an AJAX event, update this panel
-					targetOptional.ifPresent(target -> target.add(RatingPanel.this.get("rater")));
-
-				}
-
-				@Override
-				public boolean isEnabled()
-				{
-					return !hasVoted.getObject();
-				}
-			};
-
-			int iteration = item.getIndex();
-
-			// add the star image, which is either active (highlighted) or
-			// inactive (no star)
-			link.add(new WebMarkupContainer("star").add(AttributeModifier.replace("src",
-				(onIsStarActive(iteration) ? getActiveStarUrl(iteration)
-					: getInactiveStarUrl(iteration)))));
-			item.add(link);
-		}
-	}
-
 	/** For serialization. */
 	private static final long serialVersionUID = 1L;
 
@@ -432,4 +376,60 @@ public abstract class RatingPanel extends Panel
 	 * @param target
 	 */
 	protected abstract void onRated(int rating, Optional<AjaxRequestTarget> target);
+
+	/**
+	 * Renders the stars and the links necessary for rating.
+	 */
+	private final class RatingStarBar extends Loop
+	{
+		/** For serialization. */
+		private static final long serialVersionUID = 1L;
+
+		private RatingStarBar(final String id, final IModel<Integer> model)
+		{
+			super(id, model);
+		}
+
+		@Override
+		protected void populateItem(final LoopItem item)
+		{
+			// Use an AjaxFallbackLink for rating to make voting work even
+			// without Ajax.
+			AjaxFallbackLink<Void> link = new AjaxFallbackLink<Void>("link")
+			{
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				public void onClick(Optional<AjaxRequestTarget> targetOptional)
+				{
+					LoopItem item = (LoopItem)getParent();
+
+					// adjust the rating, and provide the target to the subclass
+					// of our rating component, so other components can also get
+					// updated in case of an AJAX event.
+
+					onRated(item.getIndex() + 1, targetOptional);
+
+					// if we process an AJAX event, update this panel
+					targetOptional.ifPresent(target -> target.add(RatingPanel.this.get("rater")));
+
+				}
+
+				@Override
+				public boolean isEnabled()
+				{
+					return !hasVoted.getObject();
+				}
+			};
+
+			int iteration = item.getIndex();
+
+			// add the star image, which is either active (highlighted) or
+			// inactive (no star)
+			link.add(new WebMarkupContainer("star").add(AttributeModifier.replace("src",
+				(onIsStarActive(iteration) ? getActiveStarUrl(iteration)
+					: getInactiveStarUrl(iteration)))));
+			item.add(link);
+		}
+	}
 }

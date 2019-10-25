@@ -67,6 +67,7 @@ public class Home extends WicketExamplePage
 		// Action link counts link clicks
 		final Link<Void> actionLink = new Link<Void>("actionLink")
 		{
+			@Override
 			public void onClick()
 			{
 				linkClickCount++;
@@ -79,6 +80,7 @@ public class Home extends WicketExamplePage
 		// Action link counts link clicks on works with onclick handler
 		final Link<Void> actionOnClickLink = new Link<Void>("actionOnClickLink")
 		{
+			@Override
 			public void onClick()
 			{
 				onClickLinkClickCount++;
@@ -100,6 +102,7 @@ public class Home extends WicketExamplePage
 		// Link to BookDetails page
 		add(new Link<Void>("bookDetailsLink")
 		{
+			@Override
 			public void onClick()
 			{
 				setResponsePage(new BookDetails(new Book("The Hobbit")));
@@ -109,6 +112,7 @@ public class Home extends WicketExamplePage
 		// Delayed link to BookDetails page
 		add(new Link<Void>("bookDetailsLink2")
 		{
+			@Override
 			public void onClick()
 			{
 				setResponsePage(new BookDetails(new Book("Inside The Matrix")));
@@ -211,6 +215,50 @@ public class Home extends WicketExamplePage
 	}
 
 	/**
+	 * @return Returns the linkClickCount.
+	 */
+	public int getLinkClickCount()
+	{
+		return linkClickCount;
+	}
+
+	/**
+	 * @param linkClickCount
+	 *            The linkClickCount to set.
+	 */
+	public void setLinkClickCount(final int linkClickCount)
+	{
+		this.linkClickCount = linkClickCount;
+	}
+
+	/**
+	 * Gets onClickLinkClickCount.
+	 * 
+	 * @return onClickLinkClickCount
+	 */
+	public int getOnClickLinkClickCount()
+	{
+		return onClickLinkClickCount;
+	}
+
+	/**
+	 * Sets onClickLinkClickCount.
+	 * 
+	 * @param onClickLinkClickCount
+	 *            onClickLinkClickCount
+	 */
+	public void setOnClickLinkClickCount(int onClickLinkClickCount)
+	{
+		this.onClickLinkClickCount = onClickLinkClickCount;
+	}
+
+	@Override
+	public boolean isVersioned()
+	{
+		return false;
+	}
+
+	/**
 	 * Form that handles a redirect.
 	 */
 	private final class RedirectForm extends Form<RedirectForm>
@@ -257,49 +305,5 @@ public class Home extends WicketExamplePage
 		{
 			this.redirectUrl = redirectUrl;
 		}
-	}
-
-	/**
-	 * @return Returns the linkClickCount.
-	 */
-	public int getLinkClickCount()
-	{
-		return linkClickCount;
-	}
-
-	/**
-	 * @param linkClickCount
-	 *            The linkClickCount to set.
-	 */
-	public void setLinkClickCount(final int linkClickCount)
-	{
-		this.linkClickCount = linkClickCount;
-	}
-
-	/**
-	 * Gets onClickLinkClickCount.
-	 * 
-	 * @return onClickLinkClickCount
-	 */
-	public int getOnClickLinkClickCount()
-	{
-		return onClickLinkClickCount;
-	}
-
-	/**
-	 * Sets onClickLinkClickCount.
-	 * 
-	 * @param onClickLinkClickCount
-	 *            onClickLinkClickCount
-	 */
-	public void setOnClickLinkClickCount(int onClickLinkClickCount)
-	{
-		this.onClickLinkClickCount = onClickLinkClickCount;
-	}
-
-	@Override
-	public boolean isVersioned()
-	{
-		return false;
 	}
 }

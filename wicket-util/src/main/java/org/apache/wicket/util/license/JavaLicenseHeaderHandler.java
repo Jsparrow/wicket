@@ -17,15 +17,18 @@
 package org.apache.wicket.util.license;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.wicket.util.string.Strings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import java.util.Collections;
 
 class JavaLicenseHeaderHandler extends AbstractLicenseHeaderHandler
 {
+	private static final Logger logger = LoggerFactory.getLogger(JavaLicenseHeaderHandler.class);
 	private final Pattern javaHeaderPattern = Pattern.compile("^(.*?)package.*$",
 		Pattern.MULTILINE | Pattern.DOTALL);
 
@@ -55,7 +58,7 @@ class JavaLicenseHeaderHandler extends AbstractLicenseHeaderHandler
 				if (header.equals(getLicenseHeader()) == false)
 				{
 					String newContent = Strings.replaceAll(fileContent, header, "").toString();
-					newContent = getLicenseHeader().trim() + LINE_ENDING + newContent;
+					newContent = new StringBuilder().append(getLicenseHeader().trim()).append(LINE_ENDING).append(newContent).toString();
 					new org.apache.wicket.util.file.File(file).write(newContent);
 
 					added = true;
@@ -68,7 +71,7 @@ class JavaLicenseHeaderHandler extends AbstractLicenseHeaderHandler
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 			throw new AssertionError(e.getMessage());
 		}
 
@@ -86,7 +89,7 @@ class JavaLicenseHeaderHandler extends AbstractLicenseHeaderHandler
 	@Override
 	public List<String> getSuffixes()
 	{
-		return Arrays.asList("java");
+		return Collections.singletonList("java");
 	}
 
 	@Override

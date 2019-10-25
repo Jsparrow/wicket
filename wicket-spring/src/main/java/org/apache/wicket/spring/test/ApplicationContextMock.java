@@ -69,8 +69,7 @@ public class ApplicationContextMock implements ApplicationContext, Serializable
 	{
 		if (beans.containsKey(name))
 		{
-			throw new IllegalArgumentException("a bean with name [" + name +
-				"] has already been added to the context");
+			throw new IllegalArgumentException(new StringBuilder().append("a bean with name [").append(name).append("] has already been added to the context").toString());
 		}
 		beans.put(name, bean);
 	}
@@ -86,7 +85,7 @@ public class ApplicationContextMock implements ApplicationContext, Serializable
 	}
 
 	@Override
-	public Object getBean(final String name) throws BeansException
+	public Object getBean(final String name)
 	{
 		Object bean = beans.get(name);
 		if (bean == null)
@@ -97,7 +96,7 @@ public class ApplicationContextMock implements ApplicationContext, Serializable
 	}
 
 	@Override
-	public Object getBean(final String name, final Object... args) throws BeansException
+	public Object getBean(final String name, final Object... args)
 	{
 		return getBean(name);
 	}
@@ -107,7 +106,7 @@ public class ApplicationContextMock implements ApplicationContext, Serializable
 	 */
 	@Override
 	@SuppressWarnings({ "unchecked" })
-	public <T> T getBean(String name, Class<T> requiredType) throws BeansException
+	public <T> T getBean(String name, Class<T> requiredType)
 	{
 		Object bean = getBean(name);
 		if (!(requiredType.isAssignableFrom(bean.getClass())))
@@ -122,43 +121,35 @@ public class ApplicationContextMock implements ApplicationContext, Serializable
 	 */
 	@Override
 	@SuppressWarnings({ "unchecked" })
-	public <T> Map<String, T> getBeansOfType(Class<T> type) throws BeansException
+	public <T> Map<String, T> getBeansOfType(Class<T> type)
 	{
 		final Map<String, T> found = new HashMap<>();
 
-		for (Entry<String, Object> entry : beans.entrySet())
-		{
-			if (type.isAssignableFrom(entry.getValue().getClass()))
-			{
-				found.put(entry.getKey(), (T)entry.getValue());
-			}
-		}
+		beans.entrySet().stream().filter(entry -> type.isAssignableFrom(entry.getValue().getClass())).forEach(entry -> found.put(entry.getKey(), (T) entry.getValue()));
 
 		return found;
 	}
 
 	@Override
-	public <T> T getBean(Class<T> requiredType) throws BeansException
+	public <T> T getBean(Class<T> requiredType)
 	{
 		Iterator<T> beans = getBeansOfType(requiredType).values().iterator();
 
 		if (beans.hasNext() == false)
 		{
-			throw new NoSuchBeanDefinitionException("bean of required type " + requiredType +
-				" not found");
+			throw new NoSuchBeanDefinitionException(new StringBuilder().append("bean of required type ").append(requiredType).append(" not found").toString());
 		}
 		final T bean = beans.next();
 
 		if (beans.hasNext() != false)
 		{
-			throw new NoSuchBeanDefinitionException("more than one bean of required type " +
-				requiredType + " found");
+			throw new NoSuchBeanDefinitionException(new StringBuilder().append("more than one bean of required type ").append(requiredType).append(" found").toString());
 		}
 		return bean;
 	}
 
 	@Override
-	public <T> T getBean(Class<T> requiredType, Object... objects) throws BeansException
+	public <T> T getBean(Class<T> requiredType, Object... objects)
 	{
 		return getBean(requiredType);
 	}
@@ -177,17 +168,10 @@ public class ApplicationContextMock implements ApplicationContext, Serializable
 
 	@Override
 	public Map<String, Object> getBeansWithAnnotation(Class<? extends Annotation> annotationType)
-		throws BeansException
 	{
 		final Map<String, Object> found = new HashMap<>();
 
-		for (Entry<String, Object> entry : beans.entrySet())
-		{
-			if (entry.getValue().getClass().isAnnotationPresent(annotationType))
-			{
-				found.put(entry.getKey(), entry.getValue());
-			}
-		}
+		beans.entrySet().stream().filter(entry -> entry.getValue().getClass().isAnnotationPresent(annotationType)).forEach(entry -> found.put(entry.getKey(), entry.getValue()));
 		return found;
 	}
 
@@ -290,15 +274,14 @@ public class ApplicationContextMock implements ApplicationContext, Serializable
 	public String[] getBeanNamesForType(final Class type)
 	{
 		ArrayList<String> names = new ArrayList<>();
-		for (Entry<String, Object> entry : beans.entrySet())
-		{
+		beans.entrySet().forEach(entry -> {
 			Object bean = entry.getValue();
 
 			if (type.isAssignableFrom(bean.getClass()))
 			{
 				names.add(entry.getKey());
 			}
-		}
+		});
 		return names.toArray(new String[names.size()]);
 	}
 
@@ -312,7 +295,7 @@ public class ApplicationContextMock implements ApplicationContext, Serializable
 
 	@Override
 	public <T> Map<String, T> getBeansOfType(Class<T> type, boolean includeNonSingletons,
-		boolean allowEagerInit) throws BeansException
+		boolean allowEagerInit)
 	{
 		throw new UnsupportedOperationException();
 	}
@@ -330,24 +313,24 @@ public class ApplicationContextMock implements ApplicationContext, Serializable
 	}
 
 	@Override
-	public boolean isSingleton(final String name) throws NoSuchBeanDefinitionException
+	public boolean isSingleton(final String name)
 	{
 		return true;
 	}
 
 	@Override
-	public Class<?> getType(final String name) throws NoSuchBeanDefinitionException
+	public Class<?> getType(final String name)
 	{
 		return getType(name, true);
 	}
 
 	@Override
-	public Class<?> getType(String name, boolean allowFactoryBeanInit) throws NoSuchBeanDefinitionException
+	public Class<?> getType(String name, boolean allowFactoryBeanInit)
 	{
 		Object bean = beans.get(name);
 		if (bean == null)
 		{
-			throw new NoSuchBeanDefinitionException("No bean with name '" + name + "'");
+			throw new NoSuchBeanDefinitionException(new StringBuilder().append("No bean with name '").append(name).append("'").toString());
 		}
 
 		if (bean instanceof FactoryBean)
@@ -359,7 +342,7 @@ public class ApplicationContextMock implements ApplicationContext, Serializable
 	}
 
 	@Override
-	public String[] getAliases(final String name) throws NoSuchBeanDefinitionException
+	public String[] getAliases(final String name)
 	{
 		throw new UnsupportedOperationException();
 	}
@@ -382,14 +365,12 @@ public class ApplicationContextMock implements ApplicationContext, Serializable
 
 	@Override
 	public String getMessage(final String code, final Object[] args, final Locale locale)
-		throws NoSuchMessageException
 	{
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public String getMessage(final MessageSourceResolvable resolvable, final Locale locale)
-		throws NoSuchMessageException
 	{
 		throw new UnsupportedOperationException();
 	}
@@ -407,7 +388,7 @@ public class ApplicationContextMock implements ApplicationContext, Serializable
 	}
 
 	@Override
-	public AutowireCapableBeanFactory getAutowireCapableBeanFactory() throws IllegalStateException
+	public AutowireCapableBeanFactory getAutowireCapableBeanFactory()
 	{
 		throw new UnsupportedOperationException();
 	}
@@ -437,13 +418,13 @@ public class ApplicationContextMock implements ApplicationContext, Serializable
 	}
 
 	@Override
-	public boolean isPrototype(final String name) throws NoSuchBeanDefinitionException
+	public boolean isPrototype(final String name)
 	{
 		return !isSingleton(name);
 	}
 
 	@Override
-	public boolean isTypeMatch(String s, ResolvableType resolvableType) throws NoSuchBeanDefinitionException
+	public boolean isTypeMatch(String s, ResolvableType resolvableType)
 	{
 		return false;
 	}
@@ -451,7 +432,6 @@ public class ApplicationContextMock implements ApplicationContext, Serializable
 	@Override
 	@SuppressWarnings({ "unchecked" })
 	public boolean isTypeMatch(final String name, final Class targetType)
-		throws NoSuchBeanDefinitionException
 	{
 		throw new UnsupportedOperationException();
 	}

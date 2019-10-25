@@ -69,10 +69,11 @@ public class TestConversationalPage extends WebPage implements ConversationalCom
 			public void onClick()
 			{
 				String pageType = pp.get("pageType").toString("nonbookmarkable");
-				if ("bookmarkable".equals(pageType.toLowerCase(Locale.ROOT)))
+				if ("bookmarkable".equals(pageType.toLowerCase(Locale.ROOT))) {
 					setResponsePage(TestNonConversationalPage.class);
-				else
+				} else {
 					setResponsePage(new TestNonConversationalPage());
+				}
 			}
 		});
 	}

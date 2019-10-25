@@ -37,25 +37,25 @@ class RangeValidatorTest
 	@Test
     void doubleRange() throws Exception
 	{
-		IValidator<Double> validator = new RangeValidator<Double>(1.1, 1.8);
+		IValidator<Double> validator = new RangeValidator<>(1.1, 1.8);
 
-		Validatable<Double> validatable = new Validatable<Double>((double)1);
+		Validatable<Double> validatable = new Validatable<>((double)1);
 		validator.validate(validatable);
 		assertEquals(1, validatable.getErrors().size());
 
-		validatable = new Validatable<Double>(1.1);
+		validatable = new Validatable<>(1.1);
 		validator.validate(validatable);
 		assertEquals(0, validatable.getErrors().size());
 
-		validatable = new Validatable<Double>(1.5);
+		validatable = new Validatable<>(1.5);
 		validator.validate(validatable);
 		assertEquals(0, validatable.getErrors().size());
 
-		validatable = new Validatable<Double>(1.8);
+		validatable = new Validatable<>(1.8);
 		validator.validate(validatable);
 		assertEquals(0, validatable.getErrors().size());
 
-		validatable = new Validatable<Double>((double)2);
+		validatable = new Validatable<>((double)2);
 		validator.validate(validatable);
 		assertEquals(1, validatable.getErrors().size());
 	}
@@ -67,25 +67,25 @@ class RangeValidatorTest
 	@Test
     void integerRange() throws Exception
 	{
-		IValidator<Integer> validator = new RangeValidator<Integer>(1, 8);
+		IValidator<Integer> validator = new RangeValidator<>(1, 8);
 
-		Validatable<Integer> validatable = new Validatable<Integer>(0);
+		Validatable<Integer> validatable = new Validatable<>(0);
 		validator.validate(validatable);
 		assertEquals(1, validatable.getErrors().size());
 
-		validatable = new Validatable<Integer>(1);
+		validatable = new Validatable<>(1);
 		validator.validate(validatable);
 		assertEquals(0, validatable.getErrors().size());
 
-		validatable = new Validatable<Integer>(5);
+		validatable = new Validatable<>(5);
 		validator.validate(validatable);
 		assertEquals(0, validatable.getErrors().size());
 
-		validatable = new Validatable<Integer>(8);
+		validatable = new Validatable<>(8);
 		validator.validate(validatable);
 		assertEquals(0, validatable.getErrors().size());
 
-		validatable = new Validatable<Integer>(9);
+		validatable = new Validatable<>(9);
 		validator.validate(validatable);
 		assertEquals(1, validatable.getErrors().size());
 
@@ -94,24 +94,24 @@ class RangeValidatorTest
 	@Test
     void resourceKeys()
 	{
-		Validatable<Integer> validatable = new Validatable<Integer>(10);
+		Validatable<Integer> validatable = new Validatable<>(10);
 
-		IValidator<Integer> validator = new RangeValidator<Integer>(15, null);
+		IValidator<Integer> validator = new RangeValidator<>(15, null);
 		validator.validate(validatable);
 		assertEquals("RangeValidator.minimum", getError(validatable).getKeys().get(0));
 
-		validatable = new Validatable<Integer>(10);
-		validator = new RangeValidator<Integer>(null, 5);
+		validatable = new Validatable<>(10);
+		validator = new RangeValidator<>(null, 5);
 		validator.validate(validatable);
 		assertEquals("RangeValidator.maximum", getError(validatable).getKeys().get(0));
 
-		validatable = new Validatable<Integer>(10);
-		validator = new RangeValidator<Integer>(1, 2);
+		validatable = new Validatable<>(10);
+		validator = new RangeValidator<>(1, 2);
 		validator.validate(validatable);
 		assertEquals("RangeValidator.range", getError(validatable).getKeys().get(0));
 
-		validatable = new Validatable<Integer>(10);
-		validator = new RangeValidator<Integer>(1, 1);
+		validatable = new Validatable<>(10);
+		validator = new RangeValidator<>(1, 1);
 		validator.validate(validatable);
 		assertEquals("RangeValidator.exact", getError(validatable).getKeys().get(0));
 
@@ -120,9 +120,9 @@ class RangeValidatorTest
 	@Test
     void onlyMinValue()
 	{
-		IValidator<Integer> validator = new RangeValidator<Integer>(1, null);
+		IValidator<Integer> validator = new RangeValidator<>(1, null);
 
-		Validatable<Integer> validatable = new Validatable<Integer>(0);
+		Validatable<Integer> validatable = new Validatable<>(0);
 		validator.validate(validatable);
 		assertEquals(1, validatable.getErrors().size());
 	}
@@ -130,9 +130,9 @@ class RangeValidatorTest
 	@Test
     void onlyMaxValue()
 	{
-		IValidator<Integer> validator = new RangeValidator<Integer>(null, 1);
+		IValidator<Integer> validator = new RangeValidator<>(null, 1);
 
-		Validatable<Integer> validatable = new Validatable<Integer>(2);
+		Validatable<Integer> validatable = new Validatable<>(2);
 		validator.validate(validatable);
 		assertEquals(1, validatable.getErrors().size());
 	}
@@ -143,9 +143,9 @@ class RangeValidatorTest
 	@Test
     void exact()
 	{
-		IValidator<Integer> validator = new RangeValidator<Integer>(1, 1);
+		IValidator<Integer> validator = new RangeValidator<>(1, 1);
 
-		Validatable<Integer> validatable = new Validatable<Integer>(2);
+		Validatable<Integer> validatable = new Validatable<>(2);
 		validator.validate(validatable);
 		assertEquals(1, validatable.getErrors().size());
 

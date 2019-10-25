@@ -26,6 +26,8 @@ import org.apache.wicket.protocol.ws.api.IWebSocketConnection;
 import org.apache.wicket.protocol.ws.api.message.ConnectedMessage;
 import org.apache.wicket.protocol.ws.api.registry.IKey;
 import org.apache.wicket.protocol.ws.api.registry.IWebSocketConnectionRegistry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A helper class that uses the web connection to push data to the
@@ -73,12 +75,16 @@ public class ChartUpdater
 	{
 		private static final String JSON_SKELETON = "{ \"year\": \"%s\", \"field\": \"%s\", \"value\": %s }";
 
+		private final Logger logger = LoggerFactory.getLogger(UpdateTask.class);
+
 		/**
 		 * The following fields are needed to be able to lookup the IWebSocketConnection from
 		 * IWebSocketConnectionRegistry
 		 */
 		private final String applicationName;
+
 		private final String sessionId;
+
 		private final IKey key;
 
 		/**
@@ -123,12 +129,13 @@ public class ChartUpdater
 				}
 				catch (InterruptedException x)
 				{
+					logger.error(x.getMessage(), x);
 					Thread.currentThread().interrupt();
 					break;
 				}
 				catch (Exception e)
 				{
-					e.printStackTrace();
+					logger.error(e.getMessage(), e);
 					break;
 				}
 			}

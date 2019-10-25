@@ -51,6 +51,6 @@ public class DelegateLogData implements ILogData
 	@Override
 	public String toString()
 	{
-		return "{delegate=" + delegateData + "}";
+		return new StringBuilder().append("{delegate=").append(delegateData).append("}").toString();
 	}
 }

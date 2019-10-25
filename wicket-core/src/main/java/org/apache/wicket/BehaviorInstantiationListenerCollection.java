@@ -30,14 +30,7 @@ public class BehaviorInstantiationListenerCollection extends
 	@Override
 	public void onInstantiation(final Behavior behavior)
 	{
-		notify(new INotifier<IBehaviorInstantiationListener>()
-		{
-			@Override
-			public void notify(IBehaviorInstantiationListener listener)
-			{
-				listener.onInstantiation(behavior);
-			}
-		});
+		notify((IBehaviorInstantiationListener listener) -> listener.onInstantiation(behavior));
 	}
 
 }

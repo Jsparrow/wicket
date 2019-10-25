@@ -69,6 +69,30 @@ public class Exceptions
 	}
 
 	/**
+	 * Visits the {@link Throwable}'s chain
+	 * 
+	 * @param <T>
+	 * @param throwable
+	 * @param visitor
+	 * @return result set on visitor or {@code null} if none
+	 */
+	public static <T> T visit(final Throwable throwable, final IThrowableVisitor<T> visitor)
+	{
+		Visit<T> visit = new Visit<>();
+		Throwable cursor = throwable;
+		while (cursor != null)
+		{
+			visitor.visit(cursor, visit);
+			if (visit.stopped)
+			{
+				return visit.result;
+			}
+			cursor = cursor.getCause();
+		}
+		return null;
+	}
+
+	/**
 	 * Represents a visit
 	 * 
 	 * @author igor
@@ -113,29 +137,5 @@ public class Exceptions
 		 * @param visit
 		 */
 		void visit(Throwable throwable, Visit<T> visit);
-	}
-
-	/**
-	 * Visits the {@link Throwable}'s chain
-	 * 
-	 * @param <T>
-	 * @param throwable
-	 * @param visitor
-	 * @return result set on visitor or {@code null} if none
-	 */
-	public static <T> T visit(final Throwable throwable, final IThrowableVisitor<T> visitor)
-	{
-		Visit<T> visit = new Visit<>();
-		Throwable cursor = throwable;
-		while (cursor != null)
-		{
-			visitor.visit(cursor, visit);
-			if (visit.stopped)
-			{
-				return visit.result;
-			}
-			cursor = cursor.getCause();
-		}
-		return null;
 	}
 }

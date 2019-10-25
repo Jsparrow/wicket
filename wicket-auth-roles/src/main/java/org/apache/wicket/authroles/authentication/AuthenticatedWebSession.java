@@ -30,15 +30,6 @@ import org.apache.wicket.request.Request;
 public abstract class AuthenticatedWebSession extends AbstractAuthenticatedWebSession
 {
 	private static final long serialVersionUID = 1L;
-
-	/**
-	 * @return Current authenticated web session
-	 */
-	public static AuthenticatedWebSession get()
-	{
-		return (AuthenticatedWebSession)Session.get();
-	}
-
 	/** True when the user is signed in */
 	private final AtomicBoolean signedIn = new AtomicBoolean(false);
 
@@ -51,6 +42,14 @@ public abstract class AuthenticatedWebSession extends AbstractAuthenticatedWebSe
 	public AuthenticatedWebSession(Request request)
 	{
 		super(request);
+	}
+
+	/**
+	 * @return Current authenticated web session
+	 */
+	public static AuthenticatedWebSession get()
+	{
+		return (AuthenticatedWebSession)Session.get();
 	}
 
 	/**

@@ -142,15 +142,8 @@ public class ConcatResourceBundleReference<T extends HeaderItem & IReferenceHead
 	public List<HeaderItem> getDependencies()
 	{
 		Set<HeaderItem> ret = new LinkedHashSet<>();
-		for (HeaderItem curProvided : providedResources)
-		{
-			for (HeaderItem curDependency : curProvided.getDependencies())
-				ret.add(curDependency);
-		}
-		for (HeaderItem curProvided : providedResources)
-		{
-			ret.remove(curProvided);
-		}
+		providedResources.forEach(curProvided -> curProvided.getDependencies().forEach(ret::add));
+		providedResources.forEach(ret::remove);
 		List<HeaderItem> dependencies = super.getDependencies();
 		dependencies.addAll(ret);
 		return dependencies;

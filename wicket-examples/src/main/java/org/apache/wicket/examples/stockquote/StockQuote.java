@@ -25,6 +25,8 @@ import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLConnection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Provides access to a SOAP service for getting stock quotes based on a symbol. Found on
@@ -32,6 +34,8 @@ import java.net.URLConnection;
  */
 public class StockQuote
 {
+	private static final Logger logger = LoggerFactory.getLogger(StockQuote.class);
+
 	/**
 	 * We used to use the www.xmethods.com demo webservice for stockquotes. We now use webservicex,
 	 * as xmethods was really overloaded and unreliable.
@@ -98,7 +102,7 @@ public class StockQuote
 			return "(unknown)";
 		}
 		String result = response.substring(start, end);
-		return result.equals("0.00") ? "(unknown)" : result;
+		return "0.00".equals(result) ? "(unknown)" : result;
 	}
 
 	/**
@@ -129,7 +133,7 @@ public class StockQuote
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 		}
 		return response;
 	}
@@ -190,11 +194,7 @@ public class StockQuote
 		BufferedReader in = new BufferedReader(isr);
 
 		StringBuilder sb = new StringBuilder();
-		String inputLine;
-		while ((inputLine = in.readLine()) != null)
-		{
-			sb.append(inputLine);
-		}
+		in.lines().forEach(sb::append);
 
 		in.close();
 		return sb.toString();

@@ -121,14 +121,10 @@ public class PackageResourceGuard implements IPackageResourceGuard
 		}
 
 		// Only if a placeholder, e.g. $up$ is defined, access to parent directories is allowed
-		if (Strings.isEmpty(Application.get().getResourceSettings().getParentFolderPlaceholder()))
-		{
-			if (path.contains(".."))
-			{
-				log.warn("Access to parent directories via '..' is by default disabled for shared resources: " +
-					path);
-				return false;
-			}
+		if (Strings.isEmpty(Application.get().getResourceSettings().getParentFolderPlaceholder()) && path.contains("..")) {
+			log.warn("Access to parent directories via '..' is by default disabled for shared resources: " +
+				path);
+			return false;
 		}
 
 		//

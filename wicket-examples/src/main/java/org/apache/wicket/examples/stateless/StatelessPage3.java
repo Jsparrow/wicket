@@ -35,18 +35,9 @@ public class StatelessPage3 extends WicketExamplePage
 {
 	private static final long serialVersionUID = 1L;
 
-	private Integer number;
-
 	private static final String PARAMETER_NAME = "value";
 
-	@Override
-	protected void onBeforeRender()
-	{
-		super.onBeforeRender();
-
-		// get the value from page parameters
-		number = getPage().getPageParameters().get(PARAMETER_NAME).toInt(10);
-	}
+	private Integer number;
 
 	/**
 	 * Constructor
@@ -76,6 +67,15 @@ public class StatelessPage3 extends WicketExamplePage
 		statelessForm.add(field);
 		add(statelessForm);
 		add(new FeedbackPanel("feedback"));
+	}
+
+	@Override
+	protected void onBeforeRender()
+	{
+		super.onBeforeRender();
+
+		// get the value from page parameters
+		number = getPage().getPageParameters().get(PARAMETER_NAME).toInt(10);
 	}
 
 }

@@ -74,7 +74,7 @@ public class PersistedPanel extends GenericPanel<IPersistentPageStore>
 		storeLabel.setOutputMarkupId(true);
 		add(storeLabel);
 		
-		final DropDownChoice<String> sessionsSelector = createSessionsSelector("sessions");
+		final DropDownChoice<String> sessionsSelector = createSessionsSelector();
 		sessionsSelector.setOutputMarkupId(true);
 		add(sessionsSelector);
 
@@ -132,9 +132,9 @@ public class PersistedPanel extends GenericPanel<IPersistentPageStore>
 		});
 	}
 
-	private DropDownChoice<String> createSessionsSelector(String id)
+	private DropDownChoice<String> createSessionsSelector()
 	{
-		DropDownChoice<String> sessionsSelector = new DropDownChoice<String>("sessions",
+		DropDownChoice<String> sessionsSelector = new DropDownChoice<>("sessions",
 			Model.of(getCurrentSessionIdentifier()), new SessionIdentifiersModel(getModel()));
 
 		return sessionsSelector;
@@ -176,7 +176,7 @@ public class PersistedPanel extends GenericPanel<IPersistentPageStore>
 					@Override
 					public void onComponentTagBody(MarkupStream markupStream, ComponentTag openTag)
 					{
-						replaceComponentTagBody(markupStream, openTag, "" + getModelObject().getPageId());
+						replaceComponentTagBody(markupStream, openTag, Integer.toString(getModelObject().getPageId()));
 					}
 					
 					@Override

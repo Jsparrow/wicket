@@ -685,8 +685,7 @@ public class ResourceSettings implements IPropertiesFactoryContext
 		if (strategy == null)
 		{
 			throw new NullPointerException(
-				"It is not allowed to set the resource caching strategy to value NULL. " +
-					"Please use " + NoOpResourceCachingStrategy.class.getName() + " instead.");
+				new StringBuilder().append("It is not allowed to set the resource caching strategy to value NULL. ").append("Please use ").append(NoOpResourceCachingStrategy.class.getName()).append(" instead.").toString());
 		}
 		resourceCachingStrategy = strategy;
 		return this;

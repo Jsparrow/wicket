@@ -219,9 +219,9 @@ class FormValidatorBehaviorTest extends WicketTestCase
 		 */
 		TestPage()
 		{
-			form = new Form<Void>("form");
+			form = new Form<>("form");
 			add(form);
-			name = new TextField<String>("name", Model.of(""));
+			name = new TextField<>("name", Model.of(""));
 			form.add(name);
 		}
 

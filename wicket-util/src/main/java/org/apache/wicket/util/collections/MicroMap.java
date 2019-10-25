@@ -166,17 +166,13 @@ public final class MicroMap<K, V> implements Map<K, V>, Serializable
 	@Override
 	public V remove(final Object key)
 	{
-		if (key.equals(this.key))
-		{
-			final V oldValue = value;
-
-			this.key = null;
-			value = null;
-
-			return oldValue;
+		if (!key.equals(this.key)) {
+			return null;
 		}
-
-		return null;
+		final V oldValue = value;
+		this.key = null;
+		value = null;
+		return oldValue;
 	}
 
 	/**
@@ -193,7 +189,7 @@ public final class MicroMap<K, V> implements Map<K, V>, Serializable
 		}
 		else
 		{
-			throw new IllegalStateException("Map full.  Cannot add " + map.size() + " entries");
+			throw new IllegalStateException(new StringBuilder().append("Map full.  Cannot add ").append(map.size()).append(" entries").toString());
 		}
 	}
 

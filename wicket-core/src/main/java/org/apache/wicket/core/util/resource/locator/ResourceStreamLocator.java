@@ -226,11 +226,10 @@ public class ResourceStreamLocator implements IResourceStreamLocator
 					Application.get().getResourceSettings().getUseMinifiedResources())
 				{
 					ArrayList<String> minifiedExtensions = new ArrayList<>();
-					for (String nonMinifiedExtension : nonMinifiedExtensions)
-					{
+					nonMinifiedExtensions.forEach(nonMinifiedExtension -> {
 						minifiedExtensions.add("min." + nonMinifiedExtension);
 						minifiedExtensions.add(nonMinifiedExtension);
-					}
+					});
 					extensions = minifiedExtensions;
 				}
 				else

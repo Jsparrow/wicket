@@ -24,6 +24,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.wicket.util.string.Strings;
+import java.util.Collections;
 
 /**
  * 
@@ -39,11 +40,11 @@ public class ResourceUtils
 	private static final Pattern LOCALE_MIN_PATTERN = Pattern
 		.compile("_([a-z]{2})(_([A-Z]{2})(_([^_\\.]+))?)?(\\.min)?$");
 	/** Stores standard ISO country codes from {@code java.util.Locale} **/
-	private final static Set<String> isoCountries = new HashSet<>(
-		Arrays.asList(Locale.getISOCountries()));
+	private static final Set<String> isoCountries = Collections.unmodifiableSet(new HashSet<>(
+		Arrays.asList(Locale.getISOCountries())));
 	/** Stores standard ISO language codes from {@code java.util.Locale} **/
-	private final static Set<String> isoLanguages = new HashSet<>(
-		Arrays.asList(Locale.getISOLanguages()));
+	private static final Set<String> isoLanguages = Collections.unmodifiableSet(new HashSet<>(
+		Arrays.asList(Locale.getISOLanguages())));
 	
 	/**
 	 * Return the minified version for a given resource name.
@@ -67,7 +68,7 @@ public class ResourceUtils
 			final String baseName = name.substring(0, name.length() - extension.length() + 1);
 			if (!dottedPostfix.equals(extension) && !baseName.endsWith(dottedPostfix + "."))
 			{
-				minifiedName = baseName + minPostfix + extension;
+				minifiedName = new StringBuilder().append(baseName).append(minPostfix).append(extension).toString();
 			} else
 			{
 				minifiedName = name;
@@ -111,32 +112,25 @@ public class ResourceUtils
 			String variant = matcher.group(5);
 			String min = matcher.group(6);
 
+			boolean condition = language != null && isoLanguages.contains(language) == false;
 			// did we find a language?
-			if (language != null)
-			{
-				if (isoLanguages.contains(language) == false)
-				{
-					language = null;
-					country = null;
-					variant = null;
-				}
+			if (condition) {
+				language = null;
+				country = null;
+				variant = null;
 			}
 
+			boolean condition1 = (language != null) && (country != null) && isoCountries.contains(country) == false;
 			// did we find a country?
-			if ((language != null) && (country != null))
-			{
-				if (isoCountries.contains(country) == false)
-				{
-					country = null;
-					variant = null;
-				}
+			if (condition1) {
+				country = null;
+				variant = null;
 			}
 
 			if (language != null)
 			{
 				int languagePos = path.length() - filename.length() + matcher.start();
-				String basePath = path.substring(0, languagePos) + (min == null ? "" : min) +
-					extension;
+				String basePath = new StringBuilder().append(path.substring(0, languagePos)).append(min == null ? "" : min).append(extension).toString();
 
 				Locale locale = new Locale(language, country != null ? country : "",
 					variant != null ? variant : "");

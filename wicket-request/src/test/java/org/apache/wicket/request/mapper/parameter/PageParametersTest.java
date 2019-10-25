@@ -48,15 +48,7 @@ class PageParametersTest
 		for (String in : input)
 		{
 
-			boolean found = false;
-			for (StringValue value : stringValue)
-			{
-				if (value.toString().equals(in))
-				{
-					found = true;
-					break;
-				}
-			}
+			boolean found = stringValue.stream().anyMatch(value -> value.toString().equals(in));
 
 			if (found == false)
 			{

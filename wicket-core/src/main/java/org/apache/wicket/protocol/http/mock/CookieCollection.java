@@ -32,8 +32,8 @@ import org.apache.wicket.protocol.http.mock.Cookies.Key;
  */
 public class CookieCollection
 {
-	private final Map<Cookies.Key, Cookie> cookies = new LinkedHashMap<Cookies.Key, Cookie>();
-	private final Map<Cookies.Key, Cookie> expiredCookies = new LinkedHashMap<Cookies.Key, Cookie>();
+	private final Map<Cookies.Key, Cookie> cookies = new LinkedHashMap<>();
+	private final Map<Cookies.Key, Cookie> expiredCookies = new LinkedHashMap<>();
 
 	/**
 	 * add cookie to collection
@@ -74,10 +74,7 @@ public class CookieCollection
 	 */
 	public void addAll(List<Cookie> cookies)
 	{
-		for (Cookie cookie : cookies)
-		{
-			add(cookie);
-		}
+		cookies.forEach(this::add);
 	}
 
 	/**
@@ -86,7 +83,7 @@ public class CookieCollection
 	 */
 	public List<Cookie> asList()
 	{
-		ArrayList<Cookie> ret = new ArrayList<Cookie>();
+		ArrayList<Cookie> ret = new ArrayList<>();
 		ret.addAll(cookies.values());
 		return ret;
 	}
@@ -97,7 +94,7 @@ public class CookieCollection
 	 */
 	public List<Cookie> expiredAsList()
 	{
-		ArrayList<Cookie> ret = new ArrayList<Cookie>();
+		ArrayList<Cookie> ret = new ArrayList<>();
 		ret.addAll(expiredCookies.values());
 		return ret;
 	}
@@ -108,7 +105,7 @@ public class CookieCollection
 	 */
 	public List<Cookie> allAsList()
 	{
-		ArrayList<Cookie> ret = new ArrayList<Cookie>();
+		ArrayList<Cookie> ret = new ArrayList<>();
 		ret.addAll(cookies.values());
 		ret.addAll(expiredCookies.values());
 		return ret;

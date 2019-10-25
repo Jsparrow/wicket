@@ -321,11 +321,11 @@ public abstract class Behavior
 			@Override
 			public void onComponentTag(Component component, ComponentTag tag)
 			{
-				if (tag.getType() != TagType.CLOSE)
-				{
-					String oldValue = tag.getAttribute(name);
-					tag.put(name, onAttribute.apply(oldValue));
+				if (tag.getType() == TagType.CLOSE) {
+					return;
 				}
+				String oldValue = tag.getAttribute(name);
+				tag.put(name, onAttribute.apply(oldValue));
 			}
 		};
 	}

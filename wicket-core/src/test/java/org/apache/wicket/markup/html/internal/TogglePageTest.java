@@ -35,6 +35,9 @@ import org.junit.jupiter.api.Test;
 class TogglePageTest extends WicketTestCase
 {
 
+	private final String toggledText = "This button (and red border) should appear and disappear by pressing toggle";
+
+
 	@Override
 	protected WebApplication newApplication()
 	{
@@ -132,14 +135,7 @@ class TogglePageTest extends WicketTestCase
 			InlineEnclosureWithAdditionalAjaxTargetPage ajaxPage = (InlineEnclosureWithAdditionalAjaxTargetPage)tester.getLastRenderedPage();
 			// WICKET-5302 - only the InlineEnclosure is in the Ajax response
 			// Label1 is inside the InlineEncosure
-			InlineEnclosure children = ajaxPage.visitChildren(InlineEnclosure.class, new IVisitor<InlineEnclosure, InlineEnclosure>()
-			{
-				@Override
-				public void component(InlineEnclosure component, IVisit<InlineEnclosure> visit)
-				{
-					visit.stop(component);					
-				}
-			});
+			InlineEnclosure children = ajaxPage.visitChildren(InlineEnclosure.class, (InlineEnclosure component, IVisit<InlineEnclosure> visit) -> visit.stop(component));
 			
 			tester.assertComponentOnAjaxResponse(children.getId());
 			tester.assertComponentOnAjaxResponse(ajaxPage.getLabel2());
@@ -161,11 +157,9 @@ class TogglePageTest extends WicketTestCase
 	{
 		String inlineEnclosureIdPrefix = "wicket__InlineEnclosure_";
 
-		String inlineEnclosureHiddenPattern = "<tr id=\"" + inlineEnclosureIdPrefix +
-			"\\w+\" style=\"display:none\" data-wicket-placeholder=\"\"></tr>";
+		String inlineEnclosureHiddenPattern = new StringBuilder().append("<tr id=\"").append(inlineEnclosureIdPrefix).append("\\w+\" style=\"display:none\" data-wicket-placeholder=\"\"></tr>").toString();
 
-		String inlineEnclosureVisiblePattern = "<tr bgcolor=\"red\" id=\"" +
-			inlineEnclosureIdPrefix + "\\w+\">";
+		String inlineEnclosureVisiblePattern = new StringBuilder().append("<tr bgcolor=\"red\" id=\"").append(inlineEnclosureIdPrefix).append("\\w+\">").toString();
 
 		{
 			// On
@@ -195,9 +189,6 @@ class TogglePageTest extends WicketTestCase
 		}
 	}
 
-	private final String toggledText = "This button (and red border) should appear and disappear by pressing toggle";
-
-
 	/**
 	 * @param toggleable
 	 */
@@ -217,7 +208,6 @@ class TogglePageTest extends WicketTestCase
 		tester.assertContains(Pattern.quote(toggledText));
 		tester.assertContains(Pattern.quote("Also this"));
 	}
-
 
 	/**
 	 * @param label

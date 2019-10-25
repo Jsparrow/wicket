@@ -46,14 +46,9 @@ class ResponseFilterTest extends WicketTestCase
 	@Override
 	protected WebApplication newApplication()
 	{
-		final IResponseFilter responseFilter = new IResponseFilter()
-		{
-			@Override
-			public AppendingStringBuffer filter(AppendingStringBuffer responseBuffer)
-			{
-				counter.getAndIncrement();
-				return responseBuffer;
-			}
+		final IResponseFilter responseFilter = (AppendingStringBuffer responseBuffer) -> {
+			counter.getAndIncrement();
+			return responseBuffer;
 		};
 
 		final WebApplication application = new DummyApplication()
@@ -108,18 +103,6 @@ class ResponseFilterTest extends WicketTestCase
 		assertTrue(tester.getLastResponseAsString().contains(AppendCommentFilter.COMMENT));
 	}
 
-	private static class AppendCommentFilter implements IResponseFilter
-	{
-		static final AppendCommentFilter INSTANCE = new AppendCommentFilter();
-		static final String COMMENT = "<!-- comment -->";
-
-		@Override
-		public AppendingStringBuffer filter(AppendingStringBuffer responseBuffer)
-		{
-			return new AppendingStringBuffer(responseBuffer).append(COMMENT);
-		}
-	}
-
 	/**
 	 * normalRequest()
 	 */
@@ -146,6 +129,18 @@ class ResponseFilterTest extends WicketTestCase
 		assertEquals(2, counter.get());
 		assertTrue(page.ajaxCalled);
 
+	}
+
+	private static class AppendCommentFilter implements IResponseFilter
+	{
+		static final AppendCommentFilter INSTANCE = new AppendCommentFilter();
+		static final String COMMENT = "<!-- comment -->";
+
+		@Override
+		public AppendingStringBuffer filter(AppendingStringBuffer responseBuffer)
+		{
+			return new AppendingStringBuffer(responseBuffer).append(COMMENT);
+		}
 	}
 
 	/**

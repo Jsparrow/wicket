@@ -99,37 +99,32 @@ public class PackageMapper extends AbstractBookmarkableMapper
 	{
 		Class<? extends IRequestablePage> pageClass = info.getPageClass();
 		PackageName pageClassPackageName = PackageName.forClass(pageClass);
-		if (pageClassPackageName.equals(packageName))
-		{
-			Url url = new Url();
-			for (String s : mountSegments)
-			{
-				url.getSegments().add(s);
-			}
-
-			String fullyQualifiedClassName = pageClass.getName();
-			String packageRelativeClassName = fullyQualifiedClassName;
-			int packageNameLength = packageName.getName().length();
-			if (packageNameLength > 0)
-			{
-				packageRelativeClassName = fullyQualifiedClassName.substring(packageNameLength + 1);
-			}
-			packageRelativeClassName = transformForUrl(packageRelativeClassName);
-			url.getSegments().add(packageRelativeClassName);
-			encodePageComponentInfo(url, info.getPageComponentInfo());
-
-			PageParameters copy = newPageParameters();
-			copy.mergeWith(info.getPageParameters());
-			if (setPlaceholders(copy, url) == false)
-			{
-				// mandatory parameter is not provided => cannot build Url
-				return null;
-			}
-
-			return encodePageParameters(url, copy, pageParametersEncoder);
+		if (!pageClassPackageName.equals(packageName)) {
+			return null;
 		}
-
-		return null;
+		Url url = new Url();
+		for (String s : mountSegments)
+		{
+			url.getSegments().add(s);
+		}
+		String fullyQualifiedClassName = pageClass.getName();
+		String packageRelativeClassName = fullyQualifiedClassName;
+		int packageNameLength = packageName.getName().length();
+		if (packageNameLength > 0)
+		{
+			packageRelativeClassName = fullyQualifiedClassName.substring(packageNameLength + 1);
+		}
+		packageRelativeClassName = transformForUrl(packageRelativeClassName);
+		url.getSegments().add(packageRelativeClassName);
+		encodePageComponentInfo(url, info.getPageComponentInfo());
+		PageParameters copy = newPageParameters();
+		copy.mergeWith(info.getPageParameters());
+		if (setPlaceholders(copy, url) == false)
+		{
+			// mandatory parameter is not provided => cannot build Url
+			return null;
+		}
+		return encodePageParameters(url, copy, pageParametersEncoder);
 	}
 
 	@Override
@@ -163,7 +158,7 @@ public class PackageMapper extends AbstractBookmarkableMapper
 			}
 
 			className = transformFromUrl(className);
-			String fullyQualifiedClassName = packageName.getName() + '.' + className;
+			String fullyQualifiedClassName = new StringBuilder().append(packageName.getName()).append('.').append(className).toString();
 			Class<? extends IRequestablePage> pageClass = getPageClass(fullyQualifiedClassName);
 
 			if (pageClass != null && Modifier.isAbstract(pageClass.getModifiers()) == false &&

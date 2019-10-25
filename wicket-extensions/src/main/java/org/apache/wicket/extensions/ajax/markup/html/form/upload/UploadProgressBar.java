@@ -78,30 +78,6 @@ public class UploadProgressBar extends Panel
 	 */
 	public static final String RESOURCE_STARTING = "UploadProgressBar.starting";
 
-	/**
-	 * Initializer for this component; binds static resources.
-	 */
-	public final static class ComponentInitializer implements IInitializer
-	{
-		@Override
-		public void init(final Application application)
-		{
-			// register the upload status resource
-			application.getSharedResources().add(RESOURCE_NAME, new UploadStatusResource());
-		}
-
-		@Override
-		public String toString()
-		{
-			return "UploadProgressBar initializer";
-		}
-
-		@Override
-		public void destroy(final Application application)
-		{
-		}
-	}
-
 	private static final ResourceReference JS = new JavaScriptResourceReference(
 		UploadProgressBar.class, "progressbar.js");
 
@@ -257,14 +233,7 @@ public class UploadProgressBar extends Panel
 	private Form<?> getCallbackForm()
 	{
 		Boolean insideModal = form.visitParents(ModalWindow.class,
-			new IVisitor<ModalWindow, Boolean>()
-			{
-				@Override
-				public void component(final ModalWindow object, final IVisit<Boolean> visit)
-				{
-					visit.stop(true);
-				}
-			});
+			(final ModalWindow object, final IVisit<Boolean> visit) -> visit.stop(true));
 		if ((insideModal != null) && insideModal)
 		{
 			return form;
@@ -272,6 +241,30 @@ public class UploadProgressBar extends Panel
 		else
 		{
 			return form.getRootForm();
+		}
+	}
+
+	/**
+	 * Initializer for this component; binds static resources.
+	 */
+	public static final class ComponentInitializer implements IInitializer
+	{
+		@Override
+		public void init(final Application application)
+		{
+			// register the upload status resource
+			application.getSharedResources().add(RESOURCE_NAME, new UploadStatusResource());
+		}
+
+		@Override
+		public String toString()
+		{
+			return "UploadProgressBar initializer";
+		}
+
+		@Override
+		public void destroy(final Application application)
+		{
 		}
 	}
 }

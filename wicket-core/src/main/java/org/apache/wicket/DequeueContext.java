@@ -39,31 +39,6 @@ public final class DequeueContext
 
 	private ArrayDeque<MarkupContainer> containers = new ArrayDeque<>();
 
-	/** A bookmark for the DequeueContext stack */
-	public static final class Bookmark
-	{
-		private final int index;
-		private final ComponentTag next;
-		private final ArrayDeque<ComponentTag> tags;
-		private final ArrayDeque<MarkupContainer> containers;
-
-		private Bookmark(DequeueContext parser)
-		{
-			this.index = parser.index;
-			this.next = parser.next;
-			this.tags = new ArrayDeque<>(parser.tags);
-			this.containers = new ArrayDeque<>(parser.containers);
-		}
-
-		private void restore(DequeueContext parser)
-		{
-			parser.index = index;
-			parser.next = next;
-			parser.tags = new ArrayDeque<>(tags);
-			parser.containers = new ArrayDeque<>(containers);
-		}
-	}
-
 	public DequeueContext(IMarkupFragment markup, MarkupContainer root, boolean skipFirst)
 	{
 		this.markup = markup;
@@ -296,6 +271,31 @@ public final class DequeueContext
 			}
 		}
 		return null;
+	}
+
+	/** A bookmark for the DequeueContext stack */
+	public static final class Bookmark
+	{
+		private final int index;
+		private final ComponentTag next;
+		private final ArrayDeque<ComponentTag> tags;
+		private final ArrayDeque<MarkupContainer> containers;
+
+		private Bookmark(DequeueContext parser)
+		{
+			this.index = parser.index;
+			this.next = parser.next;
+			this.tags = new ArrayDeque<>(parser.tags);
+			this.containers = new ArrayDeque<>(parser.containers);
+		}
+
+		private void restore(DequeueContext parser)
+		{
+			parser.index = index;
+			parser.next = next;
+			parser.tags = new ArrayDeque<>(tags);
+			parser.containers = new ArrayDeque<>(containers);
+		}
 	}
 
 }

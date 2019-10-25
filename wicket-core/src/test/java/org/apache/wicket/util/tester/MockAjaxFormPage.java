@@ -34,34 +34,6 @@ import org.apache.wicket.validation.validator.StringValidator;
  */
 public class MockAjaxFormPage extends WebPage
 {
-	private static final class MockDomainObject implements Serializable
-	{
-		private static final long serialVersionUID = 1L;
-
-		private String text;
-
-		/**
-		 * Gets text.
-		 * 
-		 * @return text Text entered in the text field
-		 */
-		public String getText()
-		{
-			return text;
-		}
-
-		/**
-		 * Sets text.
-		 * 
-		 * @param text
-		 *            New value for the text field
-		 */
-		public void setText(String text)
-		{
-			this.text = text;
-		}
-	}
-
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -104,5 +76,33 @@ public class MockAjaxFormPage extends WebPage
 				target.add(submit);
 			}
 		});
+	}
+
+	private static final class MockDomainObject implements Serializable
+	{
+		private static final long serialVersionUID = 1L;
+
+		private String text;
+
+		/**
+		 * Gets text.
+		 * 
+		 * @return text Text entered in the text field
+		 */
+		public String getText()
+		{
+			return text;
+		}
+
+		/**
+		 * Sets text.
+		 * 
+		 * @param text
+		 *            New value for the text field
+		 */
+		public void setText(String text)
+		{
+			this.text = text;
+		}
 	}
 }

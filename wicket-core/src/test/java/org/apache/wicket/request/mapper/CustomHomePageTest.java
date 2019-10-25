@@ -79,7 +79,7 @@ class CustomHomePageTest
 		MockHttpServletRequest request = tester.getRequest();
 		String contextPath = request.getContextPath();
 		String filterPrefix = request.getFilterPrefix();
-		tester.executeUrl(contextPath + "/" + filterPrefix + "/");
+		tester.executeUrl(new StringBuilder().append(contextPath).append("/").append(filterPrefix).append("/").toString());
 	}
 
 	/***/

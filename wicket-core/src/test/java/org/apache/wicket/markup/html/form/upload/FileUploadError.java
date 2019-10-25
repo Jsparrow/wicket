@@ -55,7 +55,7 @@ public class FileUploadError extends WebPage
 		add(form);
 
 		// inputField
-		TextField<String> inputField = new TextField<String>("textField", new Model<String>()
+		TextField<String> inputField = new TextField<>("textField", new Model<String>()
 		{
 			private static final long serialVersionUID = 1L;
 

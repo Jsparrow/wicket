@@ -20,6 +20,8 @@ import org.apache.wicket.validation.IValidatable;
 import org.apache.wicket.validation.IValidationError;
 import org.apache.wicket.validation.IValidator;
 import org.apache.wicket.validation.ValidationError;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Checks if a credit card number is valid. The number will be checked for "American Express",
@@ -38,48 +40,9 @@ import org.apache.wicket.validation.ValidationError;
  */
 public class CreditCardValidator implements IValidator<String>
 {
+	private static final Logger logger = LoggerFactory.getLogger(CreditCardValidator.class);
+
 	private static final long serialVersionUID = 1L;
-
-	/** */
-	public static enum CreditCard {
-		/** */
-		INVALID(null),
-		/** */
-		AMERICAN_EXPRESS("American Express"),
-		/** */
-		CHINA_UNIONPAY("China UnionPay"),
-		/** */
-		DINERS_CLUB_CARTE_BLANCHE("Diners Club Carte Blanche"),
-		/** */
-		DINERS_CLUB_INTERNATIONAL("Diners Club International"),
-		/** */
-		DINERS_CLUB_US_AND_CANADA("Diners Club US & Canada"),
-		/** */
-		DISCOVER_CARD("Discover Card"),
-		/** */
-		JCB("JCB"),
-		/** */
-		LASER("Laser"),
-		/** */
-		MAESTRO("Maestro"),
-		/** */
-		MASTERCARD("MasterCard"),
-		/** */
-		SOLO("Solo"),
-		/** */
-		SWITCH("Switch"),
-		/** */
-		VISA("Visa"),
-		/** */
-		VISA_ELECTRON("Visa Electron");
-
-		private final String name;
-
-		CreditCard(String name)
-		{
-			this.name = name;
-		}
-	}
 
 	/** The ID which represents the credit card institute. */
 	private CreditCard cardId = CreditCard.INVALID;
@@ -136,6 +99,7 @@ public class CreditCardValidator implements IValidator<String>
 		}
 		catch (final NumberFormatException ex)
 		{
+			logger.error(ex.getMessage(), ex);
 			validatable.error(decorate(new ValidationError(this), validatable));
 		}
 	}
@@ -170,16 +134,13 @@ public class CreditCardValidator implements IValidator<String>
 		// strip spaces and dashes
 		creditCardNumber = creditCardNumber.replaceAll("[ -]", "");
 
+		boolean condition = (creditCardNumber.length() >= 12) && (creditCardNumber.length() <= 19) &&
+			isChecksumCorrect(creditCardNumber) && ((failOnUnknown == false) ||
+			(determineCardId(creditCardNumber) != CreditCard.INVALID));
 		// the length of the credit card number has to be between 12 and 19.
 		// else the number is invalid.
-		if ((creditCardNumber.length() >= 12) && (creditCardNumber.length() <= 19) &&
-			isChecksumCorrect(creditCardNumber))
-		{
-			if ((failOnUnknown == false) ||
-				(determineCardId(creditCardNumber) != CreditCard.INVALID))
-			{
-				return true;
-			}
+		if (condition) {
+			return true;
 		}
 
 		return false;
@@ -453,13 +414,10 @@ public class CreditCardValidator implements IValidator<String>
 	 */
 	private CreditCard isLaser(String creditCardNumber)
 	{
-		if (creditCardNumber.length() >= 16 && creditCardNumber.length() <= 19)
-		{
-			if (creditCardNumber.startsWith("6304") || creditCardNumber.startsWith("6706") ||
-				creditCardNumber.startsWith("6771") || creditCardNumber.startsWith("6709"))
-			{
-				return CreditCard.LASER;
-			}
+		boolean condition = creditCardNumber.length() >= 16 && creditCardNumber.length() <= 19 && (creditCardNumber.startsWith("6304") || creditCardNumber.startsWith("6706") ||
+			creditCardNumber.startsWith("6771") || creditCardNumber.startsWith("6709"));
+		if (condition) {
+			return CreditCard.LASER;
 		}
 
 		return CreditCard.INVALID;
@@ -476,15 +434,12 @@ public class CreditCardValidator implements IValidator<String>
 	 */
 	private CreditCard isMaestro(String creditCardNumber)
 	{
-		if (creditCardNumber.length() >= 12 && creditCardNumber.length() <= 19)
-		{
-			if (creditCardNumber.startsWith("5018") || creditCardNumber.startsWith("5020") ||
-				creditCardNumber.startsWith("5038") || creditCardNumber.startsWith("6304") ||
-				creditCardNumber.startsWith("6759") || creditCardNumber.startsWith("6761") ||
-				creditCardNumber.startsWith("6763"))
-			{
-				return CreditCard.MAESTRO;
-			}
+		boolean condition = creditCardNumber.length() >= 12 && creditCardNumber.length() <= 19 && (creditCardNumber.startsWith("5018") || creditCardNumber.startsWith("5020") ||
+			creditCardNumber.startsWith("5038") || creditCardNumber.startsWith("6304") ||
+			creditCardNumber.startsWith("6759") || creditCardNumber.startsWith("6761") ||
+			creditCardNumber.startsWith("6763"));
+		if (condition) {
+			return CreditCard.MAESTRO;
 		}
 
 		return CreditCard.INVALID;
@@ -500,13 +455,10 @@ public class CreditCardValidator implements IValidator<String>
 	 */
 	private CreditCard isSolo(String creditCardNumber)
 	{
-		if ((creditCardNumber.length() == 16) || (creditCardNumber.length() == 18) ||
-			(creditCardNumber.length() == 19))
-		{
-			if (creditCardNumber.startsWith("6334") || creditCardNumber.startsWith("6767"))
-			{
-				return CreditCard.SOLO;
-			}
+		boolean condition = ((creditCardNumber.length() == 16) || (creditCardNumber.length() == 18) ||
+			(creditCardNumber.length() == 19)) && (creditCardNumber.startsWith("6334") || creditCardNumber.startsWith("6767"));
+		if (condition) {
+			return CreditCard.SOLO;
 		}
 
 		return CreditCard.INVALID;
@@ -523,15 +475,12 @@ public class CreditCardValidator implements IValidator<String>
 	 */
 	private CreditCard isSwitch(String creditCardNumber)
 	{
-		if ((creditCardNumber.length() == 16 || creditCardNumber.length() == 18 || creditCardNumber.length() == 19))
-		{
-			if (creditCardNumber.startsWith("4903") || creditCardNumber.startsWith("4905") ||
-				creditCardNumber.startsWith("4911") || creditCardNumber.startsWith("4936") ||
-				creditCardNumber.startsWith("564182") || creditCardNumber.startsWith("633110") ||
-				creditCardNumber.startsWith("6333") || creditCardNumber.startsWith("6759"))
-			{
-				return CreditCard.SWITCH;
-			}
+		boolean condition = (creditCardNumber.length() == 16 || creditCardNumber.length() == 18 || creditCardNumber.length() == 19) && (creditCardNumber.startsWith("4903") || creditCardNumber.startsWith("4905") ||
+			creditCardNumber.startsWith("4911") || creditCardNumber.startsWith("4936") ||
+			creditCardNumber.startsWith("564182") || creditCardNumber.startsWith("633110") ||
+			creditCardNumber.startsWith("6333") || creditCardNumber.startsWith("6759"));
+		if (condition) {
+			return CreditCard.SWITCH;
 		}
 
 		return CreditCard.INVALID;
@@ -547,12 +496,9 @@ public class CreditCardValidator implements IValidator<String>
 	 */
 	private CreditCard isVisa(String creditCardNumber)
 	{
-		if (creditCardNumber.length() == 13 || creditCardNumber.length() == 16)
-		{
-			if (creditCardNumber.startsWith("4"))
-			{
-				return CreditCard.VISA;
-			}
+		boolean condition = (creditCardNumber.length() == 13 || creditCardNumber.length() == 16) && creditCardNumber.startsWith("4");
+		if (condition) {
+			return CreditCard.VISA;
 		}
 
 		return CreditCard.INVALID;
@@ -632,5 +578,46 @@ public class CreditCardValidator implements IValidator<String>
 		}
 
 		return (sum % 10) == 0;
+	}
+
+	/** */
+	public static enum CreditCard {
+		/** */
+		INVALID(null),
+		/** */
+		AMERICAN_EXPRESS("American Express"),
+		/** */
+		CHINA_UNIONPAY("China UnionPay"),
+		/** */
+		DINERS_CLUB_CARTE_BLANCHE("Diners Club Carte Blanche"),
+		/** */
+		DINERS_CLUB_INTERNATIONAL("Diners Club International"),
+		/** */
+		DINERS_CLUB_US_AND_CANADA("Diners Club US & Canada"),
+		/** */
+		DISCOVER_CARD("Discover Card"),
+		/** */
+		JCB("JCB"),
+		/** */
+		LASER("Laser"),
+		/** */
+		MAESTRO("Maestro"),
+		/** */
+		MASTERCARD("MasterCard"),
+		/** */
+		SOLO("Solo"),
+		/** */
+		SWITCH("Switch"),
+		/** */
+		VISA("Visa"),
+		/** */
+		VISA_ELECTRON("Visa Electron");
+
+		private final String name;
+
+		CreditCard(String name)
+		{
+			this.name = name;
+		}
 	}
 }

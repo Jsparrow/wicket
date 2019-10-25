@@ -32,6 +32,7 @@ import org.apache.wicket.util.lang.Args;
 import org.apache.wicket.util.lang.Objects;
 import org.apache.wicket.util.string.StringValue;
 import org.apache.wicket.util.string.Strings;
+import java.util.stream.Collectors;
 
 /**
  * Mutable class that holds parameters of a Page. Page parameters consist of indexed parameters and
@@ -111,12 +112,9 @@ public class PageParameters implements IClusterable, IIndexedParameters, INamedP
 	@Override
 	public StringValue get(final int index)
 	{
-		if (indexedParameters != null)
-		{
-			if ((index >= 0) && (index < indexedParameters.size()))
-			{
-				return StringValue.valueOf(indexedParameters.get(index), locale);
-			}
+		boolean condition = indexedParameters != null && (index >= 0) && (index < indexedParameters.size());
+		if (condition) {
+			return StringValue.valueOf(indexedParameters.get(index), locale);
 		}
 		return StringValue.valueOf((String)null);
 	}
@@ -124,12 +122,9 @@ public class PageParameters implements IClusterable, IIndexedParameters, INamedP
 	@Override
 	public PageParameters remove(final int index)
 	{
-		if (indexedParameters != null)
-		{
-			if ((index >= 0) && (index < indexedParameters.size()))
-			{
-				indexedParameters.remove(index);
-			}
+		boolean condition = indexedParameters != null && (index >= 0) && (index < indexedParameters.size());
+		if (condition) {
+			indexedParameters.remove(index);
 		}
 		return this;
 	}
@@ -142,10 +137,7 @@ public class PageParameters implements IClusterable, IIndexedParameters, INamedP
 			return Collections.emptySet();
 		}
 		Set<String> set = new TreeSet<>();
-		for (NamedPair entry : namedParameters)
-		{
-			set.add(entry.getKey());
-		}
+		namedParameters.forEach(entry -> set.add(entry.getKey()));
 		return Collections.unmodifiableSet(set);
 	}
 
@@ -172,22 +164,12 @@ public class PageParameters implements IClusterable, IIndexedParameters, INamedP
 	{
 		Args.notNull(name, "name");
 
-		if (namedParameters != null)
-		{
-			List<StringValue> result = new ArrayList<>();
-			for (NamedPair entry : namedParameters)
-			{
-				if (entry.getKey().equals(name))
-				{
-					result.add(StringValue.valueOf(entry.getValue(), locale));
-				}
-			}
-			return Collections.unmodifiableList(result);
-		}
-		else
-		{
+		if (namedParameters == null) {
 			return Collections.emptyList();
 		}
+		List<StringValue> result = new ArrayList<>();
+		namedParameters.stream().filter(entry -> entry.getKey().equals(name)).forEach(entry -> result.add(StringValue.valueOf(entry.getValue(), locale)));
+		return Collections.unmodifiableList(result);
 	}
 
 	@Override
@@ -206,15 +188,7 @@ public class PageParameters implements IClusterable, IIndexedParameters, INamedP
 		}
 
 		List<NamedPair> parametersByType = new ArrayList<>();
-		Iterator<NamedPair> iterator = allNamed.iterator();
-		while (iterator.hasNext())
-		{
-			NamedPair pair = iterator.next();
-			if (type == pair.getType())
-			{
-				parametersByType.add(pair);
-			}
-		}
+		parametersByType.addAll(allNamed.stream().filter(pair -> type == pair.getType()).collect(Collectors.toList()));
 		return Collections.unmodifiableList(parametersByType);
 	}
 
@@ -309,10 +283,7 @@ public class PageParameters implements IClusterable, IIndexedParameters, INamedP
 			values.add(value.toString());
 		}
 
-		for (String val : values)
-		{
-			NamedPair entry = new NamedPair(name, val, type);
-
+		values.stream().map(val -> new NamedPair(name, val, type)).forEach(entry -> {
 			if (index < 0 || index > namedParameters.size())
 			{
 				namedParameters.add(entry);
@@ -321,7 +292,7 @@ public class PageParameters implements IClusterable, IIndexedParameters, INamedP
 			{
 				namedParameters.add(index, entry);
 			}
-		}
+		});
 		return this;
 	}
 
@@ -420,14 +391,8 @@ public class PageParameters implements IClusterable, IIndexedParameters, INamedP
 					set(index, other.get(index));
 				}
 			}
-			for (String name : other.getNamedKeys())
-			{
-				remove(name);
-			}
-			for (NamedPair curNamed : other.getAllNamed())
-			{
-				add(curNamed.getKey(), curNamed.getValue(), curNamed.getType());
-			}
+			other.getNamedKeys().forEach(this::remove);
+			other.getAllNamed().forEach(curNamed -> add(curNamed.getKey(), curNamed.getValue(), curNamed.getType()));
 		}
 		return this;
 	}
@@ -445,29 +410,36 @@ public class PageParameters implements IClusterable, IIndexedParameters, INamedP
 	@Override
 	public boolean equals(Object obj)
 	{
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		PageParameters other = (PageParameters)obj;
 		if (indexedParameters == null)
 		{
-			if (other.indexedParameters != null)
+			if (other.indexedParameters != null) {
 				return false;
+			}
 		}
-		else if (!indexedParameters.equals(other.indexedParameters))
+		else if (!indexedParameters.equals(other.indexedParameters)) {
 			return false;
+		}
 		if (namedParameters == null)
 		{
-			if (other.namedParameters != null)
+			if (other.namedParameters != null) {
 				return false;
+			}
 		}
-		else if (other.namedParameters == null)
+		else if (other.namedParameters == null) {
 			return false;
-		else if (!CollectionUtils.isEqualCollection(namedParameters, other.namedParameters))
+		} else if (!CollectionUtils.isEqualCollection(namedParameters, other.namedParameters)) {
 			return false;
+		}
 		return true;
 	}
 

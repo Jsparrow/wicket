@@ -134,7 +134,7 @@ public abstract class MetaDataKey<T> implements IClusterable
 		}
 		if (!set && object != null)
 		{
-			MetaDataEntry<T> m = new MetaDataEntry<T>(this, object);
+			MetaDataEntry<T> m = new MetaDataEntry<>(this, object);
 			if (metaData == null)
 			{
 				metaData = new MetaDataEntry[1];

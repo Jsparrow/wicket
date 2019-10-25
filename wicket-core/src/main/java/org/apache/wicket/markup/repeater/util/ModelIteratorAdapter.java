@@ -94,5 +94,5 @@ public abstract class ModelIteratorAdapter<T> implements Iterator<IModel<T>>
 	 *            object to be wrapped
 	 * @return IModel wrapper for the object
 	 */
-	abstract protected IModel<T> model(T object);
+	protected abstract IModel<T> model(T object);
 }

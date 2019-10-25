@@ -38,17 +38,17 @@ public class WicketWebSocketJQueryResourceReference extends JavaScriptResourceRe
 
 	private static final WicketWebSocketJQueryResourceReference instance = new WicketWebSocketJQueryResourceReference();
 
+	private WicketWebSocketJQueryResourceReference()
+	{
+		super(WicketWebSocketJQueryResourceReference.class, "res/js/wicket-websocket-jquery.js");
+	}
+
 	/**
 	 * @return the singleton instance
 	 */
 	public static WicketWebSocketJQueryResourceReference get()
 	{
 		return instance;
-	}
-
-	private WicketWebSocketJQueryResourceReference()
-	{
-		super(WicketWebSocketJQueryResourceReference.class, "res/js/wicket-websocket-jquery.js");
 	}
 
 	@Override

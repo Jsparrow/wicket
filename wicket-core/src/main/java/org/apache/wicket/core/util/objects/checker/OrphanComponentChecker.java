@@ -39,7 +39,6 @@ public class OrphanComponentChecker extends AbstractObjectChecker
 	 */
 	public OrphanComponentChecker()
 	{
-		super();
 	}
 
 	/**

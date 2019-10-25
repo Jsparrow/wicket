@@ -96,22 +96,21 @@ public class WebXmlFileTest
 	{
 		StringBuilder webxml = new StringBuilder();
 		webxml.append("<web-app>");
-		webxml.append("<" + filter + ">");
-		webxml.append(" <" + filter + "-name>HelloWorldApplication</" + filter + "-name>");
-		webxml.append(" <" + filter + "-class>org.apache.wicket.protocol.http.WicketFilter</" +
-			filter + "-class>");
+		webxml.append(new StringBuilder().append("<").append(filter).append(">").toString());
+		webxml.append(new StringBuilder().append(" <").append(filter).append("-name>HelloWorldApplication</").append(filter).append("-name>").toString());
+		webxml.append(new StringBuilder().append(" <").append(filter).append("-class>org.apache.wicket.protocol.http.WicketFilter</").append(filter).append("-class>").toString());
 		webxml.append(" <init-param>");
 		webxml.append("  <param-name>applicationClassName</param-name>");
 		webxml.append("  <param-value>org.apache.wicket.examples.helloworld.HelloWorldApplication</param-value>");
 		webxml.append(" </init-param>");
-		webxml.append("</" + filter + ">");
+		webxml.append(new StringBuilder().append("</").append(filter).append(">").toString());
 		webxml.append("");
-		webxml.append("<" + filter + "-mapping>");
-		webxml.append(" <" + filter + "-name>HelloWorldApplication</" + filter + "-name>");
-		webxml.append(" <url-pattern>" + url + "</url-pattern>");
+		webxml.append(new StringBuilder().append("<").append(filter).append("-mapping>").toString());
+		webxml.append(new StringBuilder().append(" <").append(filter).append("-name>HelloWorldApplication</").append(filter).append("-name>").toString());
+		webxml.append(new StringBuilder().append(" <url-pattern>").append(url).append("</url-pattern>").toString());
 		webxml.append(" <dispatcher>REQUEST</dispatcher>");
 		webxml.append(" <dispatcher>INCLUDE</dispatcher>");
-		webxml.append("</" + filter + "-mapping>");
+		webxml.append(new StringBuilder().append("</").append(filter).append("-mapping>").toString());
 		webxml.append("</web-app>");
 
 		return webxml.toString();

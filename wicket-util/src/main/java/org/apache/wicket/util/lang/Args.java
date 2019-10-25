@@ -38,7 +38,7 @@ public class Args
 	{
 		if (argument == null)
 		{
-			throw new IllegalArgumentException("Argument '" + name + "' may not be null.");
+			throw new IllegalArgumentException(new StringBuilder().append("Argument '").append(name).append("' may not be null.").toString());
 		}
 		return argument;
 	}
@@ -61,7 +61,7 @@ public class Args
 	{
 		if (Strings.isEmpty(argument))
 		{
-			throw new IllegalArgumentException("Argument '" + name + "' may not be null or empty.");
+			throw new IllegalArgumentException(new StringBuilder().append("Argument '").append(name).append("' may not be null or empty.").toString());
 		}
 		return argument;
 	}

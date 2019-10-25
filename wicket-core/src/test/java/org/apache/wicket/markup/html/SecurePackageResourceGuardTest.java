@@ -23,12 +23,16 @@ import org.apache.wicket.Application;
 import org.apache.wicket.util.lang.Packages;
 import org.apache.wicket.util.tester.WicketTestCase;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Juergen Donnerstag
  */
 class SecurePackageResourceGuardTest extends WicketTestCase
 {
+	private static final Logger logger = LoggerFactory.getLogger(SecurePackageResourceGuardTest.class);
+
 	/**
 	 * 
 	 */
@@ -64,6 +68,7 @@ class SecurePackageResourceGuardTest extends WicketTestCase
 		}
 		catch (IllegalArgumentException ex)
 		{
+			logger.error(ex.getMessage(), ex);
 			hit = true;
 		}
 		assertTrue(hit, "Expected an IllegalArgumentException");

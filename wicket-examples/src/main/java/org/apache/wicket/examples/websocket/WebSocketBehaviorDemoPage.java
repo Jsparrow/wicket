@@ -54,7 +54,7 @@ public class WebSocketBehaviorDemoPage extends WicketExamplePage
 			@Override
 			protected IResourceStream getResourceStream(IResource.Attributes attributes)
 			{
-				return new StringResourceStream("downloaded via ajax " + (i++) + " times");
+				return new StringResourceStream(new StringBuilder().append("downloaded via ajax ").append(i++).append(" times").toString());
 			}
 		}.setContentDisposition(ContentDisposition.ATTACHMENT)
 			.setFileName("File-from-IResource.txt")

@@ -26,10 +26,13 @@ import java.util.List;
 
 import org.apache.wicket.util.io.IOUtils;
 import org.apache.wicket.util.string.Strings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 abstract class AbstractLicenseHeaderHandler implements ILicenseHeaderHandler
 {
+	private static final Logger logger = LoggerFactory.getLogger(AbstractLicenseHeaderHandler.class);
 	protected static final String LINE_ENDING = System.getProperty("line.separator");
 	private final List<String> ignoreFiles;
 	private String licenseHeader;
@@ -53,7 +56,7 @@ abstract class AbstractLicenseHeaderHandler implements ILicenseHeaderHandler
 	@Override
 	public boolean addLicenseHeader(final File file)
 	{
-		System.out.println("Not supported yet.");
+		logger.info("Not supported yet.");
 		return false;
 	}
 
@@ -110,7 +113,7 @@ abstract class AbstractLicenseHeaderHandler implements ILicenseHeaderHandler
 		try
 		{
 			String content = new org.apache.wicket.util.file.File(file).readString();
-			content = getLicenseHeader() + LINE_ENDING + content;
+			content = new StringBuilder().append(getLicenseHeader()).append(LINE_ENDING).append(content).toString();
 			new org.apache.wicket.util.file.File(file).write(content);
 		}
 		catch (Exception e)

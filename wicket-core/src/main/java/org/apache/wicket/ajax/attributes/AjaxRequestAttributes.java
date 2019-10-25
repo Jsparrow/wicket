@@ -32,46 +32,6 @@ import java.time.Duration;
  */
 public final class AjaxRequestAttributes
 {
-	/**
-	 * The method to be used when submitting a form
-	 */
-	public enum Method
-	{
-		/** get */
-		GET,
-
-		/** post */
-		POST;
-
-		@Override
-		public String toString()
-		{
-			return name();
-		}
-	}
-
-	/**
-	 * The JavaScript event propagation type
-	 */
-	public enum EventPropagation
-	{
-		/**
-		 * Stops the propagation of the JavaScript event to the parent of its target
-		 */
-		STOP,
-
-		/**
-		 * Stops the propagation of the JavaScript event to the parent of its target and all other
-		 * event listeners registered on the same target
-		 */
-		STOP_IMMEDIATE,
-
-		/**
-		 * Do not stop the propagation of the JavaScript event
-		 */
-		BUBBLE
-	}
-
 	public static final String XML_DATA_TYPE = "xml";
 
 	private boolean multipart = false;
@@ -552,5 +512,45 @@ public final class AjaxRequestAttributes
 	public AjaxRequestAttributes setSerializeRecursively(final boolean serializeRecursively) {
 		this.serializeRecursively = serializeRecursively;
 		return this;
+	}
+
+	/**
+	 * The method to be used when submitting a form
+	 */
+	public enum Method
+	{
+		/** get */
+		GET,
+
+		/** post */
+		POST;
+
+		@Override
+		public String toString()
+		{
+			return name();
+		}
+	}
+
+	/**
+	 * The JavaScript event propagation type
+	 */
+	public enum EventPropagation
+	{
+		/**
+		 * Stops the propagation of the JavaScript event to the parent of its target
+		 */
+		STOP,
+
+		/**
+		 * Stops the propagation of the JavaScript event to the parent of its target and all other
+		 * event listeners registered on the same target
+		 */
+		STOP_IMMEDIATE,
+
+		/**
+		 * Do not stop the propagation of the JavaScript event
+		 */
+		BUBBLE
 	}
 }

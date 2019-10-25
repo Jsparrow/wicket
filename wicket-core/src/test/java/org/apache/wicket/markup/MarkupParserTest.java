@@ -67,7 +67,7 @@ final class MarkupParserTest extends WicketTestCase
 		final ComponentTag aOpen = (ComponentTag)markupStream.next();
 
 		log.info("", aOpen);
-		assertTrue(aOpen.getName().equals("a"));
+		assertTrue("a".equals(aOpen.getName()));
 		assertEquals("foo.html", aOpen.getAttributes().getString("href"));
 
 		markupStream.next();
@@ -75,7 +75,7 @@ final class MarkupParserTest extends WicketTestCase
 		final ComponentTag boldOpen = (ComponentTag)markupStream.next();
 
 		log.info("", boldOpen);
-		assertTrue(boldOpen.getName().equals("b"));
+		assertTrue("b".equals(boldOpen.getName()));
 		assertEquals(TagType.OPEN, boldOpen.getType());
 
 		markupStream.next();
@@ -83,7 +83,7 @@ final class MarkupParserTest extends WicketTestCase
 		final ComponentTag boldClose = (ComponentTag)markupStream.next();
 
 		log.info("", boldClose);
-		assertTrue(boldClose.getName().equals("b"));
+		assertTrue("b".equals(boldClose.getName()));
 		assertEquals(TagType.CLOSE, boldClose.getType());
 
 		markupStream.next();
@@ -91,7 +91,7 @@ final class MarkupParserTest extends WicketTestCase
 		final ComponentTag img = (ComponentTag)markupStream.next();
 
 		log.info("", img);
-		assertTrue(img.getName().equals("img"));
+		assertTrue("img".equals(img.getName()));
 		assertEquals(9, img.getAttributes().getInt("width"));
 		assertEquals(10, img.getAttributes().getInt("height"));
 		assertEquals(TagType.OPEN, img.getType());
@@ -101,7 +101,7 @@ final class MarkupParserTest extends WicketTestCase
 		final ComponentTag marker = (ComponentTag)markupStream.next();
 
 		log.info("", marker);
-		assertTrue(marker.getName().equals("marker"));
+		assertTrue("marker".equals(marker.getName()));
 		assertEquals(TagType.OPEN_CLOSE, marker.getType());
 
 		markupStream.next();
@@ -109,7 +109,7 @@ final class MarkupParserTest extends WicketTestCase
 		final ComponentTag aClose = (ComponentTag)markupStream.next();
 
 		log.info("", aClose);
-		assertTrue(aClose.getName().equals("a"));
+		assertTrue("a".equals(aClose.getName()));
 
 		assertNull(markupStream.next());
 	}
@@ -157,11 +157,7 @@ final class MarkupParserTest extends WicketTestCase
 	@Test
 	void xhtmlDocument() throws Exception
 	{
-		final String docText = ""
-			+ "<?xml version='1.0' encoding='iso-8859-1' ?>"
-			+ "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">"
-			+ "<html>" + "<head><title>Some Page</title></head>"
-			+ "<body><h1>XHTML Test</h1></body>" + "</html>";
+		final String docText = new StringBuilder().append("").append("<?xml version='1.0' encoding='iso-8859-1' ?>").append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">").append("<html>").append("<head><title>Some Page</title></head>").append("<body><h1>XHTML Test</h1></body>").append("</html>").toString();
 		final MarkupParser parser = new MarkupParser(docText);
 		parser.setWicketNamespace("componentName");
 		final IMarkupFragment tokens = parser.parse();
@@ -471,18 +467,16 @@ final class MarkupParserTest extends WicketTestCase
 	void commentsWithNestedElements() throws IOException, ResourceStreamNotFoundException
 	{
 		tester.getApplication().getMarkupSettings().setStripComments(true);
+		// @formatter:off
 		final MarkupParser parser = new MarkupParser(
-// @formatter:off
-			"<span><!--[if lt IE 8 ]>\n"
-			+ "<script src=\"js/ie7.js\"></script>\n" + 
-			"<![endif]--></span>"
+new StringBuilder().append("<span><!--[if lt IE 8 ]>\n").append("<script src=\"js/ie7.js\"></script>\n").append("<![endif]--></span>"
 			// @formatter:on
+).toString()
 		);
 		IMarkupFragment markup = parser.parse();
 
 		String parsedMarkup = markup.toString(true);
-		assertEquals("<span><!--[if lt IE 8 ]>\n" + "<script src=\"js/ie7.js\"></script>\n"
-			+ "<![endif]--></span>", parsedMarkup);
+		assertEquals(new StringBuilder().append("<span><!--[if lt IE 8 ]>\n").append("<script src=\"js/ie7.js\"></script>\n").append("<![endif]--></span>").toString(), parsedMarkup);
 	}
 
 	/**
@@ -570,9 +564,9 @@ final class MarkupParserTest extends WicketTestCase
 	void parseConditionalComment() throws IOException, ResourceStreamNotFoundException,
 		ParseException
 	{
-		String x = "  <!--[if IE]>\r\n" + //
-			"    <a href=\"SimplePage_3.html\">Link</a>\r\n" + //
-			"  <![endif]-->";
+		//
+		//
+		String x = new StringBuilder().append("  <!--[if IE]>\r\n").append("    <a href=\"SimplePage_3.html\">Link</a>\r\n").append("  <![endif]-->").toString();
 		MarkupParser parser = new MarkupParser(x);
 		Markup markup = parser.parse();
 		assertEquals(x, markup.toString(true));

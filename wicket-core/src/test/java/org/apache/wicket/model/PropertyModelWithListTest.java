@@ -30,10 +30,55 @@ import org.junit.jupiter.api.Test;
  */
 class PropertyModelWithListTest
 {
+	/**
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	void listPropertyModel() throws Exception
+	{
+		List<Bean> beans = new ArrayList<PropertyModelWithListTest.Bean>();
+		Bean bean = new Bean();
+		bean.setText("Wrinkly and green I am.");
+		beans.add(bean);
+		PropertyModel<String> model = new PropertyModel<>(beans, "0.text");
+		assertEquals("Wrinkly and green I am.", model.getObject());
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	@Test
+	void containerPropertyModel() throws Exception
+	{
+		BeansContainer container = new BeansContainer();
+		Bean bean = new Bean();
+		bean.setText("Wrinkly and green I am.");
+		container.getBeans().add(bean);
+		PropertyModel<String> model = new PropertyModel<>(container, "beans[0].text");
+		assertEquals("Wrinkly and green I am.", model.getObject());
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	@Test
+	void nestedListPropertyModel() throws Exception
+	{
+		List<List<Bean>> outer = new ArrayList<>();
+		List<Bean> inner = new ArrayList<>();
+		outer.add(inner);
+		Bean bean = new Bean();
+		bean.setText("Wrinkly and green I am.");
+		inner.add(bean);
+		PropertyModel<String> model = new PropertyModel<>(outer, "0[0].text");
+		assertEquals("Wrinkly and green I am.", model.getObject());
+	}
+
 	/** */
 	static class BeansContainer
 	{
-		private List<Bean> beans = new ArrayList<Bean>();
+		private List<Bean> beans = new ArrayList<>();
 
 		/**
 		 * @return the beans
@@ -75,50 +120,5 @@ class PropertyModelWithListTest
 		{
 			this.text = text;
 		}
-	}
-
-	/**
-	 * 
-	 * @throws Exception
-	 */
-	@Test
-	void listPropertyModel() throws Exception
-	{
-		List<Bean> beans = new ArrayList<PropertyModelWithListTest.Bean>();
-		Bean bean = new Bean();
-		bean.setText("Wrinkly and green I am.");
-		beans.add(bean);
-		PropertyModel<String> model = new PropertyModel<String>(beans, "0.text");
-		assertEquals("Wrinkly and green I am.", model.getObject());
-	}
-
-	/**
-	 * @throws Exception
-	 */
-	@Test
-	void containerPropertyModel() throws Exception
-	{
-		BeansContainer container = new BeansContainer();
-		Bean bean = new Bean();
-		bean.setText("Wrinkly and green I am.");
-		container.getBeans().add(bean);
-		PropertyModel<String> model = new PropertyModel<String>(container, "beans[0].text");
-		assertEquals("Wrinkly and green I am.", model.getObject());
-	}
-
-	/**
-	 * @throws Exception
-	 */
-	@Test
-	void nestedListPropertyModel() throws Exception
-	{
-		List<List<Bean>> outer = new ArrayList<List<Bean>>();
-		List<Bean> inner = new ArrayList<Bean>();
-		outer.add(inner);
-		Bean bean = new Bean();
-		bean.setText("Wrinkly and green I am.");
-		inner.add(bean);
-		PropertyModel<String> model = new PropertyModel<String>(outer, "0[0].text");
-		assertEquals("Wrinkly and green I am.", model.getObject());
 	}
 }

@@ -30,7 +30,6 @@ public abstract class ReadOnlyIterator<T> implements Iterator<T>
 	@Override
 	public final void remove()
 	{
-		throw new UnsupportedOperationException("Iterator " + getClass().getName() +
-			" is a read-only iterator. Calls to remove() are not allowed");
+		throw new UnsupportedOperationException(new StringBuilder().append("Iterator ").append(getClass().getName()).append(" is a read-only iterator. Calls to remove() are not allowed").toString());
 	}
 }

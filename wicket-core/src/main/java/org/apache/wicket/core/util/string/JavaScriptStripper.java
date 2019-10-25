@@ -30,28 +30,28 @@ public class JavaScriptStripper
 	 * Determines the state of script processing.
 	 */
 	/** Inside regular text */
-	private final static int REGULAR_TEXT = 1;
+	private static final int REGULAR_TEXT = 1;
 
 	/** String started with single quote (') */
-	private final static int STRING_SINGLE_QUOTE = 2;
+	private static final int STRING_SINGLE_QUOTE = 2;
 
 	/** String started with double quotes (") */
-	private final static int STRING_DOUBLE_QUOTES = 3;
+	private static final int STRING_DOUBLE_QUOTES = 3;
 
 	/** Inside two or more whitespace characters */
-	private final static int WHITE_SPACE = 4;
+	private static final int WHITE_SPACE = 4;
 
 	/** Inside a line comment (// ) */
-	private final static int LINE_COMMENT = 5;
+	private static final int LINE_COMMENT = 5;
 
 	/** Inside a multi line comment */
-	private final static int MULTILINE_COMMENT = 6;
+	private static final int MULTILINE_COMMENT = 6;
 
 	/** Inside a regular expression */
-	private final static int REG_EXP = 7;
+	private static final int REG_EXP = 7;
 
 	/** Inside a template literal */
-	private final static int TEMPLATE_LITERAL = 8;
+	private static final int TEMPLATE_LITERAL = 8;
 
 	private int getPrevCount(String s, int fromIndex, char c)
 	{
@@ -175,24 +175,18 @@ public class JavaScriptStripper
 				continue;
 			}
 
-			if (state == LINE_COMMENT)
-			{
-				if (c == '\n' || c == '\r')
-				{
-					state = REGULAR_TEXT;
-					result.append(c);
-					continue;
-				}
+			boolean condition = state == LINE_COMMENT && (c == '\n' || c == '\r');
+			if (condition) {
+				state = REGULAR_TEXT;
+				result.append(c);
+				continue;
 			}
 
-			if (state == MULTILINE_COMMENT)
-			{
-				if (c == '*' && next == '/')
-				{
-					state = REGULAR_TEXT;
-					++i;
-					continue;
-				}
+			boolean condition1 = state == MULTILINE_COMMENT && c == '*' && next == '/';
+			if (condition1) {
+				state = REGULAR_TEXT;
+				++i;
+				continue;
 			}
 
 			if (state == STRING_SINGLE_QUOTE)

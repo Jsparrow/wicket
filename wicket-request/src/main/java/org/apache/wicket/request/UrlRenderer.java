@@ -294,7 +294,7 @@ public class UrlRenderer
 		String renderedUrl = relativeUrl.toString();
 
 		// sanitize start
-		if (renderedUrl.startsWith("...") || (!renderedUrl.startsWith("..") && !renderedUrl.equals(".")))
+		if (renderedUrl.startsWith("...") || (!renderedUrl.startsWith("..") && !".".equals(renderedUrl)))
 		{
 			// WICKET-4260
 			renderedUrl = "./" + renderedUrl;

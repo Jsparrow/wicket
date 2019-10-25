@@ -39,7 +39,7 @@ public class TestPage extends WebPage
 	{
 		add(new Label("label"));
 
-		Form<Void> form1 = new Form<Void>("form1");
+		Form<Void> form1 = new Form<>("form1");
 		add(form1);
 		form1.add(new MyTextField("text1", "input-1"));
 		form1.add(new MyTextField("text2", "input-2"));

@@ -48,6 +48,124 @@ import org.apache.wicket.model.LoadableDetachableModel;
  */
 public class BreadCrumbBar extends Panel implements IBreadCrumbModel
 {
+	private static final long serialVersionUID = 1L;
+
+	private final IBreadCrumbModel decorated;
+
+	/**
+	 * Construct.
+	 * 
+	 * @param id
+	 *            Component id
+	 */
+	public BreadCrumbBar(final String id)
+	{
+		super(id);
+		decorated = new DefaultBreadCrumbsModel();
+		BreadCrumbsListView breadCrumbsListView = new BreadCrumbsListView("crumbs");
+		addListener(breadCrumbsListView);
+		add(breadCrumbsListView);
+	}
+
+
+	@Override
+	public void addListener(final IBreadCrumbModelListener listener)
+	{
+		decorated.addListener(listener);
+	}
+
+
+	@Override
+	public List<IBreadCrumbParticipant> allBreadCrumbParticipants()
+	{
+		return decorated.allBreadCrumbParticipants();
+	}
+
+
+	@Override
+	public IBreadCrumbParticipant getActive()
+	{
+		return decorated.getActive();
+	}
+
+
+	@Override
+	public void removeListener(final IBreadCrumbModelListener listener)
+	{
+		decorated.removeListener(listener);
+	}
+
+
+	@Override
+	public void setActive(final IBreadCrumbParticipant breadCrumbParticipant)
+	{
+		decorated.setActive(breadCrumbParticipant);
+	}
+
+
+	/**
+	 * Gets whether the current bread crumb should be displayed as a link (e.g. for refreshing) or
+	 * as a disabled link (effectively just a label). The latter is the default. Override if you
+	 * want different behavior.
+	 * 
+	 * @return Whether the current bread crumb should be displayed as a link; this method returns
+	 *         false
+	 */
+	protected boolean getEnableLinkToCurrent()
+	{
+		return false;
+	}
+
+
+	/**
+	 * @return markup used as a separator between breadcrumbs. By default <code>/</code> is used,
+	 *         but <code>&gt;&gt;</code> is also a popular choice.
+	 */
+	protected String getSeparatorMarkup()
+	{
+		return "/";
+	}
+
+
+	/**
+	 * Creates a new bread crumb component. That component will be rendered as part of the bread
+	 * crumbs list (which is a &lt;ul&gt; &lt;li&gt; structure).
+	 * 
+	 * @param id
+	 *            The component id
+	 * @param index
+	 *            The index of the bread crumb
+	 * @param total
+	 *            The total number of bread crumbs in the current model
+	 * @param breadCrumbParticipant
+	 *            the bread crumb
+	 * @return A new bread crumb component
+	 */
+	protected Component newBreadCrumbComponent(final String id, final long index, final int total,
+		final IBreadCrumbParticipant breadCrumbParticipant)
+	{
+		boolean enableLink = getEnableLinkToCurrent() || (index < (total - 1));
+		return new BreadCrumbComponent(id, getSeparatorMarkup(), index, this,
+			breadCrumbParticipant, enableLink);
+	}
+
+
+	@Override
+	protected void onDetach()
+	{
+		super.onDetach();
+		decorated.allBreadCrumbParticipants().forEach(crumb -> {
+			if (crumb instanceof Component)
+			{
+				((Component)crumb).detach();
+			}
+			else if (crumb instanceof IDetachable)
+			{
+				((IDetachable)crumb).detach();
+			}
+		});
+	}
+
 	/** Default crumb component. */
 	private static final class BreadCrumbComponent extends Panel
 	{
@@ -123,7 +241,7 @@ public class BreadCrumbBar extends Panel implements IBreadCrumbModel
 				protected List<IBreadCrumbParticipant> load()
 				{
 					// save a copy
-					List<IBreadCrumbParticipant> l = new ArrayList<IBreadCrumbParticipant>(
+					List<IBreadCrumbParticipant> l = new ArrayList<>(
 						allBreadCrumbParticipants());
 					size = l.size();
 					return l;
@@ -178,117 +296,6 @@ public class BreadCrumbBar extends Panel implements IBreadCrumbModel
 			long index = item.getIndex();
 			IBreadCrumbParticipant breadCrumbParticipant = (IBreadCrumbParticipant)item.getDefaultModelObject();
 			item.add(newBreadCrumbComponent("crumb", index, size, breadCrumbParticipant));
-		}
-	}
-
-	private static final long serialVersionUID = 1L;
-
-	private final IBreadCrumbModel decorated;
-
-	/**
-	 * Construct.
-	 * 
-	 * @param id
-	 *            Component id
-	 */
-	public BreadCrumbBar(final String id)
-	{
-		super(id);
-		decorated = new DefaultBreadCrumbsModel();
-		BreadCrumbsListView breadCrumbsListView = new BreadCrumbsListView("crumbs");
-		addListener(breadCrumbsListView);
-		add(breadCrumbsListView);
-	}
-
-
-	@Override
-	public void addListener(final IBreadCrumbModelListener listener)
-	{
-		decorated.addListener(listener);
-	}
-
-	@Override
-	public List<IBreadCrumbParticipant> allBreadCrumbParticipants()
-	{
-		return decorated.allBreadCrumbParticipants();
-	}
-
-	@Override
-	public IBreadCrumbParticipant getActive()
-	{
-		return decorated.getActive();
-	}
-
-	@Override
-	public void removeListener(final IBreadCrumbModelListener listener)
-	{
-		decorated.removeListener(listener);
-	}
-
-	@Override
-	public void setActive(final IBreadCrumbParticipant breadCrumbParticipant)
-	{
-		decorated.setActive(breadCrumbParticipant);
-	}
-
-	/**
-	 * Gets whether the current bread crumb should be displayed as a link (e.g. for refreshing) or
-	 * as a disabled link (effectively just a label). The latter is the default. Override if you
-	 * want different behavior.
-	 * 
-	 * @return Whether the current bread crumb should be displayed as a link; this method returns
-	 *         false
-	 */
-	protected boolean getEnableLinkToCurrent()
-	{
-		return false;
-	}
-
-	/**
-	 * @return markup used as a separator between breadcrumbs. By default <code>/</code> is used,
-	 *         but <code>&gt;&gt;</code> is also a popular choice.
-	 */
-	protected String getSeparatorMarkup()
-	{
-		return "/";
-	}
-
-	/**
-	 * Creates a new bread crumb component. That component will be rendered as part of the bread
-	 * crumbs list (which is a &lt;ul&gt; &lt;li&gt; structure).
-	 * 
-	 * @param id
-	 *            The component id
-	 * @param index
-	 *            The index of the bread crumb
-	 * @param total
-	 *            The total number of bread crumbs in the current model
-	 * @param breadCrumbParticipant
-	 *            the bread crumb
-	 * @return A new bread crumb component
-	 */
-	protected Component newBreadCrumbComponent(final String id, final long index, final int total,
-		final IBreadCrumbParticipant breadCrumbParticipant)
-	{
-		boolean enableLink = getEnableLinkToCurrent() || (index < (total - 1));
-		return new BreadCrumbComponent(id, getSeparatorMarkup(), index, this,
-			breadCrumbParticipant, enableLink);
-	}
-
-	@Override
-	protected void onDetach()
-	{
-		super.onDetach();
-		for (IBreadCrumbParticipant crumb : decorated.allBreadCrumbParticipants())
-		{
-			if (crumb instanceof Component)
-			{
-				((Component)crumb).detach();
-			}
-			else if (crumb instanceof IDetachable)
-			{
-				((IDetachable)crumb).detach();
-			}
 		}
 	}
 }

@@ -52,43 +52,6 @@ public class Image extends WebComponent implements IRequestListener
 {
 	private static final long serialVersionUID = 1L;
 
-	/**
-	 * To be used for the crossOrigin attribute
-	 *
-	 * @see {@link #setCrossOrigin(Cors)}
-	 */
-	public enum Cors {
-		/**
-		 * no authentication required
-		 */
-		ANONYMOUS("anonymous"),
-		/**
-		 * user credentials required
-		 */
-		USE_CREDENTIALS("user-credentials"),
-		/**
-		 * no cross origin
-		 */
-		NO_CORS("");
-
-		private final String realName;
-
-		private Cors(String realName)
-		{
-			this.realName = realName;
-		}
-
-		/**
-		 * Gets the real name for the cors option
-		 * 
-		 * @return the real name
-		 */
-		public String getRealName()
-		{
-			return realName;
-		}
-	}
-
 	/** The image resource this image component references (src attribute) */
 	private final LocalizedImageResource localizedImageResource = new LocalizedImageResource(this);
 
@@ -105,17 +68,6 @@ public class Image extends WebComponent implements IRequestListener
 	 * Cross origin settings
 	 */
 	private Cors crossOrigin = null;
-
-	/**
-	 * This constructor can be used if you override {@link #getImageResourceReference()} or
-	 * {@link #getImageResource()}
-	 * 
-	 * @param id
-	 */
-	protected Image(final String id)
-	{
-		super(id);
-	}
 
 	/**
 	 * Constructs an image from an image resourcereference. That resource reference will bind its
@@ -209,12 +161,23 @@ public class Image extends WebComponent implements IRequestListener
 		this(id, new Model<>(string));
 	}
 
+	/**
+	 * This constructor can be used if you override {@link #getImageResourceReference()} or
+	 * {@link #getImageResource()}
+	 * 
+	 * @param id
+	 */
+	protected Image(final String id)
+	{
+		super(id);
+	}
+
 	@Override
 	public boolean rendersPage()
 	{
 		return false;
 	}
-	
+
 	/**
 	 * @see org.apache.wicket.IResourceListener#onResourceRequested()
 	 */
@@ -222,10 +185,7 @@ public class Image extends WebComponent implements IRequestListener
 	public void onRequest()
 	{
 		localizedImageResource.onResourceRequested(null);
-		for (LocalizedImageResource localizedImageResource : localizedImageResources)
-		{
-			localizedImageResource.onResourceRequested(null);
-		}
+		localizedImageResources.forEach(localizedImageResource -> localizedImageResource.onResourceRequested(null));
 	}
 
 	/**
@@ -372,11 +332,10 @@ public class Image extends WebComponent implements IRequestListener
 	{
 		// Null out the image resource, so we reload it (otherwise we'll be
 		// stuck with the old model.
-		for (LocalizedImageResource localizedImageResource : localizedImageResources)
-		{
+		localizedImageResources.forEach(localizedImageResource -> {
 			localizedImageResource.setResourceReference(null);
 			localizedImageResource.setResource(null);
-		}
+		});
 		localizedImageResource.setResourceReference(null);
 		localizedImageResource.setResource(null);
 		return super.setDefaultModel(model);
@@ -466,8 +425,7 @@ public class Image extends WebComponent implements IRequestListener
 				xValue = xValues.size() > srcSetPosition && xValues.get(srcSetPosition) != null
 					? " " + xValues.get(srcSetPosition) : "";
 			}
-			tag.put("srcset", (srcset != null ? srcset + ", " : "") + tag.getAttribute("src") +
-				xValue);
+			tag.put("srcset", new StringBuilder().append(srcset != null ? srcset + ", " : "").append(tag.getAttribute("src")).append(xValue).toString());
 			srcSetPosition++;
 		}
 	}
@@ -552,7 +510,7 @@ public class Image extends WebComponent implements IRequestListener
 	{
 		String url = tag.getAttributes().getString("src");
 		url = url + (url.contains("?") ? "&" : "?");
-		url = url + "antiCache=" + System.currentTimeMillis();
+		url = new StringBuilder().append(url).append("antiCache=").append(System.currentTimeMillis()).toString();
 
 		tag.put("src", url);
 	}
@@ -632,6 +590,43 @@ public class Image extends WebComponent implements IRequestListener
 	public void setCrossOrigin(Cors crossOrigin)
 	{
 		this.crossOrigin = crossOrigin;
+	}
+
+	/**
+	 * To be used for the crossOrigin attribute
+	 *
+	 * @see {@link #setCrossOrigin(Cors)}
+	 */
+	public enum Cors {
+		/**
+		 * no authentication required
+		 */
+		ANONYMOUS("anonymous"),
+		/**
+		 * user credentials required
+		 */
+		USE_CREDENTIALS("user-credentials"),
+		/**
+		 * no cross origin
+		 */
+		NO_CORS("");
+
+		private final String realName;
+
+		private Cors(String realName)
+		{
+			this.realName = realName;
+		}
+
+		/**
+		 * Gets the real name for the cors option
+		 * 
+		 * @return the real name
+		 */
+		public String getRealName()
+		{
+			return realName;
+		}
 	}
 
 }

@@ -65,13 +65,6 @@ public class AddDelta extends Delta
 {
 	/**
 	 * Construct.
-	 */
-	AddDelta()
-	{
-	}
-
-	/**
-	 * Construct.
 	 * 
 	 * @param origpos
 	 * @param rev
@@ -79,6 +72,13 @@ public class AddDelta extends Delta
 	public AddDelta(final int origpos, final Chunk rev)
 	{
 		init(new Chunk(origpos, 0), rev);
+	}
+
+	/**
+	 * Construct.
+	 */
+	AddDelta()
+	{
 	}
 
 	/**

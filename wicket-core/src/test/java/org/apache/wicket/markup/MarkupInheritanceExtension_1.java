@@ -29,6 +29,5 @@ public class MarkupInheritanceExtension_1 extends MarkupInheritanceBase_1
 	 */
 	public MarkupInheritanceExtension_1()
 	{
-		super();
 	}
 }

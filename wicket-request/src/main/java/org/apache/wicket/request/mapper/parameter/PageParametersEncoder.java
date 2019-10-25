@@ -46,14 +46,13 @@ public class PageParametersEncoder implements IPageParametersEncoder
 			++i;
 		}
 
-		for (QueryParameter p : url.getQueryParameters())
-		{
+		url.getQueryParameters().forEach(p -> {
 			String parameterName = p.getName();
 			if (Strings.isEmpty(parameterName) == false)
 			{
 				parameters.add(parameterName, p.getValue(), INamedParameters.Type.QUERY_STRING);
 			}
-		}
+		});
 
 		return parameters.isEmpty() ? null : parameters;
 	}
@@ -70,11 +69,7 @@ public class PageParametersEncoder implements IPageParametersEncoder
 				url.getSegments().add(pageParameters.get(i).toString());
 			}
 
-			for (PageParameters.NamedPair pair : pageParameters.getAllNamed())
-			{
-				QueryParameter param = new QueryParameter(pair.getKey(), pair.getValue());
-				url.getQueryParameters().add(param);
-			}
+			pageParameters.getAllNamed().stream().map(pair -> new QueryParameter(pair.getKey(), pair.getValue())).forEach(param -> url.getQueryParameters().add(param));
 		}
 
 		return url;

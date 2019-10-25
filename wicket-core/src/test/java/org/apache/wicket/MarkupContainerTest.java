@@ -45,10 +45,13 @@ import org.apache.wicket.util.resource.IResourceStream;
 import org.apache.wicket.util.resource.StringResourceStream;
 import org.apache.wicket.util.tester.WicketTestCase;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @SuppressWarnings({ "javadoc", "serial" })
 class MarkupContainerTest extends WicketTestCase
 {
+	private static final Logger logger = LoggerFactory.getLogger(MarkupContainerTest.class);
 	private static final int NUMBER_OF_CHILDREN_FOR_A_MAP = MarkupContainer.MAPIFY_THRESHOLD + 1;
 
 	/**
@@ -128,9 +131,7 @@ class MarkupContainerTest extends WicketTestCase
 	void addMyself()
 	{
 		WebMarkupContainer me = new WebMarkupContainer("a");
-		assertThrows(IllegalArgumentException.class, () -> {
-			me.add(me);
-		});
+		assertThrows(IllegalArgumentException.class, () -> me.add(me));
 	}
 
 	/**
@@ -146,6 +147,7 @@ class MarkupContainerTest extends WicketTestCase
 		}
 		catch (WicketRuntimeException expected)
 		{
+			logger.error(expected.getMessage(), expected);
 		}
 
 		tester.startPage(page);
@@ -1200,8 +1202,9 @@ class MarkupContainerTest extends WicketTestCase
 	 */
 	private void takeNChildren(Iterator<Component> iterator, int numberOfChildrenToTake)
 	{
-		for (int i = 0; i < numberOfChildrenToTake; i++)
+		for (int i = 0; i < numberOfChildrenToTake; i++) {
 			iterator.next();
+		}
 	}
 
 	@Test
@@ -1209,13 +1212,13 @@ class MarkupContainerTest extends WicketTestCase
 	{
 		LoginPage loginPage = new LoginPage();
 		Optional<Component> first = loginPage.stream()
-			.filter(c -> c.getId().equals("form"))
+			.filter(c -> "form".equals(c.getId()))
 			.findFirst();
 		assertEquals(false, first.isPresent());
 
 		loginPage.add(new Form<>("form"));
 		Optional<Component> second = loginPage.stream()
-			.filter(c -> c.getId().equals("form"))
+			.filter(c -> "form".equals(c.getId()))
 			.findFirst();
 		assertEquals(true, second.isPresent());
 
@@ -1239,7 +1242,7 @@ class MarkupContainerTest extends WicketTestCase
 	{
 		LoginPage loginPage = new LoginPage();
 		Optional<Component> first = loginPage.stream()
-			.filter(c -> c.getId().equals("form"))
+			.filter(c -> "form".equals(c.getId()))
 			.findFirst();
 		assertEquals(false, first.isPresent());
 
@@ -1249,18 +1252,18 @@ class MarkupContainerTest extends WicketTestCase
 		form.add(new TextField<>("field"));
 
 		assertTrue(loginPage.streamChildren()
-			.filter(c -> c.getId().equals("form"))
+			.filter(c -> "form".equals(c.getId()))
 			.findFirst()
 			.isPresent());
 
 		assertTrue(loginPage.streamChildren()
-			.filter(c -> c.getId().equals("field"))
+			.filter(c -> "field".equals(c.getId()))
 			.findFirst()
 			.isPresent());
 
 		assertTrue(loginPage.streamChildren()
 			.filter(TextField.class::isInstance)
-			.filter(c -> c.getId().equals("field"))
+			.filter(c -> "field".equals(c.getId()))
 			.findFirst()
 			.isPresent());
 	}
@@ -1351,11 +1354,11 @@ class MarkupContainerTest extends WicketTestCase
 
 					beforeRenderCalls++;
 
-					if (firstRender)
-					{
-						firstRender = false;
-						throw new WicketRuntimeException();
+					if (!firstRender) {
+						return;
 					}
+					firstRender = false;
+					throw new WicketRuntimeException();
 				}
 			};
 			add(a1);

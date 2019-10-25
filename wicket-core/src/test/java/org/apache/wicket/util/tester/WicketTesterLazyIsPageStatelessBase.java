@@ -82,12 +82,7 @@ abstract class WicketTesterLazyIsPageStatelessBase extends WicketTestCase
 		@Override
 		public IResourceStream getMarkupResourceStream(MarkupContainer container, Class<?> containerClass)
 		{
-			return new StringResourceStream("<html>\n" +
-						"<body>\n" +
-							"\t<a wicket:id=\"link\" />\n" +
-							"\t<div wicket:id=\"isPageStateless\" />\n" +
-						"</body>\n" +
-					"</html>");
+			return new StringResourceStream(new StringBuilder().append("<html>\n").append("<body>\n").append("\t<a wicket:id=\"link\" />\n").append("\t<div wicket:id=\"isPageStateless\" />\n").append("</body>\n").append("</html>").toString());
 		}
 	}
 

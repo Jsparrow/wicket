@@ -176,10 +176,7 @@ public abstract class GroupingPageStore extends DelegatingPageStore
 			if (stableGroups == false)
 			{
 				// group might have changed, so remove page first from all groups
-				for (String other : groups)
-				{
-					delegate.removePage(new GroupContext(context, this, other), page);
-				}
+				groups.forEach(other -> delegate.removePage(new GroupContext(context, this, other), page));
 			}
 
 			// add as last
@@ -212,18 +209,12 @@ public abstract class GroupingPageStore extends DelegatingPageStore
 
 		public synchronized void removePage(IPageContext context, IManageablePage page, IPageStore delegate)
 		{
-			for (String group : groups)
-			{
-				delegate.removePage(new GroupContext(context, this, group), page);
-			}
+			groups.forEach(group -> delegate.removePage(new GroupContext(context, this, group), page));
 		}
 
 		public synchronized void removeAllPages(IPageContext context, IPageStore delegate)
 		{
-			for (String group : groups)
-			{
-				delegate.removeAllPages(new GroupContext(context, this, group));
-			}
+			groups.forEach(group -> delegate.removeAllPages(new GroupContext(context, this, group)));
 		}
 	}
 
@@ -249,7 +240,7 @@ public abstract class GroupingPageStore extends DelegatingPageStore
 		@Override
 		public String getSessionId(boolean bind)
 		{
-			return context.getSessionId(true) + "_" + group;
+			return new StringBuilder().append(context.getSessionId(true)).append("_").append(group).toString();
 		}
 
 		@Override
@@ -273,7 +264,7 @@ public abstract class GroupingPageStore extends DelegatingPageStore
 		@Override
 		public <T extends Serializable> T getSessionAttribute(String key, Supplier<T> defaultValue)
 		{
-			return context.getSessionAttribute(key + "_" + group, defaultValue);
+			return context.getSessionAttribute(new StringBuilder().append(key).append("_").append(group).toString(), defaultValue);
 		}
 
 		@Override

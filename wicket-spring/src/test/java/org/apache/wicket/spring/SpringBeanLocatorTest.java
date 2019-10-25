@@ -27,6 +27,8 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.fail;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Tests {@link SpringBeanLocator}
@@ -36,6 +38,8 @@ import static org.junit.jupiter.api.Assertions.fail;
  */
 public class SpringBeanLocatorTest
 {
+	private static final Logger logger = LoggerFactory.getLogger(SpringBeanLocatorTest.class);
+
 	private ApplicationContextMock ctx;
 
 	private ISpringContextLocator ctxLocator;
@@ -94,6 +98,7 @@ public class SpringBeanLocatorTest
 		}
 		catch (IllegalStateException e)
 		{
+			logger.error(e.getMessage(), e);
 			// noop
 		}
 	}
@@ -116,6 +121,7 @@ public class SpringBeanLocatorTest
 		}
 		catch (IllegalStateException e)
 		{
+			logger.error(e.getMessage(), e);
 			// noop
 		}
 
@@ -164,6 +170,7 @@ public class SpringBeanLocatorTest
 		}
 		catch (IllegalStateException e)
 		{
+			logger.error(e.getMessage(), e);
 			// noop
 		}
 	}
@@ -181,6 +188,7 @@ public class SpringBeanLocatorTest
 		}
 		catch (IllegalArgumentException e)
 		{
+			logger.error(e.getMessage(), e);
 			// noop
 		}
 
@@ -191,6 +199,7 @@ public class SpringBeanLocatorTest
 		}
 		catch (IllegalArgumentException e)
 		{
+			logger.error(e.getMessage(), e);
 			// noop
 		}
 	}
@@ -209,6 +218,7 @@ public class SpringBeanLocatorTest
 		}
 		catch (IllegalStateException e)
 		{
+			logger.error(e.getMessage(), e);
 			// noop
 		}
 	}

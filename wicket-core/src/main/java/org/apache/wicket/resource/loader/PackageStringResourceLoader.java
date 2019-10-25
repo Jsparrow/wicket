@@ -76,7 +76,7 @@ public class PackageStringResourceLoader extends ComponentStringResourceLoader
 				String path = filename;
 				if (packageName.length() > 0)
 				{
-					path = packageName + "/" + path;
+					path = new StringBuilder().append(packageName).append("/").append(path).toString();
 				}
 
 				// Iterator over all the combinations

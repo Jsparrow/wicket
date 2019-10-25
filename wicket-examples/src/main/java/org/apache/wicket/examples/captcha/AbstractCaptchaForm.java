@@ -61,8 +61,7 @@ public abstract class AbstractCaptchaForm<T> extends GenericPanel<T>
 			{
 				if (!randomText.equals(captchaText))
 				{
-					error("Captcha text '" + captchaText + "' is wrong.\n" +
-							"Correct text was: " + randomText);
+					error(new StringBuilder().append("Captcha text '").append(captchaText).append("' is wrong.\n").append("Correct text was: ").append(randomText).toString());
 				}
 				else
 				{

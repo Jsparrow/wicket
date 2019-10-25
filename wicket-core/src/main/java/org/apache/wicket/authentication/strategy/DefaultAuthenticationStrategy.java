@@ -63,6 +63,12 @@ public class DefaultAuthenticationStrategy implements IAuthenticationStrategy
 		this(cookieKey, defaultEncryptionKey(cookieKey));
 	}
 
+	public DefaultAuthenticationStrategy(final String cookieKey, final String encryptionKey)
+	{
+		this.cookieKey = Args.notEmpty(cookieKey, "cookieKey");
+		this.encryptionKey = Args.notEmpty(encryptionKey, "encryptionKey");
+	}
+
 	private static String defaultEncryptionKey(String cookieKey)
 	{
 		if (Application.exists())
@@ -70,12 +76,6 @@ public class DefaultAuthenticationStrategy implements IAuthenticationStrategy
 			return Application.get().getName();
 		}
 		return cookieKey;
-	}
-
-	public DefaultAuthenticationStrategy(final String cookieKey, final String encryptionKey)
-	{
-		this.cookieKey = Args.notEmpty(cookieKey, "cookieKey");
-		this.encryptionKey = Args.notEmpty(encryptionKey, "encryptionKey");
 	}
 
 	/**
@@ -111,24 +111,23 @@ public class DefaultAuthenticationStrategy implements IAuthenticationStrategy
 	public String[] load()
 	{
 		String value = getCookieUtils().load(cookieKey);
-		if (Strings.isEmpty(value) == false)
-		{
-			try
-			{
-				value = getCrypt().decryptUrlSafe(value);
-			}
-			catch (RuntimeException e)
-			{
-				logger.info(
-					"Error decrypting login cookie: {}. The cookie will be deleted. Possible cause is that a session-relative encryption key was used to encrypt this cookie while this decryption attempt is happening in a different session, eg user coming back to the application after session expiration",
-					cookieKey);
-				getCookieUtils().remove(cookieKey);
-				value = null;
-			}
-			return decode(value);
+		if (Strings.isEmpty(value) != false) {
+			return null;
 		}
-
-		return null;
+		try
+		{
+			value = getCrypt().decryptUrlSafe(value);
+		}
+		catch (RuntimeException e)
+		{
+			logger.error(e.getMessage(), e);
+			logger.info(
+				"Error decrypting login cookie: {}. The cookie will be deleted. Possible cause is that a session-relative encryption key was used to encrypt this cookie while this decryption attempt is happening in a different session, eg user coming back to the application after session expiration",
+				cookieKey);
+			getCookieUtils().remove(cookieKey);
+			value = null;
+		}
+		return decode(value);
 	}
 
 	/**
@@ -138,24 +137,21 @@ public class DefaultAuthenticationStrategy implements IAuthenticationStrategy
 	 * @return decomposed values array, or null in case cookie value was empty.
 	 */
 	protected String[] decode(String value) {
-		if (Strings.isEmpty(value) == false)
-		{
-			String username = null;
-			String password = null;
-
-			String[] values = value.split(VALUE_SEPARATOR);
-			if ((values.length > 0) && (Strings.isEmpty(values[0]) == false))
-			{
-				username = values[0];
-			}
-			if ((values.length > 1) && (Strings.isEmpty(values[1]) == false))
-			{
-				password = values[1];
-			}
-
-			return new String[] { username, password };
+		if (Strings.isEmpty(value) != false) {
+			return null;
 		}
-		return null;
+		String username = null;
+		String password = null;
+		String[] values = value.split(VALUE_SEPARATOR);
+		if ((values.length > 0) && (Strings.isEmpty(values[0]) == false))
+		{
+			username = values[0];
+		}
+		if ((values.length > 1) && (Strings.isEmpty(values[1]) == false))
+		{
+			password = values[1];
+		}
+		return new String[] { username, password };
 	}
 
 	@Override

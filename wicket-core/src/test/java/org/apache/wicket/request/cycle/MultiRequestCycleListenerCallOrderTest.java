@@ -71,7 +71,7 @@ class MultiRequestCycleListenerCallOrderTest extends WicketTestCase
 			"first.onRequestHandlerExecuted", "second.onRequestHandlerExecuted",
 			"second.onEndRequest", "first.onEndRequest", "second.onDetach", "first.onDetach");
 
-		List<String> expected = new ArrayList<String>();
+		List<String> expected = new ArrayList<>();
 		expected.addAll(primaryRequest);
 		expected.addAll(redirectRequest);
 		assertEquals(expected.toString(), application.callSequence.toString());
@@ -96,7 +96,7 @@ class MultiRequestCycleListenerCallOrderTest extends WicketTestCase
 			"first.onRequestHandlerExecuted", "second.onRequestHandlerExecuted",
 			"second.onEndRequest", "first.onEndRequest", "second.onDetach", "first.onDetach");
 
-		List<String> expected = new ArrayList<String>();
+		List<String> expected = new ArrayList<>();
 		expected.addAll(primaryRequest);
 		expected.addAll(redirectRequest);
 		assertEquals(expected.toString(), application.callSequence.toString());
@@ -128,7 +128,7 @@ class MultiRequestCycleListenerCallOrderTest extends WicketTestCase
 			"first.onRequestHandlerExecuted", "second.onRequestHandlerExecuted",
 			"second.onEndRequest", "first.onEndRequest", "second.onDetach", "first.onDetach");
 
-		List<String> expected = new ArrayList<String>();
+		List<String> expected = new ArrayList<>();
 		expected.addAll(primaryRequest);
 		expected.addAll(redirectRequest);
 
@@ -158,7 +158,7 @@ class MultiRequestCycleListenerCallOrderTest extends WicketTestCase
 			"second.onEndRequest", "first.onEndRequest", "second.onDetach", "first.onDetach");
 
 		// with ajax requests we don't expect a redirect
-		List<String> expected = new ArrayList<String>();
+		List<String> expected = new ArrayList<>();
 		expected.addAll(primaryRequest);
 
 		assertEquals(expected.toString(), application.callSequence.toString());

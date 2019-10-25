@@ -36,6 +36,30 @@ public class Http2Settings
 	{
 		private static final long serialVersionUID = 1L;
 	};
+	private PushBuilder pushBuilder = NoopPushBuilder.INSTANCE;
+
+	/**
+	 * Sets the push builder that has been initialized
+	 * 
+	 * @param pushBuilder
+	 *            the push builder to be used after the initialization
+	 * @return the push builder
+	 */
+	public Http2Settings setPushBuilder(PushBuilder pushBuilder)
+	{
+		this.pushBuilder = Args.notNull(pushBuilder, "pushBuilder");
+		return this;
+	}
+
+	/**
+	 * Gets the push builder which has been initialized
+	 * 
+	 * @return the push builder
+	 */
+	public PushBuilder getPushBuilder()
+	{
+		return pushBuilder;
+	}
 
 	/**
 	 * Holds this Http2Settings in the Application's meta data. This way wicket-core module doesn't
@@ -79,30 +103,5 @@ public class Http2Settings
 		{
 			application.setMetaData(KEY, settings);
 		}
-	}
-
-	private PushBuilder pushBuilder = NoopPushBuilder.INSTANCE;
-
-	/**
-	 * Sets the push builder that has been initialized
-	 * 
-	 * @param pushBuilder
-	 *            the push builder to be used after the initialization
-	 * @return the push builder
-	 */
-	public Http2Settings setPushBuilder(PushBuilder pushBuilder)
-	{
-		this.pushBuilder = Args.notNull(pushBuilder, "pushBuilder");
-		return this;
-	}
-
-	/**
-	 * Gets the push builder which has been initialized
-	 * 
-	 * @return the push builder
-	 */
-	public PushBuilder getPushBuilder()
-	{
-		return pushBuilder;
 	}
 }

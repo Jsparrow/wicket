@@ -55,7 +55,7 @@ class WicketSessionFilterTest extends WicketTestCase
 				super.init();
 
 				// use HttpSessionStore because we need to test it
-				setSessionStoreProvider(() -> new HttpSessionStore());
+				setSessionStoreProvider(HttpSessionStore::new);
 			}
 		};
 	}
@@ -73,43 +73,33 @@ class WicketSessionFilterTest extends WicketTestCase
 
 		// execute TestSessionFilter in different thread so that the Application and the Session are
 		// not set by WicketTester
-		Thread testThread = new Thread(new Runnable()
-		{
-			@Override
-			public void run()
+		Thread testThread = new Thread(() -> {
+			try
 			{
-				try
-				{
-					TestSessionFilter sessionFilter = new TestSessionFilter(tester);
+				TestSessionFilter sessionFilter = new TestSessionFilter(tester);
 
-					assertFalse(Application.exists());
-					assertFalse(Session.exists());
+				assertFalse(Application.exists());
+				assertFalse(Session.exists());
 
-					sessionFilter.doFilter(tester.getRequest(), tester.getResponse(),
-						new TestFilterChain());
+				sessionFilter.doFilter(tester.getRequest(), tester.getResponse(),
+					new TestFilterChain());
 
-					assertFalse(Application.exists());
-					assertFalse(Session.exists());
+				assertFalse(Application.exists());
+				assertFalse(Session.exists());
 
-				}
-				catch (Exception e)
-				{
-					throw new RuntimeException(e.getMessage(), e);
-				}
+			}
+			catch (Exception e)
+			{
+				throw new RuntimeException(e.getMessage(), e);
 			}
 		});
 
 		final StringBuilder failMessage = new StringBuilder();
 		final AtomicBoolean passed = new AtomicBoolean(true);
 
-		testThread.setUncaughtExceptionHandler(new UncaughtExceptionHandler()
-		{
-			@Override
-			public void uncaughtException(Thread t, Throwable e)
-			{
-				failMessage.append(e.getMessage());
-				passed.set(false);
-			}
+		testThread.setUncaughtExceptionHandler((Thread t, Throwable e) -> {
+			failMessage.append(e.getMessage());
+			passed.set(false);
 		});
 		testThread.start();
 		testThread.join(Duration.ofSeconds(1).toMillis());

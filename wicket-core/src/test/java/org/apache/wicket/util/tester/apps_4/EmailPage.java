@@ -37,11 +37,11 @@ public class EmailPage extends WebPage
 	 */
 	public EmailPage()
 	{
-		Form<EmailPage> form = new Form<EmailPage>("form");
+		Form<EmailPage> form = new Form<>("form");
 		form.setDefaultModel(new CompoundPropertyModel<EmailPage>(this));
 		add(form);
 
-		TextField<String> email = new TextField<String>("email");
+		TextField<String> email = new TextField<>("email");
 		email.add(EmailAddressValidator.getInstance());
 		form.add(email);
 	}

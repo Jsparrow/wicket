@@ -126,10 +126,7 @@ public class AjaxRequestHandler implements AjaxRequestTarget
 
 				if (listeners != null)
 				{
-					for (AjaxRequestTarget.IListener listener : listeners)
-					{
-						listener.onBeforeRespond(markupIdToComponent, AjaxRequestHandler.this);
-					}
+					listeners.forEach(listener -> listener.onBeforeRespond(markupIdToComponent, AjaxRequestHandler.this));
 				}
 
 				listenersFrozen = false;
@@ -148,28 +145,23 @@ public class AjaxRequestHandler implements AjaxRequestTarget
 				listenersFrozen = true;
 
 				// invoke onafterresponse event on listeners
-				if (listeners != null)
-				{
-					final Map<String, Component> components = Collections
-						.unmodifiableMap(markupIdToComponent);
-
-					// create response that will be used by listeners to append
-					// javascript
-					final AjaxRequestTarget.IJavaScriptResponse jsresponse = new AjaxRequestTarget.IJavaScriptResponse()
-					{
-						@Override
-						public void addJavaScript(String script)
-						{
-							writeNormalEvaluations(response,
-								Collections.<CharSequence> singleton(script));
-						}
-					};
-
-					for (AjaxRequestTarget.IListener listener : listeners)
-					{
-						listener.onAfterRespond(components, jsresponse);
-					}
+				if (listeners == null) {
+					return;
 				}
+				final Map<String, Component> components = Collections
+					.unmodifiableMap(markupIdToComponent);
+				// create response that will be used by listeners to append
+				// javascript
+				final AjaxRequestTarget.IJavaScriptResponse jsresponse = new AjaxRequestTarget.IJavaScriptResponse()
+				{
+					@Override
+					public void addJavaScript(String script)
+					{
+						writeNormalEvaluations(response,
+							Collections.<CharSequence> singleton(script));
+					}
+				};
+				listeners.forEach(listener -> listener.onAfterRespond(components, jsresponse));
 			}
 		};
 	}
@@ -184,7 +176,7 @@ public class AjaxRequestHandler implements AjaxRequestTarget
 	}
 
 	@Override
-	public void addListener(AjaxRequestTarget.IListener listener) throws IllegalStateException
+	public void addListener(AjaxRequestTarget.IListener listener)
 	{
 		Args.notNull(listener, "listener");
 		assertListenersNotFrozen();
@@ -206,14 +198,9 @@ public class AjaxRequestHandler implements AjaxRequestTarget
 		Args.notNull(parent, "parent");
 		Args.notNull(childCriteria, "childCriteria");
 
-		parent.visitChildren(childCriteria, new IVisitor<Component, Void>()
-		{
-			@Override
-			public void component(final Component component, final IVisit<Void> visit)
-			{
-				add(component);
-				visit.dontGoDeeper();
-			}
+		parent.visitChildren(childCriteria, (final Component component, final IVisit<Void> visit) -> {
+			add(component);
+			visit.dontGoDeeper();
 		});
 	}
 
@@ -256,8 +243,8 @@ public class AjaxRequestHandler implements AjaxRequestTarget
 				"cannot update component that does not have setOutputMarkupId property set to true. Component: " +
 					component.toString());
 		}
-		final String id = component != null ? ("'" + component.getMarkupId() + "'") : "null";
-		appendJavaScript("Wicket.Focus.setFocusOnId(" + id + ");");
+		final String id = component != null ? (new StringBuilder().append("'").append(component.getMarkupId()).append("'").toString()) : "null";
+		appendJavaScript(new StringBuilder().append("Wicket.Focus.setFocusOnId(").append(id).append(");").toString());
 	}
 
 	@Override
@@ -286,12 +273,11 @@ public class AjaxRequestHandler implements AjaxRequestTarget
 	@Override
 	public boolean equals(final Object obj)
 	{
-		if (obj instanceof AjaxRequestHandler)
-		{
-			AjaxRequestHandler that = (AjaxRequestHandler)obj;
-			return update.equals(that.update);
+		if (!(obj instanceof AjaxRequestHandler)) {
+			return false;
 		}
-		return false;
+		AjaxRequestHandler that = (AjaxRequestHandler)obj;
+		return update.equals(that.update);
 	}
 
 	/**
@@ -339,10 +325,7 @@ public class AjaxRequestHandler implements AjaxRequestTarget
 
 		respondersFrozen = true;
 
-		for (ITargetRespondListener listener : respondListeners)
-		{
-			listener.onTargetRespond(this);
-		}
+		respondListeners.forEach(listener -> listener.onTargetRespond(this));
 
 		final Application app = page.getApplication();
 
@@ -413,7 +396,7 @@ public class AjaxRequestHandler implements AjaxRequestTarget
 	@Override
 	public String toString()
 	{
-		return "[AjaxRequestHandler@" + hashCode() + " responseObject [" + update + "]";
+		return new StringBuilder().append("[AjaxRequestHandler@").append(hashCode()).append(" responseObject [").append(update).append("]").toString();
 	}
 
 	@Override

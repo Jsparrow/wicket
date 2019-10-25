@@ -44,12 +44,16 @@ import org.apache.wicket.util.resource.ResourceStreamNotFoundException;
 import org.apache.wicket.util.resource.StringResourceStream;
 import org.apache.wicket.util.tester.WicketTestCase;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author pedro
  */
 class PageProviderTest extends WicketTestCase
 {
+
+	private static final Logger logger = LoggerFactory.getLogger(PageProviderTest.class);
 
 	/**
 	 * <a href="https://issues.apache.org/jira/browse/WICKET-4046">WICKET-4046</a>
@@ -92,12 +96,6 @@ class PageProviderTest extends WicketTestCase
 		assertEquals(newState, restauredPageAfterStateChage.state);
 	}
 
-	private static class StatefullMockPage extends MockPage
-	{
-		private static final long serialVersionUID = 1L;
-		int state = 0;
-	}
-
 	/**
 	 * @see <a href="https://issues.apache.org/jira/browse/WICKET-3252">WICKET-3252</a>
 	 * */
@@ -123,6 +121,7 @@ class PageProviderTest extends WicketTestCase
 		}
 		catch (StalePageException e)
 		{
+			logger.error(e.getMessage(), e);
 			assertTrue(true);
 		}
 	}
@@ -266,6 +265,12 @@ class PageProviderTest extends WicketTestCase
 		deserialized.setPageSource(mapperContext);
 
 		assertEquals(page, deserialized.getPageInstance());
+	}
+
+	private static class StatefullMockPage extends MockPage
+	{
+		private static final long serialVersionUID = 1L;
+		int state = 0;
 	}
 
 	/** */

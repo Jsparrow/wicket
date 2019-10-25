@@ -78,7 +78,7 @@ public class InlineFrame extends WebMarkupContainer implements IRequestListener
 		// Ensure that c is a subclass of Page
 		if (!Page.class.isAssignableFrom(c))
 		{
-			throw new IllegalArgumentException("Class " + c + " is not a subclass of Page");
+			throw new IllegalArgumentException(new StringBuilder().append("Class ").append(c).append(" is not a subclass of Page").toString());
 		}
 	}
 

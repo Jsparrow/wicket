@@ -24,7 +24,15 @@ import org.junit.jupiter.api.Test;
 
 class FormSubmitOrderTest extends WicketTestCase
 {
-    public static class TestPage extends WebPage
+    @Test
+	void submitOrder() throws Exception
+	{
+		TestPage page = tester.startPage(TestPage.class);
+		tester.newFormTester("form").submit("button");
+		assertEquals("beforeformafter", page.result);
+	}
+
+	public static class TestPage extends WebPage
 	{
 		String result = "";
 
@@ -57,13 +65,5 @@ class FormSubmitOrderTest extends WicketTestCase
 				}
 			});
 		}
-	}
-
-	@Test
-	void submitOrder() throws Exception
-	{
-		TestPage page = tester.startPage(TestPage.class);
-		tester.newFormTester("form").submit("button");
-		assertEquals("beforeformafter", page.result);
 	}
 }

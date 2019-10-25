@@ -30,14 +30,6 @@ public class ContactGenerator
 
 	private static long nextId = 1;
 
-	/**
-	 * @return static instance of generator
-	 */
-	public static ContactGenerator getInstance()
-	{
-		return instance;
-	}
-
 	private String[] firstNames = { "Jacob", "Emily", "Michael", "Sarah", "Matthew", "Brianna",
 			"Nicholas", "Samantha", "Christopher", "Hailey", "Abner", "Abby", "Joshua", "Douglas",
 			"Jack", "Keith", "Gerald", "Samuel", "Willie", "Larry", "Jose", "Timothy", "Sandra",
@@ -51,6 +43,14 @@ public class ContactGenerator
 	private ContactGenerator()
 	{
 
+	}
+
+	/**
+	 * @return static instance of generator
+	 */
+	public static ContactGenerator getInstance()
+	{
+		return instance;
 	}
 
 	/**

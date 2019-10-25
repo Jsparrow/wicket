@@ -43,26 +43,6 @@ import org.apache.wicket.request.resource.SharedResourceReference;
  */
 public final class Home extends WicketExamplePage
 {
-	/**
-	 * A dynamic image resource using {@link Home#drawCircle(Graphics2D)} to draw a random circle on
-	 * the canvas.
-	 * 
-	 */
-	private final class CircleDynamicImageResource extends RenderedDynamicImageResource
-	{
-		private CircleDynamicImageResource(int width, int height)
-		{
-			super(width, height);
-		}
-
-		@Override
-		protected boolean render(Graphics2D graphics, Attributes attributes)
-		{
-			drawCircle(graphics);
-			return true;
-		}
-	}
-
 	private static final ResourceReference RESOURCE_REF = new PackageResourceReference(Home.class,
 		"Image2.gif");
 
@@ -179,5 +159,25 @@ public final class Home extends WicketExamplePage
 				return new DefaultButtonImageResource("Ok");
 			}
 		};
+	}
+
+	/**
+	 * A dynamic image resource using {@link Home#drawCircle(Graphics2D)} to draw a random circle on
+	 * the canvas.
+	 * 
+	 */
+	private final class CircleDynamicImageResource extends RenderedDynamicImageResource
+	{
+		private CircleDynamicImageResource(int width, int height)
+		{
+			super(width, height);
+		}
+
+		@Override
+		protected boolean render(Graphics2D graphics, Attributes attributes)
+		{
+			drawCircle(graphics);
+			return true;
+		}
 	}
 }

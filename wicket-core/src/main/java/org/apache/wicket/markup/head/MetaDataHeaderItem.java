@@ -115,8 +115,7 @@ public class MetaDataHeaderItem extends HeaderItem
 
 		buffer.append('<').append(tagName);
 
-		for (Map.Entry<String, Object> entry : tagAttributes.entrySet())
-		{
+		tagAttributes.entrySet().forEach(entry -> {
 			Object value = entry.getValue();
 
 			if (value instanceof IModel)
@@ -134,13 +133,9 @@ public class MetaDataHeaderItem extends HeaderItem
 					.append(Strings.replaceAll(value.toString(), "\"", "\\\""))
 					.append('"');
 			}
-		}
+		});
 		
-		for (String attrName : tagMinimizedAttributes)
-		{
-			buffer.append(' ')
-				.append(Strings.escapeMarkup(attrName));
-		}
+		tagMinimizedAttributes.forEach(attrName -> buffer.append(' ').append(Strings.escapeMarkup(attrName)));
 
 		buffer.append(" />\n");
 
@@ -267,8 +262,12 @@ public class MetaDataHeaderItem extends HeaderItem
 	@Override
 	public boolean equals(Object o)
 	{
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
 		MetaDataHeaderItem that = (MetaDataHeaderItem) o;
 		return Objects.equals(tagAttributes, that.tagAttributes) &&
 				Objects.equals(tagMinimizedAttributes, that.tagMinimizedAttributes) &&

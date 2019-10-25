@@ -62,39 +62,6 @@ public final class PageView extends Panel
 	public static final MetaDataKey<Long> RENDER_KEY = new MetaDataKey<>()
 	{
 	};
-
-	/**
-	 * El cheapo data holder.
-	 * 
-	 * @author Juergen Donnerstag
-	 */
-	private static class ComponentData implements IClusterable
-	{
-		private static final long serialVersionUID = 1L;
-
-		/** Component path. */
-		public final String path;
-
-		/** Component type. */
-		public final String type;
-
-		/** Component value. */
-		public String value;
-
-		/** Size of component in bytes */
-		public final long size;
-
-		/** the time it took to rended the component */
-		private Long renderDuration;
-
-		ComponentData(String path, String type, long size)
-		{
-			this.path = path;
-			this.type = type;
-			this.size = size;
-		}
-	}
-
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -127,8 +94,8 @@ public final class PageView extends Panel
 			}
 
 			// Get the components data and fill and sort the list
-			data = new ArrayList<ComponentData>(getComponentData(page));
-			Collections.sort(data, new Comparator<ComponentData>()
+			data = new ArrayList<>(getComponentData(page));
+			data.sort(new Comparator<ComponentData>()
 			{
 				@Override
 				public int compare(ComponentData o1, ComponentData o2)
@@ -178,51 +145,78 @@ public final class PageView extends Panel
 	 */
 	private List<ComponentData> getComponentData(final Page page)
 	{
-		final List<ComponentData> data = new ArrayList<ComponentData>();
+		final List<ComponentData> data = new ArrayList<>();
 
-		page.visitChildren(new IVisitor<Component, Void>()
-		{
-			@Override
-			public void component(final Component component, final IVisit<Void> visit)
+		page.visitChildren((final Component component, final IVisit<Void> visit) -> {
+			if (!component.getPath().startsWith(PageView.this.getPath()))
 			{
-				if (!component.getPath().startsWith(PageView.this.getPath()))
+				final ComponentData componentData;
+
+				// anonymous class? Get the parent's class name
+				String name = component.getClass().getName();
+				if (name.indexOf("$") > 0)
 				{
-					final ComponentData componentData;
-
-					// anonymous class? Get the parent's class name
-					String name = component.getClass().getName();
-					if (name.indexOf("$") > 0)
-					{
-						name = component.getClass().getSuperclass().getName();
-					}
-
-					// remove the path component
-					name = Strings.lastPathComponent(name, Component.PATH_SEPARATOR);
-
-					componentData = new ComponentData(component.getPageRelativePath(), name,
-						component.getSizeInBytes());
-
-					Long renderDuration = component.getMetaData(RENDER_KEY);
-					if (renderDuration != null)
-					{
-						componentData.renderDuration = renderDuration;
-					}
-
-					try
-					{
-						componentData.value = component.getDefaultModelObjectAsString();
-					}
-					catch (Exception e)
-					{
-						componentData.value = e.getMessage();
-					}
-
-					data.add(componentData);
+					name = component.getClass().getSuperclass().getName();
 				}
 
+				// remove the path component
+				name = Strings.lastPathComponent(name, Component.PATH_SEPARATOR);
+
+				componentData = new ComponentData(component.getPageRelativePath(), name,
+					component.getSizeInBytes());
+
+				Long renderDuration = component.getMetaData(RENDER_KEY);
+				if (renderDuration != null)
+				{
+					componentData.renderDuration = renderDuration;
+				}
+
+				try
+				{
+					componentData.value = component.getDefaultModelObjectAsString();
+				}
+				catch (Exception e)
+				{
+					componentData.value = e.getMessage();
+				}
+
+				data.add(componentData);
 			}
+
 		});
 
 		return data;
+	}
+
+	/**
+	 * El cheapo data holder.
+	 * 
+	 * @author Juergen Donnerstag
+	 */
+	private static class ComponentData implements IClusterable
+	{
+		private static final long serialVersionUID = 1L;
+
+		/** Component path. */
+		public final String path;
+
+		/** Component type. */
+		public final String type;
+
+		/** Component value. */
+		public String value;
+
+		/** Size of component in bytes */
+		public final long size;
+
+		/** the time it took to rended the component */
+		private Long renderDuration;
+
+		ComponentData(String path, String type, long size)
+		{
+			this.path = path;
+			this.type = type;
+			this.size = size;
+		}
 	}
 }

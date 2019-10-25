@@ -52,7 +52,7 @@ public class ResourceUtilsTest
 
 		String localeVariant = "blah";
 		pathLocale = ResourceUtils
-			.getLocaleFromFilename("some_fr_CA_" + localeVariant + ".min.ext");
+			.getLocaleFromFilename(new StringBuilder().append("some_fr_CA_").append(localeVariant).append(".min.ext").toString());
 		assertEquals(pathLocale.path, "some.min.ext");
 		assertEquals(pathLocale.locale.getLanguage(), "fr");
 		assertEquals(pathLocale.locale.getCountry(), "CA");

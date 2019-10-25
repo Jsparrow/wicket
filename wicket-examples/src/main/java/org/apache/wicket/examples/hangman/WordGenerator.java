@@ -27,6 +27,8 @@ import org.apache.wicket.util.io.Streams;
 import org.apache.wicket.util.resource.IResourceStream;
 import org.apache.wicket.util.resource.ResourceStreamNotFoundException;
 import org.apache.wicket.core.util.resource.locator.ResourceStreamLocator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -39,6 +41,8 @@ import org.apache.wicket.core.util.resource.locator.ResourceStreamLocator;
  */
 public class WordGenerator implements IClusterable
 {
+	private static final Logger logger = LoggerFactory.getLogger(WordGenerator.class);
+
 	/** List of words */
 	private final List<String> words;
 
@@ -61,6 +65,7 @@ public class WordGenerator implements IClusterable
 		}
 		catch (IOException | ResourceStreamNotFoundException e)
 		{
+			logger.error(e.getMessage(), e);
 			throw new RuntimeException("Couldn't read word list");
 		}
 	}

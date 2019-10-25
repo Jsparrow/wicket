@@ -137,14 +137,9 @@ public class WebSocketRequestHandler implements IWebSocketRequestHandler
 		Args.notNull(parent, "parent");
 		Args.notNull(childCriteria, "childCriteria");
 
-		parent.visitChildren(childCriteria, new IVisitor<Component, Void>()
-		{
-			@Override
-			public void component(final Component component, final IVisit<Void> visit)
-			{
-				add(component);
-				visit.dontGoDeeper();
-			}
+		parent.visitChildren(childCriteria, (final Component component, final IVisit<Void> visit) -> {
+			add(component);
+			visit.dontGoDeeper();
 		});
 	}
 
@@ -179,8 +174,8 @@ public class WebSocketRequestHandler implements IWebSocketRequestHandler
 					"cannot update component that does not have setOutputMarkupId property set to true. Component: " +
 							component.toString());
 		}
-		final String id = component != null ? ("'" + component.getMarkupId() + "'") : "null";
-		appendJavaScript("Wicket.Focus.setFocusOnId(" + id + ");");
+		final String id = component != null ? (new StringBuilder().append("'").append(component.getMarkupId()).append("'").toString()) : "null";
+		appendJavaScript(new StringBuilder().append("Wicket.Focus.setFocusOnId(").append(id).append(");").toString());
 	}
 
 	@Override
@@ -248,9 +243,10 @@ public class WebSocketRequestHandler implements IWebSocketRequestHandler
 			logData = new PageLogData(page);
 		}
 
-		if (update != null) {
-			update.detach(requestCycle);
-			update = null;
+		if (update == null) {
+			return;
 		}
+		update.detach(requestCycle);
+		update = null;
 	}
 }

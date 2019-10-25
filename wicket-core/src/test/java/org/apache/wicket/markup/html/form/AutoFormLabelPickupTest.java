@@ -32,28 +32,6 @@ import org.junit.jupiter.api.Test;
 @SuppressWarnings({ "rawtypes", "serial", "unchecked" })
 class AutoFormLabelPickupTest extends WicketTestCase
 {
-	static class PrintLabelPage extends WebPage
-	{
-		PrintLabelPage(IModel labelModel)
-		{
-			Form form = new Form("form");
-			add(form);
-			form.add(new TextField("input", Model.of("")).setLabel(labelModel));
-		}
-	}
-	static class PickUpLabelPage extends WebPage
-	{
-		PickUpLabelPage(IModel labelModel)
-		{
-			Form form = new Form("form");
-			add(form);
-			form.add(new TextField("inputMarkupLabel", Model.of("")).setLabel(labelModel));
-			form.add(new TextField("inputPropertiesLabel", Model.of("")).setLabel(labelModel));
-			form.add(new TextField("inputWithoutAutolabel", Model.of("")).setLabel(labelModel));
-			form.add(new TextField("inputWithDefaultLabel", Model.of("")));
-		}
-	}
-
 	/**
 	 * 
 	 */
@@ -160,5 +138,27 @@ class AutoFormLabelPickupTest extends WicketTestCase
 			"propertiesDefaultLabel",
 			((FormComponent)tester.getComponentFromLastRenderedPage("form:inputWithDefaultLabel")).getLabel()
 				.getObject());
+	}
+
+	static class PrintLabelPage extends WebPage
+	{
+		PrintLabelPage(IModel labelModel)
+		{
+			Form form = new Form("form");
+			add(form);
+			form.add(new TextField("input", Model.of("")).setLabel(labelModel));
+		}
+	}
+	static class PickUpLabelPage extends WebPage
+	{
+		PickUpLabelPage(IModel labelModel)
+		{
+			Form form = new Form("form");
+			add(form);
+			form.add(new TextField("inputMarkupLabel", Model.of("")).setLabel(labelModel));
+			form.add(new TextField("inputPropertiesLabel", Model.of("")).setLabel(labelModel));
+			form.add(new TextField("inputWithoutAutolabel", Model.of("")).setLabel(labelModel));
+			form.add(new TextField("inputWithDefaultLabel", Model.of("")));
+		}
 	}
 }

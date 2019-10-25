@@ -22,6 +22,8 @@ import org.apache.wicket.core.request.handler.IPageAndComponentProvider;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.IFormSubmitter;
 import org.apache.wicket.request.component.IRequestableComponent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Contains logging data for component/listener-interface request handlers.
@@ -30,6 +32,8 @@ import org.apache.wicket.request.component.IRequestableComponent;
  */
 public class ListenerLogData extends PageLogData
 {
+	private static final Logger logger = LoggerFactory.getLogger(ListenerLogData.class);
+
 	private static final long serialVersionUID = 1L;
 
 	private final Class<? extends IRequestableComponent> componentClass;
@@ -61,6 +65,7 @@ public class ListenerLogData extends PageLogData
 			}
 			catch (Exception ignore)
 			{
+				logger.error(ignore.getMessage(), ignore);
 				behaviorClass = null;
 			}
 		}
@@ -86,6 +91,7 @@ public class ListenerLogData extends PageLogData
 		}
 		catch (Exception e)
 		{
+			logger.error(e.getMessage(), e);
 			// getComponent might fail if the page does not exist (ie session timeout)
 			return null;
 		}
@@ -100,6 +106,7 @@ public class ListenerLogData extends PageLogData
 		}
 		catch (Exception e)
 		{
+			logger.error(e.getMessage(), e);
 			// getComponentPath might fail if the page does not exist (ie session timeout)
 			return null;
 		}
@@ -120,6 +127,7 @@ public class ListenerLogData extends PageLogData
 		}
 		catch (Exception e)
 		{
+			logger.error(e.getMessage(), e);
 			// getComponent might fail if the page does not exist (ie session timeout)
 			return null;
 		}

@@ -40,6 +40,65 @@ import org.xml.sax.SAXParseException;
  */
 public class WellFormedXmlTestCase
 {
+	private static final FileFilter fileFilter = (File pathname) -> {
+		String path = pathname.getAbsolutePath().replace('\\', '/');
+		return !path.contains("/src/test/") && !path.contains("/target/") &&
+			!"package.html".equals(pathname.getName()) &&
+			(pathname.isDirectory() || pathname.getName().endsWith(".html"));
+	};
+
+	private static final ErrorHandler errorHandler = new ErrorHandler()
+	{
+		@Override
+		public void warning(SAXParseException exception) throws SAXException
+		{
+			throw exception;
+		}
+
+		@Override
+		public void error(SAXParseException exception) throws SAXException
+		{
+			throw exception;
+		}
+
+		@Override
+		public void fatalError(SAXParseException exception) throws SAXException
+		{
+			throw exception;
+		}
+
+	};
+
+	private static final EntityResolver entityResolver = new EntityResolver()
+	{
+		private final Map<String, String> systemIdToUri = new HashMap<>();
+
+		{
+			systemIdToUri.put("http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd",
+				"xhtml1-transitional.dtd");
+			systemIdToUri.put("http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd",
+				"xhtml1-strict.dtd");
+
+			/*
+			 * Cheating: using xhtml dtd-s for html4 files too because the html4 dtd-s are not valid
+			 * xml dtd-s.
+			 */
+			systemIdToUri.put("http://www.w3.org/TR/html4/loose.dtd", "xhtml1-transitional.dtd");
+			systemIdToUri.put("http://www.w3.org/TR/html4/strict.dtd", "xhtml1-strict.dtd");
+		}
+
+		@Override
+		public InputSource resolveEntity(String publicId, String systemId) {
+			String uri = systemIdToUri.get(systemId);
+			if (uri != null)
+			{
+				return new InputSource(WellFormedXmlTestCase.class.getResource(uri).toString());
+			}
+
+			return null;
+		}
+	};
+
 	private DocumentBuilderFactory factory;
 
 	/**
@@ -99,68 +158,4 @@ public class WellFormedXmlTestCase
 			throw new RuntimeException("Parsing xml io failed, file: " + file, e);
 		}
 	}
-
-	private static final FileFilter fileFilter = new FileFilter()
-	{
-		@Override
-		public boolean accept(File pathname)
-		{
-			String path = pathname.getAbsolutePath().replace('\\', '/');
-			return !path.contains("/src/test/") && !path.contains("/target/") &&
-				!"package.html".equals(pathname.getName()) &&
-				(pathname.isDirectory() || pathname.getName().endsWith(".html"));
-		}
-	};
-
-	private static final ErrorHandler errorHandler = new ErrorHandler()
-	{
-		@Override
-		public void warning(SAXParseException exception) throws SAXException
-		{
-			throw exception;
-		}
-
-		@Override
-		public void error(SAXParseException exception) throws SAXException
-		{
-			throw exception;
-		}
-
-		@Override
-		public void fatalError(SAXParseException exception) throws SAXException
-		{
-			throw exception;
-		}
-
-	};
-
-	private static final EntityResolver entityResolver = new EntityResolver()
-	{
-		private final Map<String, String> systemIdToUri = new HashMap<>();
-
-		{
-			systemIdToUri.put("http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd",
-				"xhtml1-transitional.dtd");
-			systemIdToUri.put("http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd",
-				"xhtml1-strict.dtd");
-
-			/*
-			 * Cheating: using xhtml dtd-s for html4 files too because the html4 dtd-s are not valid
-			 * xml dtd-s.
-			 */
-			systemIdToUri.put("http://www.w3.org/TR/html4/loose.dtd", "xhtml1-transitional.dtd");
-			systemIdToUri.put("http://www.w3.org/TR/html4/strict.dtd", "xhtml1-strict.dtd");
-		}
-
-		@Override
-		public InputSource resolveEntity(String publicId, String systemId) {
-			String uri = systemIdToUri.get(systemId);
-			if (uri != null)
-			{
-				return new InputSource(WellFormedXmlTestCase.class.getResource(uri).toString());
-			}
-
-			return null;
-		}
-	};
 }

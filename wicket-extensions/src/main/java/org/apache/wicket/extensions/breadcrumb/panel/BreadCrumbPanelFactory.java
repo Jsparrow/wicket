@@ -49,8 +49,7 @@ public final class BreadCrumbPanelFactory implements IBreadCrumbPanelFactory
 
 		if (!BreadCrumbPanel.class.isAssignableFrom(panelClass))
 		{
-			throw new IllegalArgumentException("argument panelClass (" + panelClass +
-				") must extend class " + BreadCrumbPanel.class.getName());
+			throw new IllegalArgumentException(new StringBuilder().append("argument panelClass (").append(panelClass).append(") must extend class ").append(BreadCrumbPanel.class.getName()).toString());
 		}
 
 
@@ -90,11 +89,7 @@ public final class BreadCrumbPanelFactory implements IBreadCrumbPanelFactory
 		{
 			return panelClass.getConstructor(String.class, IBreadCrumbModel.class);
 		}
-		catch (SecurityException e)
-		{
-			throw new RuntimeException(e);
-		}
-		catch (NoSuchMethodException e)
+		catch (NoSuchMethodException | SecurityException e)
 		{
 			throw new RuntimeException(e);
 		}

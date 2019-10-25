@@ -39,28 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class WebSocketTesterProcessorTest
 {
-	final static AtomicBoolean messageReceived = new AtomicBoolean(false);
-
-	private static class TestProcessor extends TestWebSocketProcessor
-	{
-		private TestProcessor(HttpServletRequest request, WebApplication application)
-		{
-			super(request, application);
-		}
-
-		@Override
-		protected void onOutMessage(String message)
-		{
-			messageReceived.set(true);
-		}
-
-		@Override
-		protected void onOutMessage(byte[] message, int offset, int length)
-		{
-			messageReceived.set(true);
-		}
-	}
-
+	static final AtomicBoolean messageReceived = new AtomicBoolean(false);
 	WicketTester tester;
 	WebApplication application = new MockApplication()
 	{
@@ -155,6 +134,26 @@ public class WebSocketTesterProcessorTest
 		}
 		request.addParameter("resourceName", TestWebSocketResource.TEXT);
 		request.addParameter(WebRequest.PARAM_AJAX_BASE_URL, ".");
+	}
+
+	private static class TestProcessor extends TestWebSocketProcessor
+	{
+		private TestProcessor(HttpServletRequest request, WebApplication application)
+		{
+			super(request, application);
+		}
+
+		@Override
+		protected void onOutMessage(String message)
+		{
+			messageReceived.set(true);
+		}
+
+		@Override
+		protected void onOutMessage(byte[] message, int offset, int length)
+		{
+			messageReceived.set(true);
+		}
 	}
 
 }

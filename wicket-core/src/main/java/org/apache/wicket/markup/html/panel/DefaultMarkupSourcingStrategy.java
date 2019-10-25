@@ -37,19 +37,19 @@ public final class DefaultMarkupSourcingStrategy extends AbstractMarkupSourcingS
 	private static final DefaultMarkupSourcingStrategy instance = new DefaultMarkupSourcingStrategy();
 
 	/**
+	 * Construct. Please use {@link #get()} instead.
+	 */
+	private DefaultMarkupSourcingStrategy()
+	{
+	}
+
+	/**
 	 * 
 	 * @return A singleton of the strategy
 	 */
 	public static DefaultMarkupSourcingStrategy get()
 	{
 		return instance;
-	}
-
-	/**
-	 * Construct. Please use {@link #get()} instead.
-	 */
-	private DefaultMarkupSourcingStrategy()
-	{
 	}
 
 	/**

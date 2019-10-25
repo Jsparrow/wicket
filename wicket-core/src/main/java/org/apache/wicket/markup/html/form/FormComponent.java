@@ -113,244 +113,6 @@ public abstract class FormComponent<T> extends LabeledWebMarkupContainer impleme
 	private static final Logger logger = LoggerFactory.getLogger(FormComponent.class);
 
 	/**
-	 * {@link IErrorMessageSource} used for error messages against this form components.
-	 * 
-	 * @author ivaynberg
-	 */
-	private class MessageSource implements IErrorMessageSource
-	{
-		private final Set<String> triedKeys = new LinkedHashSet<>();
-
-		/**
-		 * @see org.apache.wicket.validation.IErrorMessageSource#getMessage(String, java.util.Map)
-		 */
-		@Override
-		public String getMessage(String key, Map<String, Object> vars)
-		{
-			final FormComponent<T> formComponent = FormComponent.this;
-
-			// Use the following log4j config for detailed logging on the property resolution
-			// process
-			// log4j.logger.org.apache.wicket.resource.loader=DEBUG
-			// log4j.logger.org.apache.wicket.Localizer=DEBUG
-
-			final Localizer localizer = formComponent.getLocalizer();
-
-			// retrieve prefix that will be used to construct message keys
-			String prefix = formComponent.getValidatorKeyPrefix();
-			String message;
-
-			// first try the full form of key [form-component-id].[prefix].[key]
-			String resource = getId() + "." + prefix(prefix, key);
-			message = getString(localizer, resource, formComponent);
-
-			// if not found, try a more general form (without prefix)
-			// [form-component-id].[key]
-			if (Strings.isEmpty(message) && Strings.isEmpty(prefix))
-			{
-				resource = getId() + "." + key;
-				message = getString(localizer, resource, formComponent);
-			}
-
-			// If not found try a more general form [prefix].[key]
-			if (Strings.isEmpty(message))
-			{
-				resource = prefix(prefix, key);
-				message = getString(localizer, resource, formComponent);
-			}
-
-			// If not found try the most general form [key]
-			if (Strings.isEmpty(message))
-			{
-				// Try a variation of the resource key
-				message = getString(localizer, key, formComponent);
-			}
-
-			// convert empty string to null in case our default value of "" was
-			// returned from localizer
-			if (Strings.isEmpty(message))
-			{
-				message = null;
-			}
-			else
-			{
-				message = substitute(message, addDefaultVars(vars));
-			}
-			return message;
-		}
-
-		private String prefix(String prefix, String key)
-		{
-			if (!Strings.isEmpty(prefix))
-			{
-				return prefix + "." + key;
-			}
-			else
-			{
-				return key;
-			}
-		}
-
-		/**
-		 * 
-		 * @param localizer
-		 * @param key
-		 * @param component
-		 * @return string
-		 */
-		private String getString(Localizer localizer, String key, Component component)
-		{
-			triedKeys.add(key);
-
-			// Note: It is important that the default value of "" is
-			// provided to getString() not to throw a MissingResourceException or to
-			// return a default string like "[Warning: String ..."
-			return localizer.getString(key, component, "");
-		}
-
-		private String substitute(String string, final Map<String, Object> vars)
-			throws IllegalStateException
-		{
-			return new VariableInterpolator(string, Application.get()
-				.getResourceSettings()
-				.getThrowExceptionOnMissingResource())
-			{
-				private static final long serialVersionUID = 1L;
-
-				@SuppressWarnings({ "rawtypes", "unchecked" })
-				@Override
-				protected String getValue(String variableName)
-				{
-					Object value = vars.get(variableName);
-					
-					if (value == null ||value instanceof String)
-					{
-						return String.valueOf(value);
-					}
-					
-					IConverter converter = getConverter(value.getClass());
-					
-					if (converter == null)
-					{
-						return Strings.toString(value);
-					}
-					else
-					{
-						return converter.convertToString(value, getLocale());
-					}
-				}
-			}.toString();
-		}
-
-		/**
-		 * Creates a new params map that additionally contains the default input, name, label
-		 * parameters
-		 * 
-		 * @param params
-		 *            original params map
-		 * @return new params map
-		 */
-		private Map<String, Object> addDefaultVars(Map<String, Object> params)
-		{
-			// create and fill the new params map
-			final HashMap<String, Object> fullParams;
-			if (params == null)
-			{
-				fullParams = new HashMap<>(6);
-			}
-			else
-			{
-				fullParams = new HashMap<>(params.size() + 6);
-				fullParams.putAll(params);
-			}
-
-			// add the input param if not already present
-			if (!fullParams.containsKey("input"))
-			{
-				fullParams.put("input", getInput());
-			}
-
-			// add the name param if not already present
-			if (!fullParams.containsKey("name"))
-			{
-				fullParams.put("name", getId());
-			}
-
-			// add the label param if not already present
-			if (!fullParams.containsKey("label"))
-			{
-				fullParams.put("label", getLabel());
-			}
-			return fullParams;
-		}
-
-		/**
-		 * @return value of label param for this form component
-		 */
-		private String getLabel()
-		{
-			final FormComponent<T> fc = FormComponent.this;
-			String label = null;
-
-			// first try the label model ...
-			if (fc.getLabel() != null)
-			{
-				label = fc.getLabel().getObject();
-			}
-			// ... then try a resource of format [form-component-id] with
-			// default of '[form-component-id]'
-			if (label == null)
-			{
-
-				label = fc.getDefaultLabel();
-			}
-			return label;
-		}
-	}
-
-
-	/**
-	 * Adapter that makes this component appear as {@link IValidatable}
-	 * 
-	 * @author ivaynberg
-	 */
-	private class ValidatableAdapter implements IValidatable<T>
-	{
-		/**
-		 * @see org.apache.wicket.validation.IValidatable#error(org.apache.wicket.validation.IValidationError)
-		 */
-		@Override
-		public void error(IValidationError error)
-		{
-			FormComponent.this.error(error);
-		}
-
-		/**
-		 * @see org.apache.wicket.validation.IValidatable#getValue()
-		 */
-		@Override
-		public T getValue()
-		{
-			return getConvertedInput();
-		}
-
-		/**
-		 * @see org.apache.wicket.validation.IValidatable#isValid()
-		 */
-		@Override
-		public boolean isValid()
-		{
-			return FormComponent.this.isValid();
-		}
-
-		@Override
-		public IModel<T> getModel()
-		{
-			return FormComponent.this.getModel();
-		}
-	}
-
-	/**
 	 * The value separator
 	 */
 	public static final String VALUE_SEPARATOR = ";";
@@ -368,6 +130,39 @@ public abstract class FormComponent<T> extends LabeledWebMarkupContainer impleme
 	 * Make empty strings null values boolean. Used by AbstractTextComponent subclass.
 	 */
 	protected static final short FLAG_CONVERT_EMPTY_INPUT_STRING_TO_NULL = FLAG_RESERVED1;
+
+	private transient T convertedInput;
+
+	/**
+	 * Raw Input entered by the user or NO_RAW_INPUT if nothing is filled in.
+	 */
+	private String rawInput = NO_RAW_INPUT;
+
+	/**
+	 * Type that the raw input string will be converted to
+	 */
+	private String typeName;
+
+	/**
+	 * @see org.apache.wicket.Component#Component(String)
+	 */
+	public FormComponent(final String id)
+	{
+		this(id, null);
+	}
+
+	/**
+	 * @param id
+	 * @param model
+	 * @see org.apache.wicket.Component#Component(String, IModel)
+	 */
+	public FormComponent(final String id, IModel<T> model)
+	{
+		super(id, model);
+		// the form decides whether form components are versioned or not
+		// see Form.setVersioned
+		setVersioned(false);
+	}
 
 	/**
 	 * Visits any form components inside component if it is a container, or component itself if it
@@ -448,39 +243,6 @@ public abstract class FormComponent<T> extends LabeledWebMarkupContainer impleme
 		});
 	}
 
-	private transient T convertedInput;
-
-	/**
-	 * Raw Input entered by the user or NO_RAW_INPUT if nothing is filled in.
-	 */
-	private String rawInput = NO_RAW_INPUT;
-
-	/**
-	 * Type that the raw input string will be converted to
-	 */
-	private String typeName;
-
-	/**
-	 * @see org.apache.wicket.Component#Component(String)
-	 */
-	public FormComponent(final String id)
-	{
-		this(id, null);
-	}
-
-	/**
-	 * @param id
-	 * @param model
-	 * @see org.apache.wicket.Component#Component(String, IModel)
-	 */
-	public FormComponent(final String id, IModel<T> model)
-	{
-		super(id, model);
-		// the form decides whether form components are versioned or not
-		// see Form.setVersioned
-		setVersioned(false);
-	}
-
 	/**
 	 * Gets the string the component would use as a label when one was requested but no label model
 	 * was set via {@link #getLabel()}. The value of this string is usually set in a property file;
@@ -506,7 +268,6 @@ public abstract class FormComponent<T> extends LabeledWebMarkupContainer impleme
 	{
 		return getLocalizer().getString(getId(), getParent(), defaultValue);
 	}
-
 
 	/**
 	 * Adds a validator to this form component
@@ -556,13 +317,9 @@ public abstract class FormComponent<T> extends LabeledWebMarkupContainer impleme
 				match = behavior;
 				break;
 			}
-			else if (behavior instanceof ValidatorAdapter)
-			{
-				if (((ValidatorAdapter<?>)behavior).getValidator().equals(validator))
-				{
-					match = behavior;
-					break;
-				}
+			else if (behavior instanceof ValidatorAdapter && ((ValidatorAdapter<?>)behavior).getValidator().equals(validator)) {
+				match = behavior;
+				break;
 			}
 		}
 
@@ -618,24 +375,21 @@ public abstract class FormComponent<T> extends LabeledWebMarkupContainer impleme
 	 */
 	public boolean checkRequired()
 	{
-		if (isRequired())
-		{
-			final String input = getInput();
-
-			// when null, check whether this is natural for that component, or
-			// whether - as is the case with text fields - this can only happen
-			// when the component was disabled
-			if (input == null && !isInputNullable() && !isEnabledInHierarchy())
-			{
-				// this value must have come from a disabled field
-				// do not perform validation
-				return true;
-			}
-
-			// perform validation by looking whether the value is null or empty
-			return !Strings.isEmpty(input);
+		if (!isRequired()) {
+			return true;
 		}
-		return true;
+		final String input = getInput();
+		// when null, check whether this is natural for that component, or
+		// whether - as is the case with text fields - this can only happen
+		// when the component was disabled
+		if (input == null && !isInputNullable() && !isEnabledInHierarchy())
+		{
+			// this value must have come from a disabled field
+			// do not perform validation
+			return true;
+		}
+		// perform validation by looking whether the value is null or empty
+		return !Strings.isEmpty(input);
 	}
 
 	/**
@@ -733,7 +487,6 @@ public abstract class FormComponent<T> extends LabeledWebMarkupContainer impleme
 		return form;
 	}
 
-
 	/**
 	 * Gets the request parameter for this component as a string.
 	 * 
@@ -771,18 +524,15 @@ public abstract class FormComponent<T> extends LabeledWebMarkupContainer impleme
 			}
 		}
 
-		if (!isInputNullable())
-		{
-			if (values != null && values.length == 1 && values[0] == null)
-			{
-				// we the key got passed in (otherwise values would be null),
-				// but the value was set to null.
-				// As the servlet spec isn't clear on what to do with 'empty'
-				// request values - most return an empty string, but some null -
-				// we have to workaround here and deliberately set to an empty
-				// string if the the component is not nullable (text components)
-				return EMPTY_STRING_ARRAY;
-			}
+		boolean condition = !isInputNullable() && values != null && values.length == 1 && values[0] == null;
+		if (condition) {
+			// we the key got passed in (otherwise values would be null),
+			// but the value was set to null.
+			// As the servlet spec isn't clear on what to do with 'empty'
+			// request values - most return an empty string, but some null -
+			// we have to workaround here and deliberately set to an empty
+			// string if the the component is not nullable (text components)
+			return EMPTY_STRING_ARRAY;
 		}
 		return values;
 	}
@@ -895,13 +645,7 @@ public abstract class FormComponent<T> extends LabeledWebMarkupContainer impleme
 	{
 		final List<IValidator<? super T>> list = new ArrayList<>();
 
-		for (Behavior behavior : getBehaviors())
-		{
-			if (behavior instanceof IValidator)
-			{
-				list.add((IValidator<? super T>)behavior);
-			}
-		}
+		getBehaviors().stream().filter(behavior -> behavior instanceof IValidator).forEach(behavior -> list.add((IValidator<? super T>) behavior));
 
 		return Collections.unmodifiableList(list);
 	}
@@ -944,26 +688,25 @@ public abstract class FormComponent<T> extends LabeledWebMarkupContainer impleme
 	 */
 	public final void inputChanged()
 	{
-		if (isVisibleInHierarchy() && isEnabledInHierarchy())
+		if (!(isVisibleInHierarchy() && isEnabledInHierarchy())) {
+			return;
+		}
+		// Get input as String array
+		final String[] input = getInputAsArray();
+		// If there is any input
+		if (input != null && input.length > 0 && input[0] != null)
 		{
-			// Get input as String array
-			final String[] input = getInputAsArray();
-
-			// If there is any input
-			if (input != null && input.length > 0 && input[0] != null)
-			{
-				// join the values together with ";", for example, "id1;id2;id3"
-				rawInput = StringList.valueOf(input).join(VALUE_SEPARATOR);
-			}
-			else if (isInputNullable())
-			{
-				// no input
-				rawInput = null;
-			}
-			else
-			{
-				rawInput = NO_RAW_INPUT;
-			}
+			// join the values together with ";", for example, "id1;id2;id3"
+			rawInput = StringList.valueOf(input).join(VALUE_SEPARATOR);
+		}
+		else if (isInputNullable())
+		{
+			// no input
+			rawInput = null;
+		}
+		else
+		{
+			rawInput = NO_RAW_INPUT;
 		}
 	}
 
@@ -1147,7 +890,6 @@ public abstract class FormComponent<T> extends LabeledWebMarkupContainer impleme
 		setModelObject(getConvertedInput());
 	}
 
-
 	/**
 	 * Called to indicate that the user input is valid.
 	 */
@@ -1175,19 +917,19 @@ public abstract class FormComponent<T> extends LabeledWebMarkupContainer impleme
 		// validate
 
 		validateRequired();
+		if (!isValid()) {
+			return;
+		}
+		convertInput();
 		if (isValid())
 		{
-			convertInput();
-			if (isValid())
+			if (isRequired() && getConvertedInput() == null && isInputNullable())
 			{
-				if (isRequired() && getConvertedInput() == null && isInputNullable())
-				{
-					reportRequiredError();
-				}
-				else
-				{
-					validateValidators();
-				}
+				reportRequiredError();
+			}
+			else
+			{
+				validateValidators();
 			}
 		}
 	}
@@ -1324,7 +1066,7 @@ public abstract class FormComponent<T> extends LabeledWebMarkupContainer impleme
 	 *             If input can't be converted
 	 */
 	@SuppressWarnings("unchecked")
-	protected T convertValue(String[] value) throws ConversionException
+	protected T convertValue(String[] value)
 	{
 		return (T)(value != null && value.length > 0 && value[0] != null ? trim(value[0]) : null);
 	}
@@ -1351,9 +1093,9 @@ public abstract class FormComponent<T> extends LabeledWebMarkupContainer impleme
 		}
 		catch (NumberFormatException e)
 		{
+			logger.error(e.getMessage(), e);
 			throw new IllegalArgumentException(
-				exceptionMessage("Internal error.  Request string '" + string +
-					"' not a valid integer"));
+				exceptionMessage(new StringBuilder().append("Internal error.  Request string '").append(string).append("' not a valid integer").toString()));
 		}
 	}
 
@@ -1376,8 +1118,8 @@ public abstract class FormComponent<T> extends LabeledWebMarkupContainer impleme
 			}
 			catch (NumberFormatException e)
 			{
-				throw new IllegalArgumentException(exceptionMessage("Request string '" + string +
-					"' is not a valid integer"));
+				logger.error(e.getMessage(), e);
+				throw new IllegalArgumentException(exceptionMessage(new StringBuilder().append("Request string '").append(string).append("' is not a valid integer").toString()));
 			}
 		}
 		else
@@ -1394,16 +1136,15 @@ public abstract class FormComponent<T> extends LabeledWebMarkupContainer impleme
 	protected final int[] inputAsIntArray()
 	{
 		final String[] strings = getInputAsArray();
-		if (strings != null)
-		{
-			final int[] ints = new int[strings.length];
-			for (int i = 0; i < strings.length; i++)
-			{
-				ints[i] = Integer.parseInt(strings[i]);
-			}
-			return ints;
+		if (strings == null) {
+			return null;
 		}
-		return null;
+		final int[] ints = new int[strings.length];
+		for (int i = 0; i < strings.length; i++)
+		{
+			ints[i] = Integer.parseInt(strings[i]);
+		}
+		return ints;
 	}
 
 	/**
@@ -1560,9 +1301,8 @@ public abstract class FormComponent<T> extends LabeledWebMarkupContainer impleme
 					}
 					catch (Exception e)
 					{
-						throw new WicketRuntimeException("Exception '" + e.getMessage() +
-								"' occurred during validation " + validator.getClass().getName() +
-								" on component " + getPath(), e);
+						throw new WicketRuntimeException(new StringBuilder().append("Exception '").append(e.getMessage()).append("' occurred during validation ").append(validator.getClass().getName()).append(" on component ")
+								.append(getPath()).toString(), e);
 					}
 				}
 				if (!isValid())
@@ -1686,7 +1426,7 @@ public abstract class FormComponent<T> extends LabeledWebMarkupContainer impleme
 			formComponent.modelChanged();
 		}
 	}
-	
+
 	/**
 	 * Creates a new collection. 
 	 * 
@@ -1701,6 +1441,243 @@ public abstract class FormComponent<T> extends LabeledWebMarkupContainer impleme
 			return new HashSet<>(elements);
 		} else {
 			return new ArrayList<>(elements);
+		}
+	}
+
+	/**
+	 * {@link IErrorMessageSource} used for error messages against this form components.
+	 * 
+	 * @author ivaynberg
+	 */
+	private class MessageSource implements IErrorMessageSource
+	{
+		private final Set<String> triedKeys = new LinkedHashSet<>();
+
+		/**
+		 * @see org.apache.wicket.validation.IErrorMessageSource#getMessage(String, java.util.Map)
+		 */
+		@Override
+		public String getMessage(String key, Map<String, Object> vars)
+		{
+			final FormComponent<T> formComponent = FormComponent.this;
+
+			// Use the following log4j config for detailed logging on the property resolution
+			// process
+			// log4j.logger.org.apache.wicket.resource.loader=DEBUG
+			// log4j.logger.org.apache.wicket.Localizer=DEBUG
+
+			final Localizer localizer = formComponent.getLocalizer();
+
+			// retrieve prefix that will be used to construct message keys
+			String prefix = formComponent.getValidatorKeyPrefix();
+			String message;
+
+			// first try the full form of key [form-component-id].[prefix].[key]
+			String resource = new StringBuilder().append(getId()).append(".").append(prefix(prefix, key)).toString();
+			message = getString(localizer, resource, formComponent);
+
+			// if not found, try a more general form (without prefix)
+			// [form-component-id].[key]
+			if (Strings.isEmpty(message) && Strings.isEmpty(prefix))
+			{
+				resource = new StringBuilder().append(getId()).append(".").append(key).toString();
+				message = getString(localizer, resource, formComponent);
+			}
+
+			// If not found try a more general form [prefix].[key]
+			if (Strings.isEmpty(message))
+			{
+				resource = prefix(prefix, key);
+				message = getString(localizer, resource, formComponent);
+			}
+
+			// If not found try the most general form [key]
+			if (Strings.isEmpty(message))
+			{
+				// Try a variation of the resource key
+				message = getString(localizer, key, formComponent);
+			}
+
+			// convert empty string to null in case our default value of "" was
+			// returned from localizer
+			if (Strings.isEmpty(message))
+			{
+				message = null;
+			}
+			else
+			{
+				message = substitute(message, addDefaultVars(vars));
+			}
+			return message;
+		}
+
+		private String prefix(String prefix, String key)
+		{
+			if (!Strings.isEmpty(prefix))
+			{
+				return new StringBuilder().append(prefix).append(".").append(key).toString();
+			}
+			else
+			{
+				return key;
+			}
+		}
+
+		/**
+		 * 
+		 * @param localizer
+		 * @param key
+		 * @param component
+		 * @return string
+		 */
+		private String getString(Localizer localizer, String key, Component component)
+		{
+			triedKeys.add(key);
+
+			// Note: It is important that the default value of "" is
+			// provided to getString() not to throw a MissingResourceException or to
+			// return a default string like "[Warning: String ..."
+			return localizer.getString(key, component, "");
+		}
+
+		private String substitute(String string, final Map<String, Object> vars)
+		{
+			return new VariableInterpolator(string, Application.get()
+				.getResourceSettings()
+				.getThrowExceptionOnMissingResource())
+			{
+				private static final long serialVersionUID = 1L;
+
+				@SuppressWarnings({ "rawtypes", "unchecked" })
+				@Override
+				protected String getValue(String variableName)
+				{
+					Object value = vars.get(variableName);
+					
+					if (value == null ||value instanceof String)
+					{
+						return String.valueOf(value);
+					}
+					
+					IConverter converter = getConverter(value.getClass());
+					
+					if (converter == null)
+					{
+						return Strings.toString(value);
+					}
+					else
+					{
+						return converter.convertToString(value, getLocale());
+					}
+				}
+			}.toString();
+		}
+
+		/**
+		 * Creates a new params map that additionally contains the default input, name, label
+		 * parameters
+		 * 
+		 * @param params
+		 *            original params map
+		 * @return new params map
+		 */
+		private Map<String, Object> addDefaultVars(Map<String, Object> params)
+		{
+			// create and fill the new params map
+			final HashMap<String, Object> fullParams;
+			if (params == null)
+			{
+				fullParams = new HashMap<>(6);
+			}
+			else
+			{
+				fullParams = new HashMap<>(params.size() + 6);
+				fullParams.putAll(params);
+			}
+
+			// add the input param if not already present
+			if (!fullParams.containsKey("input"))
+			{
+				fullParams.put("input", getInput());
+			}
+
+			// add the name param if not already present
+			if (!fullParams.containsKey("name"))
+			{
+				fullParams.put("name", getId());
+			}
+
+			// add the label param if not already present
+			if (!fullParams.containsKey("label"))
+			{
+				fullParams.put("label", getLabel());
+			}
+			return fullParams;
+		}
+
+		/**
+		 * @return value of label param for this form component
+		 */
+		private String getLabel()
+		{
+			final FormComponent<T> fc = FormComponent.this;
+			String label = null;
+
+			// first try the label model ...
+			if (fc.getLabel() != null)
+			{
+				label = fc.getLabel().getObject();
+			}
+			// ... then try a resource of format [form-component-id] with
+			// default of '[form-component-id]'
+			if (label == null)
+			{
+
+				label = fc.getDefaultLabel();
+			}
+			return label;
+		}
+	}
+
+
+	/**
+	 * Adapter that makes this component appear as {@link IValidatable}
+	 * 
+	 * @author ivaynberg
+	 */
+	private class ValidatableAdapter implements IValidatable<T>
+	{
+		/**
+		 * @see org.apache.wicket.validation.IValidatable#error(org.apache.wicket.validation.IValidationError)
+		 */
+		@Override
+		public void error(IValidationError error)
+		{
+			FormComponent.this.error(error);
+		}
+
+		/**
+		 * @see org.apache.wicket.validation.IValidatable#getValue()
+		 */
+		@Override
+		public T getValue()
+		{
+			return getConvertedInput();
+		}
+
+		/**
+		 * @see org.apache.wicket.validation.IValidatable#isValid()
+		 */
+		@Override
+		public boolean isValid()
+		{
+			return FormComponent.this.isValid();
+		}
+
+		@Override
+		public IModel<T> getModel()
+		{
+			return FormComponent.this.getModel();
 		}
 	}
 }

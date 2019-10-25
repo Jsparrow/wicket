@@ -17,11 +17,11 @@
 package org.apache.wicket.util.license;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.wicket.util.diff.Diff;
 import org.apache.wicket.util.diff.Revision;
+import java.util.Collections;
 
 class VelocityLicenseHeaderHandler extends AbstractLicenseHeaderHandler
 {
@@ -63,7 +63,7 @@ class VelocityLicenseHeaderHandler extends AbstractLicenseHeaderHandler
 	@Override
 	public List<String> getSuffixes()
 	{
-		return Arrays.asList("vm");
+		return Collections.singletonList("vm");
 	}
 
 	@Override

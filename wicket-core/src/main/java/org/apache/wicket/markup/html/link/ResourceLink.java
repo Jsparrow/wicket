@@ -31,7 +31,7 @@ import org.apache.wicket.request.resource.ResourceReference;
  * @param <T>
  *            type of model object
  */
-public class ResourceLink<T> extends Link<T> implements IRequestListener
+public class ResourceLink<T> extends Link<T>
 {
 	private static final long serialVersionUID = 1L;
 
@@ -124,26 +124,24 @@ public class ResourceLink<T> extends Link<T> implements IRequestListener
 	@Override
 	protected final CharSequence getURL()
 	{
-		if (resourceReference != null)
-		{
-			// TODO post 1.2: should we have support for locale changes when the
-			// resource reference (or resource??) is set manually..
-			// We should get a new resource reference for the current locale
-			// then
-			// that points to the same resource but with another locale if it
-			// exists.
-			// something like
-			// SharedResource.getResourceReferenceForLocale(resourceReference);
-			if (resourceReference.canBeRegistered())
-			{
-				getApplication().getResourceReferenceRegistry().registerResourceReference(
-					resourceReference);
-			}
-
-			return getRequestCycle().urlFor(
-				new ResourceReferenceRequestHandler(resourceReference, resourceParameters));
+		if (resourceReference == null) {
+			return urlForListener(resourceParameters);
 		}
-		return urlForListener(resourceParameters);
+		// TODO post 1.2: should we have support for locale changes when the
+		// resource reference (or resource??) is set manually..
+		// We should get a new resource reference for the current locale
+		// then
+		// that points to the same resource but with another locale if it
+		// exists.
+		// something like
+		// SharedResource.getResourceReferenceForLocale(resourceReference);
+		if (resourceReference.canBeRegistered())
+		{
+			getApplication().getResourceReferenceRegistry().registerResourceReference(
+				resourceReference);
+		}
+		return getRequestCycle().urlFor(
+			new ResourceReferenceRequestHandler(resourceReference, resourceParameters));
 	}
 	
 	@Override

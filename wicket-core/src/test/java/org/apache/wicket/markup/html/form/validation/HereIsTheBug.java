@@ -40,10 +40,10 @@ public class HereIsTheBug extends Panel
 	{
 		super(id);
 
-		Form<FormData> form = new Form<FormData>("form", new CompoundPropertyModel<FormData>(
+		Form<FormData> form = new Form<>("form", new CompoundPropertyModel<FormData>(
 			new FormData()));
 		FormComponentFeedbackBorder border = new FormComponentFeedbackBorder("border");
-		TextField<String> textField = new TextField<String>("name");
+		TextField<String> textField = new TextField<>("name");
 		textField.setRequired(true);
 		border.add(textField);
 		border.add(new FeedbackPanel("feedback"));

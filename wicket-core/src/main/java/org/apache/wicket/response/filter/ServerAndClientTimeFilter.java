@@ -86,12 +86,10 @@ public class ServerAndClientTimeFilter implements IResponseFilter
 			endScript.append(txt);
 			endScript.append("';\n").append(JavaScriptUtils.SCRIPT_CLOSE_TAG).append("\n");
 			responseBuffer.insert(bodyIndex - 1, endScript);
-			responseBuffer.insert(headIndex + 6, "\n" + JavaScriptUtils.SCRIPT_OPEN_TAG +
-				"\nvar clientTimeVariable = new Date().getTime();\n" +
-				JavaScriptUtils.SCRIPT_CLOSE_TAG + "\n");
+			responseBuffer.insert(headIndex + 6, new StringBuilder().append("\n").append(JavaScriptUtils.SCRIPT_OPEN_TAG).append("\nvar clientTimeVariable = new Date().getTime();\n").append(JavaScriptUtils.SCRIPT_CLOSE_TAG).append("\n")
+					.toString());
 		}
-		log.info(timeTaken + "ms server time taken for request " +
-			RequestCycle.get().getRequest().getUrl() + " response size: " + responseBuffer.length());
+		log.info(new StringBuilder().append(timeTaken).append("ms server time taken for request ").append(RequestCycle.get().getRequest().getUrl()).append(" response size: ").append(responseBuffer.length()).toString());
 		return responseBuffer;
 	}
 }

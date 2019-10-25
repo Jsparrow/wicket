@@ -36,6 +36,8 @@ import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -43,6 +45,8 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
  */
 public class StatelessPage extends WebPage
 {
+	private static final Logger logger = LoggerFactory.getLogger(StatelessPage.class);
+
 	public static final String AJAX_SUBMIT = "AJAX submit";
 
 	public static final String FORM_SUBMIT = "form submit";
@@ -50,19 +54,6 @@ public class StatelessPage extends WebPage
 	private static int itemCount = 0;
 
 	private static final long serialVersionUID = 1L;
-
-	private static List<String> getList()
-	{
-		final ArrayList<String> list = new ArrayList<String>(itemCount);
-		final int count = ++itemCount;
-
-		for (int idx = 1; idx <= count; idx++)
-		{
-			list.add(Integer.toString(idx));
-		}
-
-		return list;
-	}
 
 	/**
 	 * Constructor that is invoked when page is invoked without a session.
@@ -97,7 +88,7 @@ public class StatelessPage extends WebPage
 			{
 				final List<String> _data = getList();
 
-				System.out.println(_data);
+				logger.info(String.valueOf(_data));
 
 				listView.setModelObject(_data);
 
@@ -110,7 +101,7 @@ public class StatelessPage extends WebPage
 				return true;
 			}
 		};
-		final Link<String> homeLink = new BookmarkablePageLink<String>("home", StatelessPage.class);
+		final Link<String> homeLink = new BookmarkablePageLink<>("home", StatelessPage.class);
 
 		add(homeLink);
 		list.add(listView);
@@ -118,8 +109,8 @@ public class StatelessPage extends WebPage
 		add(moreLink);
 
 		// add form
-		TextField<String> name = new TextField<String>("name", new Model<String>("name"));
-		TextField<String> surname = new TextField<String>("surname", new Model<String>("surname"));
+		TextField<String> name = new TextField<>("name", new Model<String>("name"));
+		TextField<String> surname = new TextField<>("surname", new Model<String>("surname"));
 
 		Form<String> form = new StatelessForm<String>("inputForm")
 		{
@@ -163,5 +154,18 @@ public class StatelessPage extends WebPage
 			}
 		});
 		add(form);
+	}
+
+	private static List<String> getList()
+	{
+		final ArrayList<String> list = new ArrayList<>(itemCount);
+		final int count = ++itemCount;
+
+		for (int idx = 1; idx <= count; idx++)
+		{
+			list.add(Integer.toString(idx));
+		}
+
+		return list;
 	}
 }

@@ -39,13 +39,13 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
  */
 public class OnFormValidateModelObjectsPage extends WebPage
 {
-	private static Map<String, ParentModel> pmMap = new HashMap<String, ParentModel>();
+	private static Map<String, ParentModel> pmMap = new HashMap<>();
 
 	public OnFormValidateModelObjectsPage(final PageParameters parameters)
 	{
 		super(parameters);
 
-		CompoundPropertyModel<ParentModel> parentModel = new CompoundPropertyModel<ParentModel>(
+		CompoundPropertyModel<ParentModel> parentModel = new CompoundPropertyModel<>(
 				new LoadableDetachableModel<ParentModel>()
 				{
 					@Override
@@ -131,7 +131,6 @@ public class OnFormValidateModelObjectsPage extends WebPage
 
 		ParentModel()
 		{
-			super();
 		}
 
 		public String getName()

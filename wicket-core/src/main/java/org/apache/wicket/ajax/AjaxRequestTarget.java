@@ -31,6 +31,40 @@ import org.apache.wicket.request.ILoggableRequestHandler;
 public interface AjaxRequestTarget extends IPartialPageRequestHandler, ILoggableRequestHandler
 {
 	/**
+	 * Adds a listener to this target
+	 *
+	 * @param listener
+	 * @throws IllegalStateException
+	 *             if {@link AjaxRequestTarget.IListener}'s events are currently being fired or have both been fired
+	 *             already
+	 */
+	void addListener(AjaxRequestTarget.IListener listener);
+
+	/**
+	 * Register the given respond listener. The listener's
+	 * {@link org.apache.wicket.ajax.AjaxRequestTarget.ITargetRespondListener#onTargetRespond} method will be invoked when
+	 * the {@link AjaxRequestTarget} starts to respond.
+	 *
+	 * @param listener
+	 */
+	void registerRespondListener(ITargetRespondListener listener);
+
+	/**
+	 * Returns the HTML id of the last focused element.
+	 *
+	 * @return markup id of last focused element, <code>null</code> if none
+	 */
+	String getLastFocusedElementId();
+
+	/**
+	 * Returns the page. Be aware that the page can be instantiated if this wasn't the case already.
+	 *
+	 * @return page instance
+	 */
+	@Override
+	Page getPage();
+
+	/**
 	 * An {@link AjaxRequestTarget} listener that can be used to respond to various target-related
 	 * events
 	 *
@@ -114,38 +148,4 @@ public interface AjaxRequestTarget extends IPartialPageRequestHandler, ILoggable
 		 */
 		void onTargetRespond(AjaxRequestTarget target);
 	}
-
-	/**
-	 * Adds a listener to this target
-	 *
-	 * @param listener
-	 * @throws IllegalStateException
-	 *             if {@link AjaxRequestTarget.IListener}'s events are currently being fired or have both been fired
-	 *             already
-	 */
-	void addListener(AjaxRequestTarget.IListener listener);
-
-	/**
-	 * Register the given respond listener. The listener's
-	 * {@link org.apache.wicket.ajax.AjaxRequestTarget.ITargetRespondListener#onTargetRespond} method will be invoked when
-	 * the {@link AjaxRequestTarget} starts to respond.
-	 *
-	 * @param listener
-	 */
-	void registerRespondListener(ITargetRespondListener listener);
-
-	/**
-	 * Returns the HTML id of the last focused element.
-	 *
-	 * @return markup id of last focused element, <code>null</code> if none
-	 */
-	String getLastFocusedElementId();
-
-	/**
-	 * Returns the page. Be aware that the page can be instantiated if this wasn't the case already.
-	 *
-	 * @return page instance
-	 */
-	@Override
-	Page getPage();
 }

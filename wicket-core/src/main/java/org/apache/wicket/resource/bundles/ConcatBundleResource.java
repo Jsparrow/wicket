@@ -89,17 +89,19 @@ public class ConcatBundleResource extends AbstractResource implements IStaticCac
 			try
 			{
 				List<IResourceStream> resources = collectResourceStreams();
-				if (resources == null)
+				if (resources == null) {
 					return sendResourceError(resourceResponse, HttpServletResponse.SC_NOT_FOUND,
 						"Unable to find resource");
+				}
 
 				resourceResponse.setContentType(findContentType(resources));
 
 				// add Last-Modified header (to support HEAD requests and If-Modified-Since)
 				final Instant lastModified = findLastModified(resources);
 
-				if (lastModified != null)
+				if (lastModified != null) {
 					resourceResponse.setLastModified(lastModified);
+				}
 
 				// read resource data
 				final byte[] bytes = readAllResources(resources);
@@ -152,10 +154,7 @@ public class ConcatBundleResource extends AbstractResource implements IStaticCac
 
 	protected String findContentType(List<IResourceStream> resources)
 	{
-		for (IResourceStream curStream : resources)
-			if (curStream.getContentType() != null)
-				return curStream.getContentType();
-		return null;
+		return resources.stream().filter(curStream -> curStream.getContentType() != null).findFirst().map(IResourceStream::getContentType).orElse(null);
 	}
 
 	protected Instant findLastModified(List<IResourceStream> resources)
@@ -164,8 +163,9 @@ public class ConcatBundleResource extends AbstractResource implements IStaticCac
 		for (IResourceStream curStream : resources)
 		{
 			Instant curLastModified = curStream.lastModifiedTime();
-			if (ret == null || curLastModified.isAfter(ret))
+			if (ret == null || curLastModified.isAfter(ret)) {
 				ret = curLastModified;
+			}
 		}
 		return ret;
 	}
@@ -283,12 +283,9 @@ public class ConcatBundleResource extends AbstractResource implements IStaticCac
 		{
 			bytes = readAllResources(resources);
 		}
-		catch (IOException e)
+		catch (ResourceStreamNotFoundException | IOException e)
 		{
-			return null;
-		}
-		catch (ResourceStreamNotFoundException e)
-		{
+			log.error(e.getMessage(), e);
 			return null;
 		}
 

@@ -31,6 +31,8 @@ import java.util.Enumeration;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Test for {@link SpringWebApplicationFactory}.
@@ -100,6 +102,8 @@ public class SpringWebApplicationFactoryTest
 	 */
 	public static class Application extends WebApplication
 	{
+		private final Logger logger = LoggerFactory.getLogger(Application.class);
+
 		@Override
 		public Class<? extends Page> getHomePage()
 		{
@@ -117,6 +121,7 @@ public class SpringWebApplicationFactoryTest
 			}
 			catch (Exception ex)
 			{
+				logger.error(ex.getMessage(), ex);
 				fail("does not work with application-specific context");
 			}
 		}

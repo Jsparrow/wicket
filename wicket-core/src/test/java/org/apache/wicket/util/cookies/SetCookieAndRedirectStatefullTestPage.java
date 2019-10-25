@@ -42,7 +42,7 @@ public class SetCookieAndRedirectStatefullTestPage extends WebPage
 	 */
 	public SetCookieAndRedirectStatefullTestPage()
 	{
-		inputModel = new Model<String>();
+		inputModel = new Model<>();
 		Form<Void> form = new Form<Void>("form")
 		{
 			private static final long serialVersionUID = 1L;

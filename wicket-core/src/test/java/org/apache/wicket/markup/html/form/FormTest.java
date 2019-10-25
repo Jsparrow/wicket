@@ -112,7 +112,9 @@ public class FormTest extends WicketTestCase
 
 		class TestPage extends WebPage implements IMarkupResourceStreamProvider
 		{
-			boolean shouldFail, submit, error;
+			boolean shouldFail;
+			boolean submit;
+			boolean error;
 
 			TestPage()
 			{
@@ -121,8 +123,9 @@ public class FormTest extends WicketTestCase
 					@Override
 					protected void onValidateModelObjects()
 					{
-						if (shouldFail)
+						if (shouldFail) {
 							error("failed");
+						}
 					}
 
 					@Override
@@ -161,6 +164,20 @@ public class FormTest extends WicketTestCase
 		assertTrue(page.error);
 	}
 
+	/**
+	 * Tests if a stateful form does not render the pageparameters from the page
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	void pageWithParameters() throws Exception
+	{
+		PageParameters parameters = new PageParameters();
+		parameters.add("first", "foo");
+		parameters.add("second", "bar");
+		executeTest(FormMethodTestPage.class, parameters, "pageWithParameters_expected.html");
+	}
+
 	/** */
 	public static class TestPage extends MockPageParametersAware
 	{
@@ -183,19 +200,5 @@ public class FormTest extends WicketTestCase
 			};
 		}
 
-	}
-
-	/**
-	 * Tests if a stateful form does not render the pageparameters from the page
-	 * 
-	 * @throws Exception
-	 */
-	@Test
-	void pageWithParameters() throws Exception
-	{
-		PageParameters parameters = new PageParameters();
-		parameters.add("first", "foo");
-		parameters.add("second", "bar");
-		executeTest(FormMethodTestPage.class, parameters, "pageWithParameters_expected.html");
 	}
 }

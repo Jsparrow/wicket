@@ -25,6 +25,8 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -32,6 +34,8 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
  */
 public class TestConversationPage extends WebPage
 {
+	private static final Logger logger = LoggerFactory.getLogger(TestConversationPage.class);
+
 	private static final long serialVersionUID = 1L;
 
 	@Inject
@@ -50,7 +54,7 @@ public class TestConversationPage extends WebPage
 		super(parameters);
 
 		conversation.begin();
-		System.out.println("Opened Conversion with id = " + conversation.getId());
+		logger.info("Opened Conversion with id = " + conversation.getId());
 
 		add(new Label("count", new PropertyModel<String>(this, "counter.countStr")));
 
@@ -72,12 +76,13 @@ public class TestConversationPage extends WebPage
 			public void onClick()
 			{
 				String pageType = parameters.get("pageType").toString("nonbookmarkable");
-				if ("bookmarkable".equals(pageType.toLowerCase(Locale.ROOT)))
+				if ("bookmarkable".equals(pageType.toLowerCase(Locale.ROOT))) {
 					setResponsePage(TestNonConversationalPage.class);
-				else if ("hybrid".equals(pageType.toLowerCase(Locale.ROOT)))
+				} else if ("hybrid".equals(pageType.toLowerCase(Locale.ROOT))) {
 					setResponsePage(TestConversationPage.this);
-				else
+				} else {
 					setResponsePage(new TestNonConversationalPage());
+				}
 			}
 		});
 

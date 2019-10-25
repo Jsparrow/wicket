@@ -113,6 +113,13 @@ public class CheckBox extends FormComponent<Boolean>
 		return null;
 	}
 
+	@Override
+	public boolean checkRequired()
+	{
+		// a checkbox always has a value so this check always passes
+		return true;
+	}
+
 	/**
 	 * Converter specific to the check box
 	 * 
@@ -158,13 +165,6 @@ public class CheckBox extends FormComponent<Boolean>
 		{
 			return value.toString();
 		}
-	}
-
-	@Override
-	public boolean checkRequired()
-	{
-		// a checkbox always has a value so this check always passes
-		return true;
 	}
 
 }

@@ -22,6 +22,8 @@ import static org.junit.jupiter.api.Assertions.fail;
 import org.apache.wicket.WicketRuntimeException;
 import org.apache.wicket.util.tester.WicketTestCase;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jcompagner
@@ -29,13 +31,15 @@ import org.junit.jupiter.api.Test;
 class PrimitiveTypeRequiredTest extends WicketTestCase
 {
 
+	private static final Logger logger = LoggerFactory.getLogger(PrimitiveTypeRequiredTest.class);
+
 	/**
 	 * @throws Exception
 	 */
 	@Test
 	void primitiveClass() throws Exception
 	{
-		TextField<Integer> tf = new TextField<Integer>("test", int.class);
+		TextField<Integer> tf = new TextField<>("test", int.class);
 		assertTrue(tf.isRequired());
 
 		try
@@ -45,6 +49,7 @@ class PrimitiveTypeRequiredTest extends WicketTestCase
 		}
 		catch (WicketRuntimeException wre)
 		{
+			logger.error(wre.getMessage(), wre);
 			// ignore should happen
 		}
 	}

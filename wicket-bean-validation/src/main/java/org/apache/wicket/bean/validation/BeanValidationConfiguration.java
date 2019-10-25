@@ -19,6 +19,8 @@ import org.apache.wicket.Application;
 import org.apache.wicket.MetaDataKey;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.util.lang.Args;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Configures bean validation and integrates it with Wicket
@@ -28,6 +30,8 @@ import org.apache.wicket.util.lang.Args;
  */
 public class BeanValidationConfiguration implements BeanValidationContext
 {
+	private static final Logger logger = LoggerFactory.getLogger(BeanValidationConfiguration.class);
+
 	private static final MetaDataKey<BeanValidationConfiguration> KEY = new MetaDataKey<>()
 	{
 	};
@@ -49,6 +53,7 @@ public class BeanValidationConfiguration implements BeanValidationContext
 		}
 		catch (ClassNotFoundException e)
 		{
+			logger.error(e.getMessage(), e);
 			// ignore exception, we are using bean validation 1.1
 		}
 		REQUIRED_ANNOTATIONS = Collections.unmodifiableList(tmp);

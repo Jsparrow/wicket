@@ -44,7 +44,7 @@ import org.junit.jupiter.api.Test;
  */
 class RefreshingViewOnRemoveTest extends WicketTestCase
 {
-	private final List<TestComponent> components = new ArrayList<TestComponent>();
+	private final List<TestComponent> components = new ArrayList<>();
 	private int round = 1;
 
 	/**
@@ -56,39 +56,31 @@ class RefreshingViewOnRemoveTest extends WicketTestCase
 		tester.startPage(new TestPage());
 
 		// check everything was detached
-		for (TestComponent c : components)
-		{
-			assertTrue(c.detached, "Component " + c + " is not detached.");
-		}
+		components.forEach(c -> assertTrue(c.detached, new StringBuilder().append("Component ").append(c).append(" is not detached.").toString()));
 
 		round++;
 		tester.startPage(tester.getLastRenderedPage());
 
 		// check everything was detached
-		for (TestComponent c : components)
-		{
-			assertTrue(c.detached);
-		}
+		components.forEach(c -> assertTrue(c.detached));
 
 		// check we have round 1 and round 2 components
 		boolean round1 = false;
 		boolean round2 = false;
 		for (TestComponent c : components)
 		{
-			if (c.round == 1)
+			if (c.round == 1) {
 				round1 = true;
-			if (c.round == 2)
+			}
+			if (c.round == 2) {
 				round2 = true;
+			}
 		}
 		assertTrue(round1);
 		assertTrue(round2);
 
 		// check onremove was called on all round 1 components
-		for (TestComponent c : components)
-		{
-			if (c.round == 1)
-				assertTrue(c.removed);
-		}
+		components.stream().filter(c -> c.round == 1).forEach(c -> assertTrue(c.removed));
 
 	}
 

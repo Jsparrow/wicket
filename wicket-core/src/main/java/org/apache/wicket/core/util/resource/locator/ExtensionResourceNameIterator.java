@@ -16,8 +16,8 @@
  */
 package org.apache.wicket.core.util.resource.locator;
 
-import java.util.Arrays;
 import java.util.Iterator;
+import java.util.Collections;
 
 /**
  * Iterate over a set of extensions. If null is provided, hasNext() will
@@ -27,7 +27,7 @@ import java.util.Iterator;
  */
 public class ExtensionResourceNameIterator implements Iterator<String>
 {
-	private static final Iterable<String> NULL_ITERABLE = Arrays.asList((String)null);
+	private static final Iterable<String> NULL_ITERABLE = Collections.singletonList((String)null);
 
 	private final Iterator<String> iterator;
 
@@ -75,12 +75,9 @@ public class ExtensionResourceNameIterator implements Iterator<String>
 	{
 		String ext = current;
 
-		if (ext != null)
-		{
-			if (ext.startsWith("."))
-			{
-				ext = ext.substring(1);
-			}
+		boolean condition = ext != null && ext.startsWith(".");
+		if (condition) {
+			ext = ext.substring(1);
 		}
 		return ext;
 	}

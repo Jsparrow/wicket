@@ -210,65 +210,61 @@ public abstract class AbstractRequestLogger implements IRequestLogger
 	public void requestTime(long timeTaken)
 	{
 		RequestData requestdata = RequestCycle.get().getMetaData(REQUEST_DATA);
-		if (requestdata != null)
+		if (requestdata == null) {
+			return;
+		}
+		if (activeRequests.get() > 0)
 		{
-			if (activeRequests.get() > 0)
+			requestdata.setActiveRequest(activeRequests.decrementAndGet());
+		}
+		Session session = Session.exists() ? Session.get() : null;
+		String sessionId = session != null ? session.getId() : "N/A";
+		requestdata.setSessionId(sessionId);
+		Object sessionInfo = getSessionInfo(session);
+		requestdata.setSessionInfo(sessionInfo);
+		long sizeInBytes = -1;
+		if (Application.exists() &&
+			Application.get().getRequestLoggerSettings().getRecordSessionSize())
+		{
+			try
 			{
-				requestdata.setActiveRequest(activeRequests.decrementAndGet());
+				sizeInBytes = session != null ? session.getSizeInBytes() : -1;
 			}
-			Session session = Session.exists() ? Session.get() : null;
-			String sessionId = session != null ? session.getId() : "N/A";
-			requestdata.setSessionId(sessionId);
-
-			Object sessionInfo = getSessionInfo(session);
-			requestdata.setSessionInfo(sessionInfo);
-
-			long sizeInBytes = -1;
-			if (Application.exists() &&
-				Application.get().getRequestLoggerSettings().getRecordSessionSize())
+			catch (Exception e)
 			{
-				try
-				{
-					sizeInBytes = session != null ? session.getSizeInBytes() : -1;
-				}
-				catch (Exception e)
-				{
-					// log the error and let the request logging continue (this is what happens in
-					// the detach phase of the request cycle anyway. This provides better
-					// diagnostics).
-					LOG.error(
-						"Exception while determining the size of the session in the request logger: " +
-							e.getMessage(), e);
-				}
+				// log the error and let the request logging continue (this is what happens in
+				// the detach phase of the request cycle anyway. This provides better
+				// diagnostics).
+				LOG.error(
+					"Exception while determining the size of the session in the request logger: " +
+						e.getMessage(), e);
 			}
-			requestdata.setSessionSize(sizeInBytes);
-			requestdata.setTimeTaken(timeTaken);
-
-			addRequest(requestdata);
-
-			SessionData sessiondata;
-			if (sessionId != null)
+		}
+		requestdata.setSessionSize(sizeInBytes);
+		requestdata.setTimeTaken(timeTaken);
+		addRequest(requestdata);
+		SessionData sessiondata;
+		if (sessionId != null)
+		{
+			sessiondata = liveSessions.get(sessionId);
+			if (sessiondata == null)
 			{
+				// if the session has been destroyed during the request by
+				// Session#invalidateNow, retrieve the old session data from the RequestCycle.
+				sessiondata = RequestCycle.get().getMetaData(SESSION_DATA);
+			}
+			if (sessiondata == null)
+			{
+				// passivated session or logger only started after it.
+				sessionCreated(sessionId);
 				sessiondata = liveSessions.get(sessionId);
-				if (sessiondata == null)
-				{
-					// if the session has been destroyed during the request by
-					// Session#invalidateNow, retrieve the old session data from the RequestCycle.
-					sessiondata = RequestCycle.get().getMetaData(SESSION_DATA);
-				}
-				if (sessiondata == null)
-				{
-					// passivated session or logger only started after it.
-					sessionCreated(sessionId);
-					sessiondata = liveSessions.get(sessionId);
-				}
-				if (sessiondata != null)
-				{
-					sessiondata.setSessionInfo(sessionInfo);
-					sessiondata.setSessionSize(sizeInBytes);
-					sessiondata.addTimeTaken(timeTaken);
-					RequestCycle.get().setMetaData(SESSION_DATA, sessiondata);
-				}
+			}
+			if (sessiondata != null)
+			{
+				sessiondata.setSessionInfo(sessionInfo);
+				sessiondata.setSessionSize(sizeInBytes);
+				sessiondata.addTimeTaken(timeTaken);
+				RequestCycle.get().setMetaData(SESSION_DATA, sessiondata);
 			}
 		}
 	}
@@ -289,8 +285,9 @@ public abstract class AbstractRequestLogger implements IRequestLogger
 	{
 		RequestCycle requestCycle = RequestCycle.get();
 		SessionData sessionData = liveSessions.remove(sessionId);
-		if (requestCycle != null)
+		if (requestCycle != null) {
 			requestCycle.setMetaData(SESSION_DATA, sessionData);
+		}
 	}
 
 	@Override
@@ -316,12 +313,12 @@ public abstract class AbstractRequestLogger implements IRequestLogger
 	public void performLogging()
 	{
 		RequestData requestdata = RequestCycle.get().getMetaData(REQUEST_DATA);
-		if (requestdata != null)
-		{
-			// log the request- and sessiondata (the latter can be null)
-			SessionData sessiondata = RequestCycle.get().getMetaData(SESSION_DATA);
-			log(requestdata, sessiondata);
+		if (requestdata == null) {
+			return;
 		}
+		// log the request- and sessiondata (the latter can be null)
+		SessionData sessiondata = RequestCycle.get().getMetaData(SESSION_DATA);
+		log(requestdata, sessiondata);
 	}
 
 	protected abstract void log(RequestData rd, SessionData sd);
@@ -343,8 +340,9 @@ public abstract class AbstractRequestLogger implements IRequestLogger
 		synchronized (requestWindowLock)
 		{
 			// if the requestWindow is a zero-length array, nothing gets stored
-			if (requestWindow.length == 0)
+			if (requestWindow.length == 0) {
 				return;
+			}
 
 			// use the oldest request data to recalculate the average request time
 			RequestData old = requestWindow[indexInWindow];
@@ -362,8 +360,9 @@ public abstract class AbstractRequestLogger implements IRequestLogger
 			}
 			else
 			{
-				if (startTimeOfOldestRequest == null)
+				if (startTimeOfOldestRequest == null) {
 					startTimeOfOldestRequest = rd.getStartDate();
+				}
 			}
 			totalRequestTime += rd.getTimeTaken();
 		}
@@ -371,10 +370,11 @@ public abstract class AbstractRequestLogger implements IRequestLogger
 
 	private int getWindowSize()
 	{
-		if (requestWindow[requestWindow.length - 1] == null)
+		if (requestWindow[requestWindow.length - 1] == null) {
 			return indexInWindow;
-		else
+		} else {
 			return requestWindow.length;
+		}
 	}
 
 	@Override
@@ -383,8 +383,9 @@ public abstract class AbstractRequestLogger implements IRequestLogger
 		synchronized (requestWindowLock)
 		{
 			int windowSize = getWindowSize();
-			if (windowSize == 0)
+			if (windowSize == 0) {
 				return 0;
+			}
 			return totalRequestTime / windowSize;
 		}
 	}
@@ -395,8 +396,9 @@ public abstract class AbstractRequestLogger implements IRequestLogger
 		synchronized (requestWindowLock)
 		{
 			int windowSize = getWindowSize();
-			if (windowSize == 0)
+			if (windowSize == 0) {
 				return 0;
+			}
 			long start = startTimeOfOldestRequest.getTime();
 			long end = System.currentTimeMillis();
 			double diff = end - start;
@@ -424,8 +426,9 @@ public abstract class AbstractRequestLogger implements IRequestLogger
 	public void logResponseTarget(IRequestHandler requestHandler)
 	{
 		RequestData requestData = getCurrentRequest();
-		if (requestData != null)
+		if (requestData != null) {
 			requestData.setResponseTarget(requestHandler);
+		}
 	}
 
 	/**
@@ -437,8 +440,9 @@ public abstract class AbstractRequestLogger implements IRequestLogger
 		int newCapacity = getRequestsWindowSize();
 
 		// do nothing if the capacity requirement hasn't changed
-		if (newCapacity == requestWindow.length)
+		if (newCapacity == requestWindow.length) {
 			return;
+		}
 
 		RequestData[] newRequestWindow = new RequestData[newCapacity];
 		synchronized (requestWindowLock)

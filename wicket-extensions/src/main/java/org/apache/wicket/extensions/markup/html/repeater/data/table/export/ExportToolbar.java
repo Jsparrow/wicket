@@ -180,13 +180,12 @@ public class ExportToolbar extends AbstractToolbar
 		RepeatingView linkContainers = new RepeatingView("linkContainer");
 		td.add(linkContainers);
 
-		for (IDataExporter exporter : dataExporters)
-		{
+		dataExporters.forEach(exporter -> {
 			WebMarkupContainer span = new WebMarkupContainer(linkContainers.newChildId());
 			linkContainers.add(span);
 
 			span.add(createExportLink("exportLink", exporter));
-		}
+		});
 	}
 
 	/**
@@ -205,8 +204,9 @@ public class ExportToolbar extends AbstractToolbar
 			/**
 			 * Set fileName and cacheDuration lazily
 			 */
+			@Override
 			public void respond(Attributes attributes) {
-				setFileName(fileNameModel.getObject() + "." + dataExporter.getFileNameExtension());
+				setFileName(new StringBuilder().append(fileNameModel.getObject()).append(".").append(dataExporter.getFileNameExtension()).toString());
 				setCacheDuration(ExportToolbar.this.getCacheDuration());
 				
 				super.respond(attributes);
@@ -367,13 +367,7 @@ public class ExportToolbar extends AbstractToolbar
 		{
 			IDataProvider<T> dataProvider = dataTable.getDataProvider();
 			List<IExportableColumn<T, ?>> exportableColumns = new LinkedList<>();
-			for (IColumn<T, S> col : dataTable.getColumns())
-			{
-				if (col instanceof IExportableColumn)
-				{
-					exportableColumns.add((IExportableColumn<T, ?>)col);
-				}
-			}
+			dataTable.getColumns().stream().filter(col -> col instanceof IExportableColumn).forEach(col -> exportableColumns.add((IExportableColumn<T, ?>) col));
 			dataExporter.exportData(dataProvider, exportableColumns, outputStream);
 		}
 	}

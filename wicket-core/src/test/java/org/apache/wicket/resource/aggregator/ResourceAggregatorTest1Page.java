@@ -39,7 +39,6 @@ public class ResourceAggregatorTest1Page extends WebPage
 	 */
 	public ResourceAggregatorTest1Page()
 	{
-		super();
 	}
 
 

@@ -35,6 +35,12 @@ public class HomePage extends WebPage
 	private static final long serialVersionUID = 1L;
 
 	/** */
+	public static int AJAX = 2;
+
+	/** */
+	public static int NORMAL = 4;
+
+	/** */
 	public String textfieldForm1;
 
 	/** */
@@ -49,12 +55,8 @@ public class HomePage extends WebPage
 	/** */
     private int formSubmitted = 0;
 
-	/** */
-	public static int AJAX = 2;
-	/** */
-	public static int NORMAL = 4;
-
 	boolean hitOnSubmit = false;
+
 	boolean hitOnError = false;
 
 	/**
@@ -69,7 +71,7 @@ public class HomePage extends WebPage
 		add(new Label("message",
 			"If you see this message wicket is properly configured and running"));
 
-		final Form<Void> form = new Form<Void>("form");
+		final Form<Void> form = new Form<>("form");
 		form.setOutputMarkupId(true);
 		add(form);
 
@@ -119,7 +121,7 @@ public class HomePage extends WebPage
 
 		// --------------------
 
-		Form<Void> form3 = new Form<Void>("form3");
+		Form<Void> form3 = new Form<>("form3");
 		MyPanel panel = new MyPanel("panel");
 		form3.add(panel);
 		form3.add(new AjaxSubmitLink("submit")

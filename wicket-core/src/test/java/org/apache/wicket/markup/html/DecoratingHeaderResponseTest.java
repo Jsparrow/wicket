@@ -55,27 +55,18 @@ class DecoratingHeaderResponseTest extends WicketTestCase
 	void decoratedStringPrepend() throws IOException, ResourceStreamNotFoundException,
 		ParseException
 	{
-		tester.getApplication().setHeaderResponseDecorator(new IHeaderResponseDecorator()
-		{
+		tester.getApplication().setHeaderResponseDecorator((IHeaderResponse response) -> new ResourceAggregator(new DecoratingHeaderResponse(response) {
 			@Override
-			public IHeaderResponse decorate(IHeaderResponse response)
-			{
-				return new ResourceAggregator(new DecoratingHeaderResponse(response)
-				{
-					@Override
-					public void render(HeaderItem item)
-					{
-						if (item instanceof JavaScriptReferenceHeaderItem)
-						{
-							JavaScriptReferenceHeaderItem original = (JavaScriptReferenceHeaderItem)item;
-							item = JavaScriptHeaderItem.forReference(new PackageResourceReference(
-								"DECORATED-" + original.getReference().getName()), original.getId());
-						}
-						super.render(item);
-					}
-				});
+			public void render(HeaderItem item) {
+				if (item instanceof JavaScriptReferenceHeaderItem) {
+					JavaScriptReferenceHeaderItem original = (JavaScriptReferenceHeaderItem) item;
+					item = JavaScriptHeaderItem.forReference(
+							new PackageResourceReference("DECORATED-" + original.getReference().getName()),
+							original.getId());
+				}
+				super.render(item);
 			}
-		});
+		}));
 		tester.startPage(TestPage.class);
 		XmlPullParser parser = new XmlPullParser();
 		parser.parse(tester.getLastResponseAsString());

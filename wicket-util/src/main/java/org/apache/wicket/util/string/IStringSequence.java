@@ -33,7 +33,7 @@ public interface IStringSequence
 	 * @return The string at the given index
 	 * @throws IndexOutOfBoundsException
 	 */
-	String get(int index) throws IndexOutOfBoundsException;
+	String get(int index);
 
 	/**
 	 * @return Typesafe string iterator

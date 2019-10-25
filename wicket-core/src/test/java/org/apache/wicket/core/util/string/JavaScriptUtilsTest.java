@@ -81,11 +81,11 @@ class JavaScriptUtilsTest
 		JavaScriptUtils.writeInlineScript(response,
 			"var message = 'Scripts are written to the <script></script> tag'", attributes);
 
-		assertEquals("<script type=\"text/javascript\">\n" //
-			+ "/*<![CDATA[*/\n" //
-			+ "var message = 'Scripts are written to the <script><\\/script> tag'\n" //
-			+ "/*]]>*/\n"//
-			+ "</script>\n", response.toString());
+		assertEquals(new StringBuilder().append("<script type=\"text/javascript\">\n" //
+).append("/*<![CDATA[*/\n" //
+).append("var message = 'Scripts are written to the <script><\\/script> tag'\n" //
+).append("/*]]>*/\n"//
+).append("</script>\n").toString(), response.toString());
 	}
 
 	/**

@@ -51,9 +51,9 @@ public class HttpSessionStore implements ISessionStore
 {
 	private static final Logger log = LoggerFactory.getLogger(HttpSessionStore.class);
 
-	private final Set<UnboundListener> unboundListeners = new CopyOnWriteArraySet<UnboundListener>();
+	private final Set<UnboundListener> unboundListeners = new CopyOnWriteArraySet<>();
 
-	private final Set<BindListener> bindListeners = new CopyOnWriteArraySet<BindListener>();
+	private final Set<BindListener> bindListeners = new CopyOnWriteArraySet<>();
 
 	/**
 	 * @param request The Wicket request
@@ -88,27 +88,22 @@ public class HttpSessionStore implements ISessionStore
 	@Override
 	public final void bind(final Request request, final Session newSession)
 	{
-		if (getWicketSession(request) != newSession)
+		if (getWicketSession(request) == newSession) {
+			return;
+		}
+		// call template method
+		onBind(request, newSession);
+		getBindListeners().forEach(listener -> listener.bindingSession(request, newSession));
+		HttpSession httpSession = getHttpSession(request, false);
+		if (httpSession != null)
 		{
-			// call template method
-			onBind(request, newSession);
-			for (BindListener listener : getBindListeners())
-			{
-				listener.bindingSession(request, newSession);
-			}
+			// register an unbinding listener for cleaning up
+			String applicationKey = Application.get().getName();
+			httpSession.setAttribute("Wicket:SessionUnbindingListener-" + applicationKey,
+				new SessionBindingListener(applicationKey, newSession));
 
-			HttpSession httpSession = getHttpSession(request, false);
-
-			if (httpSession != null)
-			{
-				// register an unbinding listener for cleaning up
-				String applicationKey = Application.get().getName();
-				httpSession.setAttribute("Wicket:SessionUnbindingListener-" + applicationKey,
-					new SessionBindingListener(applicationKey, newSession));
-
-				// register the session object itself
-				setWicketSession(request, newSession);
-			}
+			// register the session object itself
+			setWicketSession(request, newSession);
 		}
 	}
 
@@ -261,7 +256,7 @@ public class HttpSessionStore implements ISessionStore
 	@Override
 	public final List<String> getAttributeNames(final Request request)
 	{
-		List<String> list = new ArrayList<String>();
+		List<String> list = new ArrayList<>();
 		HttpSession httpSession = getHttpSession(request, false);
 		if (httpSession != null)
 		{
@@ -284,21 +279,20 @@ public class HttpSessionStore implements ISessionStore
 	public final void removeAttribute(final Request request, final String name)
 	{
 		HttpSession httpSession = getHttpSession(request, false);
-		if (httpSession != null)
-		{
-			String attributeName = getSessionAttributePrefix(request) + name;
-
-			IRequestLogger logger = Application.get().getRequestLogger();
-			if (logger != null)
-			{
-				Object value = httpSession.getAttribute(attributeName);
-				if (value != null)
-				{
-					logger.objectRemoved(value);
-				}
-			}
-			httpSession.removeAttribute(attributeName);
+		if (httpSession == null) {
+			return;
 		}
+		String attributeName = getSessionAttributePrefix(request) + name;
+		IRequestLogger logger = Application.get().getRequestLogger();
+		if (logger != null)
+		{
+			Object value = httpSession.getAttribute(attributeName);
+			if (value != null)
+			{
+				logger.objectRemoved(value);
+			}
+		}
+		httpSession.removeAttribute(attributeName);
 	}
 
 	@Override
@@ -307,23 +301,23 @@ public class HttpSessionStore implements ISessionStore
 	{
 		// ignore call if the session was marked invalid
 		HttpSession httpSession = getHttpSession(request, false);
-		if (httpSession != null)
-		{
-			String attributeName = getSessionAttributePrefix(request) + name;
-			IRequestLogger logger = Application.get().getRequestLogger();
-			if (logger != null)
-			{
-				if (httpSession.getAttribute(attributeName) == null)
-				{
-					logger.objectCreated(value);
-				}
-				else
-				{
-					logger.objectUpdated(value);
-				}
-			}
-			httpSession.setAttribute(attributeName, value);
+		if (httpSession == null) {
+			return;
 		}
+		String attributeName = getSessionAttributePrefix(request) + name;
+		IRequestLogger logger = Application.get().getRequestLogger();
+		if (logger != null)
+		{
+			if (httpSession.getAttribute(attributeName) == null)
+			{
+				logger.objectCreated(value);
+			}
+			else
+			{
+				logger.objectUpdated(value);
+			}
+		}
+		httpSession.setAttribute(attributeName, value);
 	}
 
 	@Override
@@ -432,18 +426,14 @@ public class HttpSessionStore implements ISessionStore
 			}
 
 			ISessionStore sessionStore = application.getSessionStore();
-			if (sessionStore != null)
-			{
-				if (sessionStore instanceof HttpSessionStore)
-				{
-					((HttpSessionStore) sessionStore).onUnbind(sessionId);
-				}
-
-				for (UnboundListener listener : sessionStore.getUnboundListener())
-				{
-					listener.sessionUnbound(sessionId);
-				}
+			if (sessionStore == null) {
+				return;
 			}
+			if (sessionStore instanceof HttpSessionStore)
+			{
+				((HttpSessionStore) sessionStore).onUnbind(sessionId);
+			}
+			sessionStore.getUnboundListener().forEach(listener -> listener.sessionUnbound(sessionId));
 		}
 	}
 }

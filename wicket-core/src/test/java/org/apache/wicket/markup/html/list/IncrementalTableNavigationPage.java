@@ -36,8 +36,7 @@ public class IncrementalTableNavigationPage extends WebPage
 	 */
 	public IncrementalTableNavigationPage()
 	{
-		super();
-		List<String> list = new ArrayList<String>();
+		List<String> list = new ArrayList<>();
 		list.add("one");
 		list.add("two");
 		list.add("three");
@@ -60,10 +59,10 @@ public class IncrementalTableNavigationPage extends WebPage
 		};
 
 		add(table);
-		PagingNavigationIncrementLink<Void> prev = new PagingNavigationIncrementLink<Void>("prev",
+		PagingNavigationIncrementLink<Void> prev = new PagingNavigationIncrementLink<>("prev",
 			table, -1);
 		add(prev);
-		PagingNavigationIncrementLink<Void> nextNext = new PagingNavigationIncrementLink<Void>(
+		PagingNavigationIncrementLink<Void> nextNext = new PagingNavigationIncrementLink<>(
 			"nextNext", table, +2);
 		add(nextNext);
 	}

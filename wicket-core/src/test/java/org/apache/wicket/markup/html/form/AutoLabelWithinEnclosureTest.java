@@ -24,6 +24,22 @@ import org.junit.jupiter.api.Test;
 @SuppressWarnings({ "rawtypes", "serial", "unchecked" })
 class AutoLabelWithinEnclosureTest extends WicketTestCase
 {
+	@Test
+    void labelWithinEnclosure_Visible() throws Exception
+	{
+		tester.startPage(new LabelWithinEnclosurePage(true));
+		tester.dumpPage();
+		tester.assertContains("<label wicket:for=\"textfield\" id=\"textfield2-w-lbl\" for=\"textfield2\">blabla</label>");
+	}
+
+	@Test
+    void labelWithinEnclosure_Invisible() throws Exception
+	{
+		tester.startPage(new LabelWithinEnclosurePage(false));
+		tester.dumpPage();
+		tester.assertContainsNot("label");
+	}
+
 	static class LabelWithinEnclosurePage extends WebPage
 	{
 		LabelWithinEnclosurePage(final boolean textFieldVisible)
@@ -39,21 +55,5 @@ class AutoLabelWithinEnclosureTest extends WicketTestCase
 				}
 			});
 		}
-	}
-
-	@Test
-    void labelWithinEnclosure_Visible() throws Exception
-	{
-		tester.startPage(new LabelWithinEnclosurePage(true));
-		tester.dumpPage();
-		tester.assertContains("<label wicket:for=\"textfield\" id=\"textfield2-w-lbl\" for=\"textfield2\">blabla</label>");
-	}
-
-	@Test
-    void labelWithinEnclosure_Invisible() throws Exception
-	{
-		tester.startPage(new LabelWithinEnclosurePage(false));
-		tester.dumpPage();
-		tester.assertContainsNot("label");
 	}
 }

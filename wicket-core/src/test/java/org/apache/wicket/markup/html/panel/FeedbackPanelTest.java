@@ -93,10 +93,7 @@ class FeedbackPanelTest extends WicketTestCase
                 Class<?> containerClass)
         {
             return new StringResourceStream(
-                    "<body>\n" + 
-                    "<div wicket:id='feedback'/>\n" + 
-                    "<div wicket:id='label'/>\n" + 
-                    "</body>");
+                    new StringBuilder().append("<body>\n").append("<div wicket:id='feedback'/>\n").append("<div wicket:id='label'/>\n").append("</body>").toString());
         }
     }
     

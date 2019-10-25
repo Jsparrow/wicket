@@ -113,71 +113,63 @@ public class AnnotProxyFieldValueFactory implements IFieldValueFactory
 	@Override
 	public Object getFieldValue(final Field field, final Object fieldOwner)
 	{
-		if (supportsField(field))
+		if (!supportsField(field)) {
+			return null;
+		}
+		SpringBean annot = field.getAnnotation(SpringBean.class);
+		String name;
+		boolean required;
+		if (annot != null)
 		{
-			SpringBean annot = field.getAnnotation(SpringBean.class);
-
-			String name;
-			boolean required;
-			if (annot != null)
+			name = annot.name();
+			required = annot.required();
+		}
+		else
+		{
+			Named named = field.getAnnotation(Named.class);
+			name = named != null ? named.value() : "";
+			required = true;
+		}
+		Class<?> generic = ResolvableType.forField(field).resolveGeneric(0);
+		String beanName = getBeanName(field, name, generic);
+		SpringBeanLocator locator = new SpringBeanLocator(beanName, field.getType(), field, contextLocator);
+		// only check the cache if the bean is a singleton
+		Object cachedValue = cache.get(locator);
+		if (cachedValue != null)
+		{
+			return cachedValue;
+		}
+		Object target;
+		try
+		{
+			// check whether there is a bean with the provided properties
+			target = locator.locateProxyTarget();
+		}
+		catch (IllegalStateException isx)
+		{
+			if (required)
 			{
-				name = annot.name();
-				required = annot.required();
+				throw isx;
 			}
 			else
 			{
-				Named named = field.getAnnotation(Named.class);
-				name = named != null ? named.value() : "";
-				required = true;
+				return null;
 			}
-
-			Class<?> generic = ResolvableType.forField(field).resolveGeneric(0);
-			String beanName = getBeanName(field, name, required, generic);
-
-			SpringBeanLocator locator = new SpringBeanLocator(beanName, field.getType(), field, contextLocator);
-
-			// only check the cache if the bean is a singleton
-			Object cachedValue = cache.get(locator);
-			if (cachedValue != null)
-			{
-				return cachedValue;
-			}
-
-			Object target;
-			try
-			{
-				// check whether there is a bean with the provided properties
-				target = locator.locateProxyTarget();
-			}
-			catch (IllegalStateException isx)
-			{
-				if (required)
-				{
-					throw isx;
-				}
-				else
-				{
-					return null;
-				}
-			}
-
-			if (wrapInProxies)
-			{
-				target = LazyInitProxyFactory.createProxy(field.getType(), locator);
-			}
-
-			// only put the proxy into the cache if the bean is a singleton
-			if (locator.isSingletonBean())
-			{
-				Object tmpTarget = cache.putIfAbsent(locator, target);
-				if (tmpTarget != null)
-				{
-					target = tmpTarget;
-				}
-			}
-			return target;
 		}
-		return null;
+		if (wrapInProxies)
+		{
+			target = LazyInitProxyFactory.createProxy(field.getType(), locator);
+		}
+		// only put the proxy into the cache if the bean is a singleton
+		if (locator.isSingletonBean())
+		{
+			Object tmpTarget = cache.putIfAbsent(locator, target);
+			if (tmpTarget != null)
+			{
+				target = tmpTarget;
+			}
+		}
+		return target;
 	}
 
 	/**
@@ -185,13 +177,13 @@ public class AnnotProxyFieldValueFactory implements IFieldValueFactory
 	 * @param field
 	 * @return bean name
 	 */
-	private String getBeanName(final Field field, String name, boolean required, Class<?> generic)
+	private String getBeanName(final Field field, String name, Class<?> generic)
 	{
 		if (Strings.isEmpty(name))
 		{
 			Class<?> fieldType = field.getType();
 			
-			SimpleEntry<Class<?>, Class<?>> key = new SimpleEntry<Class<?>, Class<?>>(fieldType, generic);
+			SimpleEntry<Class<?>, Class<?>> key = new SimpleEntry<>(fieldType, generic);
 			name = beanNameCache.get(key);
 			if (name == null)
 			{
@@ -256,12 +248,8 @@ public class AnnotProxyFieldValueFactory implements IFieldValueFactory
 				{
 					BeanDefinition beanDef = getBeanDefinition(
 						((AbstractApplicationContext)ctx).getBeanFactory(), name);
-					if (beanDef instanceof AbstractBeanDefinition)
-					{
-						if (beanDef.isPrimary())
-						{
-							primaries.add(name);
-						}
+					if (beanDef instanceof AbstractBeanDefinition && beanDef.isPrimary()) {
+						primaries.add(name);
 					}
 				}
 				if (primaries.size() == 1)

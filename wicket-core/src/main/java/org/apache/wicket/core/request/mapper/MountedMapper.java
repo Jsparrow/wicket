@@ -215,13 +215,10 @@ public class MountedMapper extends AbstractBookmarkableMapper
 	 */
 	private boolean checkHomePage(Url url)
 	{
-		if (url.getSegments().isEmpty() && url.getQueryParameters().isEmpty())
-		{
-			// this is home page
-			if (getPageClass().equals(getContext().getHomePageClass()))
-			{
-				return true;
-			}
+		boolean condition = url.getSegments().isEmpty() && url.getQueryParameters().isEmpty() && getPageClass().equals(getContext().getHomePageClass());
+		// this is home page
+		if (condition) {
+			return true;
 		}
 		return false;
 	}
@@ -265,6 +262,6 @@ public class MountedMapper extends AbstractBookmarkableMapper
 	@Override
 	public String toString()
 	{
-		return "MountedMapper [mountSegments=" + Strings.join("/", mountSegments) + "]";
+		return new StringBuilder().append("MountedMapper [mountSegments=").append(Strings.join("/", mountSegments)).append("]").toString();
 	}
 }

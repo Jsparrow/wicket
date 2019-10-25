@@ -28,10 +28,14 @@ import java.time.Instant;
 import java.util.Locale;
 
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("javadoc")
 public class StringValueTest
 {
+	private static final Logger logger = LoggerFactory.getLogger(StringValueTest.class);
+
 	/**
 	 * WICKET-5359 equals
 	 */
@@ -119,6 +123,7 @@ public class StringValueTest
 		}
 		catch (StringValueConversionException svcx)
 		{
+			logger.error(svcx.getMessage(), svcx);
 			assertTrue(true);
 		}
 
@@ -149,18 +154,14 @@ public class StringValueTest
 	public void failingEnum() throws Exception
 	{
 
-		assertThrows(StringValueConversionException.class, () -> {
-			new StringValue("camelot").toEnum(TestEnum.class);
-		});
+		assertThrows(StringValueConversionException.class, () -> new StringValue("camelot").toEnum(TestEnum.class));
 
 	}
 
 	@Test
 	public void failingEnum2() throws Exception
 	{
-		assertThrows(StringValueConversionException.class, () -> {
-			new StringValue("camelot").toOptionalEnum(TestEnum.class);
-		});
+		assertThrows(StringValueConversionException.class, () -> new StringValue("camelot").toOptionalEnum(TestEnum.class));
 
 	}
 

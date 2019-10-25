@@ -37,7 +37,7 @@ public class MyBorder extends BorderPanel
 	{
 		super(id);
 
-		final Form<Void> form = new Form<Void>("form");
+		final Form<Void> form = new Form<>("form");
 		form.setOutputMarkupId(true);
 		add(form);
 

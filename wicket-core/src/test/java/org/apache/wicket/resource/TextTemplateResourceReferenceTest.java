@@ -58,12 +58,12 @@ class TextTemplateResourceReferenceTest extends WicketTestCase
 		CharSequence urlForTemplate = page.urlFor(new PackageResourceReference(
 			TextTemplateResourceReferenceTest.class, TEMPLATE_NAME), null);
 		tester.executeUrl(urlForTemplate.toString());
-		tester.assertContains("TMPL_START\\|" + EXPECTED_VALUE + "\\|TMPL_END");
+		tester.assertContains(new StringBuilder().append("TMPL_START\\|").append(EXPECTED_VALUE).append("\\|TMPL_END").toString());
 
 		// update the model and re-render (WICKET-4487)
 		page.variables.put(VARIABLE_NAME, SECOND_EXPECTED_VALUE);
 		tester.executeUrl(urlForTemplate.toString());
-		tester.assertContains("TMPL_START\\|"+SECOND_EXPECTED_VALUE+"\\|TMPL_END");
+		tester.assertContains(new StringBuilder().append("TMPL_START\\|").append(SECOND_EXPECTED_VALUE).append("\\|TMPL_END").toString());
 
 	}
 
@@ -73,7 +73,7 @@ class TextTemplateResourceReferenceTest extends WicketTestCase
 	{
 		private static final long serialVersionUID = 1L;
 
-		private final Map<String, Object> variables = new HashMap<String, Object>();
+		private final Map<String, Object> variables = new HashMap<>();
 
 		@Override
 		public void renderHead(IHeaderResponse response)

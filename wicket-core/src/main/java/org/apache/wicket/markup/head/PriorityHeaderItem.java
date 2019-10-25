@@ -75,10 +75,7 @@ public class PriorityHeaderItem extends HeaderItem implements IWrappedHeaderItem
 	public List<HeaderItem> getDependencies()
 	{
 		List<PriorityHeaderItem> ret = new ArrayList<>();
-		for (HeaderItem curDependency : getWrapped().getDependencies())
-		{
-			ret.add(wrap(curDependency));
-		}
+		getWrapped().getDependencies().forEach(curDependency -> ret.add(wrap(curDependency)));
 		List<HeaderItem> dependencies = super.getDependencies();
 		dependencies.addAll(ret);
 		return dependencies;
@@ -93,8 +90,12 @@ public class PriorityHeaderItem extends HeaderItem implements IWrappedHeaderItem
 	@Override
 	public boolean equals(Object o)
 	{
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
 		PriorityHeaderItem that = (PriorityHeaderItem) o;
 		return Objects.equals(wrapped, that.wrapped);
 	}
@@ -108,6 +109,6 @@ public class PriorityHeaderItem extends HeaderItem implements IWrappedHeaderItem
 	@Override
 	public String toString()
 	{
-		return "PriorityHeaderItem(" + getWrapped() + ")";
+		return new StringBuilder().append("PriorityHeaderItem(").append(getWrapped()).append(")").toString();
 	}
 }

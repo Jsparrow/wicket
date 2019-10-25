@@ -92,7 +92,7 @@ class ValidatorStringResourceLoaderTest extends WicketTestCase
 	{
 		private ValidatorLoaderPage(IValidator<String> validator)
 		{
-			Form<Void> form = new Form<Void>("form");
+			Form<Void> form = new Form<>("form");
 			add(form);
 
 			PasswordTextField passwordTextField = new PasswordTextField("passwd", Model.of(""));
@@ -134,12 +134,12 @@ class ValidatorStringResourceLoaderTest extends WicketTestCase
 		private FormValidatorPage()
 		{
 			FormValidatorEntity entity = new FormValidatorEntity();
-			CompoundPropertyModel<FormValidatorEntity> model = new CompoundPropertyModel<FormValidatorEntity>(entity);
-			Form<FormValidatorEntity> form = new Form<FormValidatorEntity>("form", model);
+			CompoundPropertyModel<FormValidatorEntity> model = new CompoundPropertyModel<>(entity);
+			Form<FormValidatorEntity> form = new Form<>("form", model);
 			add(form);
 
-			TextField<String> field1 = new TextField<String>("field1");
-			TextField<String> field2 = new TextField<String>("field2");
+			TextField<String> field1 = new TextField<>("field1");
+			TextField<String> field2 = new TextField<>("field2");
 			form.add(field1, field2);
 			
 			form.add(new FormValidator(field1, field2));

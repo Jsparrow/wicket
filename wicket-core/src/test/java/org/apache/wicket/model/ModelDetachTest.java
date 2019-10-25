@@ -33,7 +33,7 @@ class ModelDetachTest
 	void compoundPropertyModelDetach()
 	{
 		Detachable detachable = new Detachable();
-		IModel<Detachable> model = new CompoundPropertyModel<Detachable>(detachable);
+		IModel<Detachable> model = new CompoundPropertyModel<>(detachable);
 		model.detach();
 		assertTrue(detachable.detached);
 	}
@@ -45,7 +45,7 @@ class ModelDetachTest
 	void boundCompoundPropertyModelDetach()
 	{
 		Detachable detachable = new Detachable();
-		IModel<Detachable> model = new CompoundPropertyModel<Detachable>(detachable);
+		IModel<Detachable> model = new CompoundPropertyModel<>(detachable);
 		model.detach();
 		assertTrue(detachable.detached);
 	}

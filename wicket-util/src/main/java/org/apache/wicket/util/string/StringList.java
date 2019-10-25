@@ -62,6 +62,25 @@ public final class StringList extends AbstractStringList
 	private int totalLength;
 
 	/**
+	 * Constructor.
+	 */
+	public StringList()
+	{
+		strings = new ArrayList<>();
+	}
+
+	/**
+	 * Constructor.
+	 * 
+	 * @param size
+	 *            Number of elements to preallocate
+	 */
+	public StringList(final int size)
+	{
+		strings = new ArrayList<>(size);
+	}
+
+	/**
 	 * Returns a list of a string repeated a given number of times.
 	 * 
 	 * @param count
@@ -126,21 +145,12 @@ public final class StringList extends AbstractStringList
 	 */
 	public static StringList valueOf(final Collection<?> collection)
 	{
-		if (collection != null)
-		{
-			final StringList strings = new StringList(collection.size());
-
-			for (Object object : collection)
-			{
-				strings.add(StringValue.valueOf(object));
-			}
-
-			return strings;
-		}
-		else
-		{
+		if (collection == null) {
 			return new StringList();
 		}
+		final StringList strings = new StringList(collection.size());
+		collection.forEach(object -> strings.add(StringValue.valueOf(object)));
+		return strings;
 	}
 
 	/**
@@ -202,25 +212,6 @@ public final class StringList extends AbstractStringList
 		}
 
 		return strings;
-	}
-
-	/**
-	 * Constructor.
-	 */
-	public StringList()
-	{
-		strings = new ArrayList<>();
-	}
-
-	/**
-	 * Constructor.
-	 * 
-	 * @param size
-	 *            Number of elements to preallocate
-	 */
-	public StringList(final int size)
-	{
-		strings = new ArrayList<>(size);
 	}
 
 	/**
@@ -340,7 +331,7 @@ public final class StringList extends AbstractStringList
 	public void remove(final int index)
 	{
 		String string = strings.remove(index);
-		totalLength = totalLength - string.length();
+		totalLength -= string.length();
 	}
 
 	/**

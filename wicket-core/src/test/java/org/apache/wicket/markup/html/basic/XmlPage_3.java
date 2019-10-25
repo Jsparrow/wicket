@@ -34,7 +34,7 @@ public class XmlPage_3 extends WebPage
 	 */
 	public XmlPage_3()
 	{
-		if (getString("test").equals("value") == false)
+		if ("value".equals(getString("test")) == false)
 		{
 			throw new RuntimeException("Expected 'test'");
 		}

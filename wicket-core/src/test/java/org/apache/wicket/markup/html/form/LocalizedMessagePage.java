@@ -41,9 +41,9 @@ public class LocalizedMessagePage extends WebPage
 	 */
 	public LocalizedMessagePage()
 	{
-		add(form = new Form<Void>("form"));
+		add(form = new Form<>("form"));
 
-		field = new TextField<Double>("field", Double.class);
+		field = new TextField<>("field", Double.class);
 		field.setLabel(Model.of("Number"));
 		field.add(new RangeValidator<Double>(0.5d, 1.5d));
 		form.add(field);

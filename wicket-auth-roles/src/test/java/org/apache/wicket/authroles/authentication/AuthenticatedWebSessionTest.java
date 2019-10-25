@@ -57,8 +57,9 @@ class AuthenticatedWebSessionTest extends WicketTestCase {
 	@Test
     void shouldLookupForSessionOnce() throws InterruptedException {
 		ExecutorService executorService = Executors.newFixedThreadPool(10);
-		for (int i = 0; i < 10; i++)
+		for (int i = 0; i < 10; i++) {
 			executorService.submit(new SiginTask(tester.getApplication()));
+		}
 		executorService.shutdown();
 		executorService.awaitTermination(5, SECONDS);
 		// counting lookup calls since sesion.bind() is final

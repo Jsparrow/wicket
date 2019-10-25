@@ -74,6 +74,22 @@ public abstract class DataViewBase<T> extends AbstractPageableView<T>
 		return new ModelIterator<T>(internalGetDataProvider(), offset, count);
 	}
 
+	@Override
+	protected final long internalGetItemCount()
+	{
+		return internalGetDataProvider().size();
+	}
+
+	/**
+	 * @see org.apache.wicket.markup.repeater.AbstractPageableView#onDetach()
+	 */
+	@Override
+	protected void onDetach()
+	{
+		dataProvider.detach();
+		super.onDetach();
+	}
+
 	/**
 	 * Helper class that converts input from IDataProvider to an iterator over view items.
 	 * 
@@ -134,21 +150,5 @@ public abstract class DataViewBase<T> extends AbstractPageableView<T>
 			index++;
 			return dataProvider.model(items.next());
 		}
-	}
-
-	@Override
-	protected final long internalGetItemCount()
-	{
-		return internalGetDataProvider().size();
-	}
-
-	/**
-	 * @see org.apache.wicket.markup.repeater.AbstractPageableView#onDetach()
-	 */
-	@Override
-	protected void onDetach()
-	{
-		dataProvider.detach();
-		super.onDetach();
 	}
 }

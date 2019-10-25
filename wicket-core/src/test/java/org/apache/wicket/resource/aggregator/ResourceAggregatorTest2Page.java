@@ -34,7 +34,6 @@ public class ResourceAggregatorTest2Page extends ResourceAggregatorTest1Page
 	 */
 	public ResourceAggregatorTest2Page()
 	{
-		super();
 	}
 
 

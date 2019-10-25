@@ -35,6 +35,50 @@ public class InstrumentationObjectSizeOfStrategy implements IObjectSizeOfStrateg
 {
 
 	private static final Logger LOG = LoggerFactory.getLogger(InstrumentationObjectSizeOfStrategy.class);
+	/**
+	 * Instrumentation instance.
+	 */
+	private final Instrumentation instrumentation;
+
+	/**
+	 * Construct.
+	 * 
+	 * @param instrumentation
+	 */
+	public InstrumentationObjectSizeOfStrategy(Instrumentation instrumentation)
+	{
+		this.instrumentation = instrumentation;
+	}
+
+	/**
+	 * Calculates full size of object iterating over its hierarchy graph.
+	 * 
+	 * @param obj
+	 *            object to calculate size of
+	 * @return object size
+	 * 
+	 * @see org.apache.wicket.core.util.lang.WicketObjects.IObjectSizeOfStrategy#sizeOf(java.io.Serializable)
+	 */
+	@Override
+	public long sizeOf(Serializable obj)
+	{
+		if (obj == null)
+		{
+			return 0;
+		}
+		try
+		{
+			SizeRecodingOutputStream recorder = new SizeRecodingOutputStream();
+			recorder.writeObject(obj);
+			return recorder.getTotalSize();
+		}
+		catch (IOException e)
+		{
+			LOG.error("An error occurred while calculating the size of object: " + obj, e);
+			return -1;
+		}
+
+	}
 
 	/**
 	 * Records the size of an object and it's dependents as if they were serialized but using the
@@ -84,50 +128,5 @@ public class InstrumentationObjectSizeOfStrategy implements IObjectSizeOfStrateg
 
 			return obj;
 		}
-	}
-
-	/**
-	 * Instrumentation instance.
-	 */
-	private final Instrumentation instrumentation;
-
-	/**
-	 * Construct.
-	 * 
-	 * @param instrumentation
-	 */
-	public InstrumentationObjectSizeOfStrategy(Instrumentation instrumentation)
-	{
-		this.instrumentation = instrumentation;
-	}
-
-	/**
-	 * Calculates full size of object iterating over its hierarchy graph.
-	 * 
-	 * @param obj
-	 *            object to calculate size of
-	 * @return object size
-	 * 
-	 * @see org.apache.wicket.core.util.lang.WicketObjects.IObjectSizeOfStrategy#sizeOf(java.io.Serializable)
-	 */
-	@Override
-	public long sizeOf(Serializable obj)
-	{
-		if (obj == null)
-		{
-			return 0;
-		}
-		try
-		{
-			SizeRecodingOutputStream recorder = new SizeRecodingOutputStream();
-			recorder.writeObject(obj);
-			return recorder.getTotalSize();
-		}
-		catch (IOException e)
-		{
-			LOG.error("An error occurred while calculating the size of object: " + obj, e);
-			return -1;
-		}
-
 	}
 }

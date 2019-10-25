@@ -66,90 +66,6 @@ import org.apache.wicket.util.lang.Objects;
  */
 public class ConverterLocator implements IConverterLocator
 {
-	/**
-	 * ConverterLocator that is to be used when no registered converter is found.
-	 * 
-	 * @param <C>
-	 *            The object to convert from and to String
-	 */
-	private static class DefaultConverter<C> implements IConverter<C>
-	{
-		private static final long serialVersionUID = 1L;
-
-		private final transient WeakReference<Class<C>> type;
-
-		/**
-		 * Construct.
-		 * 
-		 * @param type
-		 */
-		private DefaultConverter(Class<C> type)
-		{
-			this.type = new WeakReference<>(type);
-		}
-
-		@Override
-		public C convertToObject(String value, Locale locale)
-		{
-			if (value == null)
-			{
-				return null;
-			}
-			Class<C> theType = type.get();
-			if ("".equals(value))
-			{
-				if (String.class.equals(theType))
-				{
-					return theType.cast("");
-				}
-				return null;
-			}
-
-			try
-			{
-				C converted = Objects.convertValue(value, theType);
-				if (converted != null)
-				{
-					return converted;
-				}
-
-				if (theType != null && theType.isInstance(value))
-				{
-					return theType.cast(value);
-				}
-			}
-			catch (Exception e)
-			{
-				throw new ConversionException(e.getMessage(), e).setSourceValue(value);
-			}
-
-			throw new ConversionException("Could not convert value: " + value + " to type: " +
-				theType.getName() + ". Could not find compatible converter.").setSourceValue(value);
-		}
-
-		@Override
-		public String convertToString(C value, Locale locale)
-		{
-			if (value == null || "".equals(value))
-			{
-				return "";
-			}
-
-			try
-			{
-				return Objects.convertValue(value, String.class);
-			}
-			catch (RuntimeException e)
-			{
-				throw new ConversionException("Could not convert object of type: " +
-					value.getClass() + " to String. Possible its #toString() returned null. " +
-					"Either install a custom converter (see IConverterLocator) or " +
-					"override #toString() to return a non-null value.", e).setSourceValue(value)
-					.setConverter(this);
-			}
-		}
-	}
-
 	private static final long serialVersionUID = 1L;
 
 	/** Maps Classes to ITypeConverters. */
@@ -262,5 +178,85 @@ public class ConverterLocator implements IConverterLocator
 		Args.notNull(c, "Class");
 		Args.notNull(converter, "converter");
 		return classToConverter.put(c.getName(), converter);
+	}
+
+	/**
+	 * ConverterLocator that is to be used when no registered converter is found.
+	 * 
+	 * @param <C>
+	 *            The object to convert from and to String
+	 */
+	private static class DefaultConverter<C> implements IConverter<C>
+	{
+		private static final long serialVersionUID = 1L;
+
+		private final transient WeakReference<Class<C>> type;
+
+		/**
+		 * Construct.
+		 * 
+		 * @param type
+		 */
+		private DefaultConverter(Class<C> type)
+		{
+			this.type = new WeakReference<>(type);
+		}
+
+		@Override
+		public C convertToObject(String value, Locale locale)
+		{
+			if (value == null)
+			{
+				return null;
+			}
+			Class<C> theType = type.get();
+			if ("".equals(value))
+			{
+				if (String.class.equals(theType))
+				{
+					return theType.cast("");
+				}
+				return null;
+			}
+
+			try
+			{
+				C converted = Objects.convertValue(value, theType);
+				if (converted != null)
+				{
+					return converted;
+				}
+
+				if (theType != null && theType.isInstance(value))
+				{
+					return theType.cast(value);
+				}
+			}
+			catch (Exception e)
+			{
+				throw new ConversionException(e.getMessage(), e).setSourceValue(value);
+			}
+
+			throw new ConversionException(new StringBuilder().append("Could not convert value: ").append(value).append(" to type: ").append(theType.getName()).append(". Could not find compatible converter.").toString()).setSourceValue(value);
+		}
+
+		@Override
+		public String convertToString(C value, Locale locale)
+		{
+			if (value == null || "".equals(value))
+			{
+				return "";
+			}
+
+			try
+			{
+				return Objects.convertValue(value, String.class);
+			}
+			catch (RuntimeException e)
+			{
+				throw new ConversionException(new StringBuilder().append("Could not convert object of type: ").append(value.getClass()).append(" to String. Possible its #toString() returned null. ").append("Either install a custom converter (see IConverterLocator) or ").append("override #toString() to return a non-null value.").toString(), e).setSourceValue(value)
+					.setConverter(this);
+			}
+		}
 	}
 }

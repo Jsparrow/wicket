@@ -73,6 +73,126 @@ public class SourcesPage extends WebPage
 	private static final Logger log = LoggerFactory.getLogger(SourcesPage.class);
 
 	/**
+	 * Parameter key for identifying the page class. UUID generated.
+	 */
+	public static final String PAGE_CLASS = SourcesPage.class.getSimpleName() + "_class";
+
+	/**
+	 * Parameter key for identify the name of the source file in the package.
+	 */
+	public static final String SOURCE = "source";
+
+	/**
+	 * The selected name of the packaged resource to display.
+	 */
+	private String name;
+
+	private transient Class<? extends Page> page;
+
+	/**
+	 * The panel for setting the ajax calls.
+	 */
+	private final Component codePanel;
+
+	private final Label filename;
+
+	/**
+	 * 
+	 * Construct.
+	 * 
+	 * @param params
+	 */
+	public SourcesPage(final PageParameters params)
+	{
+		super(params);
+
+		filename = new Label("filename", () -> name != null ? name : params.get(SOURCE).toOptionalString());
+		filename.setOutputMarkupId(true);
+		add(filename);
+		codePanel = new CodePanel("codepanel").setOutputMarkupId(true);
+		add(codePanel);
+		add(new FilesBrowser("filespanel"));
+	}
+
+	/**
+	 * Sets the name.
+	 * 
+	 * @param name
+	 *            the name to set.
+	 */
+	public void setName(String name)
+	{
+		this.name = name;
+	}
+
+	/**
+	 * Gets the name.
+	 * 
+	 * @return the name.
+	 */
+	public String getName()
+	{
+		return name;
+	}
+
+	/**
+	 * 
+	 * @param page
+	 * @return PageParameters for reconstructing the bookmarkable page.
+	 */
+	public static PageParameters generatePageParameters(Page page)
+	{
+		return generatePageParameters(page.getClass(), null);
+	}
+
+	/**
+	 * 
+	 * @param clazz
+	 * @param fileName
+	 * @return PageParameters for reconstructing the bookmarkable page.
+	 */
+	public static PageParameters generatePageParameters(Class<? extends Page> clazz, String fileName)
+	{
+		PageParameters p = new PageParameters();
+		p.set(PAGE_CLASS, clazz.getName());
+		if (fileName != null)
+		{
+			p.set(SOURCE, fileName);
+		}
+		return p;
+	}
+
+	private Class<? extends Page> getPageTargetClass()
+	{
+		if (page == null)
+		{
+			String pageParam = getPageParameters().get(PAGE_CLASS).toOptionalString();
+			if (pageParam == null)
+			{
+				log.error("key: {} is null.", PAGE_CLASS);
+				getRequestCycle().replaceAllRequestHandlers(
+					new ErrorCodeRequestHandler(404,
+						"Could not find sources for the page you requested"));
+			}
+			else if (!pageParam.startsWith("org.apache.wicket.examples"))
+			{
+				log.error("user is trying to access class: {} which is not in the scope of org.apache.wicket.examples",
+						pageParam);
+				throw new UnauthorizedInstantiationException(getClass());
+			}
+			page = WicketObjects.resolveClass(pageParam);
+
+			if (page == null)
+			{
+				getRequestCycle().replaceAllRequestHandlers(
+					new ErrorCodeRequestHandler(404,
+						"Could not find sources for the page you requested"));
+			}
+		}
+		return page;
+	}
+
+	/**
 	 * Model for retrieving the source code from the classpath of a packaged resource.
 	 */
 	private class SourceModel implements IModel<String>
@@ -123,7 +243,7 @@ public class SourcesPage extends WebPage
 			catch (IOException e)
 			{
 				log.error(
-					"Unable to read resource stream for: " + source + "; Page=" + page.toString(),
+					new StringBuilder().append("Unable to read resource stream for: ").append(source).append("; Page=").append(page.toString()).toString(),
 					e);
 				return "";
 			}
@@ -219,10 +339,12 @@ public class SourcesPage extends WebPage
 							// real filespec unchanged
 							String lowerJarZipPart = jarZipPart.toLowerCase(Locale.ROOT);
 							int index = lowerJarZipPart.indexOf(".zip");
-							if (index == -1)
+							if (index == -1) {
 								index = lowerJarZipPart.indexOf(".jar");
-							if (index == -1)
+							}
+							if (index == -1) {
 								throw e;
+							}
 
 							String filename = jarZipPart.substring(0, index + 4); // 4 =
 							// len
@@ -230,7 +352,7 @@ public class SourcesPage extends WebPage
 							// ".jar"
 							// or
 							// ".zip"
-							log.debug("trying the filename: " + filename + " to load as a zip/jar.");
+							log.debug(new StringBuilder().append("trying the filename: ").append(filename).append(" to load as a zip/jar.").toString());
 							JarFile jarFile = new JarFile(filename, false);
 							scanJarFile(packageRef, jarFile, resources);
 							return resources;
@@ -356,126 +478,5 @@ public class SourcesPage extends WebPage
 			code.setOutputMarkupId(true);
 			add(code);
 		}
-	}
-
-	/**
-	 * Parameter key for identifying the page class. UUID generated.
-	 */
-	public static final String PAGE_CLASS = SourcesPage.class.getSimpleName() + "_class";
-
-	/**
-	 * Parameter key for identify the name of the source file in the package.
-	 */
-	public static final String SOURCE = "source";
-
-	/**
-	 * The selected name of the packaged resource to display.
-	 */
-	private String name;
-
-	private transient Class<? extends Page> page;
-
-	/**
-	 * The panel for setting the ajax calls.
-	 */
-	private final Component codePanel;
-
-	private final Label filename;
-
-	/**
-	 * Sets the name.
-	 * 
-	 * @param name
-	 *            the name to set.
-	 */
-	public void setName(String name)
-	{
-		this.name = name;
-	}
-
-	/**
-	 * Gets the name.
-	 * 
-	 * @return the name.
-	 */
-	public String getName()
-	{
-		return name;
-	}
-
-
-	/**
-	 * 
-	 * Construct.
-	 * 
-	 * @param params
-	 */
-	public SourcesPage(final PageParameters params)
-	{
-		super(params);
-
-		filename = new Label("filename", () -> name != null ? name : params.get(SOURCE).toOptionalString());
-		filename.setOutputMarkupId(true);
-		add(filename);
-		codePanel = new CodePanel("codepanel").setOutputMarkupId(true);
-		add(codePanel);
-		add(new FilesBrowser("filespanel"));
-	}
-
-	/**
-	 * 
-	 * @param page
-	 * @return PageParameters for reconstructing the bookmarkable page.
-	 */
-	public static PageParameters generatePageParameters(Page page)
-	{
-		return generatePageParameters(page.getClass(), null);
-	}
-
-	/**
-	 * 
-	 * @param clazz
-	 * @param fileName
-	 * @return PageParameters for reconstructing the bookmarkable page.
-	 */
-	public static PageParameters generatePageParameters(Class<? extends Page> clazz, String fileName)
-	{
-		PageParameters p = new PageParameters();
-		p.set(PAGE_CLASS, clazz.getName());
-		if (fileName != null)
-		{
-			p.set(SOURCE, fileName);
-		}
-		return p;
-	}
-
-	private Class<? extends Page> getPageTargetClass()
-	{
-		if (page == null)
-		{
-			String pageParam = getPageParameters().get(PAGE_CLASS).toOptionalString();
-			if (pageParam == null)
-			{
-				log.error("key: {} is null.", PAGE_CLASS);
-				getRequestCycle().replaceAllRequestHandlers(
-					new ErrorCodeRequestHandler(404,
-						"Could not find sources for the page you requested"));
-			}
-			else if (!pageParam.startsWith("org.apache.wicket.examples"))
-			{
-				log.error("user is trying to access class: {} which is not in the scope of org.apache.wicket.examples",
-						pageParam);
-				throw new UnauthorizedInstantiationException(getClass());
-			}
-			page = WicketObjects.resolveClass(pageParam);
-
-			if (page == null)
-			{
-				getRequestCycle().replaceAllRequestHandlers(
-					new ErrorCodeRequestHandler(404,
-						"Could not find sources for the page you requested"));
-			}
-		}
-		return page;
 	}
 }

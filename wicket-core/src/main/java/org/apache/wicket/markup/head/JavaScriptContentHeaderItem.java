@@ -85,23 +85,30 @@ public class JavaScriptContentHeaderItem extends JavaScriptHeaderItem
 	@Override
 	public Iterable<?> getRenderTokens()
 	{
-		if (Strings.isEmpty(getId()))
+		if (Strings.isEmpty(getId())) {
 			return Collections.singletonList(getJavaScript());
+		}
 		return Arrays.asList(getId(), getJavaScript());
 	}
 
 	@Override
 	public String toString()
 	{
-		return "JavaScriptHeaderItem(" + getJavaScript() + ")";
+		return new StringBuilder().append("JavaScriptHeaderItem(").append(getJavaScript()).append(")").toString();
 	}
 
 	@Override
 	public boolean equals(Object o)
 	{
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
-		if (!super.equals(o)) return false;
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+		if (!super.equals(o)) {
+			return false;
+		}
 		JavaScriptContentHeaderItem that = (JavaScriptContentHeaderItem) o;
 		return Objects.equals(javaScript, that.javaScript);
 	}

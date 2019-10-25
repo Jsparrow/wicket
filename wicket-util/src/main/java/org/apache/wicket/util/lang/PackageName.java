@@ -32,6 +32,17 @@ public class PackageName implements IClusterable
 	private final String name;
 
 	/**
+	 * Constructor
+	 * 
+	 * @param name
+	 *            The name of this package
+	 */
+	private PackageName(final String name)
+	{
+		this.name = name;
+	}
+
+	/**
 	 * @param c
 	 *            The class to get a PackageName object for
 	 * @return The PackageName object
@@ -49,17 +60,6 @@ public class PackageName implements IClusterable
 	public static PackageName forPackage(final Package p)
 	{
 		return new PackageName(p.getName());
-	}
-
-	/**
-	 * Constructor
-	 * 
-	 * @param name
-	 *            The name of this package
-	 */
-	private PackageName(final String name)
-	{
-		this.name = name;
 	}
 
 	@Override

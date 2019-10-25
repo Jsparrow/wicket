@@ -53,8 +53,8 @@ public class MyDateField extends FormComponentPanel<String>
 	{
 		super(id, model);
 		setType(String.class);
-		PropertyModel<String> dateFieldModel = new PropertyModel<String>(this, "date");
-		add(dateField = new TextField<String>("date", dateFieldModel));
+		PropertyModel<String> dateFieldModel = new PropertyModel<>(this, "date");
+		add(dateField = new TextField<>("date", dateFieldModel));
 	}
 
 	/**

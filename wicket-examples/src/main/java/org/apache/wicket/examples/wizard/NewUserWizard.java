@@ -55,119 +55,6 @@ import org.apache.wicket.validation.validator.EmailAddressValidator;
  */
 public class NewUserWizard extends Wizard
 {
-	/**
-	 * The confirmation step.
-	 */
-	private final class ConfirmationStep extends StaticContentStep
-	{
-		/**
-		 * Construct.
-		 */
-		public ConfirmationStep()
-		{
-			super(true);
-			IModel<User> userModel = new Model<>(user);
-			setTitleModel(new ResourceModel("confirmation.title"));
-			setSummaryModel(new StringResourceModel("confirmation.summary", this, userModel));
-			setContentModel(new StringResourceModel("confirmation.content", this, userModel));
-		}
-	}
-
-	/**
-	 * The user details step.
-	 */
-	private final class UserDetailsStep extends WizardStep
-	{
-		/**
-		 * Construct.
-		 */
-		public UserDetailsStep()
-		{
-			setTitleModel(new ResourceModel("confirmation.title"));
-			setSummaryModel(new StringResourceModel("userdetails.summary", this, new Model<>(
-				user)));
-			add(new RequiredTextField<>("user.firstName"));
-			add(new RequiredTextField<>("user.lastName"));
-			add(new TextField<>("user.department"));
-			add(new CheckBox("assignRoles"));
-		}
-	}
-
-	/**
-	 * The user name step.
-	 */
-	private final class UserNameStep extends WizardStep
-	{
-		/**
-		 * Construct.
-		 */
-		public UserNameStep()
-		{
-			super(new ResourceModel("username.title"), new ResourceModel("username.summary"));
-
-			add(new RequiredTextField<>("user.userName"));
-
-			FormComponent<String> email = new RequiredTextField<String>("user.email").add(EmailAddressValidator.getInstance());
-			add(email);
-
-			TextField<String> emailRepeat = new TextField<>("emailRepeat",
-				new Model<String>());
-			add(emailRepeat);
-
-			add(new EqualInputValidator(email, emailRepeat));
-		}
-	}
-
-	/**
-	 * The user details step.
-	 */
-	private final class UserRolesStep extends WizardStep implements ICondition
-	{
-		/**
-		 * Construct.
-		 */
-		public UserRolesStep()
-		{
-			super(new ResourceModel("userroles.title"), null);
-			setSummaryModel(new StringResourceModel("userroles.summary", this,
-				new Model<>(user)));
-			final ListMultipleChoice<String> rolesChoiceField = new ListMultipleChoice<>(
-				"user.roles", allRoles);
-			add(rolesChoiceField);
-			final TextField<String> rolesSetNameField = new TextField<>("user.rolesSetName");
-			add(rolesSetNameField);
-			add(new AbstractFormValidator()
-			{
-				@Override
-				public FormComponent[] getDependentFormComponents()
-				{
-					// name and roles don't have anything to validate,
-					// so might as well just skip them here
-					return null;
-				}
-
-				@Override
-				public void validate(Form<?> form)
-				{
-					String rolesInput = rolesChoiceField.getInput();
-					if (rolesInput != null && (!"".equals(rolesInput)))
-					{
-						if ("".equals(rolesSetNameField.getInput()))
-						{
-							rolesSetNameField.error(new ValidationError().addKey("error.noSetNameForRoles"));
-						}
-					}
-				}
-			});
-		}
-
-		@Override
-		public boolean evaluate()
-		{
-			return assignRoles;
-		}
-	}
-
 	/** cheap ass roles database. */
 	private static final List<String> allRoles = Arrays.asList("admin", "user", "moderator",
 		"joker", "slacker");
@@ -269,5 +156,115 @@ public class NewUserWizard extends Wizard
 	public void setUser(User user)
 	{
 		this.user = user;
+	}
+
+	/**
+	 * The confirmation step.
+	 */
+	private final class ConfirmationStep extends StaticContentStep
+	{
+		/**
+		 * Construct.
+		 */
+		public ConfirmationStep()
+		{
+			super(true);
+			IModel<User> userModel = new Model<>(user);
+			setTitleModel(new ResourceModel("confirmation.title"));
+			setSummaryModel(new StringResourceModel("confirmation.summary", this, userModel));
+			setContentModel(new StringResourceModel("confirmation.content", this, userModel));
+		}
+	}
+
+	/**
+	 * The user details step.
+	 */
+	private final class UserDetailsStep extends WizardStep
+	{
+		/**
+		 * Construct.
+		 */
+		public UserDetailsStep()
+		{
+			setTitleModel(new ResourceModel("confirmation.title"));
+			setSummaryModel(new StringResourceModel("userdetails.summary", this, new Model<>(
+				user)));
+			add(new RequiredTextField<>("user.firstName"));
+			add(new RequiredTextField<>("user.lastName"));
+			add(new TextField<>("user.department"));
+			add(new CheckBox("assignRoles"));
+		}
+	}
+
+	/**
+	 * The user name step.
+	 */
+	private final class UserNameStep extends WizardStep
+	{
+		/**
+		 * Construct.
+		 */
+		public UserNameStep()
+		{
+			super(new ResourceModel("username.title"), new ResourceModel("username.summary"));
+
+			add(new RequiredTextField<>("user.userName"));
+
+			FormComponent<String> email = new RequiredTextField<String>("user.email").add(EmailAddressValidator.getInstance());
+			add(email);
+
+			TextField<String> emailRepeat = new TextField<>("emailRepeat",
+				new Model<String>());
+			add(emailRepeat);
+
+			add(new EqualInputValidator(email, emailRepeat));
+		}
+	}
+
+	/**
+	 * The user details step.
+	 */
+	private final class UserRolesStep extends WizardStep implements ICondition
+	{
+		/**
+		 * Construct.
+		 */
+		public UserRolesStep()
+		{
+			super(new ResourceModel("userroles.title"), null);
+			setSummaryModel(new StringResourceModel("userroles.summary", this,
+				new Model<>(user)));
+			final ListMultipleChoice<String> rolesChoiceField = new ListMultipleChoice<>(
+				"user.roles", allRoles);
+			add(rolesChoiceField);
+			final TextField<String> rolesSetNameField = new TextField<>("user.rolesSetName");
+			add(rolesSetNameField);
+			add(new AbstractFormValidator()
+			{
+				@Override
+				public FormComponent[] getDependentFormComponents()
+				{
+					// name and roles don't have anything to validate,
+					// so might as well just skip them here
+					return null;
+				}
+
+				@Override
+				public void validate(Form<?> form)
+				{
+					String rolesInput = rolesChoiceField.getInput();
+					boolean condition = rolesInput != null && (!"".equals(rolesInput)) && "".equals(rolesSetNameField.getInput());
+					if (condition) {
+						rolesSetNameField.error(new ValidationError().addKey("error.noSetNameForRoles"));
+					}
+				}
+			});
+		}
+
+		@Override
+		public boolean evaluate()
+		{
+			return assignRoles;
+		}
 	}
 }

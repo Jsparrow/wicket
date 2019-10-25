@@ -213,7 +213,7 @@ public class InSessionPageStore extends DelegatingPageStore
 	 * Data kept in the {@link Session}, might get serialized along with its containing
 	 * {@link HttpSession}.
 	 */
-	static abstract class SessionData implements Serializable
+	abstract static class SessionData implements Serializable
 	{
 
 		transient ISerializer serializer;
@@ -336,6 +336,7 @@ public class InSessionPageStore extends DelegatingPageStore
 			this.maxPages = Args.withinRange(1, Integer.MAX_VALUE, maxPages, "maxPages");
 		}
 
+		@Override
 		public synchronized void add(IManageablePage page)
 		{
 			super.add(page);

@@ -96,14 +96,7 @@ class ActionPermissionsTest
 		Label label = new Label("label", "text");
 		Action mambo = new Action("mambo");
 		MetaDataRoleAuthorizationStrategy strategy = new MetaDataRoleAuthorizationStrategy(
-			new IRoleCheckingStrategy()
-			{
-				@Override
-				public boolean hasAnyRole(Roles roles)
-				{
-					return false;
-				}
-			});
+			(Roles roles) -> false);
 		label.setMetaData(MetaDataRoleAuthorizationStrategy.ACTION_PERMISSIONS,
 			new ActionPermissions());
 		MetaDataRoleAuthorizationStrategy.unauthorize(label, mambo, "johan");
@@ -120,14 +113,7 @@ class ActionPermissionsTest
 		Label label = new Label("label", "text");
 		Action mambo = new Action("mambo");
 		MetaDataRoleAuthorizationStrategy strategy = new MetaDataRoleAuthorizationStrategy(
-			new IRoleCheckingStrategy()
-			{
-				@Override
-				public boolean hasAnyRole(Roles roles)
-				{
-					return false;
-				}
-			});
+			(Roles roles) -> false);
 		label.setMetaData(MetaDataRoleAuthorizationStrategy.ACTION_PERMISSIONS,
 			new ActionPermissions());
 		MetaDataRoleAuthorizationStrategy.authorize(label, mambo, "johan");

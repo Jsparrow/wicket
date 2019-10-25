@@ -54,18 +54,18 @@ public class MarkupFactory
 	private IMarkupResourceStreamProvider markupResourceStreamProvider = null;
 
 	/**
+	 * Construct.
+	 */
+	public MarkupFactory()
+	{
+	}
+
+	/**
 	 * @return Gets the markup factory registered with the Wicket application
 	 */
 	public static MarkupFactory get()
 	{
 		return Application.get().getMarkupSettings().getMarkupFactory();
-	}
-
-	/**
-	 * Construct.
-	 */
-	public MarkupFactory()
-	{
 	}
 
 	/**
@@ -255,13 +255,11 @@ public class MarkupFactory
 	 */
 	protected final boolean checkMarkupType(final MarkupContainer container)
 	{
-		if (container.getMarkupType() == null)
-		{
-			log.debug("Markup file not loaded, since the markup type is not yet available: {}", container);
-			return false;
+		if (container.getMarkupType() != null) {
+			return true;
 		}
-
-		return true;
+		log.debug("Markup file not loaded, since the markup type is not yet available: {}", container);
+		return false;
 	}
 
 	/**
@@ -357,8 +355,7 @@ public class MarkupFactory
 		}
 		else if (!clazz.isAssignableFrom(container.getClass()))
 		{
-			throw new IllegalArgumentException("Parameter clazz must be an instance of " +
-				container.getClass().getName() + ", but is a " + clazz.getName());
+			throw new IllegalArgumentException(new StringBuilder().append("Parameter clazz must be an instance of ").append(container.getClass().getName()).append(", but is a ").append(clazz.getName()).toString());
 		}
 		return containerClass;
 	}

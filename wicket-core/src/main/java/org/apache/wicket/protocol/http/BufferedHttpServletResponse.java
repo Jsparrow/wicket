@@ -519,23 +519,16 @@ class BufferedHttpServletResponse implements HttpServletResponse
 		}
 		if (headers != null)
 		{
-			for (Entry<String, List<Object>> stringObjectEntry : headers.entrySet())
-			{
+			headers.entrySet().forEach(stringObjectEntry -> {
 				String name = stringObjectEntry.getKey();
 				List<Object> values = stringObjectEntry.getValue();
-				for (Object value : values)
-				{
-					addHeader(name, value, servletResponse);
-				}
-			}
+				values.forEach(value -> addHeader(name, value, servletResponse));
+			});
 		}
 
 		if (cookies != null)
 		{
-			for (Cookie cookie : cookies)
-			{
-				servletResponse.addCookie(cookie);
-			}
+			cookies.forEach(servletResponse::addCookie);
 		}
 		if (locale != null)
 		{
@@ -639,10 +632,7 @@ class BufferedHttpServletResponse implements HttpServletResponse
 			return Collections.emptyList();
 		}
 		List<String> ret = new ArrayList<>(values.size());
-		for (Object value : values)
-		{
-			ret.add(value.toString());
-		}
+		values.forEach(value -> ret.add(value.toString()));
 		return ret;
 	}
 

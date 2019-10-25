@@ -34,6 +34,30 @@ public class HomePage extends WebPage
 	private String datefield;
 	private String datefield2;
 
+	/**
+	 * Constructor that is invoked when page is invoked without a session.
+	 * 
+	 * @param parameters
+	 *            Page parameters
+	 */
+	public HomePage(final PageParameters parameters)
+	{
+		// Add the simplest type of label
+		add(new Label("message",
+			"If you see this message wicket is properly configured and running"));
+
+		MyBorder border = new MyBorder("border");
+		add(border);
+
+		Body body = border.getBodyContainer();
+		body.add(new TextField<String>("textfield", new PropertyModel<String>(this, "textfield")));
+		body.add(new Label("lbltextfield", new PropertyModel<String>(this, "textfield")));
+		body.add(new MyTextField("datefield", new PropertyModel<String>(this, "datefield")).setOutputMarkupId(true));
+		body.add(new Label("lbldatefield", new PropertyModel<String>(this, "datefield")));
+		body.add(new MyDateField("datefield2", new PropertyModel<String>(this, "datefield2")).setOutputMarkupId(true));
+		body.add(new Label("lbldatefield2", new PropertyModel<String>(this, "datefield2")));
+	}
+
 	String getTextfield()
 	{
 		return textfield;
@@ -62,29 +86,5 @@ public class HomePage extends WebPage
 	void setDatefield2(String datefield)
 	{
 		datefield2 = datefield;
-	}
-
-	/**
-	 * Constructor that is invoked when page is invoked without a session.
-	 * 
-	 * @param parameters
-	 *            Page parameters
-	 */
-	public HomePage(final PageParameters parameters)
-	{
-		// Add the simplest type of label
-		add(new Label("message",
-			"If you see this message wicket is properly configured and running"));
-
-		MyBorder border = new MyBorder("border");
-		add(border);
-
-		Body body = border.getBodyContainer();
-		body.add(new TextField<String>("textfield", new PropertyModel<String>(this, "textfield")));
-		body.add(new Label("lbltextfield", new PropertyModel<String>(this, "textfield")));
-		body.add(new MyTextField("datefield", new PropertyModel<String>(this, "datefield")).setOutputMarkupId(true));
-		body.add(new Label("lbldatefield", new PropertyModel<String>(this, "datefield")));
-		body.add(new MyDateField("datefield2", new PropertyModel<String>(this, "datefield2")).setOutputMarkupId(true));
-		body.add(new Label("lbldatefield2", new PropertyModel<String>(this, "datefield2")));
 	}
 }

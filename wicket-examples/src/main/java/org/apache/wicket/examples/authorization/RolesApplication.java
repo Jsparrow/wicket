@@ -48,7 +48,6 @@ public class RolesApplication extends WebApplication
 	 */
 	public RolesApplication()
 	{
-		super();
 	}
 
 	/**

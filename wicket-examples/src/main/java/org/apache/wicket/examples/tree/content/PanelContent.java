@@ -26,7 +26,7 @@ import org.apache.wicket.model.IModel;
 /**
  * @author Sven Meier
  */
-public class PanelContent extends Content implements IDetachable
+public class PanelContent extends Content
 {
 	private static final long serialVersionUID = 1L;
 

@@ -76,15 +76,14 @@ public class Page5 extends WicketExamplePage
 	private String join(List<StringValue> values)
 	{
 	    StringBuilder sb = new StringBuilder();
-		for (StringValue sv : values)
-		{
+		values.forEach(sv -> {
 			if (sb.length() > 0)
 			{
 				sb.append(", ");
 			}
 
 			sb.append(sv.toString());
-		}
+		});
 		return sb.toString();
 	}
 }

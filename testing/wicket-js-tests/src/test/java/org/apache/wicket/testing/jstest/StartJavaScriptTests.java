@@ -32,6 +32,8 @@ import org.eclipse.jetty.server.SslConnectionFactory;
 import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.webapp.WebAppContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Separate startup class for people that want to run the examples directly. Use parameter
@@ -42,6 +44,15 @@ import org.eclipse.jetty.webapp.WebAppContext;
  */
 public class StartJavaScriptTests
 {
+	private static final Logger logger = LoggerFactory.getLogger(StartJavaScriptTests.class);
+
+	/**
+	 * Construct.
+	 */
+	StartJavaScriptTests()
+	{
+	}
+
 	/**
 	 * Main function, starts the jetty server.
 	 *
@@ -88,9 +99,9 @@ public class StartJavaScriptTests
 			https.setIdleTimeout(500000);
 
 			server.addConnector(https);
-			System.out.println("SSL access to the examples has been enabled on port 8443");
-			System.out
-					.println("You can access the application using SSL on https://localhost:8443");
+			logger.info("SSL access to the examples has been enabled on port 8443");
+			logger
+					.info("You can access the application using SSL on https://localhost:8443");
 			System.out.println();
 		}
 
@@ -121,7 +132,7 @@ public class StartJavaScriptTests
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 			System.exit(100);
 		}
 	}
@@ -134,15 +145,7 @@ public class StartJavaScriptTests
 		}
 		catch (Exception e)
 		{
-			System.out.println("can not open browser " + e);
+			logger.info("can not open browser " + e, e);
 		}
-	}
-
-	/**
-	 * Construct.
-	 */
-	StartJavaScriptTests()
-	{
-		super();
 	}
 }

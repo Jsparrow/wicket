@@ -119,9 +119,7 @@ class CollectionFormComponentTest extends WicketTestCase
 		Choice choice = new Choice(object);
 		choice.setConvertedInput(Arrays.asList("A", "B"));
 
-		assertThrows(WicketRuntimeException.class, () -> {
-			FormComponent.updateCollectionModel(choice);
-		});
+		assertThrows(WicketRuntimeException.class, () -> FormComponent.updateCollectionModel(choice));
 	}
 
 	@Test
@@ -253,9 +251,7 @@ class CollectionFormComponentTest extends WicketTestCase
 		Choice choice = new Choice(object);
 		choice.setConvertedInput(Arrays.asList("A", "B"));
 
-		assertThrows(WicketRuntimeException.class, () -> {
-			FormComponent.updateCollectionModel(choice);
-		});
+		assertThrows(WicketRuntimeException.class, () -> FormComponent.updateCollectionModel(choice));
 	}
 
 	@Test
@@ -267,7 +263,7 @@ class CollectionFormComponentTest extends WicketTestCase
 			@Override
 			protected Collection<String> load()
 			{
-				return Collections.unmodifiableList(Arrays.asList("1", "2"));
+				return List.of("1", "2");
 			}
 
 		};

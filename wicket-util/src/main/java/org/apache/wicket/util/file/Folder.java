@@ -32,48 +32,6 @@ import org.apache.wicket.util.lang.Bytes;
  */
 public class Folder extends File
 {
-	/**
-	 * Filter for files
-	 * 
-	 * @author Jonathan Locke
-	 */
-	public static interface FileFilter
-	{
-		/**
-		 * File filter that matches all files
-		 */
-		public static FileFilter ALL_FILES = new FileFilter()
-		{
-			@Override
-			public boolean accept(final File file)
-			{
-				return true;
-			}
-		};
-
-		/**
-		 * @param file
-		 *            The file to test
-		 * @return True if the file should be accepted
-		 */
-		public boolean accept(File file);
-	}
-
-	/**
-	 * Filter for folders
-	 * 
-	 * @author Jonathan Locke
-	 */
-	public static interface FolderFilter
-	{
-		/**
-		 * @param folder
-		 *            The folder to test
-		 * @return True if the file should be accepted
-		 */
-		public boolean accept(Folder folder);
-	}
-
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -224,16 +182,15 @@ public class Folder extends File
 		});
 
 		// Convert java.io files to org.apache.wicket files
-		if (files != null)
-		{
-			final File[] wicketFiles = new File[files.length];
-			for (int i = 0; i < files.length; i++)
-			{
-				wicketFiles[i] = new File(files[i]);
-			}
-			return wicketFiles;
+		if (files == null) {
+			return new File[0];
 		}
-		return new File[0];
+		final File[] wicketFiles = new File[files.length];
+		for (int i = 0; i < files.length; i++)
+		{
+			wicketFiles[i] = new File(files[i]);
+		}
+		return wicketFiles;
 	}
 
 	/**
@@ -243,14 +200,9 @@ public class Folder extends File
 	 */
 	public Folder[] getFolders()
 	{
-		return getFolders(new FolderFilter()
-		{
-			@Override
-			public boolean accept(final Folder folder)
-			{
-				final String name = folder.getName();
-				return !name.equals(".") && !name.equals("..");
-			}
+		return getFolders((final Folder folder) -> {
+			final String name = folder.getName();
+			return !".".equals(name) && !"..".equals(name);
 		});
 	}
 
@@ -275,16 +227,15 @@ public class Folder extends File
 		});
 
 		// Convert
-		if (files != null)
-		{
-			final Folder[] wicketFolders = new Folder[files.length];
-			for (int i = 0; i < files.length; i++)
-			{
-				wicketFolders[i] = new Folder(files[i]);
-			}
-			return wicketFolders;
+		if (files == null) {
+			return new Folder[0];
 		}
-		return new Folder[0];
+		final Folder[] wicketFolders = new Folder[files.length];
+		for (int i = 0; i < files.length; i++)
+		{
+			wicketFolders[i] = new Folder(files[i]);
+		}
+		return wicketFolders;
 	}
 
 	/**
@@ -332,5 +283,40 @@ public class Folder extends File
 		}
 		success = removeFiles() && success;
 		return folder.delete() && success;
+	}
+
+	/**
+	 * Filter for files
+	 * 
+	 * @author Jonathan Locke
+	 */
+	public static interface FileFilter
+	{
+		/**
+		 * File filter that matches all files
+		 */
+		FileFilter ALL_FILES = (final File file) -> true;
+
+		/**
+		 * @param file
+		 *            The file to test
+		 * @return True if the file should be accepted
+		 */
+		boolean accept(File file);
+	}
+
+	/**
+	 * Filter for folders
+	 * 
+	 * @author Jonathan Locke
+	 */
+	public static interface FolderFilter
+	{
+		/**
+		 * @param folder
+		 *            The folder to test
+		 * @return True if the file should be accepted
+		 */
+		boolean accept(Folder folder);
 	}
 }

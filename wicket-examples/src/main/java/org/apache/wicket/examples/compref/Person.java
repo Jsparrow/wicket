@@ -143,7 +143,7 @@ public class Person implements IClusterable
 	 */
 	public String getFullName()
 	{
-		return name + " " + lastName;
+		return new StringBuilder().append(name).append(" ").append(lastName).toString();
 	}
 
 	/**
@@ -152,7 +152,7 @@ public class Person implements IClusterable
 	@Override
 	public String toString()
 	{
-		return "[Person name=" + name + ", lastName=" + lastName + ", dateOfBirth=" + dateOfBirth +
-				"]";
+		return new StringBuilder().append("[Person name=").append(name).append(", lastName=").append(lastName).append(", dateOfBirth=").append(dateOfBirth).append("]")
+				.toString();
 	}
 }

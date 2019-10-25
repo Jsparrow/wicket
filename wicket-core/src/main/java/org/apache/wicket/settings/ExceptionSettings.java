@@ -42,19 +42,6 @@ import org.apache.wicket.util.lang.EnumeratedType;
 public class ExceptionSettings
 {
 	/**
-	 * Enumerated type for different ways of displaying unexpected exceptions.
-	 */
-	public static final class UnexpectedExceptionDisplay extends EnumeratedType
-	{
-		private static final long serialVersionUID = 1L;
-
-		UnexpectedExceptionDisplay(final String name)
-		{
-			super(name);
-		}
-	}
-
-	/**
 	 * Indicates that an exception page appropriate to development should be shown when an
 	 * unexpected exception is thrown.
 	 */
@@ -66,62 +53,14 @@ public class ExceptionSettings
 	 */
 	public static final UnexpectedExceptionDisplay SHOW_INTERNAL_ERROR_PAGE = new UnexpectedExceptionDisplay(
 			"SHOW_INTERNAL_ERROR_PAGE");
-
 	/**
 	 * Indicates that no exception page should be shown when an unexpected exception is thrown.
 	 */
 	public static final UnexpectedExceptionDisplay SHOW_NO_EXCEPTION_PAGE = new UnexpectedExceptionDisplay(
 			"SHOW_NO_EXCEPTION_PAGE");
-
-	/**
-	 * How to handle errors while processing an Ajax request
-	 *
-	 * @author igor
-	 */
-	public enum AjaxErrorStrategy {
-		/** redirect to error page, just like a normal requset */
-		REDIRECT_TO_ERROR_PAGE,
-		/** invoke client side failure handler */
-		INVOKE_FAILURE_HANDLER
-	}
-
-	/**
-	 * Which threads' stacktrace to dump when a page lock timeout occurs
-	 *
-	 * @author papegaaij
-	 */
-	public enum ThreadDumpStrategy {
-		/** Do not dump any stacktraces */
-		NO_THREADS,
-		/** Dump the stacktrace of the thread holding the lock */
-		THREAD_HOLDING_LOCK,
-		/** Dump stacktraces of all threads of the application */
-		ALL_THREADS
-	}
-
-	/**
-	 * A strategy defining what to do when a component that will not render its
-	 * markup tag (because of {@link org.apache.wicket.Component#setRenderBodyOnly(boolean) setRenderBodyOnly(true)}
-	 * or used with &lt;wicket:xyz&gt;) is also asked to output a
-	 * markup {@link org.apache.wicket.Component#setOutputMarkupId(boolean) id} or
-	 * {@link org.apache.wicket.Component#setOutputMarkupPlaceholderTag(boolean) placeholder tag}
-	 */
-	public enum NotRenderableErrorStrategy {
-		/**
-		 * Log a message with level {@link org.slf4j.Logger#warn(String) WARNING}
-		 */
-		LOG_WARNING,
-		/**
-		 * Throw a runtime exception
-		 */
-		THROW_EXCEPTION
-	}
-
 	/** Type of handling for unexpected exceptions */
 	private UnexpectedExceptionDisplay unexpectedExceptionDisplay = SHOW_EXCEPTION_PAGE;
-
 	private AjaxErrorStrategy errorHandlingStrategyDuringAjaxRequests = AjaxErrorStrategy.REDIRECT_TO_ERROR_PAGE;
-
 	/**
 	 * Strategy to use for dumping stack traces of live threads in the JVM.
 	 * <p>
@@ -129,7 +68,6 @@ public class ExceptionSettings
 	 * </p>
 	 */
 	private ThreadDumpStrategy threadDumpStrategy = ThreadDumpStrategy.THREAD_HOLDING_LOCK;
-
 	private NotRenderableErrorStrategy notRenderableErrorStrategy = NotRenderableErrorStrategy.LOG_WARNING;
 
 	/**
@@ -214,5 +152,62 @@ public class ExceptionSettings
 
 	public void setNotRenderableErrorStrategy(final NotRenderableErrorStrategy notRenderableErrorStrategy) {
 		this.notRenderableErrorStrategy = notRenderableErrorStrategy;
+	}
+
+	/**
+	 * How to handle errors while processing an Ajax request
+	 *
+	 * @author igor
+	 */
+	public enum AjaxErrorStrategy {
+		/** redirect to error page, just like a normal requset */
+		REDIRECT_TO_ERROR_PAGE,
+		/** invoke client side failure handler */
+		INVOKE_FAILURE_HANDLER
+	}
+
+	/**
+	 * Which threads' stacktrace to dump when a page lock timeout occurs
+	 *
+	 * @author papegaaij
+	 */
+	public enum ThreadDumpStrategy {
+		/** Do not dump any stacktraces */
+		NO_THREADS,
+		/** Dump the stacktrace of the thread holding the lock */
+		THREAD_HOLDING_LOCK,
+		/** Dump stacktraces of all threads of the application */
+		ALL_THREADS
+	}
+
+	/**
+	 * A strategy defining what to do when a component that will not render its
+	 * markup tag (because of {@link org.apache.wicket.Component#setRenderBodyOnly(boolean) setRenderBodyOnly(true)}
+	 * or used with &lt;wicket:xyz&gt;) is also asked to output a
+	 * markup {@link org.apache.wicket.Component#setOutputMarkupId(boolean) id} or
+	 * {@link org.apache.wicket.Component#setOutputMarkupPlaceholderTag(boolean) placeholder tag}
+	 */
+	public enum NotRenderableErrorStrategy {
+		/**
+		 * Log a message with level {@link org.slf4j.Logger#warn(String) WARNING}
+		 */
+		LOG_WARNING,
+		/**
+		 * Throw a runtime exception
+		 */
+		THROW_EXCEPTION
+	}
+
+	/**
+	 * Enumerated type for different ways of displaying unexpected exceptions.
+	 */
+	public static final class UnexpectedExceptionDisplay extends EnumeratedType
+	{
+		private static final long serialVersionUID = 1L;
+
+		UnexpectedExceptionDisplay(final String name)
+		{
+			super(name);
+		}
 	}
 }

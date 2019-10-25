@@ -188,11 +188,7 @@ public class WebSocketResponse extends WebResponse
 	@Override
 	public void sendError(int sc, String msg)
 	{
-		LOG.warn("An HTTP error response in WebSocket communication would not be processed by the browser! " +
-				"If you need to send the error code and message to the client then configure custom WebSocketResponse " +
-				"via WebSocketSettings#newWebSocketResponse() factory method and override #sendError() method to write " +
-				"them in an appropriate format for your application. " +
-				"The ignored error code is '{}' and the message: '{}'.", sc, msg);
+		LOG.warn(new StringBuilder().append("An HTTP error response in WebSocket communication would not be processed by the browser! ").append("If you need to send the error code and message to the client then configure custom WebSocketResponse ").append("via WebSocketSettings#newWebSocketResponse() factory method and override #sendError() method to write ").append("them in an appropriate format for your application. ").append("The ignored error code is '{}' and the message: '{}'.").toString(), sc, msg);
 	}
 
 	@Override
@@ -207,7 +203,7 @@ public class WebSocketResponse extends WebResponse
 		isRedirect = true;
 		url = encodeRedirectURL(url);
 
-		String ajaxRedirect = "<ajax-response><redirect><![CDATA[" + url + "]]></redirect></ajax-response>";
+		String ajaxRedirect = new StringBuilder().append("<ajax-response><redirect><![CDATA[").append(url).append("]]></redirect></ajax-response>").toString();
 		write(ajaxRedirect);
 	}
 

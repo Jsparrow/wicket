@@ -65,7 +65,7 @@ public class ClientSideImageMap extends Panel
 
 	private String circleCoordinates(int x, int y, int radius)
 	{
-		return x + "," + y + "," + radius;
+		return new StringBuilder().append(x).append(",").append(y).append(",").append(radius).toString();
 	}
 
 	private String polygonCoordinates(int... coordinates)
@@ -85,7 +85,8 @@ public class ClientSideImageMap extends Panel
 
 	private String rectangleCoordinates(int x1, int y1, int x2, int y2)
 	{
-		return x1 + "," + y1 + "," + x2 + "," + y2;
+		return new StringBuilder().append(x1).append(",").append(y1).append(",").append(x2).append(",")
+				.append(y2).toString();
 	}
 
 	private String shapeCoordinates(Shape shape)

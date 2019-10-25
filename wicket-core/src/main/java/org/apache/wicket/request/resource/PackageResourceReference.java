@@ -180,8 +180,9 @@ public class PackageResourceReference extends ResourceReference
 		IResourceStream stream = locator.locate(getScope(), absolutePath, style, variation, locale,
 			null, false);
 
-		if (stream == null)
+		if (stream == null) {
 			return new ResourceReference.UrlAttributes(null, null, null);
+		}
 
 		return new ResourceReference.UrlAttributes(stream.getLocale(), stream.getStyle(),
 			stream.getVariation());

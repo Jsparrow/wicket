@@ -53,6 +53,8 @@ import org.apache.wicket.util.tester.WicketTestCase;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jcompagner
@@ -60,6 +62,8 @@ import org.junit.jupiter.api.Test;
  */
 public class PropertyResolverTest extends WicketTestCase
 {
+
+	private static final Logger logger = LoggerFactory.getLogger(PropertyResolverTest.class);
 
 	private static final PropertyResolverConverter CONVERTER = new PropertyResolverConverter(
 		new ConverterLocator(), Locale.US);
@@ -111,9 +115,7 @@ public class PropertyResolverTest extends WicketTestCase
 		integer = (Integer)PropertyResolver.getValue("age", person);
 		assertTrue(integer == 10);
 
-		assertThrows(ConversionException.class, () -> {
-			PropertyResolver.setValue("age", person, null, CONVERTER);
-		});
+		assertThrows(ConversionException.class, () -> PropertyResolver.setValue("age", person, null, CONVERTER));
 	}
 
 	/**
@@ -156,6 +158,7 @@ public class PropertyResolverTest extends WicketTestCase
 		}
 		catch (WicketRuntimeException ex)
 		{
+			logger.error(ex.getMessage(), ex);
 		}
 	}
 
@@ -174,6 +177,7 @@ public class PropertyResolverTest extends WicketTestCase
 		}
 		catch (WicketRuntimeException ex)
 		{
+			logger.error(ex.getMessage(), ex);
 		}
 	}
 
@@ -195,6 +199,7 @@ public class PropertyResolverTest extends WicketTestCase
 		}
 		catch (ConversionException ex)
 		{
+			logger.error(ex.getMessage(), ex);
 		}
 
 	}
@@ -220,7 +225,7 @@ public class PropertyResolverTest extends WicketTestCase
 	void mapWithDotLookup() throws Exception
 	{
 		Address address = new Address();
-		HashMap<String, Address> hm = new HashMap<String, Address>();
+		HashMap<String, Address> hm = new HashMap<>();
 		PropertyResolver.setValue("addressMap", person, hm, CONVERTER);
 		PropertyResolver.setValue("addressMap[address.test]", person, address, CONVERTER);
 		assertNotNull(hm.get("address.test"));
@@ -339,7 +344,7 @@ public class PropertyResolverTest extends WicketTestCase
 	@Test
 	void listSizeLookup() throws Exception
 	{
-		List<Address> addresses = new ArrayList<Address>();
+		List<Address> addresses = new ArrayList<>();
 		addresses.add(new Address());
 		addresses.add(new Address());
 		person.setAddressList(addresses);
@@ -356,7 +361,7 @@ public class PropertyResolverTest extends WicketTestCase
 	@Test
 	void mapSizeLookup() throws Exception
 	{
-		Map<String, Address> addresses = new HashMap<String, Address>();
+		Map<String, Address> addresses = new HashMap<>();
 		Address address = new Address();
 		addresses.put("size", address);
 		addresses.put("test", new Address());
@@ -410,6 +415,7 @@ public class PropertyResolverTest extends WicketTestCase
 		}
 		catch (RuntimeException ex)
 		{
+			logger.error(ex.getMessage(), ex);
 
 		}
 	}
@@ -600,23 +606,11 @@ public class PropertyResolverTest extends WicketTestCase
 		}
 		catch (Exception e)
 		{
+			logger.error(e.getMessage(), e);
 
 		}
 		person.setCountry(new Country2("test", new Country("test")));
 		PropertyResolver.getPropertyClass("country.subCountry.name", person);
-	}
-
-	/**
-	 * Used for models in testing.
-	 */
-	private static class InnerVectorPOJO extends Vector<Void>
-	{
-		private static final long serialVersionUID = 1L;
-
-		/**
-		 */
-		@SuppressWarnings("unused")
-		public String testValue = "vector";
 	}
 
 	/**
@@ -638,17 +632,6 @@ public class PropertyResolverTest extends WicketTestCase
 		final DirectFieldSetWithDifferentTypeThanGetter obj = new DirectFieldSetWithDifferentTypeThanGetter();
 		PropertyResolver.setValue("value", obj, 1, null);
 		assertEquals(1, obj.value);
-	}
-
-	private static class DirectFieldSetWithDifferentTypeThanGetter
-	{
-		private int value;
-
-		@SuppressWarnings("unused")
-		public String getValue()
-		{
-			return String.valueOf(value);
-		}
 	}
 
 	/**
@@ -755,7 +738,7 @@ public class PropertyResolverTest extends WicketTestCase
 		Object actual = converter.convert(date, Long.class);
 		assertEquals(date.getTime(), actual);
 	}
-	
+
 	/**
 	 * WICKET-5623 custom properties
 	 */
@@ -786,6 +769,30 @@ public class PropertyResolverTest extends WicketTestCase
 		PropertyResolver.setValue("instantPayment", bean, null, CONVERTER);
 		Boolean instantPayment = (Boolean) PropertyResolver.getValue("instantPayment", bean);
 		assertFalse(instantPayment);
+	}
+
+	/**
+	 * Used for models in testing.
+	 */
+	private static class InnerVectorPOJO extends Vector<Void>
+	{
+		private static final long serialVersionUID = 1L;
+
+		/**
+		 */
+		@SuppressWarnings("unused")
+		public String testValue = "vector";
+	}
+
+	private static class DirectFieldSetWithDifferentTypeThanGetter
+	{
+		private int value;
+
+		@SuppressWarnings("unused")
+		public String getValue()
+		{
+			return String.valueOf(value);
+		}
 	}
 
 	class CustomGetAndSetLocator implements IPropertyLocator {

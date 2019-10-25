@@ -35,7 +35,6 @@ public class BasePage extends WebPage
 	 */
     BasePage()
 	{
-		super();
 	}
 
 	/**

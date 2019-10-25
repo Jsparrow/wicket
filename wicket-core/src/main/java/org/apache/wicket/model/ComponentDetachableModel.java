@@ -110,7 +110,7 @@ public class ComponentDetachableModel<T> implements IComponentAssignedModel<T>
 	@Override
 	public IWrapModel<T> wrapOnAssignment(Component comp)
 	{
-		return new WrapModel<T>(comp);
+		return new WrapModel<>(comp);
 	}
 
 	private class WrapModel<P> implements IWrapModel<T>
@@ -138,11 +138,11 @@ public class ComponentDetachableModel<T> implements IComponentAssignedModel<T>
 		 */
 		private void attach()
 		{
-			if (!attached)
-			{
-				attached = true;
-				ComponentDetachableModel.this.attach();
+			if (attached) {
+				return;
 			}
+			attached = true;
+			ComponentDetachableModel.this.attach();
 		}
 
 		@Override
@@ -162,11 +162,11 @@ public class ComponentDetachableModel<T> implements IComponentAssignedModel<T>
 		@Override
 		public void detach()
 		{
-			if (attached)
-			{
-				attached = false;
-				ComponentDetachableModel.this.detach();
+			if (!attached) {
+				return;
 			}
+			attached = false;
+			ComponentDetachableModel.this.detach();
 		}
 	}
 }

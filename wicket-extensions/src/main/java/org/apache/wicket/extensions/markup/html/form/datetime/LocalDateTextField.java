@@ -31,6 +31,8 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.util.convert.IConverter;
 import org.apache.wicket.util.convert.converter.LocalDateConverter;
 import org.apache.wicket.util.string.Strings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A TextField that is mapped to a <code>java.time.LocalDate</code> object and that uses java.time time to
@@ -42,6 +44,8 @@ import org.apache.wicket.util.string.Strings;
  */
 public class LocalDateTextField extends TextField<LocalDate> implements ITextFormatProvider
 {
+	private static final Logger logger = LoggerFactory.getLogger(LocalDateTextField.class);
+
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -118,6 +122,7 @@ public class LocalDateTextField extends TextField<LocalDate> implements ITextFor
 				try {
 					temporalAccessor = dateTimeFormatter.parse(value);
 				} catch (DateTimeParseException ex) {
+					logger.error(ex.getMessage(), ex);
 					throw newConversionException("Cannot parse '" + value, value, locale);
 				}
 				

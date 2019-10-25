@@ -39,7 +39,7 @@ public class SelectTestPage3 extends WebPage
 		form = new Form<>("form");
 		add(form);
 
-		select = new Select<Integer>("select", new Model<Integer>(1));
+		select = new Select<>("select", new Model<Integer>(1));
 		form.add(select);
 
 		List<Integer> choices = Arrays.asList(1, 2, 3);
@@ -53,10 +53,10 @@ public class SelectTestPage3 extends WebPage
 			
 			@Override
 			public String getDisplayValue(Integer object) {
-				return "<" + object + ">";
+				return new StringBuilder().append("<").append(object).append(">").toString();
 			}
 		};
 		
-		select.add(options = new SelectOptions<Integer>("options", new ListModel<>(choices), renderer ));
+		select.add(options = new SelectOptions<>("options", new ListModel<>(choices), renderer ));
 	}
 }

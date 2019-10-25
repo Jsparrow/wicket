@@ -421,18 +421,15 @@ public class TabbedPanel<T extends ITab> extends Panel
 			component = tab.getPanel(TAB_PANEL_ID);
 			if (component == null)
 			{
-				throw new WicketRuntimeException("ITab.getPanel() returned null. TabbedPanel [" +
-					getPath() + "] ITab index [" + currentTab + "]");
+				throw new WicketRuntimeException(new StringBuilder().append("ITab.getPanel() returned null. TabbedPanel [").append(getPath()).append("] ITab index [").append(currentTab).append("]").toString());
 			}
 		}
 
 		if (!component.getId().equals(TAB_PANEL_ID))
 		{
 			throw new WicketRuntimeException(
-				"ITab.getPanel() returned a panel with invalid id [" +
-					component.getId() +
-					"]. You must always return a panel with id equal to the provided panelId parameter. TabbedPanel [" +
-					getPath() + "] ITab index [" + currentTab + "]");
+				new StringBuilder().append("ITab.getPanel() returned a panel with invalid id [").append(component.getId()).append("]. You must always return a panel with id equal to the provided panelId parameter. TabbedPanel [").append(getPath()).append("] ITab index [").append(currentTab)
+						.append("]").toString());
 		}
 
 		addOrReplace(component);
@@ -515,20 +512,16 @@ public class TabbedPanel<T extends ITab> extends Panel
 				visibilities = resized;
 			}
 
-			if (visibilities.length > 0)
-			{
-				Boolean visible = visibilities[index];
-				if (visible == null)
-				{
-					visible = tabs.get(index).isVisible();
-					visibilities[index] = visible;
-				}
-				return visible;
-			}
-			else
-			{
+			if (visibilities.length <= 0) {
 				return false;
 			}
+			Boolean visible = visibilities[index];
+			if (visible == null)
+			{
+				visible = tabs.get(index).isVisible();
+				visibilities[index] = visible;
+			}
+			return visible;
 		}
 	}
 }

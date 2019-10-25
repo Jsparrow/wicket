@@ -57,7 +57,7 @@ public class ResourceBundleReference extends ResourceReference implements IResou
 			bundleRef.getStyle(), bundleRef.getVariation());
 
 		this.bundleRef = bundleRef;
-		providedResources = new ArrayList<HeaderItem>();
+		providedResources = new ArrayList<>();
 	}
 
 	/**
@@ -95,15 +95,8 @@ public class ResourceBundleReference extends ResourceReference implements IResou
 	public List<HeaderItem> getDependencies()
 	{
 		Set<HeaderItem> ret = new LinkedHashSet<>();
-		for (HeaderItem curProvided : providedResources)
-		{
-			for (HeaderItem curDependency : curProvided.getDependencies())
-				ret.add(curDependency);
-		}
-		for (HeaderItem curProvided : providedResources)
-		{
-			ret.remove(curProvided);
-		}
+		providedResources.forEach(curProvided -> curProvided.getDependencies().forEach(ret::add));
+		providedResources.forEach(ret::remove);
 		List<HeaderItem> dependencies = super.getDependencies();
 		dependencies.addAll(ret);
 		return dependencies;

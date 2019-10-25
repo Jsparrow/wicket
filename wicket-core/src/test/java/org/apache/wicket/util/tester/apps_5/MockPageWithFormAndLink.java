@@ -29,33 +29,8 @@ import org.apache.wicket.model.CompoundPropertyModel;
  */
 public class MockPageWithFormAndLink extends WebPage
 {
-	/**
-	 * @author Frank Bille
-	 */
-	public static class MockPojo
-	{
-		private String name;
-
-		/**
-		 * @return name
-		 */
-		public String getName()
-		{
-			return name;
-		}
-
-		/**
-		 * @param name
-		 */
-		public void setName(String name)
-		{
-			this.name = name;
-		}
-	}
-
 	private static final long serialVersionUID = 1L;
 	private Form<MockPojo> form;
-
 	private TextField<String> nameField;
 
 
@@ -66,9 +41,9 @@ public class MockPageWithFormAndLink extends WebPage
 	 */
 	public MockPageWithFormAndLink(MockPojo mockPojo)
 	{
-		form = new Form<MockPojo>("form", new CompoundPropertyModel<MockPojo>(mockPojo));
+		form = new Form<>("form", new CompoundPropertyModel<MockPojo>(mockPojo));
 		add(form);
-		nameField = new TextField<String>("name");
+		nameField = new TextField<>("name");
 		form.add(nameField);
 	}
 
@@ -106,5 +81,30 @@ public class MockPageWithFormAndLink extends WebPage
 	public void setNameField(TextField<String> name)
 	{
 		nameField = name;
+	}
+
+
+	/**
+	 * @author Frank Bille
+	 */
+	public static class MockPojo
+	{
+		private String name;
+
+		/**
+		 * @return name
+		 */
+		public String getName()
+		{
+			return name;
+		}
+
+		/**
+		 * @param name
+		 */
+		public void setName(String name)
+		{
+			this.name = name;
+		}
 	}
 }

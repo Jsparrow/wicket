@@ -53,10 +53,10 @@ public abstract class AbstractCheckGroupTestPage extends WebPage
 	{
 
 		form = new Form<Void>("form");
-		group = new CheckGroup<String>("group", new CollectionModel<String>(list));
+		group = new CheckGroup<>("group", new CollectionModel<String>(list));
 		WebMarkupContainer container = new WebMarkupContainer("container");
-		check1 = new Check<String>("check1", new Model<String>("check1"));
-		check2 = new Check<String>("check2", new Model<String>("check2"));
+		check1 = new Check<>("check1", new Model<String>("check1"));
+		check2 = new Check<>("check2", new Model<String>("check2"));
 
 
 		add(form);

@@ -59,7 +59,7 @@ class TestForm extends Form<Void>
 	public TestForm(String id)
 	{
 		super(id);
-		textField = new TextField<String>("textField", new Model<String>());
+		textField = new TextField<>("textField", new Model<String>());
 		textField.add(new AjaxFormSubmitBehavior("change")
 		{
 			private static final long serialVersionUID = 1L;

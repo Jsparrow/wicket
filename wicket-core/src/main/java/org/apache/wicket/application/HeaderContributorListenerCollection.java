@@ -32,13 +32,6 @@ public class HeaderContributorListenerCollection extends ListenerCollection<IHea
 	@Override
 	public void renderHead(final IHeaderResponse response)
 	{
-		notify(new INotifier<IHeaderContributor>()
-		{
-			@Override
-			public void notify(final IHeaderContributor listener)
-			{
-				listener.renderHead(response);
-			}
-		});
+		notify((final IHeaderContributor listener) -> listener.renderHead(response));
 	}
 }

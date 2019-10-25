@@ -27,7 +27,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -224,6 +223,7 @@ public class MockServletContext implements ServletContext
 		}
 		catch (SecurityException sx)
 		{
+			log.error(sx.getMessage(), sx);
 			// not allowed to write so fallback to tmpdir
 			String tmpDir = System.getProperty("java.io.tmpdir");
 			file = new File(tmpDir);
@@ -546,7 +546,7 @@ public class MockServletContext implements ServletContext
 	{
 		if (webappRoot == null)
 		{
-			return new HashSet<String>();
+			return new HashSet<>();
 		}
 
 		if (name.startsWith("/"))
@@ -558,7 +558,7 @@ public class MockServletContext implements ServletContext
 			name = name.substring(0, name.length() - 1);
 		}
 		String[] elements = null;
-		if (name.trim().length() == 0)
+		if (name.trim().isEmpty())
 		{
 			elements = new String[0];
 		}
@@ -923,13 +923,13 @@ public class MockServletContext implements ServletContext
 
 		public MockedServletRegistationHandler(String servletName)
 		{
-			this.servletName = Arrays.asList(servletName);
+			this.servletName = Collections.singletonList(servletName);
 		}
 
 		@Override
 		public Object invoke(Object object, Method method, Object[] args) throws Throwable
 		{
-			if (method.getName().equals("getMappings"))
+			if ("getMappings".equals(method.getName()))
 			{
 				return servletName;
 			}

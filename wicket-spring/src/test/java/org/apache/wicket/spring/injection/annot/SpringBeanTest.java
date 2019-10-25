@@ -31,6 +31,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Test for SpringBean.
@@ -39,6 +41,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  */
 public class SpringBeanTest
 {
+	private static final Logger logger = LoggerFactory.getLogger(SpringBeanTest.class);
 	private WicketTester tester;
 	private ApplicationContextMock ctx;
 
@@ -94,6 +97,7 @@ public class SpringBeanTest
 		}
 		catch (IllegalStateException e)
 		{
+			logger.error(e.getMessage(), e);
 		}
 
 		// with required = false everything is fine
@@ -125,6 +129,7 @@ public class SpringBeanTest
 		}
 		catch (IllegalStateException e)
 		{
+			logger.error(e.getMessage(), e);
 		}
 
 		// we must inject bean with name "mrBean"
@@ -132,7 +137,7 @@ public class SpringBeanTest
 		tester.startPage(page = new AnnotatedBeanNotRequiredDifferentName());
 		SpringBeanLocator locator = (SpringBeanLocator)((ILazyInitProxy)page.getBean()).getObjectLocator();
 
-		assertTrue(locator.getBeanName().equals("mrBean"));
+		assertTrue("mrBean".equals(locator.getBeanName()));
 	}
 
 	/**

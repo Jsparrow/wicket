@@ -34,7 +34,7 @@ class AddChildToParentInOnInitializeTest extends WicketTestCase
 	{
 		tester.startPage(TestPage.class);
 		tester.assertRenderedPage(TestPage.class);
-		tester.assertComponent(TestPage.PARENT_ID + ':' + TestPage.FIRST_CHILD_ID, WebMarkupContainer.class);
+		tester.assertComponent(new StringBuilder().append(TestPage.PARENT_ID).append(':').append(TestPage.FIRST_CHILD_ID).toString(), WebMarkupContainer.class);
 		tester.assertComponent(TestPage.PARENT_ID, Parent.class);
 	}
 
@@ -59,13 +59,9 @@ class AddChildToParentInOnInitializeTest extends WicketTestCase
 		@Override
 		public IResourceStream getMarkupResourceStream(MarkupContainer container, Class<?> containerClass)
 		{
-			return new StringResourceStream("<html><head></head><body>" +
-					"<div wicket:id='"+ PARENT_ID +"'>" +
-						"<div wicket:id='"+FIRST_CHILD_ID+"'></div>" +
-						"<div wicket:id='"+ SECOND_CHILD_ID +"'></div>" +
-						"<div wicket:id='"+ THIRD_CHILD_ID +"'></div>" +
-					"</div>" +
-					"</body></html>");
+			return new StringResourceStream(new StringBuilder().append("<html><head></head><body>").append("<div wicket:id='").append(PARENT_ID).append("'>").append("<div wicket:id='").append(FIRST_CHILD_ID).append("'></div>")
+					.append("<div wicket:id='").append(SECOND_CHILD_ID).append("'></div>").append("<div wicket:id='").append(THIRD_CHILD_ID).append("'></div>").append("</div>").append("</body></html>")
+					.toString());
 		}
 	}
 

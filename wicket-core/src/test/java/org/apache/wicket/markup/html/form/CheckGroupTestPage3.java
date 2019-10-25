@@ -16,7 +16,7 @@
  */
 package org.apache.wicket.markup.html.form;
 
-import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * tests rendering of second checkbox selected
@@ -26,16 +26,16 @@ import java.util.Arrays;
  */
 public class CheckGroupTestPage3 extends AbstractCheckGroupTestPage
 {
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * Constructor
 	 */
 	public CheckGroupTestPage3()
 	{
-		super(Arrays.asList("check2"));
+		super(Collections.singletonList("check2"));
 
 	}
-
-	private static final long serialVersionUID = 1L;
 
 
 }

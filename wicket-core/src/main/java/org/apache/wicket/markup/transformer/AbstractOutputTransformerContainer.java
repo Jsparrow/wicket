@@ -100,16 +100,8 @@ public abstract class AbstractOutputTransformerContainer extends MarkupContainer
 	{
 		if (transformBodyOnly == true)
 		{
-			execute(new Runnable()
-			{
-				@Override
-				public void run()
-				{
-					// Invoke default execution
-					AbstractOutputTransformerContainer.super.onComponentTagBody(markupStream,
-						openTag);
-				}
-			});
+			// Invoke default execution
+			execute(() -> AbstractOutputTransformerContainer.super.onComponentTagBody(markupStream, openTag));
 		}
 		else
 		{
@@ -122,15 +114,8 @@ public abstract class AbstractOutputTransformerContainer extends MarkupContainer
 	{
 		if (transformBodyOnly == false)
 		{
-			execute(new Runnable()
-			{
-				@Override
-				public void run()
-				{
-					// Invoke default execution
-					AbstractOutputTransformerContainer.super.onRender();
-				}
-			});
+			// Invoke default execution
+			execute(() -> AbstractOutputTransformerContainer.super.onRender());
 		}
 		else
 		{

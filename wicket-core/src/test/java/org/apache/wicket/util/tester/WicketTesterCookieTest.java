@@ -72,11 +72,10 @@ class WicketTesterCookieTest extends WicketTestCase
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append('{');
-		for (Map.Entry<String, Cookie> e : cookieMap.entrySet())
-		{
+		cookieMap.entrySet().forEach(e -> {
 			sb.append(e.getKey()).append('=').append(asString(e.getValue()));
 			sb.append(",");
-		}
+		});
 		sb.append('}');
 		return sb.toString();
 	}
@@ -110,7 +109,7 @@ class WicketTesterCookieTest extends WicketTestCase
 	 */
 	private static Map<String, Cookie> cookiesFromList(List<Cookie> cookies)
 	{
-		Map<String, Cookie> ret = new LinkedHashMap<String, Cookie>();
+		Map<String, Cookie> ret = new LinkedHashMap<>();
 		for (Cookie cookie : cookies)
 		{
 			Cookie oldValue = ret.put(cookie.getName(), cookie);
@@ -457,7 +456,7 @@ class WicketTesterCookieTest extends WicketTestCase
 		{
 			Cookie removed = cookieMap.remove(cookie.getName());
 			assertNotNull(removed, "Cookie " + cookie.getName());
-			assertTrue(Cookies.isEqual(cookie, removed), "Cookie " + cookie.getName() + " matches");
+			assertTrue(Cookies.isEqual(cookie, removed), new StringBuilder().append("Cookie ").append(cookie.getName()).append(" matches").toString());
 		}
 		assertTrue(cookieMap.isEmpty(), "no cookies left " + asString(cookieMap));
 	}

@@ -47,11 +47,11 @@ public class SimplePage_3 extends SimplePage
 	@Override
 	public IMarkupFragment getMarkup()
 	{
-		return Markup.of("<html xmlns:wicket><body>" //
-			+ "<span wicket:id='myLabel'>mein Label</span>" //
-			+ "<span wicket:id='test'>body</span>" //
-			+ "<span wicket:id='myPanel'>panel</span>" //
-			+ "<span wicket:id='myBorder'>border</span>" //
-			+ "</body></html>");
+		return Markup.of(new StringBuilder().append("<html xmlns:wicket><body>" //
+).append("<span wicket:id='myLabel'>mein Label</span>" //
+).append("<span wicket:id='test'>body</span>" //
+).append("<span wicket:id='myPanel'>panel</span>" //
+).append("<span wicket:id='myBorder'>border</span>" //
+).append("</body></html>").toString());
 	}
 }

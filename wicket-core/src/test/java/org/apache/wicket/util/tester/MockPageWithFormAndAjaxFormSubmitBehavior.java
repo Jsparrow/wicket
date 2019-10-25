@@ -49,7 +49,7 @@ public class MockPageWithFormAndAjaxFormSubmitBehavior extends WebPage
 	{
 		pojo = new Pojo("Mock name");
 
-		Form<Pojo> form = new Form<Pojo>("form", new CompoundPropertyModel<Pojo>(pojo));
+		Form<Pojo> form = new Form<>("form", new CompoundPropertyModel<Pojo>(pojo));
 		add(form);
 
 		form.add(new TextField<String>("name"));

@@ -38,10 +38,13 @@ import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.util.string.StringValue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class AjaxStatelessExample extends WicketExamplePage
 {
+	private static final Logger logger = LoggerFactory.getLogger(AjaxStatelessExample.class);
 	private static final String COUNTER_PARAM = "counter";
 
 	/**
@@ -137,7 +140,7 @@ public class AjaxStatelessExample extends WicketExamplePage
 			protected void onSubmit(AjaxRequestTarget target)
 			{
 				super.onSubmit(target);
-				String values = "Your name is: " + nameField.getModelObject() + " " + surnameField.getModelObject();
+				String values = new StringBuilder().append("Your name is: ").append(nameField.getModelObject()).append(" ").append(surnameField.getModelObject()).toString();
 				submittedValues.setDefaultModelObject(values);
 				target.add(feedback, submittedValues);
 			}
@@ -165,6 +168,7 @@ public class AjaxStatelessExample extends WicketExamplePage
 				}
 				catch (InterruptedException ex)
 				{
+					logger.error(ex.getMessage(), ex);
 					Thread.currentThread().interrupt();
 				}
 			}
@@ -191,6 +195,7 @@ public class AjaxStatelessExample extends WicketExamplePage
 				}
 				catch (InterruptedException ex)
 				{
+					logger.error(ex.getMessage(), ex);
 					Thread.currentThread().interrupt();
 				}
 			}

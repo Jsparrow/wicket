@@ -147,30 +147,25 @@ public class ReloadingWicketFilter extends WicketFilter
 	public void init(final boolean isServlet, final FilterConfig filterConfig)
 		throws ServletException
 	{
-		reloadingClassLoader.setListener(new IChangeListener<Class<?>>()
-		{
-			@Override
-			public void onChange(Class<?> clz)
+		reloadingClassLoader.setListener((Class<?> clz) -> {
+			destroy();
+
+			// Remove the ModificationWatcher from the current reloading class loader
+			reloadingClassLoader.destroy();
+
+			/*
+			 * Create a new classloader, as there is no way to clear a ClassLoader's cache. This
+			 * supposes that we don't share objects across application instances, this is almost
+			 * true, except for Wicket's Session object.
+			 */
+			reloadingClassLoader = new ReloadingClassLoader(getClass().getClassLoader());
+			try
 			{
-				destroy();
-
-				// Remove the ModificationWatcher from the current reloading class loader
-				reloadingClassLoader.destroy();
-
-				/*
-				 * Create a new classloader, as there is no way to clear a ClassLoader's cache. This
-				 * supposes that we don't share objects across application instances, this is almost
-				 * true, except for Wicket's Session object.
-				 */
-				reloadingClassLoader = new ReloadingClassLoader(getClass().getClassLoader());
-				try
-				{
-					init(filterConfig);
-				}
-				catch (ServletException e)
-				{
-					throw new RuntimeException(e);
-				}
+				init(filterConfig);
+			}
+			catch (ServletException e)
+			{
+				throw new RuntimeException(e);
 			}
 		});
 

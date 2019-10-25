@@ -36,9 +36,13 @@ import org.apache.wicket.request.IRequestHandler;
 import org.apache.wicket.request.IRequestMapper;
 import org.apache.wicket.request.Url;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class HttpsMapperTest
 {
+	private static final Logger logger = LoggerFactory.getLogger(HttpsMapperTest.class);
+
 	@Test
 	void getDesiredSchemeOfPageClass()
 	{
@@ -96,7 +100,8 @@ class HttpsMapperTest
 			assertThat("expected error", false);
 		}
 		catch (IllegalStateException e)
-		{ // expected
+		{
+			logger.error(e.getMessage(), e); // expected
 
 		}
 	}

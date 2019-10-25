@@ -104,7 +104,7 @@ public abstract class AbstractClassResolver implements IClassResolver
 							throw new ClassNotFoundException(className);
 						}
 					}
-					classes.put(className, new WeakReference<Class<?>>(clazz));
+					classes.put(className, new WeakReference<>(clazz));
 					break;
 			}
 		}

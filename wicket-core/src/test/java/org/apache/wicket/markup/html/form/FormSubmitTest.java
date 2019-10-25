@@ -26,6 +26,8 @@ import org.apache.wicket.util.tester.FormTester;
 import org.apache.wicket.util.tester.WicketTestCase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Please see <a href="http://cwiki.apache.org/WICKET/nested-forms.html">"Nested Forms"</a> for more
@@ -35,6 +37,7 @@ import org.junit.jupiter.api.Test;
  */
 class FormSubmitTest extends WicketTestCase
 {
+	private static final Logger logger = LoggerFactory.getLogger(FormSubmitTest.class);
 	private NestedFormsPage page;
 	private NestableForm outerForm;
 	private NestableForm middleForm;
@@ -176,7 +179,7 @@ class FormSubmitTest extends WicketTestCase
 		}
 		catch (ListenerInvocationNotAllowedException expected)
 		{
-			;
+			logger.error(expected.getMessage(), expected);
 		}
 		assertOnSubmitCalled(false, false, false);
 		assertOnErrorCalled(false, false, false);

@@ -86,6 +86,10 @@ public class Palette<T> extends FormComponentPanel<Collection<T>>
 
 	private static final long serialVersionUID = 1L;
 
+	/** reference to the palette's javascript resource */
+	private static final ResourceReference JAVASCRIPT = new JQueryPluginResourceReference(
+		Palette.class, "palette.js");
+
 	/** collection containing all available choices */
 	private final IModel<? extends Collection<? extends T>> choicesModel;
 
@@ -119,10 +123,6 @@ public class Palette<T> extends FormComponentPanel<Collection<T>>
 	 * attribute
 	 */
 	private Component selectionComponent;
-
-	/** reference to the palette's javascript resource */
-	private static final ResourceReference JAVASCRIPT = new JQueryPluginResourceReference(
-		Palette.class, "palette.js");
 
 	/**
 	 * @param id
@@ -206,7 +206,6 @@ public class Palette<T> extends FormComponentPanel<Collection<T>>
 		super.onBeforeRender();
 	}
 
-
 	/**
 	 * One-time init method for components that are created via overridable factories. This method
 	 * is here because we do not want to call overridable methods form palette's constructor.
@@ -244,7 +243,6 @@ public class Palette<T> extends FormComponentPanel<Collection<T>>
 		return isEnabledInHierarchy();
 	}
 
-
 	/**
 	 * @return iterator over selected choices
 	 */
@@ -260,7 +258,6 @@ public class Palette<T> extends FormComponentPanel<Collection<T>>
 	{
 		return getRecorderComponent().getUnselectedList().iterator();
 	}
-
 
 	/**
 	 * factory method to create the tracker component
@@ -298,7 +295,6 @@ public class Palette<T> extends FormComponentPanel<Collection<T>>
 	{
 		return new Label(componentId, new ResourceModel("palette.selected", "Selected"));
 	}
-
 
 	/**
 	 * factory method for the move down component
@@ -425,7 +421,6 @@ public class Palette<T> extends FormComponentPanel<Collection<T>>
 		};
 	}
 
-
 	/**
 	 * factory method for the removeAll component
 	 * 
@@ -549,7 +544,6 @@ public class Palette<T> extends FormComponentPanel<Collection<T>>
 		return choiceRenderer;
 	}
 
-
 	/**
 	 * @return items visible without scrolling
 	 */
@@ -599,7 +593,6 @@ public class Palette<T> extends FormComponentPanel<Collection<T>>
 			.append("','").append(getSelectionComponent().getMarkupId()).append("','")
 			.append(getRecorderComponent().getMarkupId()).append("');").toString();
 	}
-
 
 	/**
 	 * @return choices component on focus javascript handler
@@ -678,6 +671,17 @@ public class Palette<T> extends FormComponentPanel<Collection<T>>
 		super.onDetach();
 	}
 
+	/**
+	 * Renders header contributions
+	 * 
+	 * @param response
+	 */
+	@Override
+	public void renderHead(final IHeaderResponse response)
+	{
+		response.render(JavaScriptHeaderItem.forReference(JAVASCRIPT));
+	}
+
 	private class PaletteButton extends WebMarkupContainer
 	{
 
@@ -704,16 +708,5 @@ public class Palette<T> extends FormComponentPanel<Collection<T>>
 				tag.getAttributes().put("disabled", "disabled");
 			}
 		}
-	}
-
-	/**
-	 * Renders header contributions
-	 * 
-	 * @param response
-	 */
-	@Override
-	public void renderHead(final IHeaderResponse response)
-	{
-		response.render(JavaScriptHeaderItem.forReference(JAVASCRIPT));
 	}
 }

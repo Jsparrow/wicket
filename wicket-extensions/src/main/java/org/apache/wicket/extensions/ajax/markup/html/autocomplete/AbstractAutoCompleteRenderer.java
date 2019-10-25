@@ -46,11 +46,11 @@ public abstract class AbstractAutoCompleteRenderer<T> implements IAutoCompleteRe
 		}
 		textValue = Strings.escapeMarkup(textValue).toString();
 
-		response.write("<li textvalue=\"" + textValue + "\"");
+		response.write(new StringBuilder().append("<li textvalue=\"").append(textValue).append("\"").toString());
 		final CharSequence handler = getOnSelectJavaScriptExpression(object);
 		if (handler != null)
 		{
-			response.write(" onselect=\"" + handler + '"');
+			response.write(new StringBuilder().append(" onselect=\"").append(handler).append('"').toString());
 		}
 		response.write(">");
 		renderChoice(object, response, criteria);

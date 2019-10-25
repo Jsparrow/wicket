@@ -187,18 +187,12 @@ public abstract class TreeModelProvider<T> implements ITreeProvider<T>
 		{
 			if (nodeUpdates != null)
 			{
-				for (T object : nodeUpdates)
-				{
-					tree.updateNode(object, target);
-				}
+				nodeUpdates.forEach(object -> tree.updateNode(object, target));
 			}
 
 			if (branchUpdates != null)
 			{
-				for (T object : branchUpdates)
-				{
-					tree.updateBranch(object, target);
-				}
+				branchUpdates.forEach(object -> tree.updateBranch(object, target));
 			}
 		}
 

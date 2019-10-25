@@ -32,19 +32,6 @@ import org.junit.jupiter.api.Test;
 
 class ListMultipleChoiceTest extends WicketTestCase
 {
-	class TestPage extends WebPage
-	{
-		IModel<List<String>> selectedValues = new ListModel<String>(new ArrayList<String>());
-		List<String> choices = Arrays.asList("a", "b", "c", "d", "e", "f");
-
-		TestPage()
-		{
-			Form<Void> form = new Form<>("form");
-			this.add(form);
-			form.add(newListMultipleChoice("list", selectedValues, choices));
-		}
-	}
-
 	@Test
 	void testSelectionWorks() throws Exception
 	{
@@ -82,5 +69,18 @@ class ListMultipleChoiceTest extends WicketTestCase
 															 IModel<List<String>> selectedValues, List<String> choices)
 	{
 		return new ListMultipleChoice<>(id, selectedValues, choices);
+	}
+
+	class TestPage extends WebPage
+	{
+		IModel<List<String>> selectedValues = new ListModel<String>(new ArrayList<String>());
+		List<String> choices = Arrays.asList("a", "b", "c", "d", "e", "f");
+
+		TestPage()
+		{
+			Form<Void> form = new Form<>("form");
+			this.add(form);
+			form.add(newListMultipleChoice("list", selectedValues, choices));
+		}
 	}
 }

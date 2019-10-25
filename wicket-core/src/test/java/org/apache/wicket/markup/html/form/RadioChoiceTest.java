@@ -16,17 +16,16 @@
  */
 package org.apache.wicket.markup.html.form;
 
-import java.util.Arrays;
-
 import org.apache.wicket.util.tester.WicketTestCase;
 import org.junit.jupiter.api.Test;
+import java.util.Collections;
 
 class RadioChoiceTest extends WicketTestCase
 {
 	@Test
     void defaultLabelPositionIsAfter() throws Exception
 	{
-		RadioChoice<Integer> radioChoice = new RadioChoice<Integer>("testid", Arrays.asList(1));
+		RadioChoice<Integer> radioChoice = new RadioChoice<>("testid", Collections.singletonList(1));
 		tester.startComponentInPage(radioChoice);
 
 		tester.assertResultPage("<span wicket:id=\"testid\"><input name=\"testid\" type=\"radio\" value=\"0\" id=\"testid1-0\"/><label for=\"testid1-0\">1</label>\n</span>");
@@ -35,7 +34,7 @@ class RadioChoiceTest extends WicketTestCase
 	@Test
     void labelPositionBefore() throws Exception
 	{
-		RadioChoice<Integer> radioChoice = new RadioChoice<Integer>("testid", Arrays.asList(1));
+		RadioChoice<Integer> radioChoice = new RadioChoice<>("testid", Collections.singletonList(1));
 		radioChoice.setLabelPosition(AbstractChoice.LabelPosition.BEFORE);
 		tester.startComponentInPage(radioChoice);
 
@@ -45,7 +44,7 @@ class RadioChoiceTest extends WicketTestCase
 	@Test
     void labelPositionWrapBefore() throws Exception
 	{
-		RadioChoice<Integer> radioChoice = new RadioChoice<Integer>("testid", Arrays.asList(1));
+		RadioChoice<Integer> radioChoice = new RadioChoice<>("testid", Collections.singletonList(1));
 		radioChoice.setLabelPosition(AbstractChoice.LabelPosition.WRAP_BEFORE);
 		tester.startComponentInPage(radioChoice);
 
@@ -55,7 +54,7 @@ class RadioChoiceTest extends WicketTestCase
 	@Test
     void labelPositionWrapAfter() throws Exception
 	{
-		RadioChoice<Integer> radioChoice = new RadioChoice<Integer>("testid", Arrays.asList(1));
+		RadioChoice<Integer> radioChoice = new RadioChoice<>("testid", Collections.singletonList(1));
 		radioChoice.setLabelPosition(AbstractChoice.LabelPosition.WRAP_AFTER);
 		tester.startComponentInPage(radioChoice);
 

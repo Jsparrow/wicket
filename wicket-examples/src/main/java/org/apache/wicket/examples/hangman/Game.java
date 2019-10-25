@@ -85,16 +85,15 @@ public class Game implements IClusterable
 	 */
 	public boolean guess(final Letter letter)
 	{
-		if (!letter.isGuessed())
-		{
-			final boolean correct = word.guess(letter);
-			if (!correct)
-			{
-				guessesRemaining--;
-			}
-			return correct;
+		if (letter.isGuessed()) {
+			return false;
 		}
-		return false;
+		final boolean correct = word.guess(letter);
+		if (!correct)
+		{
+			guessesRemaining--;
+		}
+		return correct;
 	}
 
 	/**

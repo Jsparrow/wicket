@@ -37,27 +37,6 @@ public class AjaxChannel implements IClusterable
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * The type of an {@link AjaxChannel}
-	 */
-	public static enum Type {
-
-		/**
-		 * Ajax requests are kept in a Queue at the client side and processed one at a time
-		 */
-		QUEUE,
-
-		/**
-		 * dropping - only the last Ajax request is processed, the others are discarded
-		 */
-		DROP,
-
-		/**
-		 * the ajax call will discarded if there is an active/running request on the same channel
-		 */
-		ACTIVE
-	}
-
-	/**
 	 * The name of the default channel
 	 */
 	public static final String DEFAULT_NAME = "0";
@@ -157,13 +136,21 @@ public class AjaxChannel implements IClusterable
 	@Override
 	public boolean equals(Object o)
 	{
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
 
 		AjaxChannel that = (AjaxChannel) o;
 
-		if (!name.equals(that.name)) return false;
-		if (type != that.type) return false;
+		if (!name.equals(that.name)) {
+			return false;
+		}
+		if (type != that.type) {
+			return false;
+		}
 
 		return true;
 	}
@@ -174,5 +161,26 @@ public class AjaxChannel implements IClusterable
 		int result = name.hashCode();
 		result = 31 * result + type.hashCode();
 		return result;
+	}
+
+	/**
+	 * The type of an {@link AjaxChannel}
+	 */
+	public static enum Type {
+
+		/**
+		 * Ajax requests are kept in a Queue at the client side and processed one at a time
+		 */
+		QUEUE,
+
+		/**
+		 * dropping - only the last Ajax request is processed, the others are discarded
+		 */
+		DROP,
+
+		/**
+		 * the ajax call will discarded if there is an active/running request on the same channel
+		 */
+		ACTIVE
 	}
 }

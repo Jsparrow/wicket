@@ -36,11 +36,6 @@ public class WebSession extends Session
 {
 	private static final long serialVersionUID = 1L;
 
-	public static WebSession get()
-	{
-		return (WebSession)Session.get();
-	}
-
 	/**
 	 * Constructor. Note that {@link RequestCycle} is not available until this constructor returns.
 	 * 
@@ -52,6 +47,11 @@ public class WebSession extends Session
 		super(request);
 	}
 
+	public static WebSession get()
+	{
+		return (WebSession)Session.get();
+	}
+
 	/**
 	 * Call signOut() and remove the logon data from whereever they have been persisted (e.g.
 	 * Cookies)
@@ -61,12 +61,11 @@ public class WebSession extends Session
 	@Override
 	public void invalidate()
 	{
-		if (isSessionInvalidated() == false)
-		{
-			getApplication().getSecuritySettings().getAuthenticationStrategy().remove();
-
-			super.invalidate();
+		if (isSessionInvalidated() != false) {
+			return;
 		}
+		getApplication().getSecuritySettings().getAuthenticationStrategy().remove();
+		super.invalidate();
 	}
 
 	/**
@@ -110,7 +109,7 @@ public class WebSession extends Session
 	{
 		return new BrowserInfoPage();
 	}
-	
+
 	@Override
 	protected String generateNewSessionId() 
 	{

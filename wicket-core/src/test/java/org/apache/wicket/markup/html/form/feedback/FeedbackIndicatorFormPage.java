@@ -36,7 +36,7 @@ public class FeedbackIndicatorFormPage extends WebPage
 	 */
 	public FeedbackIndicatorFormPage()
 	{
-		final TextField<Serializable> tf = new TextField<Serializable>("input",
+		final TextField<Serializable> tf = new TextField<>("input",
 			new Model<Serializable>());
 		final FormComponentFeedbackIndicator feedback = new FormComponentFeedbackIndicator(
 			"feedback");

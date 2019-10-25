@@ -34,7 +34,6 @@ public class JavaxWebSocketFilter extends AbstractUpgradeFilter
 {
 	public JavaxWebSocketFilter()
 	{
-		super();
 	}
 
 	public JavaxWebSocketFilter(WebApplication application)
@@ -86,7 +85,7 @@ public class JavaxWebSocketFilter extends AbstractUpgradeFilter
 				}
 				else
 				{
-					result = result + ',' + WicketServerEndpointConfig.WICKET_WEB_SOCKET_PATH;
+					result = new StringBuilder().append(result).append(',').append(WicketServerEndpointConfig.WICKET_WEB_SOCKET_PATH).toString();
 				}
 			}
 

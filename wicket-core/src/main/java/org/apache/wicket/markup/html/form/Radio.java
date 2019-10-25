@@ -136,9 +136,7 @@ public class Radio<T> extends LabeledWebMarkupContainer implements IGenericCompo
 			if (group == null)
 			{
 				throw new WicketRuntimeException(
-					"Radio component [" +
-						getPath() +
-						"] cannot find its parent RadioGroup. All Radio components must be a child of or below in the hierarchy of a RadioGroup component.");
+					new StringBuilder().append("Radio component [").append(getPath()).append("] cannot find its parent RadioGroup. All Radio components must be a child of or below in the hierarchy of a RadioGroup component.").toString());
 			}
 		}
 		return group;

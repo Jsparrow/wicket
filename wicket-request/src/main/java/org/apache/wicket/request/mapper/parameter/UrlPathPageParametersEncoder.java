@@ -55,11 +55,10 @@ public class UrlPathPageParametersEncoder implements IPageParametersEncoder
 
 		Url url = new Url();
 
-		for (PageParameters.NamedPair pair : params.getAllNamed())
-		{
+		params.getAllNamed().forEach(pair -> {
 			url.getSegments().add(pair.getKey());
 			url.getSegments().add(pair.getValue());
-		}
+		});
 
 		return url;
 	}

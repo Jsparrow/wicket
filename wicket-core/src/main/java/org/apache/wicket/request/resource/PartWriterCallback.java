@@ -27,6 +27,8 @@ import org.apache.wicket.request.resource.IResource.Attributes;
 import org.apache.wicket.util.io.IOUtils;
 import org.apache.wicket.util.io.Streams;
 import org.apache.wicket.util.lang.Args;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Used to read a part of an input stream and writes it to the output stream of the response taken
@@ -38,6 +40,8 @@ import org.apache.wicket.util.lang.Args;
  */
 public class PartWriterCallback extends WriteCallback
 {
+	private static final Logger logger = LoggerFactory.getLogger(PartWriterCallback.class);
+
 	/**
 	 * The input stream to read from
 	 */
@@ -170,6 +174,7 @@ public class PartWriterCallback extends WriteCallback
 		}
 		catch (ResponseIOException e)
 		{
+			logger.error(e.getMessage(), e);
 			// the client has closed the connection and
 			// doesn't read the stream further on
 			// (in tomcats

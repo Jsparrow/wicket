@@ -40,9 +40,7 @@ public class InvalidBehaviorIdException extends WicketRuntimeException
 	public InvalidBehaviorIdException(Component component, int behaviorId)
 	{
 		super(
-			String.format("Cannot find behavior with id '%d' on component '%s' in page '%s'. " +
-				"Perhaps the behavior did not properly implement getStatelessHint() and returned 'true' " +
-				"to indicate that it is stateless instead of returning 'false' to indicate that it is stateful.",
+			String.format(new StringBuilder().append("Cannot find behavior with id '%d' on component '%s' in page '%s'. ").append("Perhaps the behavior did not properly implement getStatelessHint() and returned 'true' ").append("to indicate that it is stateless instead of returning 'false' to indicate that it is stateful.").toString(),
 					behaviorId,
 					component.getClassRelativePath(),
 					component.getPage()));

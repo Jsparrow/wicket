@@ -82,15 +82,12 @@ public class HeadForceTagIdHandler extends AbstractMarkupFilter
 		// no, it's not. Are we in <wicket:head> ?
 		else if (inHead == true)
 		{
+			boolean condition = (tag instanceof WicketTag == false) && (tag.getId() == null) &&
+				(tag.isOpen() || tag.isOpenClose()) && needId(tag) && tag.getAttributes().get("id") == null;
 			// is the tag open and has empty wicket:id?
-			if ((tag instanceof WicketTag == false) && (tag.getId() == null) &&
-				(tag.isOpen() || tag.isOpenClose()) && needId(tag))
-			{
-				if (tag.getAttributes().get("id") == null)
-				{
-					tag.getAttributes().put("id", headElementIdPrefix + nextValue());
-					tag.setModified(true);
-				}
+			if (condition) {
+				tag.getAttributes().put("id", headElementIdPrefix + nextValue());
+				tag.setModified(true);
 			}
 		}
 
@@ -105,11 +102,11 @@ public class HeadForceTagIdHandler extends AbstractMarkupFilter
 	private boolean needId(final ComponentTag tag)
 	{
 		final String name = tag.getName().toLowerCase(Locale.ROOT);
-		if (name.equals("script") && tag.getAttributes().containsKey("src") == false)
+		if ("script".equals(name) && tag.getAttributes().containsKey("src") == false)
 		{
 			return true;
 		}
-		else if (name.equals("style") && tag.getAttributes().containsKey("href") == false)
+		else if ("style".equals(name) && tag.getAttributes().containsKey("href") == false)
 		{
 			return true;
 		}

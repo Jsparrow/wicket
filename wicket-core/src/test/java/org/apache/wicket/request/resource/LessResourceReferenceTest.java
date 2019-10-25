@@ -45,31 +45,6 @@ public class LessResourceReferenceTest extends WicketTestCase
 {
 	private static final AtomicBoolean PROCESS_RESPONSE_CALLED = new AtomicBoolean(false);
 
-	/**
-	 * An {@link org.apache.wicket.request.resource.IResourceReferenceFactory} that creates
-	 * LessResourceReference for resources with extension '.less'
-	 */
-	static class LessResourceReferenceFactory extends ResourceReferenceRegistry.DefaultResourceReferenceFactory
-	{
-		@Override
-		public ResourceReference create(ResourceReference.Key key)
-		{
-			ResourceReference result = null;
-			if (PackageResource.exists(key))
-			{
-				if ("less".equals(Files.extension(key.getName())))
-				{
-					result = new LessResourceReference(key);
-				}
-				else
-				{
-					result = super.create(key);
-				}
-			}
-			return result;
-		}
-	}
-
 	@BeforeEach
 	void before()
 	{
@@ -133,6 +108,31 @@ public class LessResourceReferenceTest extends WicketTestCase
 		assertTrue(PROCESS_RESPONSE_CALLED.get());
 	}
 
+	/**
+	 * An {@link org.apache.wicket.request.resource.IResourceReferenceFactory} that creates
+	 * LessResourceReference for resources with extension '.less'
+	 */
+	static class LessResourceReferenceFactory extends ResourceReferenceRegistry.DefaultResourceReferenceFactory
+	{
+		@Override
+		public ResourceReference create(ResourceReference.Key key)
+		{
+			ResourceReference result = null;
+			if (PackageResource.exists(key))
+			{
+				if ("less".equals(Files.extension(key.getName())))
+				{
+					result = new LessResourceReference(key);
+				}
+				else
+				{
+					result = super.create(key);
+				}
+			}
+			return result;
+		}
+	}
+
 	private static class LessResourcePage extends WebPage implements IMarkupResourceStreamProvider
 	{
 		private final LessResourceReference resourceReference = new LessResourceReference(LessResourceReferenceTest.class, "LessResourceReference.less");
@@ -144,6 +144,7 @@ public class LessResourceReferenceTest extends WicketTestCase
 			response.render(CssHeaderItem.forReference(resourceReference));
 		}
 
+		@Override
 		public IResourceStream getMarkupResourceStream(MarkupContainer container, Class<?> containerClass)
 		{
 			return new StringResourceStream("<html/>");

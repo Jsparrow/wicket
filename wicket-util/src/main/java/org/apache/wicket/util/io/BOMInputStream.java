@@ -84,19 +84,33 @@ import java.util.List;
  */
 public class BOMInputStream extends ProxyInputStream
 {
-    private final boolean include;
     /**
+     * Compares ByteOrderMark objects in descending length order.
+     */
+    private static final Comparator<ByteOrderMark> ByteOrderMarkLengthComparator = (final ByteOrderMark bom1, final ByteOrderMark bom2) -> {
+	    final int len1 = bom1.length();
+	    final int len2 = bom2.length();
+	    if (len1 > len2) {
+	        return -1;
+	    }
+	    if (len2 > len1) {
+	        return 1;
+	    }
+	    return 0;
+	};
+	private final boolean include;
+	/**
      * BOMs are sorted from longest to shortest.
      */
     private final List<ByteOrderMark> boms;
-    private ByteOrderMark byteOrderMark;
-    private int[] firstBytes;
-    private int fbLength;
-    private int fbIndex;
-    private int markFbIndex;
-    private boolean markedAtStart;
+	private ByteOrderMark byteOrderMark;
+	private int[] firstBytes;
+	private int fbLength;
+	private int fbIndex;
+	private int markFbIndex;
+	private boolean markedAtStart;
 
-    /**
+	/**
      * Constructs a new BOM InputStream that excludes a {@link ByteOrderMark#UTF_8} BOM.
      * 
      * @param delegate
@@ -106,7 +120,7 @@ public class BOMInputStream extends ProxyInputStream
         this(delegate, false, ByteOrderMark.UTF_8);
     }
 
-    /**
+	/**
      * Constructs a new BOM InputStream that detects a a {@link ByteOrderMark#UTF_8} and optionally includes it.
      * 
      * @param delegate
@@ -118,7 +132,7 @@ public class BOMInputStream extends ProxyInputStream
         this(delegate, include, ByteOrderMark.UTF_8);
     }
 
-    /**
+	/**
      * Constructs a new BOM InputStream that excludes the specified BOMs.
      * 
      * @param delegate
@@ -130,26 +144,7 @@ public class BOMInputStream extends ProxyInputStream
         this(delegate, false, boms);
     }
 
-    /**
-     * Compares ByteOrderMark objects in descending length order.
-     */
-    private static final Comparator<ByteOrderMark> ByteOrderMarkLengthComparator = new Comparator<ByteOrderMark>() {
-
-        @Override
-		public int compare(final ByteOrderMark bom1, final ByteOrderMark bom2) {
-            final int len1 = bom1.length();
-            final int len2 = bom2.length();
-            if (len1 > len2) {
-                return -1;
-            }
-            if (len2 > len1) {
-                return 1;
-            }
-            return 0;
-        }
-    };
-
-    /**
+	/**
      * Constructs a new BOM InputStream that detects the specified BOMs and optionally includes them.
      * 
      * @param delegate
@@ -171,7 +166,7 @@ public class BOMInputStream extends ProxyInputStream
 
     }
 
-    /**
+	/**
      * Indicates whether the stream contains one of the specified BOMs.
      * 
      * @return true if the stream has one of the specified BOMs, otherwise false if it does not
@@ -182,7 +177,7 @@ public class BOMInputStream extends ProxyInputStream
         return getBOM() != null;
     }
 
-    /**
+	/**
      * Indicates whether the stream contains the specified BOM.
      * 
      * @param bom
@@ -200,7 +195,7 @@ public class BOMInputStream extends ProxyInputStream
         return byteOrderMark != null && getBOM().equals(bom);
     }
 
-    /**
+	/**
      * Return the BOM (Byte Order Mark).
      * 
      * @return The BOM or null if none
@@ -223,20 +218,19 @@ public class BOMInputStream extends ProxyInputStream
             }
             // match BOM in firstBytes
             byteOrderMark = find();
-            if (byteOrderMark != null) {
-                if (!include) {
-                    if (byteOrderMark.length() < firstBytes.length) {
-                        fbIndex = byteOrderMark.length();
-                    } else {
-                        fbLength = 0;
-                    }
-                }
-            }
+            boolean condition = byteOrderMark != null && !include;
+			if (condition) {
+			    if (byteOrderMark.length() < firstBytes.length) {
+			        fbIndex = byteOrderMark.length();
+			    } else {
+			        fbLength = 0;
+			    }
+			}
         }
         return byteOrderMark;
     }
 
-    /**
+	/**
      * Return the BOM charset Name - {@link ByteOrderMark#getCharsetName()}.
      * 
      * @return The BOM charset Name or null if no BOM found
@@ -249,7 +243,7 @@ public class BOMInputStream extends ProxyInputStream
         return byteOrderMark == null ? null : byteOrderMark.getCharsetName();
     }
 
-    /**
+	/**
      * This method reads and either preserves or skips the first bytes in the stream. It behaves like the single-byte
      * <code>read()</code> method, either returning a valid byte or -1 to indicate that the initial bytes have been
      * processed already.
@@ -263,21 +257,16 @@ public class BOMInputStream extends ProxyInputStream
         return fbIndex < fbLength ? firstBytes[fbIndex++] : -1;
     }
 
-    /**
+	/**
      * Find a BOM with the specified bytes.
      * 
      * @return The matched BOM or null if none matched
      */
     private ByteOrderMark find() {
-        for (final ByteOrderMark bom : boms) {
-            if (matches(bom)) {
-                return bom;
-            }
-        }
-        return null;
+        return boms.stream().filter(this::matches).findFirst().orElse(null);
     }
 
-    /**
+	/**
      * Check if the bytes match a BOM.
      * 
      * @param bom
@@ -297,7 +286,7 @@ public class BOMInputStream extends ProxyInputStream
         return true;
     }
 
-    // ----------------------------------------------------------------------------
+	// ----------------------------------------------------------------------------
     // Implementation of InputStream
     // ----------------------------------------------------------------------------
 
@@ -314,7 +303,7 @@ public class BOMInputStream extends ProxyInputStream
         return b >= 0 ? b : in.read();
     }
 
-    /**
+	/**
      * Invokes the delegate's <code>read(byte[], int, int)</code> method, detecting and optionally skipping BOM.
      * 
      * @param buf
@@ -343,7 +332,7 @@ public class BOMInputStream extends ProxyInputStream
         return secondCount < 0 ? firstCount > 0 ? firstCount : -1 : firstCount + secondCount;
     }
 
-    /**
+	/**
      * Invokes the delegate's <code>read(byte[])</code> method, detecting and optionally skipping BOM.
      * 
      * @param buf
@@ -357,7 +346,7 @@ public class BOMInputStream extends ProxyInputStream
         return read(buf, 0, buf.length);
     }
 
-    /**
+	/**
      * Invokes the delegate's <code>mark(int)</code> method.
      * 
      * @param readlimit
@@ -370,7 +359,7 @@ public class BOMInputStream extends ProxyInputStream
         in.mark(readlimit);
     }
 
-    /**
+	/**
      * Invokes the delegate's <code>reset()</code> method.
      * 
      * @throws IOException
@@ -386,7 +375,7 @@ public class BOMInputStream extends ProxyInputStream
         in.reset();
     }
 
-    /**
+	/**
      * Invokes the delegate's <code>skip(long)</code> method, detecting and optionallyskipping BOM.
      * 
      * @param n

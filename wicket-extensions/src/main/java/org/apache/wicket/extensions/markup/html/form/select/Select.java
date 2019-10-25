@@ -107,19 +107,14 @@ public class Select<T> extends FormComponent<T>
 	{
 		final StringBuilder builder = new StringBuilder();
 
-		visitChildren(SelectOption.class, new IVisitor<SelectOption<T>, Void>()
-		{
-			@Override
-			public void component(SelectOption<T> option, IVisit<Void> visit)
+		visitChildren(SelectOption.class, (SelectOption<T> option, IVisit<Void> visit) -> {
+			if (isSelected(option.getDefaultModel()))
 			{
-				if (isSelected(option.getDefaultModel()))
+				if (builder.length() > 0)
 				{
-					if (builder.length() > 0)
-					{
-						builder.append(VALUE_SEPARATOR);
-					}
-					builder.append(option.getValue());
+					builder.append(VALUE_SEPARATOR);
 				}
+				builder.append(option.getValue());
 			}
 		});
 
@@ -146,9 +141,7 @@ public class Select<T> extends FormComponent<T>
 		if (!supportsMultiple && (values.length > 1))
 		{
 			throw new WicketRuntimeException(
-				"The model of Select component [" +
-					getPath() +
-					"] is not of type java.util.Collection, but more then one SelectOption component has been selected. Either remove the multiple attribute from the select tag or make the model of the Select component a collection");
+				new StringBuilder().append("The model of Select component [").append(getPath()).append("] is not of type java.util.Collection, but more then one SelectOption component has been selected. Either remove the multiple attribute from the select tag or make the model of the Select component a collection").toString());
 		}
 
 		List<Object> converted = new ArrayList<>(values.length);
@@ -157,34 +150,22 @@ public class Select<T> extends FormComponent<T>
 		 * if the input is null we do not need to do anything since the model collection has already
 		 * been cleared
 		 */
-		for (int i = 0; i < values.length; i++)
-		{
-			final String value = values[i];
+		for (String value : values) {
 			if (!Strings.isEmpty(value))
 			{
 				SelectOption<T> option = visitChildren(SelectOption.class,
-					new IVisitor<SelectOption<T>, SelectOption<T>>()
-					{
-						@Override
-						public void component(SelectOption<T> option, IVisit<SelectOption<T>> visit)
+					(SelectOption<T> option1, IVisit<SelectOption<T>> visit) -> {
+						if (String.valueOf(option1.getValue()).equals(value))
 						{
-							if (String.valueOf(option.getValue()).equals(value))
-							{
-								visit.stop(option);
-							}
+							visit.stop(option1);
 						}
 					});
 
 				if (option == null)
 				{
 					throw new WicketRuntimeException(
-						"submitted http post value [" +
-							Arrays.toString(values) +
-							"] for SelectOption component [" +
-							getPath() +
-							"] contains an illegal value [" +
-							value +
-							"] which does not point to a SelectOption component. Due to this the Select component cannot resolve the selected SelectOption component pointed to by the illegal value. A possible reason is that component hierarchy changed between rendering and form submission.");
+						new StringBuilder().append("submitted http post value [").append(Arrays.toString(values)).append("] for SelectOption component [").append(getPath()).append("] contains an illegal value [")
+								.append(value).append("] which does not point to a SelectOption component. Due to this the Select component cannot resolve the selected SelectOption component pointed to by the illegal value. A possible reason is that component hierarchy changed between rendering and form submission.").toString());
 				}
 				converted.add(option.getDefaultModelObject());
 			}
@@ -252,25 +233,21 @@ public class Select<T> extends FormComponent<T>
 		Args.notNull(option, "option");
 
 		// if the raw input is specified use that, otherwise use model
-		if (hasRawInput())
+		if (!hasRawInput()) {
+			return isSelected(option.getDefaultModel());
+		}
+		final String raw = getRawInput();
+		if (!Strings.isEmpty(raw))
 		{
-			final String raw = getRawInput();
-			if (!Strings.isEmpty(raw))
-			{
-				String[] values = raw.split(VALUE_SEPARATOR);
-				for (int i = 0; i < values.length; i++)
+			String[] values = raw.split(VALUE_SEPARATOR);
+			for (String value : values) {
+				if (value.equals(option.getValue()))
 				{
-					String value = values[i];
-					if (value.equals(option.getValue()))
-					{
-						return true;
-					}
+					return true;
 				}
 			}
-			return false;
 		}
-
-		return isSelected(option.getDefaultModel());
+		return false;
 	}
 
 	/**

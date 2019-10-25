@@ -563,9 +563,7 @@ public class WicketTester extends BaseWicketTester
 	private List<Serializable> getActualFeedbackMessages(List<FeedbackMessage> feedbackMessages)
 	{
 		List<Serializable> actualMessages = new ArrayList<>();
-		for (FeedbackMessage feedbackMessage : feedbackMessages)
-		{
-			Serializable message = feedbackMessage.getMessage();
+		feedbackMessages.stream().map(FeedbackMessage::getMessage).forEach(message -> {
 			if (message instanceof ValidationErrorFeedback)
 			{
 				actualMessages.add(message.toString());
@@ -574,7 +572,7 @@ public class WicketTester extends BaseWicketTester
 			{
 				actualMessages.add(message);
 			}
-		}
+		});
 		return actualMessages;
 	}
 
@@ -610,15 +608,7 @@ public class WicketTester extends BaseWicketTester
 		for (int i = 0; i < messages.length && i < renderedMessages.size(); i++)
 		{
 			final Serializable expected = messages[i];
-			boolean found = false;
-			for (FeedbackMessage actual : renderedMessages)
-			{
-				if (Objects.equal(expected, actual.getMessage()))
-				{
-					found = true;
-					break;
-				}
-			}
+			boolean found = renderedMessages.stream().anyMatch(actual -> Objects.equal(expected, actual.getMessage()));
 			if (!found)
 			{
 				assertResult(Result.fail("Missing expected feedback message: " + expected));
@@ -842,16 +832,16 @@ public class WicketTester extends BaseWicketTester
 		}
 		catch (ClassCastException e)
 		{
+			log.error(e.getMessage(), e);
 			throw new IllegalArgumentException(
-				"Component with id:" + id + " is not a BookmarkablePageLink");
+				new StringBuilder().append("Component with id:").append(id).append(" is not a BookmarkablePageLink").toString());
 		}
 
 		assertEquals(pageClass, pageLink.getPageClass(),
-			"BookmarkablePageLink: " + id + " is pointing to the wrong page");
+			new StringBuilder().append("BookmarkablePageLink: ").append(id).append(" is pointing to the wrong page").toString());
 
 		assertEquals(parameters, pageLink.getPageParameters(),
-			"One or more of the parameters associated with the BookmarkablePageLink: " + id +
-				" do not match");
+			new StringBuilder().append("One or more of the parameters associated with the BookmarkablePageLink: ").append(id).append(" do not match").toString());
 	}
 
 	/**
@@ -867,7 +857,7 @@ public class WicketTester extends BaseWicketTester
 	public <T extends Page> void executeTest(final Class<?> testClass, final Class<T> pageClass,
 		final String filename) throws Exception
 	{
-		log.info("=== " + pageClass.getName() + " ===");
+		log.info(new StringBuilder().append("=== ").append(pageClass.getName()).append(" ===").toString());
 
 		startPage(pageClass);
 		assertRenderedPage(pageClass);
@@ -886,7 +876,7 @@ public class WicketTester extends BaseWicketTester
 	public void executeTest(final Class<?> testClass, final Page page, final String filename)
 		throws Exception
 	{
-		log.info("=== " + page.getClass().getName() + " ===");
+		log.info(new StringBuilder().append("=== ").append(page.getClass().getName()).append(" ===").toString());
 
 		startPage(page);
 		assertRenderedPage(page.getClass());
@@ -905,7 +895,7 @@ public class WicketTester extends BaseWicketTester
 	public void executeTest(final Class<?> testClass, final Component component,
 		final String filename) throws Exception
 	{
-		log.info("=== " + component.getClass().getName() + " ===");
+		log.info(new StringBuilder().append("=== ").append(component.getClass().getName()).append(" ===").toString());
 
 		startComponentInPage(component);
 		assertResultPage(testClass, filename);
@@ -925,7 +915,7 @@ public class WicketTester extends BaseWicketTester
 	public <T extends Page> void executeTest(final Class<?> testClass, final Class<T> pageClass,
 		PageParameters parameters, final String filename) throws Exception
 	{
-		log.info("=== " + pageClass.getName() + " ===");
+		log.info(new StringBuilder().append("=== ").append(pageClass.getName()).append(" ===").toString());
 
 		startPage(pageClass, parameters);
 		assertRenderedPage(pageClass);
@@ -944,7 +934,7 @@ public class WicketTester extends BaseWicketTester
 	{
 		assertNotNull(component);
 
-		log.info("=== " + testClass.getName() + " : " + component.getPageRelativePath() + " ===");
+		log.info(new StringBuilder().append("=== ").append(testClass.getName()).append(" : ").append(component.getPageRelativePath()).append(" ===").toString());
 
 		executeListener(component);
 		assertResultPage(testClass, filename);
@@ -962,7 +952,7 @@ public class WicketTester extends BaseWicketTester
 	{
 		assertNotNull(behavior);
 
-		log.info("=== " + testClass.getName() + " : " + behavior.toString() + " ===");
+		log.info(new StringBuilder().append("=== ").append(testClass.getName()).append(" : ").append(behavior.toString()).append(" ===").toString());
 
 		executeBehavior(behavior);
 		assertResultPage(testClass, filename);

@@ -95,12 +95,11 @@ public abstract class AjaxEventBehavior extends AbstractDefaultAjaxBehavior
 	{
 		super.renderHead(component, response);
 
-		if (component.isEnabledInHierarchy())
-		{
-			CharSequence js = getCallbackScript(component);
-
-			response.render(OnDomReadyHeaderItem.forScript(js.toString()));
+		if (!component.isEnabledInHierarchy()) {
+			return;
 		}
+		CharSequence js = getCallbackScript(component);
+		response.render(OnDomReadyHeaderItem.forScript(js.toString()));
 	}
 
 	@Override

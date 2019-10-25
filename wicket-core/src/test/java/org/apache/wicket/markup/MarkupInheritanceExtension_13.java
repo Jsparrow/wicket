@@ -28,6 +28,5 @@ public class MarkupInheritanceExtension_13 extends MarkupInheritanceBase_13
 	 */
 	public MarkupInheritanceExtension_13()
 	{
-		super();
 	}
 }

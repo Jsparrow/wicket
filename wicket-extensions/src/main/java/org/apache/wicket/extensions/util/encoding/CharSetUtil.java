@@ -59,34 +59,32 @@ public class CharSetUtil
 	 * @param application
 	 *            Wicket application object
 	 */
-	private synchronized static void initialize(final WebApplication application)
+	private static synchronized void initialize(final WebApplication application)
 	{
-		if (charSetMap == null)
+		if (charSetMap != null) {
+			return;
+		}
+		// Get servlet context
+		final ServletContext context = application.getServletContext();
+		final InputStream inputStream = context.getResourceAsStream("/WEB-INF/" +
+			CharSetMap.CHARSET_RESOURCE);
+		if (inputStream == null)
 		{
-			// Get servlet context
-			final ServletContext context = application.getServletContext();
-
-			final InputStream inputStream = context.getResourceAsStream("/WEB-INF/" +
-				CharSetMap.CHARSET_RESOURCE);
-
-			if (inputStream == null)
+			charSetMap = new CharSetMap();
+			if (log.isDebugEnabled())
 			{
-				charSetMap = new CharSetMap();
-				if (log.isDebugEnabled())
-				{
-					log.debug("File '" + CharSetMap.CHARSET_RESOURCE + "' not found");
-				}
+				log.debug(new StringBuilder().append("File '").append(CharSetMap.CHARSET_RESOURCE).append("' not found").toString());
 			}
-			else
+		}
+		else
+		{
+			try
 			{
-				try
-				{
-					charSetMap = new CharSetMap(inputStream);
-				}
-				catch (IOException ex)
-				{
-					throw new WicketRuntimeException("Error while reading CharSetMap", ex);
-				}
+				charSetMap = new CharSetMap(inputStream);
+			}
+			catch (IOException ex)
+			{
+				throw new WicketRuntimeException("Error while reading CharSetMap", ex);
 			}
 		}
 	}

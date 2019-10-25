@@ -151,9 +151,7 @@ class HtmlHeaderItemsContainerTest extends WicketTestCase
 	@Test
 	void pageWithTwoHeaderItems()
 	{
-		assertThrows(MarkupException.class, () -> {
-			tester.startPage(PageWithTwoHeaderItems.class);
-		});
+		assertThrows(MarkupException.class, () -> tester.startPage(PageWithTwoHeaderItems.class));
 	}
 
 	/**
@@ -164,9 +162,7 @@ class HtmlHeaderItemsContainerTest extends WicketTestCase
 	@Test
 	void pageWithHeaderItemsOutOfHead()
 	{
-		assertThrows(MarkupException.class, () -> {
-			tester.startPage(PageWithHeaderItemsOutOfHead.class);
-		});
+		assertThrows(MarkupException.class, () -> tester.startPage(PageWithHeaderItemsOutOfHead.class));
 	}
 
 	/**

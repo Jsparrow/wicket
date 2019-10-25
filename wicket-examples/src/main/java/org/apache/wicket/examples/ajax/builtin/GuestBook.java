@@ -93,8 +93,7 @@ public class GuestBook extends BasePage
 				target.add(text);
 
 				// focus the textarea again
-				target.appendJavaScript("document.getElementById('" + text.getMarkupId() +
-					"').focus();");
+				target.appendJavaScript(new StringBuilder().append("document.getElementById('").append(text.getMarkupId()).append("').focus();").toString());
 			}
 
 			@Override
@@ -115,6 +114,14 @@ public class GuestBook extends BasePage
 				attributes.setPreventDefault(true);
 			}
 		});
+	}
+
+	/**
+	 * Clears the comments.
+	 */
+	public static void clear()
+	{
+		commentList.clear();
 	}
 
 	/**
@@ -159,13 +166,5 @@ public class GuestBook extends BasePage
 			// Clear out the text component
 			comment.setText("");
 		}
-	}
-
-	/**
-	 * Clears the comments.
-	 */
-	public static void clear()
-	{
-		commentList.clear();
 	}
 }

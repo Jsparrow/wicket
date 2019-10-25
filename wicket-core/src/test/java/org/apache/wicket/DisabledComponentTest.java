@@ -49,8 +49,6 @@ class DisabledComponentTest extends WicketTestCase
 		Link<?> link = ((DisabledComponentPage1)tester.getLastRenderedPage()).link;
 		link.setEnabled(false);
 
-		assertThrows(ListenerInvocationNotAllowedException.class, () -> {
-			executeListener(link, "DisabledComponentPage1b_result.html");
-		});
+		assertThrows(ListenerInvocationNotAllowedException.class, () -> executeListener(link, "DisabledComponentPage1b_result.html"));
 	}
 }

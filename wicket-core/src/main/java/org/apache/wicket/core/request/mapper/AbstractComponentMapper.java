@@ -32,7 +32,7 @@ import org.apache.wicket.util.string.Strings;
  *
  * @author Matej Knopp
  */
-public abstract class AbstractComponentMapper extends AbstractMapper implements IRequestMapper
+public abstract class AbstractComponentMapper extends AbstractMapper
 {
 	/**
 	 * Construct.
@@ -70,14 +70,14 @@ public abstract class AbstractComponentMapper extends AbstractMapper implements 
 	{
 		Args.notNull(url, "url");
 
-		if (info != null)
+		if (info == null) {
+			return;
+		}
+		String s = info.toString();
+		if (!Strings.isEmpty(s))
 		{
-			String s = info.toString();
-			if (!Strings.isEmpty(s))
-			{
-				QueryParameter parameter = new QueryParameter(s, "");
-				url.getQueryParameters().add(parameter);
-			}
+			QueryParameter parameter = new QueryParameter(s, "");
+			url.getQueryParameters().add(parameter);
 		}
 	}
 

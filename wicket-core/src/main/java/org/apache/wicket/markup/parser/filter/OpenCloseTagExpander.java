@@ -72,14 +72,12 @@ public class OpenCloseTagExpander extends AbstractMarkupFilter
 	public MarkupElement nextElement() throws ParseException
 	{
 		// Did we hold back an elem? Than return that first
-		if (next != null)
-		{
-			MarkupElement rtn = next;
-			next = null;
-			return rtn;
+		if (next == null) {
+			return super.nextElement();
 		}
-
-		return super.nextElement();
+		MarkupElement rtn = next;
+		next = null;
+		return rtn;
 	}
 
 	@Override
@@ -89,19 +87,15 @@ public class OpenCloseTagExpander extends AbstractMarkupFilter
 		{
 			String name = tag.getName();
 
-			if (contains(name))
-			{
-				if (onFound(tag))
+			if (contains(name) && onFound(tag)) {
+				next = new ComponentTag(tag.getName(), TagType.CLOSE);
+				if (getWicketNamespace().equals(tag.getNamespace()))
 				{
-					next = new ComponentTag(tag.getName(), TagType.CLOSE);
-					if (getWicketNamespace().equals(tag.getNamespace()))
-					{
-						next = new WicketTag(next);
-					}
-					next.setNamespace(tag.getNamespace());
-					next.setOpenTag(tag);
-					next.setModified(true);
+					next = new WicketTag(next);
 				}
+				next.setNamespace(tag.getNamespace());
+				next.setOpenTag(tag);
+				next.setModified(true);
 			}
 		}
 

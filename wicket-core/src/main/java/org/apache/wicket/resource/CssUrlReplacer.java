@@ -147,7 +147,7 @@ public class CssUrlReplacer implements IScopeAwareTextResourceProcessor, ICssCom
 
 			// embedded data urls don't need single quotes, but regular urls do:
 			matcher.appendReplacement(output,
-				embedded ? "url(" + processedUrl + ")" : "url('" + processedUrl + "')");
+				embedded ? new StringBuilder().append("url(").append(processedUrl).append(")").toString() : new StringBuilder().append("url('").append(processedUrl).append("')").toString());
 		}
 		matcher.appendTail(output);
 		return output.toString();

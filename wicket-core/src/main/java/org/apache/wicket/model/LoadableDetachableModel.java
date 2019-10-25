@@ -58,17 +58,6 @@ public abstract class LoadableDetachableModel<T> implements IModel<T>
 
 	private static final Logger log = LoggerFactory.getLogger(LoadableDetachableModel.class);
 
-	/** Internal state of the LoadableDetachableModel. */
-	private enum InternalState {
-		DETACHED, ATTACHING, ATTACHED;
-
-		@Override
-		public String toString()
-		{
-			return name().toLowerCase(Locale.ROOT);
-		}
-	}
-
 	/** Keeps track of whether this model is attached or detached */
 	private transient InternalState state = InternalState.DETACHED;
 
@@ -196,7 +185,7 @@ public abstract class LoadableDetachableModel<T> implements IModel<T>
 		state = InternalState.ATTACHED;
 		transientModelObject = object;
 	}
-	
+
 	/**
 	 * Create a {@link LoadableDetachableModel} for the given supplier.
 	 *
@@ -216,5 +205,16 @@ public abstract class LoadableDetachableModel<T> implements IModel<T>
 				return getter.get();
 			}
 		};
+	}
+
+	/** Internal state of the LoadableDetachableModel. */
+	private enum InternalState {
+		DETACHED, ATTACHING, ATTACHED;
+
+		@Override
+		public String toString()
+		{
+			return name().toLowerCase(Locale.ROOT);
+		}
 	}
 }

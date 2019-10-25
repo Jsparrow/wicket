@@ -35,31 +35,6 @@ public class OnChangeAjaxBehaviorPage extends BasePage
 
 	private final IModel<String> inputModel = Model.of("");
 
-	private String getValue(String input)
-	{
-		if (Strings.isEmpty(input))
-		{
-			return "";
-		}
-
-	 StringBuilder buffer = new StringBuilder();
-
-		Locale[] locales = Locale.getAvailableLocales();
-
-		for (final Locale locale : locales)
-		{
-			final String country = locale.getDisplayCountry();
-
-			if (country.toUpperCase(Locale.ROOT).startsWith(input.toUpperCase(Locale.ROOT)))
-			{
-				buffer.append(country);
-				buffer.append(' ');
-			}
-		}
-
-		return buffer.toString();
-	}
-
 	/**
 	 * Constructor
 	 */
@@ -89,6 +64,31 @@ public class OnChangeAjaxBehaviorPage extends BasePage
 			}
 		};
 		field.add(onChangeAjaxBehavior);
+	}
+
+	private String getValue(String input)
+	{
+		if (Strings.isEmpty(input))
+		{
+			return "";
+		}
+
+	 StringBuilder buffer = new StringBuilder();
+
+		Locale[] locales = Locale.getAvailableLocales();
+
+		for (final Locale locale : locales)
+		{
+			final String country = locale.getDisplayCountry();
+
+			if (country.toUpperCase(Locale.ROOT).startsWith(input.toUpperCase(Locale.ROOT)))
+			{
+				buffer.append(country);
+				buffer.append(' ');
+			}
+		}
+
+		return buffer.toString();
 	}
 
 	@Override

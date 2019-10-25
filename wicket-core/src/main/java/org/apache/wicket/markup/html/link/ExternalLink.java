@@ -174,8 +174,8 @@ public class ExternalLink extends AbstractLink
 				}
 
 				// if the tag is an anchor proper
-				if (tag.getName().equalsIgnoreCase("a") || tag.getName().equalsIgnoreCase("link") ||
-					tag.getName().equalsIgnoreCase("area"))
+				if ("a".equalsIgnoreCase(tag.getName()) || "link".equalsIgnoreCase(tag.getName()) ||
+					"area".equalsIgnoreCase(tag.getName()))
 				{
 					// generate the href attribute
 					tag.put("href", url);
@@ -193,14 +193,14 @@ public class ExternalLink extends AbstractLink
 					// generate a popup script by asking popup settings for one
 					if (popupSettings != null)
 					{
-						popupSettings.setTarget("'" + url + "'");
+						popupSettings.setTarget(new StringBuilder().append("'").append(url).append("'").toString());
 						String popupScript = popupSettings.getPopupJavaScript();
 						tag.put("onclick", popupScript);
 					}
 					else
 					{
 						// or generate an onclick JS handler directly
-						tag.put("onclick", "window.location.href='" + url + "';return false;");
+						tag.put("onclick", new StringBuilder().append("window.location.href='").append(url).append("';return false;").toString());
 					}
 				}
 			}

@@ -105,17 +105,16 @@ public class XmlPartialPageUpdate extends PartialPageUpdate
 	protected void writeHeaderContribution(Response response)
 	{
 		CharSequence contents = headerBuffer.getContents();
-		if (Strings.isEmpty(contents) == false)
-		{
-			response.write("<header-contribution>");
-
-			// we need to write response as CDATA and parse it on client,
-			// because konqueror crashes when there is a <script> element
-			response.write("<![CDATA[<head xmlns:wicket=\"http://wicket.apache.org\">");
-			response.write(encode(contents));
-			response.write("</head>]]>");
-			response.write("</header-contribution>");
+		if (Strings.isEmpty(contents) != false) {
+			return;
 		}
+		response.write("<header-contribution>");
+		// we need to write response as CDATA and parse it on client,
+		// because konqueror crashes when there is a <script> element
+		response.write("<![CDATA[<head xmlns:wicket=\"http://wicket.apache.org\">");
+		response.write(encode(contents));
+		response.write("</head>]]>");
+		response.write("</header-contribution>");
 	}
 
 	@Override
@@ -133,15 +132,12 @@ public class XmlPartialPageUpdate extends PartialPageUpdate
 
 	private void writeEvaluations(final Response response, String elementName, Collection<CharSequence> scripts)
 	{
-		if (scripts.size() > 0)
-		{
-			StringBuilder combinedScript = new StringBuilder(1024);
-			for (CharSequence script : scripts)
-			{
-				combinedScript.append("(function(){").append(script).append("})();");
-			}
-			writeEvaluation(elementName, response, combinedScript);
+		if (scripts.size() <= 0) {
+			return;
 		}
+		StringBuilder combinedScript = new StringBuilder(1024);
+		scripts.forEach(script -> combinedScript.append("(function(){").append(script).append("})();"));
+		writeEvaluation(elementName, response, combinedScript);
 	}
 
 	/**

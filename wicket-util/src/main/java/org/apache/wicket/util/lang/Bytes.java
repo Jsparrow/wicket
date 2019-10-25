@@ -295,7 +295,6 @@ public final class Bytes extends LongValue
 	 * @throws StringValueConversionException
 	 */
 	public static Bytes valueOf(final String string, final Locale locale)
-		throws StringValueConversionException
 	{
 		final Matcher matcher = valuePattern.matcher(string);
 
@@ -312,23 +311,23 @@ public final class Bytes extends LongValue
 				// Get units specified
 				final String units = matcher.group(3);
 
-				if (units.equalsIgnoreCase(""))
+				if ("".equalsIgnoreCase(units))
 				{
 					return bytes(value);
 				}
-				else if (units.equalsIgnoreCase("K"))
+				else if ("K".equalsIgnoreCase(units))
 				{
 					return kilobytes(value);
 				}
-				else if (units.equalsIgnoreCase("M"))
+				else if ("M".equalsIgnoreCase(units))
 				{
 					return megabytes(value);
 				}
-				else if (units.equalsIgnoreCase("G"))
+				else if ("G".equalsIgnoreCase(units))
 				{
 					return gigabytes(value);
 				}
-				else if (units.equalsIgnoreCase("T"))
+				else if ("T".equalsIgnoreCase(units))
 				{
 					return terabytes(value);
 				}
@@ -359,7 +358,7 @@ public final class Bytes extends LongValue
 	 * @return The Bytes value for the string
 	 * @throws StringValueConversionException
 	 */
-	public static Bytes valueOf(final String string) throws StringValueConversionException
+	public static Bytes valueOf(final String string)
 	{
 		return valueOf(string, Locale.getDefault(Locale.Category.FORMAT));
 	}

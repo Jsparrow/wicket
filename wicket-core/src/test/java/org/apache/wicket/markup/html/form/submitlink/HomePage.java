@@ -29,21 +29,20 @@ import org.apache.wicket.model.PropertyModel;
  */
 public class HomePage extends WebPage
 {
-	private boolean submitted = false;
-	private boolean submittedViaLinkBefore = false;
-	private boolean submittedViaLinkAfter = false;
-	private String text;
 	/**
 	 *
 	 */
 	private static final long serialVersionUID = 1L;
+	private boolean submitted = false;
+	private boolean submittedViaLinkBefore = false;
+	private boolean submittedViaLinkAfter = false;
+	private String text;
 
 	/**
 	 * Construct.
 	 */
 	public HomePage()
 	{
-		super();
 		Form<Void> form = new Form<Void>("form")
 		{
 			/**
@@ -109,7 +108,6 @@ public class HomePage extends WebPage
 	{
 		this.text = text;
 	}
-
 
 	boolean isSubmittedViaLinkBefore()
 	{

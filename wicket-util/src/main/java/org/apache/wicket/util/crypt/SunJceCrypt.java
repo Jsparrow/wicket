@@ -44,13 +44,13 @@ public class SunJceCrypt extends AbstractCrypt
 	/**
 	 * Iteration count used in combination with the salt to create the encryption key.
 	 */
-	private final static int COUNT = 17;
+	private static final int COUNT = 17;
 
 	/** Name of the default encryption method */
 	public static final String DEFAULT_CRYPT_METHOD = "PBEWithMD5AndDES";
 
 	/** Salt */
-	public final static byte[] SALT = { (byte)0x15, (byte)0x8c, (byte)0xa3, (byte)0x4a,
+	public static final byte[] SALT = { (byte)0x15, (byte)0x8c, (byte)0xa3, (byte)0x4a,
 			(byte)0x66, (byte)0x51, (byte)0x2a, (byte)0xbc };
 
 	private static final PBEParameterSpec PARAMETER_SPEC = new PBEParameterSpec(SALT, COUNT);

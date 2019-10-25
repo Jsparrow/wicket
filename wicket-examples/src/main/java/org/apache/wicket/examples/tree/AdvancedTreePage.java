@@ -105,6 +105,7 @@ public abstract class AdvancedTreePage extends AbstractTreePage
 
 		form.add(new Link<Void>("expandAll")
 		{
+			@Override
 			public void onClick()
 			{
 				FooExpansion.get().expandAll();
@@ -113,6 +114,7 @@ public abstract class AdvancedTreePage extends AbstractTreePage
 
 		form.add(new Link<Void>("collapseAll")
 		{
+			@Override
 			public void onClick()
 			{
 				FooExpansion.get().collapseAll();
@@ -166,10 +168,7 @@ public abstract class AdvancedTreePage extends AbstractTreePage
 	@Override
 	public void detachModels()
 	{
-		for (Content content : contents)
-		{
-			content.detach();
-		}
+		contents.forEach(Content::detach);
 
 		super.detachModels();
 	}

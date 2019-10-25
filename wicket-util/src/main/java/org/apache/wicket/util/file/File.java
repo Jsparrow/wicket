@@ -188,12 +188,9 @@ public class File extends java.io.File implements IModifiable
 	public OutputStream outputStream() throws FileNotFoundException
 	{
 		final Folder parent = getParentFolder();
-		if (!parent.exists())
-		{
-			if (!parent.mkdirs())
-			{
-				throw new FileNotFoundException("Couldn't create path " + parent);
-			}
+		boolean condition = !parent.exists() && !parent.mkdirs();
+		if (condition) {
+			throw new FileNotFoundException("Couldn't create path " + parent);
 		}
 		return new BufferedOutputStream(new FileOutputStream(this));
 	}
@@ -268,7 +265,7 @@ public class File extends java.io.File implements IModifiable
 	 */
 	public String toQuotedString()
 	{
-		return "\"" + toString() + "\"";
+		return new StringBuilder().append("\"").append(toString()).append("\"").toString();
 	}
 
 	/**

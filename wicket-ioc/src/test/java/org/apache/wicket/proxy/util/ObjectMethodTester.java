@@ -37,6 +37,7 @@ public class ObjectMethodTester implements IObjectMethodTester
 	/**
 	 * @see org.apache.wicket.proxy.util.IObjectMethodTester#isValid()
 	 */
+	@Override
 	public boolean isValid()
 	{
 		return valid;
@@ -45,6 +46,7 @@ public class ObjectMethodTester implements IObjectMethodTester
 	/**
 	 * @see org.apache.wicket.proxy.util.IObjectMethodTester#reset()
 	 */
+	@Override
 	public void reset()
 	{
 		valid = true;

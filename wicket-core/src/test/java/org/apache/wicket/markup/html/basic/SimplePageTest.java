@@ -29,6 +29,8 @@ import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.util.tester.WicketTestCase;
 import org.apache.wicket.util.value.ValueMap;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Simple application that demonstrates the mock http application code (and checks that it is
@@ -38,6 +40,8 @@ import org.junit.jupiter.api.Test;
  */
 class SimplePageTest extends WicketTestCase
 {
+	private static final Logger logger = LoggerFactory.getLogger(SimplePageTest.class);
+
 	/**
 	 * @throws Exception
 	 */
@@ -251,6 +255,7 @@ class SimplePageTest extends WicketTestCase
 		}
 		catch (MarkupNotFoundException ex)
 		{
+			logger.error(ex.getMessage(), ex);
 			hit = true;
 		}
 		assertTrue(hit, "Did expect a MarkupNotFoundException");
@@ -269,6 +274,7 @@ class SimplePageTest extends WicketTestCase
 		}
 		catch (MarkupException ex)
 		{
+			logger.error(ex.getMessage(), ex);
 			hit = true;
 		}
 		assertTrue(hit, "Did expect a MarkupException");
@@ -298,6 +304,7 @@ class SimplePageTest extends WicketTestCase
 		}
 		catch (MarkupException ex)
 		{
+			logger.error(ex.getMessage(), ex);
 			hit = true;
 		}
 		assertTrue(hit, "Did expect a MarkupException");

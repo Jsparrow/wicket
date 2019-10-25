@@ -28,23 +28,24 @@ import org.apache.wicket.util.lang.Args;
 public interface IObjectChecker
 {
 	/**
+	 * Checks an object that it meets some requirements before serializing it
+	 *
+	 * @param object
+	 *      the object to check
+	 * @return a Result object describing whether the check is successful or not
+	 */
+	Result check(Object object);
+
+	/**
+	 * @return A list of types which should not be checked by this checker
+	 */
+	List<Class<?>> getExclusions();
+
+	/**
 	 * Represents the result of a check.
 	 */
 	class Result
 	{
-		public enum Status
-		{
-			/**
-			 * The check is successful
-			 */
-			SUCCESS,
-
-			/**
-			 * The check failed for some reason
-			 */
-			FAILURE
-		}
-
 		/**
 		 * A singleton that can be used for successful checks
 		 */
@@ -100,27 +101,25 @@ public interface IObjectChecker
 			this.cause = cause;
 		}
 
+
 		@Override
 		public String toString()
 		{
-			return "Result{" +
-					"reason='" + reason + '\'' +
-					", status=" + status +
-					'}';
+			return new StringBuilder().append("Result{").append("reason='").append(reason).append('\'').append(", status=").append(status).append('}')
+					.toString();
+		}
+
+		public enum Status
+		{
+			/**
+			 * The check is successful
+			 */
+			SUCCESS,
+
+			/**
+			 * The check failed for some reason
+			 */
+			FAILURE
 		}
 	}
-
-	/**
-	 * Checks an object that it meets some requirements before serializing it
-	 *
-	 * @param object
-	 *      the object to check
-	 * @return a Result object describing whether the check is successful or not
-	 */
-	Result check(Object object);
-
-	/**
-	 * @return A list of types which should not be checked by this checker
-	 */
-	List<Class<?>> getExclusions();
 }

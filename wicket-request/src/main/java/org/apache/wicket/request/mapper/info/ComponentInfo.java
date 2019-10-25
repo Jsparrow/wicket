@@ -35,79 +35,6 @@ public class ComponentInfo
 	private static final char SEPARATOR = '-';
 	private static final char COMPONENT_SEPARATOR = ':';
 	private static final char SEPARATOR_ENCODED = '~';
-
-	/**
-	 * Replaces ':' with '-', and '-' with '~'.
-	 * 
-	 * @param path
-	 *            the path to the component in its page
-	 * @return the encoded path
-	 */
-	private static String encodeComponentPath(CharSequence path)
-	{
-		if (path != null)
-		{
-			StringBuilder result = new StringBuilder();
-			int length = path.length();
-			for (int i = 0; i < length; i++)
-			{
-				char c = path.charAt(i);
-				switch (c)
-				{
-					case COMPONENT_SEPARATOR :
-						result.append(SEPARATOR);
-						break;
-					case SEPARATOR :
-						result.append(SEPARATOR_ENCODED);
-						break;
-					default :
-						result.append(c);
-				}
-			}
-			return result.toString();
-		}
-		else
-		{
-			return null;
-		}
-	}
-
-	/**
-	 * Replaces '~' with '-' and '-' with ':'
-	 * 
-	 * @param path
-	 *            the encoded path of the component in its page
-	 * @return the (non-encoded) path of the component in its page
-	 */
-	private static String decodeComponentPath(CharSequence path)
-	{
-		if (path != null)
-		{
-			StringBuilder result = new StringBuilder();
-			int length = path.length();
-			for (int i = 0; i < length; i++)
-			{
-				char c = path.charAt(i);
-				switch (c)
-				{
-					case SEPARATOR_ENCODED :
-						result.append(SEPARATOR);
-						break;
-					case SEPARATOR :
-						result.append(COMPONENT_SEPARATOR);
-						break;
-					default :
-						result.append(c);
-				}
-			}
-			return result.toString();
-		}
-		else
-		{
-			return null;
-		}
-	}
-
 	private final String componentPath;
 	private final Integer behaviorId;
 	private final Integer renderCount;
@@ -126,6 +53,70 @@ public class ComponentInfo
 		this.componentPath = componentPath;
 		this.behaviorId = behaviorId;
 		this.renderCount = renderCount;
+	}
+
+	/**
+	 * Replaces ':' with '-', and '-' with '~'.
+	 * 
+	 * @param path
+	 *            the path to the component in its page
+	 * @return the encoded path
+	 */
+	private static String encodeComponentPath(CharSequence path)
+	{
+		if (path == null) {
+			return null;
+		}
+		StringBuilder result = new StringBuilder();
+		int length = path.length();
+		for (int i = 0; i < length; i++)
+		{
+			char c = path.charAt(i);
+			switch (c)
+			{
+				case COMPONENT_SEPARATOR :
+					result.append(SEPARATOR);
+					break;
+				case SEPARATOR :
+					result.append(SEPARATOR_ENCODED);
+					break;
+				default :
+					result.append(c);
+			}
+		}
+		return result.toString();
+	}
+
+	/**
+	 * Replaces '~' with '-' and '-' with ':'
+	 * 
+	 * @param path
+	 *            the encoded path of the component in its page
+	 * @return the (non-encoded) path of the component in its page
+	 */
+	private static String decodeComponentPath(CharSequence path)
+	{
+		if (path == null) {
+			return null;
+		}
+		StringBuilder result = new StringBuilder();
+		int length = path.length();
+		for (int i = 0; i < length; i++)
+		{
+			char c = path.charAt(i);
+			switch (c)
+			{
+				case SEPARATOR_ENCODED :
+					result.append(SEPARATOR);
+					break;
+				case SEPARATOR :
+					result.append(COMPONENT_SEPARATOR);
+					break;
+				default :
+					result.append(c);
+			}
+		}
+		return result.toString();
 	}
 
 	/**
@@ -188,7 +179,7 @@ public class ComponentInfo
 	 */
 	private static boolean isNumber(final String string)
 	{
-		if ((string == null) || (string.length() == 0))
+		if ((string == null) || (string.isEmpty()))
 		{
 			return false;
 		}

@@ -73,18 +73,6 @@ class JavaSerializerTest extends WicketTestCase
 	}
 
 	/**
-	 * A Model used for #notDetachedModel() test
-	 */
-	private static class NotDetachedModel extends LoadableDetachableModel<String>
-	{
-		@Override
-		protected String load()
-		{
-			return "loaded";
-		}
-	}
-
-	/**
 	 * https://issues.apache.org/jira/browse/WICKET-4812
 	 * 
 	 * Tests that serialization fails when using the default ObjectOutputStream in
@@ -98,18 +86,6 @@ class JavaSerializerTest extends WicketTestCase
 		byte[] serialized = serializer.serialize(component);
 		assertNull(serialized, "The produced byte[] must be null if there was an error");
 	}
-
-	private static class NotSerializableComponent extends WebComponent
-	{
-		private final NotSerializableObject member = new NotSerializableObject();
-
-		NotSerializableComponent(final String id)
-		{
-			super(id);
-		}
-	}
-
-	private static class NotSerializableObject {}
 
 	@Test
 	void normal()
@@ -187,11 +163,35 @@ class JavaSerializerTest extends WicketTestCase
 		}
 	}
 
+	/**
+	 * A Model used for #notDetachedModel() test
+	 */
+	private static class NotDetachedModel extends LoadableDetachableModel<String>
+	{
+		@Override
+		protected String load()
+		{
+			return "loaded";
+		}
+	}
+
+	private static class NotSerializableComponent extends WebComponent
+	{
+		private final NotSerializableObject member = new NotSerializableObject();
+
+		NotSerializableComponent(final String id)
+		{
+			super(id);
+		}
+	}
+
+	private static class NotSerializableObject {}
+
 	private static class ObjectThatBlowsOnSerialization implements Serializable
 	{
 		private int counter = 0;
 
-		private void writeObject(ObjectOutputStream oos) throws IOException
+		private void writeObject() throws IOException
 		{
 			counter++;
 			if (counter == 1)

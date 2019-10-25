@@ -33,6 +33,7 @@ import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.util.io.IClusterable;
+import java.util.stream.Collectors;
 
 /**
  * Ajax todo list without having to write any JavaScript yourself.
@@ -41,6 +42,37 @@ import org.apache.wicket.util.io.IClusterable;
  */
 public class TodoList extends BasePage
 {
+	/**
+	 * Container for redrawing the todo items list with an AJAX call.
+	 */
+	private final WebMarkupContainer showItems;
+
+	/**
+	 * The list of todo items.
+	 */
+	final List<TodoItem> items = new ArrayList<>();
+
+	/**
+	 * Constructor.
+	 */
+	public TodoList()
+	{
+		// add the listview container for the todo items.
+		showItems = new TodoItemsContainer("showItems");
+		add(showItems);
+
+		add(new AjaxFallbackLink<Void>("ajaxback")
+		{
+			@Override
+			public void onClick(Optional<AjaxRequestTarget> targetOptional)
+			{
+				setResponsePage(getPage());
+			}
+		});
+		// add the add container for the todo items.
+		add(new AddItemsContainer("addItems"));
+	}
+
 	/**
 	 * The todo object.
 	 */
@@ -163,6 +195,95 @@ public class TodoList extends BasePage
 	{
 		/** Visibility toggle so that either the link or the form is visible. */
 		private boolean linkVisible = true;
+
+		/**
+		 * Constructor.
+		 * 
+		 * @param id
+		 *            the component id.
+		 */
+		public AddItemsContainer(String id)
+		{
+			super(id);
+			// let wicket generate a markup-id so the contents can be
+			// updated through an AJAX call.
+			setOutputMarkupId(true);
+			add(new AddTodoLink("link"));
+			add(new RemoveCompletedTodosLink("remove"));
+			add(new AddTodoForm("form"));
+		}
+
+		/**
+		 * Called then the add link was clicked, shows the form, and hides the link.
+		 * 
+		 * @param targetOptional
+		 *            the request target.
+		 */
+		void onShowForm(Optional<AjaxRequestTarget> targetOptional)
+		{
+			// toggle the visibility
+			linkVisible = false;
+
+			// redraw the add container.
+			targetOptional.ifPresent(target -> target.add(this));
+		}
+
+		void onRemoveCompletedTodos(Optional<AjaxRequestTarget> targetOptional)
+		{
+			List<TodoItem> ready = new ArrayList<>();
+			ready.addAll(items.stream().filter(TodoList.TodoItem::isChecked).collect(Collectors.toList()));
+			items.removeAll(ready);
+
+			targetOptional.ifPresent(target -> {
+				// repaint our panel
+				target.add(this);
+
+				// repaint the listview as there was a new item added.
+				target.add(showItems);
+			});
+		}
+
+		/**
+		 * Called when the form is submitted through the add button, stores the todo item, hides the
+		 * form, displays the add link and updates the listview.
+		 * 
+		 * @param target
+		 *            the request target
+		 */
+		void onAdd(TodoItem item, AjaxRequestTarget target)
+		{
+			// add the item
+			items.add(new TodoItem(item));
+
+			// reset the model
+			item.setChecked(false);
+			item.setText("");
+
+			// toggle the visibility
+			linkVisible = true;
+
+			// repaint our panel
+			target.add(this);
+
+			// repaint the listview as there was a new item added.
+			target.add(showItems);
+		}
+
+		/**
+		 * Called when adding a new todo item was canceled. Hides the add form and displays the add
+		 * link.
+		 * 
+		 * @param target
+		 *            the request target.
+		 */
+		void onCancelTodo(AjaxRequestTarget target)
+		{
+			// toggle the visibility
+			linkVisible = true;
+
+			// repaint the panel.
+			target.add(this);
+		}
 
 		/** Link for displaying the AddTodo form. */
 		private final class AddTodoLink extends AjaxFallbackLink<Void>
@@ -294,131 +415,5 @@ public class TodoList extends BasePage
 				return !linkVisible;
 			}
 		}
-
-		/**
-		 * Constructor.
-		 * 
-		 * @param id
-		 *            the component id.
-		 */
-		public AddItemsContainer(String id)
-		{
-			super(id);
-			// let wicket generate a markup-id so the contents can be
-			// updated through an AJAX call.
-			setOutputMarkupId(true);
-			add(new AddTodoLink("link"));
-			add(new RemoveCompletedTodosLink("remove"));
-			add(new AddTodoForm("form"));
-		}
-
-		/**
-		 * Called then the add link was clicked, shows the form, and hides the link.
-		 * 
-		 * @param targetOptional
-		 *            the request target.
-		 */
-		void onShowForm(Optional<AjaxRequestTarget> targetOptional)
-		{
-			// toggle the visibility
-			linkVisible = false;
-
-			// redraw the add container.
-			targetOptional.ifPresent(target -> target.add(this));
-		}
-
-		void onRemoveCompletedTodos(Optional<AjaxRequestTarget> targetOptional)
-		{
-			List<TodoItem> ready = new ArrayList<>();
-			for (TodoItem todo : items)
-			{
-				if (todo.isChecked())
-				{
-					ready.add(todo);
-				}
-			}
-			items.removeAll(ready);
-
-			targetOptional.ifPresent(target -> {
-				// repaint our panel
-				target.add(this);
-
-				// repaint the listview as there was a new item added.
-				target.add(showItems);
-			});
-		}
-
-		/**
-		 * Called when the form is submitted through the add button, stores the todo item, hides the
-		 * form, displays the add link and updates the listview.
-		 * 
-		 * @param target
-		 *            the request target
-		 */
-		void onAdd(TodoItem item, AjaxRequestTarget target)
-		{
-			// add the item
-			items.add(new TodoItem(item));
-
-			// reset the model
-			item.setChecked(false);
-			item.setText("");
-
-			// toggle the visibility
-			linkVisible = true;
-
-			// repaint our panel
-			target.add(this);
-
-			// repaint the listview as there was a new item added.
-			target.add(showItems);
-		}
-
-		/**
-		 * Called when adding a new todo item was canceled. Hides the add form and displays the add
-		 * link.
-		 * 
-		 * @param target
-		 *            the request target.
-		 */
-		void onCancelTodo(AjaxRequestTarget target)
-		{
-			// toggle the visibility
-			linkVisible = true;
-
-			// repaint the panel.
-			target.add(this);
-		}
-	}
-
-	/**
-	 * Container for redrawing the todo items list with an AJAX call.
-	 */
-	private final WebMarkupContainer showItems;
-
-	/**
-	 * The list of todo items.
-	 */
-	final List<TodoItem> items = new ArrayList<>();
-
-	/**
-	 * Constructor.
-	 */
-	public TodoList()
-	{
-		// add the listview container for the todo items.
-		showItems = new TodoItemsContainer("showItems");
-		add(showItems);
-
-		add(new AjaxFallbackLink<Void>("ajaxback")
-		{
-			@Override
-			public void onClick(Optional<AjaxRequestTarget> targetOptional)
-			{
-				setResponsePage(getPage());
-			}
-		});
-		// add the add container for the todo items.
-		add(new AddItemsContainer("addItems"));
 	}
 }

@@ -366,21 +366,17 @@ public class PagingNavigation extends Loop
 			firstListItem = 0;
 		}
 
-		if ((viewSize != getIterations()) || (startIndex != firstListItem))
-		{
-			modelChanging();
-
-			// Tell the ListView what the new start index shall be
-			addStateChange();
-			startIndex = firstListItem;
-
-			setIterations((int)Math.min(viewSize, pageable.getPageCount()));
-
-			modelChanged();
-
-			// force all children to be re-rendered
-			removeAll();
+		if (!((viewSize != getIterations()) || (startIndex != firstListItem))) {
+			return;
 		}
+		modelChanging();
+		// Tell the ListView what the new start index shall be
+		addStateChange();
+		startIndex = firstListItem;
+		setIterations((int)Math.min(viewSize, pageable.getPageCount()));
+		modelChanged();
+		// force all children to be re-rendered
+		removeAll();
 	}
 
 	/**
@@ -423,7 +419,7 @@ public class PagingNavigation extends Loop
 		public void onComponentTag(Component component, ComponentTag tag)
 		{
 			String pageIndex = String.valueOf(page + 1).intern();
-			Map<String, String> vars = new MicroMap<String, String>("page", pageIndex);
+			Map<String, String> vars = new MicroMap<>("page", pageIndex);
 			tag.put("title", PagingNavigation.this.getString(RES, Model.ofMap(vars)));
 		}
 	}

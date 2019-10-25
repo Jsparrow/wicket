@@ -45,6 +45,8 @@ import org.apache.wicket.util.resource.StringResourceStream;
 import org.apache.wicket.util.tester.MockFormFileUploadPage.MockDomainObjectFileUpload;
 import org.apache.wicket.util.tester.MockFormPage.MockDomainObject;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Test of FormTester.
@@ -53,6 +55,8 @@ import org.junit.jupiter.api.Test;
  */
 class FormTesterTest extends WicketTestCase
 {
+
+	private static final Logger logger = LoggerFactory.getLogger(FormTesterTest.class);
 
 	/**
 	 * Test that normal use of the formtester (no file uploads) works.
@@ -256,6 +260,7 @@ class FormTesterTest extends WicketTestCase
 		}
 		catch (ListenerInvocationNotAllowedException expected)
 		{
+			logger.error(expected.getMessage(), expected);
 			// expected
 		}
 	}

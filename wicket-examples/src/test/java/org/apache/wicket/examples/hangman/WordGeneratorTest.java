@@ -60,7 +60,7 @@ public class WordGeneratorTest extends WicketTestCase
 		{
 			Word word = wg.next();
 			log.info("Word found: " + word);
-			assertTrue(words.remove(word), "Word " + word + " should have been returned only once");
+			assertTrue(words.remove(word), new StringBuilder().append("Word ").append(word).append(" should have been returned only once").toString());
 		}
 		assertTrue(words.isEmpty(), "All words should have been returned twice");
 	}

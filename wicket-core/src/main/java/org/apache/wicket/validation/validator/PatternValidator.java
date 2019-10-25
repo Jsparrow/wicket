@@ -134,7 +134,7 @@ public class PatternValidator implements IValidator<String>
 	@Override
 	public String toString()
 	{
-		return "[PatternValidator pattern = " + pattern + "]";
+		return new StringBuilder().append("[PatternValidator pattern = ").append(pattern).append("]").toString();
 	}
 
 	/**
@@ -147,12 +147,12 @@ public class PatternValidator implements IValidator<String>
 	public void validate(IValidatable<String> validatable)
 	{
 		// Check value against pattern
-		if (pattern.matcher(validatable.getValue()).matches() == reverse)
-		{
-			ValidationError error = new ValidationError(this);
-			error.setVariable("pattern", pattern.pattern());
-			validatable.error(decorate(error, validatable));
+		if (pattern.matcher(validatable.getValue()).matches() != reverse) {
+			return;
 		}
+		ValidationError error = new ValidationError(this);
+		error.setVariable("pattern", pattern.pattern());
+		validatable.error(decorate(error, validatable));
 	}
 
 	/**

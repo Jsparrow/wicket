@@ -45,10 +45,10 @@ public class ChoiceComponentPage extends WebPage
 	 */
 	public ChoiceComponentPage()
 	{
-		form = new Form<Void>("form");
+		form = new Form<>("form");
 		add(form);
 
-		group = new RadioGroup<Boolean>("group", new Model(Boolean.TRUE));
+		group = new RadioGroup<>("group", new Model(Boolean.TRUE));
 		group.add(new AjaxFormChoiceComponentUpdatingBehavior()
 		{
 			@Override
@@ -58,13 +58,13 @@ public class ChoiceComponentPage extends WebPage
 		});
 		form.add(group);
 
-		radioTrue = new Radio<Boolean>("radioTrue", Model.of(Boolean.TRUE));
+		radioTrue = new Radio<>("radioTrue", Model.of(Boolean.TRUE));
 		group.add(radioTrue);
 
-		radioFalse = new Radio<Boolean>("radioFalse", Model.of(Boolean.FALSE));
+		radioFalse = new Radio<>("radioFalse", Model.of(Boolean.FALSE));
 		group.add(radioFalse);
 
-		text = new TextField<String>("text", Model.of(""));
+		text = new TextField<>("text", Model.of(""));
 		group.add(text.setRequired(true));
 	}
 }

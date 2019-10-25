@@ -131,8 +131,7 @@ public abstract class BreadCrumbPanel extends Panel implements IBreadCrumbPartic
 		final IBreadCrumbParticipant active = breadCrumbModel.getActive();
 		if (active == null)
 		{
-			throw new IllegalStateException("The model has no active bread crumb. Before using " +
-				this + ", you have to have at least one bread crumb in the model");
+			throw new IllegalStateException(new StringBuilder().append("The model has no active bread crumb. Before using ").append(this).append(", you have to have at least one bread crumb in the model").toString());
 		}
 
 		// add back button support

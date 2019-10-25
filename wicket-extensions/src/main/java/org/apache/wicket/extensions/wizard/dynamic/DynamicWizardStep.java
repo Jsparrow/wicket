@@ -41,7 +41,6 @@ public abstract class DynamicWizardStep extends WizardStep implements IDynamicWi
 	 */
 	public DynamicWizardStep(final IDynamicWizardStep previousStep)
 	{
-		super();
 		this.previousStep = previousStep;
 	}
 

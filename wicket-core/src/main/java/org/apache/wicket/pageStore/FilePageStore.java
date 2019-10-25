@@ -166,12 +166,9 @@ public class FilePageStore extends AbstractPersistentPageStore implements IPersi
 	protected void removePersistedPage(String sessionIdentifier, IManageablePage page)
 	{
 		File file = getPageFile(sessionIdentifier, page.getPageId(), false);
-		if (file.exists())
-		{
-			if (!file.delete())
-			{
-				log.warn("cannot remove page data for session {} page {}", sessionIdentifier, page.getPageId());
-			}
+		boolean condition = file.exists() && !file.delete();
+		if (condition) {
+			log.warn("cannot remove page data for session {} page {}", sessionIdentifier, page.getPageId());
 		}
 	}
 
@@ -229,32 +226,15 @@ public class FilePageStore extends AbstractPersistentPageStore implements IPersi
 		Arrays.sort(files, new LastModifiedComparator());
 
 		long total = 0;
-		for (int f = 0; f < files.length; f++)
-		{
-			File candidate = files[f];
-
+		for (File candidate : files) {
 			total += candidate.length();
 
-			if (total > maxSizePerSession.bytes())
-			{
-				if (!Files.remove(candidate))
-				{
-					log.warn("cannot remove page data for session {} page {}", sessionIdentifier,
-						candidate.getName());
-				}
+			boolean condition = total > maxSizePerSession.bytes() && !Files.remove(candidate);
+			if (condition) {
+				log.warn("cannot remove page data for session {} page {}", sessionIdentifier,
+					candidate.getName());
 			}
 		}
-	}
-
-	public class LastModifiedComparator implements Comparator<File>
-	{
-
-		@Override
-		public int compare(File f1, File f2)
-		{
-			return Long.compare(f2.lastModified(), f1.lastModified());
-		}
-
 	}
 
 	@Override
@@ -262,10 +242,7 @@ public class FilePageStore extends AbstractPersistentPageStore implements IPersi
 	{
 		Set<String> sessionIdentifiers = new HashSet<>();
 
-		for (File folder : folders.getAll())
-		{
-			sessionIdentifiers.add(folder.getName());
-		}
+		folders.getAll().forEach(folder -> sessionIdentifiers.add(folder.getName()));
 
 		return sessionIdentifiers;
 	}
@@ -293,6 +270,7 @@ public class FilePageStore extends AbstractPersistentPageStore implements IPersi
 					}
 					catch (Exception ex)
 					{
+						log.error(ex.getMessage(), ex);
 						log.debug("unexpected file {}", file.getAbsolutePath());
 						continue;
 					}
@@ -329,6 +307,7 @@ public class FilePageStore extends AbstractPersistentPageStore implements IPersi
 		}
 		catch (IOException ex)
 		{
+			log.error(ex.getMessage(), ex);
 			log.debug("cannot get pageType for {}", file);
 		}
 
@@ -375,5 +354,16 @@ public class FilePageStore extends AbstractPersistentPageStore implements IPersi
 		}
 
 		return Bytes.bytes(total);
+	}
+
+	public class LastModifiedComparator implements Comparator<File>
+	{
+
+		@Override
+		public int compare(File f1, File f2)
+		{
+			return Long.compare(f2.lastModified(), f1.lastModified());
+		}
+
 	}
 }

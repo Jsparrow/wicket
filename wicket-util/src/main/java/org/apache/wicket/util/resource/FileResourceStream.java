@@ -77,11 +77,11 @@ public class FileResourceStream extends AbstractResourceStream
 	@Override
 	public void close() throws IOException
 	{
-		if (inputStream != null)
-		{
-			inputStream.close();
-			inputStream = null;
+		if (inputStream == null) {
+			return;
 		}
+		inputStream.close();
+		inputStream = null;
 	}
 
 	@Override
@@ -120,8 +120,7 @@ public class FileResourceStream extends AbstractResourceStream
 			}
 			catch (FileNotFoundException e)
 			{
-				throw new ResourceStreamNotFoundException("Resource " + file +
-					" could not be found", e);
+				throw new ResourceStreamNotFoundException(new StringBuilder().append("Resource ").append(file).append(" could not be found").toString(), e);
 			}
 		}
 

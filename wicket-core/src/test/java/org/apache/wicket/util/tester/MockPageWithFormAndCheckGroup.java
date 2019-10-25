@@ -39,7 +39,7 @@ public class MockPageWithFormAndCheckGroup extends WebPage
 {
 	private static final long serialVersionUID = 1L;
 
-	private List<Integer> selected = new ArrayList<Integer>();
+	private List<Integer> selected = new ArrayList<>();
 
 	/**
 	 * Construct.
@@ -50,7 +50,7 @@ public class MockPageWithFormAndCheckGroup extends WebPage
 		add(form);
 
 
-		CheckGroup<Integer> checkGroup = new CheckGroup<Integer>("checkGroup",
+		CheckGroup<Integer> checkGroup = new CheckGroup<>("checkGroup",
 			new PropertyModel<Collection<Integer>>(this, "selected"));
 		form.add(checkGroup);
 

@@ -24,22 +24,6 @@ package org.apache.wicket.util.visit;
 public interface IVisitFilter
 {
 	/**
-	 * Controls whether or not the {@code object} will be visited
-	 * 
-	 * @param object
-	 * @return {@code true} if the object should be visited
-	 */
-	boolean visitObject(Object object);
-
-	/**
-	 * Controls whether or not the {@code object}'s children will be visited
-	 * 
-	 * @param object
-	 * @return {@code true} if the object's children should be visited
-	 */
-	boolean visitChildren(Object object);
-
-	/**
 	 * A visitor filter that allows all objects and their children to be visited
 	 */
 	IVisitFilter ANY = new IVisitFilter()
@@ -58,4 +42,20 @@ public interface IVisitFilter
 			return true;
 		}
 	};
+
+	/**
+	 * Controls whether or not the {@code object} will be visited
+	 * 
+	 * @param object
+	 * @return {@code true} if the object should be visited
+	 */
+	boolean visitObject(Object object);
+
+	/**
+	 * Controls whether or not the {@code object}'s children will be visited
+	 * 
+	 * @param object
+	 * @return {@code true} if the object's children should be visited
+	 */
+	boolean visitChildren(Object object);
 }

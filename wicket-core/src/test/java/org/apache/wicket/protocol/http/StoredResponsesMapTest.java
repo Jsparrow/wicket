@@ -89,9 +89,7 @@ class StoredResponsesMapTest
 	void cannotPutArbitraryValue()
 	{
 		StoredResponsesMap map = new StoredResponsesMap(1000, Duration.ofDays(1));
-		assertThrows(IllegalArgumentException.class, () -> {
-			map.put("1", new Object());
-		});
+		assertThrows(IllegalArgumentException.class, () -> map.put("1", new Object()));
 
 	}
 
@@ -112,37 +110,32 @@ class StoredResponsesMapTest
 		final CountDownLatch endLatch = new CountDownLatch(numberOfThreads);
 		final SecureRandom rnd = new SecureRandom();
 		final StoredResponsesMap map = new StoredResponsesMap(1000, Duration.ofSeconds(60));
-		final List<String> keys = new CopyOnWriteArrayList<String>();
+		final List<String> keys = new CopyOnWriteArrayList<>();
 
-		final Runnable r = new Runnable()
-		{
-			@Override
-			public void run()
+		final Runnable r = () -> {
+			startLatch.countDown();
+			try
 			{
-				startLatch.countDown();
-				try
-				{
-					// wait all threads before starting the test
-					startLatch.await();
-				}
-				catch (InterruptedException e)
-				{
-					throw new RuntimeException(e);
-				}
-
-				for (int i = 0; i < iterations; i++)
-				{
-					String key = "abc" + (rnd.nextDouble() * iterations);
-					keys.add(key);
-					map.put(key, new BufferedWebResponse(null));
-
-					int randomMax = keys.size() - 1;
-					int toRemove = randomMax == 0 ? 0 : rnd.nextInt(randomMax);
-					String key2 = keys.get(toRemove);
-					map.remove(key2);
-				}
-				endLatch.countDown();
+				// wait all threads before starting the test
+				startLatch.await();
 			}
+			catch (InterruptedException e)
+			{
+				throw new RuntimeException(e);
+			}
+
+			for (int i = 0; i < iterations; i++)
+			{
+				String key = "abc" + (rnd.nextDouble() * iterations);
+				keys.add(key);
+				map.put(key, new BufferedWebResponse(null));
+
+				int randomMax = keys.size() - 1;
+				int toRemove = randomMax == 0 ? 0 : rnd.nextInt(randomMax);
+				String key2 = keys.get(toRemove);
+				map.remove(key2);
+			}
+			endLatch.countDown();
 		};
 
 		for (int t = 0; t < numberOfThreads; t++)

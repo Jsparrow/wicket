@@ -47,9 +47,7 @@ class AttributeModifierTest
 	@Test
 	void nullAttributeFailsConstruction()
 	{
-		assertThrows(IllegalArgumentException.class, () -> {
-			new AttributeModifier(null, new Model<>("model"));
-		});
+		assertThrows(IllegalArgumentException.class, () -> new AttributeModifier(null, new Model<>("model")));
 	}
 
 	/**

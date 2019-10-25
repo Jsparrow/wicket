@@ -223,8 +223,7 @@ public class WicketMessageResolver implements IComponentResolver
 			{
 				if (isThrowExceptionIfPropertyNotFound() == true)
 				{
-					throw new WicketRuntimeException("Property '" + key +
-						"' not found in property files. Markup: " + markupStream.toString());
+					throw new WicketRuntimeException(new StringBuilder().append("Property '").append(key).append("' not found in property files. Markup: ").append(markupStream.toString()).toString());
 				}
 
 				log.warn("No value found for wicket:message tag with key: {}", key);
@@ -255,7 +254,7 @@ public class WicketMessageResolver implements IComponentResolver
 			final Map<String, CharSequence> childTags = findAndRenderChildWicketTags(markupStream,
 				openTag);
 
-			final Map<String, Object> variablesReplaced = new HashMap<String, Object>();
+			final Map<String, Object> variablesReplaced = new HashMap<>();
 
 			// Replace all ${var} within the property value with real values
 			CharSequence text = new MapVariableInterpolator(value, childTags)
@@ -289,10 +288,8 @@ public class WicketMessageResolver implements IComponentResolver
 					// If still not found, don't know what to do
 					if (value == null)
 					{
-						String msg = "The localized text for <wicket:message key=\"" + key +
-							"\"> has a variable ${" + variableName +
-							"}. However the wicket:message element does not have a child " +
-							"element with a wicket:id=\"" + variableName + "\".";
+						String msg = new StringBuilder().append("The localized text for <wicket:message key=\"").append(key).append("\"> has a variable ${").append(variableName).append("}. However the wicket:message element does not have a child ").append("element with a wicket:id=\"")
+								.append(variableName).append("\".").toString();
 
 						if (isThrowExceptionIfPropertyNotFound() == true)
 						{
@@ -301,7 +298,7 @@ public class WicketMessageResolver implements IComponentResolver
 						else
 						{
 							log.warn(msg);
-							value = "### VARIABLE NOT FOUND: " + variableName + " ###";
+							value = new StringBuilder().append("### VARIABLE NOT FOUND: ").append(variableName).append(" ###").toString();
 						}
 					}
 
@@ -317,25 +314,17 @@ public class WicketMessageResolver implements IComponentResolver
 			getResponse().write(text);
 
 			// Make sure all of the children were rendered
-			for (String id : childTags.keySet())
-			{
-				if (variablesReplaced.containsKey(id) == false)
+			childTags.keySet().stream().filter(id -> variablesReplaced.containsKey(id) == false).map(id -> new StringBuilder().append("The <wicket:message key=\"").append(key).append("\"> has a child element with wicket:id=\"").append(id).append("\". You must add the variable ${").append(id)
+					.append("} to the localized text for the wicket:message.").toString()).forEach(msg -> {
+				if (isThrowExceptionIfPropertyNotFound() == true)
 				{
-					String msg = "The <wicket:message key=\"" + key +
-						"\"> has a child element with wicket:id=\"" + id +
-						"\". You must add the variable ${" + id +
-						"} to the localized text for the wicket:message.";
-
-					if (isThrowExceptionIfPropertyNotFound() == true)
-					{
-						markupStream.throwMarkupException(msg);
-					}
-					else
-					{
-						log.warn(msg);
-					}
+					markupStream.throwMarkupException(msg);
 				}
-			}
+				else
+				{
+					log.warn(msg);
+				}
+			});
 		}
 
 		/**
@@ -349,7 +338,7 @@ public class WicketMessageResolver implements IComponentResolver
 		private Map<String, CharSequence> findAndRenderChildWicketTags(
 			final MarkupStream markupStream, final ComponentTag openTag)
 		{
-			Map<String, CharSequence> childTags = new HashMap<String, CharSequence>();
+			Map<String, CharSequence> childTags = new HashMap<>();
 
 			// get original tag from markup because we modified openTag to always be open
 			ComponentTag tag = markupStream.getPreviousTag();

@@ -87,25 +87,6 @@ public class KittenCaptchaPanel extends Panel
 	}
 
 	/**
-	 * @param filename
-	 *            The name of the file to load
-	 * @return The image read form the file
-	 */
-	private static BufferedImage load(final String filename)
-	{
-		try
-		{
-			return ImageIO.read(new MemoryCacheImageInputStream(
-				KittenCaptchaPanel.class.getResourceAsStream(filename)));
-		}
-		catch (IOException e)
-		{
-			LOG.error("Error loading image", e);
-			return null;
-		}
-	}
-
-	/**
 	 * The various animals as placed animals
 	 */
 	private final PlacedAnimalList animals;
@@ -233,6 +214,25 @@ public class KittenCaptchaPanel extends Panel
 	}
 
 	/**
+	 * @param filename
+	 *            The name of the file to load
+	 * @return The image read form the file
+	 */
+	private static BufferedImage load(final String filename)
+	{
+		try
+		{
+			return ImageIO.read(new MemoryCacheImageInputStream(
+				KittenCaptchaPanel.class.getResourceAsStream(filename)));
+		}
+		catch (IOException e)
+		{
+			LOG.error("Error loading image", e);
+			return null;
+		}
+	}
+
+	/**
 	 * @return True if all (three) kittens have been selected
 	 */
 	public boolean allKittensSelected()
@@ -271,15 +271,7 @@ public class KittenCaptchaPanel extends Panel
 
 			// Determine if there is too much overlap with other animals
 			final double tooClose = new Point(width, height).distance(new Point(0, 0)) / 2.0;
-			boolean tooMuchOverlap = false;
-			for (final PlacedAnimal animal : animals)
-			{
-				if (point.distance(animal.location) < tooClose)
-				{
-					tooMuchOverlap = true;
-					break;
-				}
-			}
+			boolean tooMuchOverlap = animals.stream().anyMatch(animal -> point.distance(animal.location) < tooClose);
 
 			// If there was not too much overlap
 			if (!tooMuchOverlap)
@@ -354,7 +346,7 @@ public class KittenCaptchaPanel extends Panel
 		{
 			this.isKitten = isKitten;
 			image = load("images/" + filename);
-			highlightedImage = load("images/" + filename + "_highlight");
+			highlightedImage = load(new StringBuilder().append("images/").append(filename).append("_highlight").toString());
 			visibleRegion = new OpaqueRegion(image);
 		}
 
@@ -401,14 +393,6 @@ public class KittenCaptchaPanel extends Panel
 		 */
 		private transient SoftReference<byte[]> data = null;
 
-		@Override
-		protected void configureResponse(final ResourceResponse response,
-			final Attributes attributes)
-		{
-			super.configureResponse(response, attributes);
-			response.disableCaching();
-		}
-
 		/**
 		 * @param animals
 		 *            The positioned animals
@@ -417,6 +401,14 @@ public class KittenCaptchaPanel extends Panel
 		{
 			this.animals = animals;
 			setFormat("jpg");
+		}
+
+		@Override
+		protected void configureResponse(final ResourceResponse response,
+			final Attributes attributes)
+		{
+			super.configureResponse(response, attributes);
+			response.disableCaching();
 		}
 
 		/**
@@ -553,7 +545,8 @@ public class KittenCaptchaPanel extends Panel
 		@Override
 		public String toString()
 		{
-			return (isKitten ? "kitten at " : "other at ") + location.x + ", " + location.y;
+			return new StringBuilder().append(isKitten ? "kitten at " : "other at ").append(location.x).append(", ")
+					.append(location.y).toString();
 		}
 
 		/**
@@ -664,24 +657,21 @@ public class KittenCaptchaPanel extends Panel
 
 			// Ensure kittens are visible enough
 			List<PlacedAnimal> strayKittens = new ArrayList<>();
-			for (final PlacedAnimal animal : animals)
-			{
-				// If it's a kitten
-				if (animal.isKitten)
-				{
-					// Compute the area of the visible region in pixels
-					final int kittenArea = animal.getAnimal().visibleRegion.areaInPixels();
+			// If it's a kitten
+			animals.stream().filter((final PlacedAnimal animal) -> animal.isKitten)
+					.forEach((final PlacedAnimal animal) -> {
+						// Compute the area of the visible region in pixels
+						final int kittenArea = animal.getAnimal().visibleRegion.areaInPixels();
 
-					// If at least 4/5ths of the given kitten is not visible
-					// (because it is obscured by other animal(s))
-					if (visibleRegion(animal).areaInPixels() < kittenArea * 4 / 5)
-					{
-						// The user probably can't identify it, so add to the
-						// stray kittens list
-						strayKittens.add(animal);
-					}
-				}
-			}
+						// If at least 4/5ths of the given kitten is not visible
+						// (because it is obscured by other animal(s))
+						if (visibleRegion(animal).areaInPixels() < kittenArea * 4 / 5)
+						{
+							// The user probably can't identify it, so add to the
+							// stray kittens list
+							strayKittens.add(animal);
+						}
+					});
 
 			// Remove any the stray kittens and then re-add them so they move to
 			// the top of the z-order
@@ -717,16 +707,8 @@ public class KittenCaptchaPanel extends Panel
 			Collections.reverse(reversedAnimals);
 
 			// Return any animal at the given location
-			for (final PlacedAnimal animal : reversedAnimals)
-			{
-				if (animal.contains(location))
-				{
-					return animal;
-				}
-			}
-
 			// No animal found
-			return null;
+			return reversedAnimals.stream().filter(animal -> animal.contains(location)).findFirst().orElse(null);
 		}
 
 		/**
@@ -743,10 +725,7 @@ public class KittenCaptchaPanel extends Panel
 			graphics.drawImage(grass, 0, 0, null);
 
 			// Draw each animal in order
-			for (final PlacedAnimal animal : animals)
-			{
-				animal.draw(graphics);
-			}
+			animals.forEach((final PlacedAnimal animal) -> animal.draw(graphics));
 
 			// Clean up graphics resource
 			graphics.dispose();
@@ -760,10 +739,7 @@ public class KittenCaptchaPanel extends Panel
 		 */
 		private void reset()
 		{
-			for (final PlacedAnimal animal : animals)
-			{
-				animal.isHighlighted = false;
-			}
+			animals.forEach((final PlacedAnimal animal) -> animal.isHighlighted = false);
 		}
 
 		/**
@@ -785,7 +761,7 @@ public class KittenCaptchaPanel extends Panel
 			}
 			else
 			{
-				return selected + " " + getString("animalsSelected");
+				return new StringBuilder().append(selected).append(" ").append(getString("animalsSelected")).toString();
 			}
 		}
 

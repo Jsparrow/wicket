@@ -86,8 +86,7 @@ public class PackageResourceStream extends AbstractResourceStream
 
 		if (resourceStream == null)
 		{
-			throw new WicketRuntimeException("Cannot find resource with " + scope.getName() +
-				" and path " + path);
+			throw new WicketRuntimeException(new StringBuilder().append("Cannot find resource with ").append(scope.getName()).append(" and path ").append(path).toString());
 		}
 	}
 

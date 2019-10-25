@@ -36,6 +36,8 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.eclipse.jetty.websocket.jsr356.server.ServerContainer;
 import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainerInitializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Separate startup class for people that want to run the examples directly. Use parameter
@@ -43,6 +45,15 @@ import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainer
  */
 public class StartExamples
 {
+	private static final Logger logger = LoggerFactory.getLogger(StartExamples.class);
+
+	/**
+	 * Construct.
+	 */
+	StartExamples()
+	{
+	}
+
 	/**
 	 * Main function, starts the jetty server.
 	 * 
@@ -89,9 +100,9 @@ public class StartExamples
 			https.setIdleTimeout(500000);
 
 			server.addConnector(https);
-			System.out.println("SSL access to the examples has been enabled on port 8443");
-			System.out
-					.println("You can access the application using SSL on https://localhost:8443");
+			logger.info("SSL access to the examples has been enabled on port 8443");
+			logger
+					.info("You can access the application using SSL on https://localhost:8443");
 			System.out.println();
 		}
 
@@ -127,16 +138,8 @@ public class StartExamples
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 			System.exit(100);
 		}
-	}
-
-	/**
-	 * Construct.
-	 */
-	StartExamples()
-	{
-		super();
 	}
 }

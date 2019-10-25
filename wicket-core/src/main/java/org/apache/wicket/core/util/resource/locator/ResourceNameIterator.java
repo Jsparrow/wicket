@@ -235,8 +235,8 @@ public class ResourceNameIterator implements IResourceNameIterator
 	@Override
 	public String toString()
 	{
-		return path + prepend(getVariation(), '_') + prepend(getStyle(), '_') +
-			prepend(getLocale(), '_') + prepend(getExtension(), '.');
+		return new StringBuilder().append(path).append(prepend(getVariation(), '_')).append(prepend(getStyle(), '_')).append(prepend(getLocale(), '_')).append(prepend(getExtension(), '.'))
+				.toString();
 	}
 
 	/**

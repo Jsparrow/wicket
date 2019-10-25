@@ -45,7 +45,8 @@ public class PanelEdit extends Panel {
 
         AjaxButton submit = new AjaxButton("submit") {
 
-            protected void onSubmit(AjaxRequestTarget target) {
+            @Override
+			protected void onSubmit(AjaxRequestTarget target) {
                 Component currentcomponent = PanelEdit.this;
                 Component newComponent = new Label(currentcomponent.getId())
                 		.setOutputMarkupId(true);

@@ -50,6 +50,8 @@ import org.junit.jupiter.api.Test;
 class BookmarkableMapperTest extends AbstractMapperTest
 {
 
+	private static final String PAGE_CLASS_NAME = MockPage.class.getName();
+
 	private final BookmarkableMapper encoder = new BookmarkableMapper()
 	{
 		@Override
@@ -64,8 +66,6 @@ class BookmarkableMapperTest extends AbstractMapperTest
 			return true;
 		}
 	};
-
-	private static final String PAGE_CLASS_NAME = MockPage.class.getName();
 
 	/**
 	 *
@@ -89,7 +89,7 @@ class BookmarkableMapperTest extends AbstractMapperTest
 	@Test
 	void decodePageClassWithPathParameters()
 	{
-		Url url = Url.parse("wicket/bookmarkable/" + PAGE_CLASS_NAME + ";something=else");
+		Url url = Url.parse(new StringBuilder().append("wicket/bookmarkable/").append(PAGE_CLASS_NAME).append(";something=else").toString());
 		IRequestHandler handler = encoder.mapRequest(getRequest(url));
 
 		assertTrue(handler instanceof RenderPageRequestHandler);
@@ -105,7 +105,7 @@ class BookmarkableMapperTest extends AbstractMapperTest
 	@Test
 	void decode2()
 	{
-		Url url = Url.parse("wicket/bookmarkable/" + PAGE_CLASS_NAME + "/indexed1?a=b&b=c");
+		Url url = Url.parse(new StringBuilder().append("wicket/bookmarkable/").append(PAGE_CLASS_NAME).append("/indexed1?a=b&b=c").toString());
 		IRequestHandler handler = encoder.mapRequest(getRequest(url));
 		assertThat(handler).isInstanceOf(RenderPageRequestHandler.class);
 		IRequestablePage page = ((RenderPageRequestHandler)handler).getPage();
@@ -130,7 +130,7 @@ class BookmarkableMapperTest extends AbstractMapperTest
 	@Test
 	void decode3()
 	{
-		Url url = Url.parse("wicket/bookmarkable/" + PAGE_CLASS_NAME + "?15");
+		Url url = Url.parse(new StringBuilder().append("wicket/bookmarkable/").append(PAGE_CLASS_NAME).append("?15").toString());
 		IRequestHandler handler = encoder.mapRequest(getRequest(url));
 
 		assertThat(handler).isInstanceOf(RenderPageRequestHandler.class);
@@ -155,7 +155,7 @@ class BookmarkableMapperTest extends AbstractMapperTest
 	@Test
 	void decode4()
 	{
-		Url url = Url.parse("wicket/bookmarkable/" + PAGE_CLASS_NAME + "/i1/i2?15&a=b&b=c");
+		Url url = Url.parse(new StringBuilder().append("wicket/bookmarkable/").append(PAGE_CLASS_NAME).append("/i1/i2?15&a=b&b=c").toString());
 		IRequestHandler handler = encoder.mapRequest(getRequest(url));
 
 		assertThat(handler).isInstanceOf(RenderPageRequestHandler.class);
@@ -176,7 +176,7 @@ class BookmarkableMapperTest extends AbstractMapperTest
 	@Test
 	void decode5()
 	{
-		Url url = Url.parse("wicket/bookmarkable/" + PAGE_CLASS_NAME + "?15--foo-bar");
+		Url url = Url.parse(new StringBuilder().append("wicket/bookmarkable/").append(PAGE_CLASS_NAME).append("?15--foo-bar").toString());
 		IRequestHandler handler = encoder.mapRequest(getRequest(url));
 
 		assertThat(handler).isInstanceOf(ListenerRequestHandler.class);
@@ -196,8 +196,7 @@ class BookmarkableMapperTest extends AbstractMapperTest
 	@Test
 	void decode6()
 	{
-		Url url = Url.parse("wicket/bookmarkable/" + PAGE_CLASS_NAME
-			+ "/i1/i2?15--foo-bar&a=b&b=c");
+		Url url = Url.parse(new StringBuilder().append("wicket/bookmarkable/").append(PAGE_CLASS_NAME).append("/i1/i2?15--foo-bar&a=b&b=c").toString());
 		IRequestHandler handler = encoder.mapRequest(getRequest(url));
 
 		assertThat(handler).isInstanceOf(ListenerRequestHandler.class);
@@ -220,8 +219,7 @@ class BookmarkableMapperTest extends AbstractMapperTest
 	@Test
 	void decode7()
 	{
-		Url url = Url.parse("wicket/bookmarkable/" + PAGE_CLASS_NAME
-			+ "?15-ILinkListener.4-foo-bar");
+		Url url = Url.parse(new StringBuilder().append("wicket/bookmarkable/").append(PAGE_CLASS_NAME).append("?15-ILinkListener.4-foo-bar").toString());
 		IRequestHandler handler = encoder.mapRequest(getRequest(url));
 
 		assertThat(handler).isInstanceOf(ListenerRequestHandler.class);
@@ -241,8 +239,7 @@ class BookmarkableMapperTest extends AbstractMapperTest
 	@Test
 	void decode8()
 	{
-		Url url = Url.parse("wicket/bookmarkable/" + PAGE_CLASS_NAME
-			+ "/i1/i2?15-5.ILinkListener-foo-bar&a=b&b=c");
+		Url url = Url.parse(new StringBuilder().append("wicket/bookmarkable/").append(PAGE_CLASS_NAME).append("/i1/i2?15-5.ILinkListener-foo-bar&a=b&b=c").toString());
 
 		context.setNextPageRenderCount(5);
 
@@ -262,8 +259,7 @@ class BookmarkableMapperTest extends AbstractMapperTest
 	void decode9()
 	{
 		assertThrows(StalePageException.class, () -> {
-			Url url = Url.parse("wicket/bookmarkable/" + PAGE_CLASS_NAME
-										+ "/i1/i2?15-5.ILinkListener-foo-bar&a=b&b=c");
+			Url url = Url.parse(new StringBuilder().append("wicket/bookmarkable/").append(PAGE_CLASS_NAME).append("/i1/i2?15-5.ILinkListener-foo-bar&a=b&b=c").toString());
 
 			context.setNextPageRenderCount(6);
 			IRequestHandler handler = encoder.mapRequest(getRequest(url));
@@ -296,7 +292,7 @@ class BookmarkableMapperTest extends AbstractMapperTest
 	@Test
 	void decode11()
 	{
-		final Url url = Url.parse(context.getBookmarkableIdentifier() + "/" + PAGE_CLASS_NAME);
+		final Url url = Url.parse(new StringBuilder().append(context.getBookmarkableIdentifier()).append("/").append(PAGE_CLASS_NAME).toString());
 
 		Request request = new Request()
 		{
@@ -354,7 +350,7 @@ class BookmarkableMapperTest extends AbstractMapperTest
 	@Test
 	void decode12()
 	{
-		final Url url = Url.parse(context.getBookmarkableIdentifier() + "/" + PAGE_CLASS_NAME);
+		final Url url = Url.parse(new StringBuilder().append(context.getBookmarkableIdentifier()).append("/").append(PAGE_CLASS_NAME).toString());
 
 		Request request = new Request()
 		{
@@ -411,7 +407,7 @@ class BookmarkableMapperTest extends AbstractMapperTest
 	@Test
 	void decode13()
 	{
-		final Url url = Url.parse(context.getBookmarkableIdentifier() + "/" + PAGE_CLASS_NAME);
+		final Url url = Url.parse(new StringBuilder().append(context.getBookmarkableIdentifier()).append("/").append(PAGE_CLASS_NAME).toString());
 
 		Request request = new Request()
 		{
@@ -519,7 +515,7 @@ class BookmarkableMapperTest extends AbstractMapperTest
 		provider.setPageSource(context);
 		IRequestHandler handler = new BookmarkablePageRequestHandler(provider);
 		Url url = encoder.mapHandler(handler);
-		assertEquals("wicket/bookmarkable/" + PAGE_CLASS_NAME + "/i1/i2?a=b&b=c", url.toString());
+		assertEquals(new StringBuilder().append("wicket/bookmarkable/").append(PAGE_CLASS_NAME).append("/i1/i2?a=b&b=c").toString(), url.toString());
 	}
 
 	/**
@@ -539,7 +535,7 @@ class BookmarkableMapperTest extends AbstractMapperTest
 		IRequestHandler handler = new BookmarkablePageRequestHandler(provider);
 		Url url = encoder.mapHandler(handler);
 
-		assertEquals("wicket/bookmarkable/" + PAGE_CLASS_NAME + "/i1/i2?a=b&b=c", url.toString());
+		assertEquals(new StringBuilder().append("wicket/bookmarkable/").append(PAGE_CLASS_NAME).append("/i1/i2?a=b&b=c").toString(), url.toString());
 	}
 
 	/**
@@ -559,7 +555,7 @@ class BookmarkableMapperTest extends AbstractMapperTest
 		IRequestHandler handler = new RenderPageRequestHandler(provider);
 		Url url = encoder.mapHandler(handler);
 
-		assertEquals("wicket/bookmarkable/" + PAGE_CLASS_NAME + "/i1/i2?15&a=b&b=c", url.toString());
+		assertEquals(new StringBuilder().append("wicket/bookmarkable/").append(PAGE_CLASS_NAME).append("/i1/i2?15&a=b&b=c").toString(), url.toString());
 	}
 
 	/**
@@ -610,8 +606,7 @@ class BookmarkableMapperTest extends AbstractMapperTest
 
 		Url url = encoder.mapHandler(handler);
 
-		assertEquals("wicket/bookmarkable/" + PAGE_CLASS_NAME
-			+ "/i1/i2?15-0.-foo-bar&a=b&b=c", url.toString());
+		assertEquals(new StringBuilder().append("wicket/bookmarkable/").append(PAGE_CLASS_NAME).append("/i1/i2?15-0.-foo-bar&a=b&b=c").toString(), url.toString());
 	}
 
 	/**
@@ -637,8 +632,7 @@ class BookmarkableMapperTest extends AbstractMapperTest
 
 		Url url = encoder.mapHandler(handler);
 
-		assertEquals("wicket/bookmarkable/" + PAGE_CLASS_NAME
-			+ "/i1/i2?15-0.4-foo-bar&a=b&b=c", url.toString());
+		assertEquals(new StringBuilder().append("wicket/bookmarkable/").append(PAGE_CLASS_NAME).append("/i1/i2?15-0.4-foo-bar&a=b&b=c").toString(), url.toString());
 	}
 
 	/**

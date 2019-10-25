@@ -65,7 +65,7 @@ public class EmptySrcAttributeCheckFilter implements IResponseFilter
 			log.warn("Empty src attribute found in response:");
 			int from = Math.max(0, pos - 32);
 			int to = Math.min(pos + 32, responseBuffer.length());
-			log.warn("[...]" + responseBuffer.substring(from, to) + "[...]");
+			log.warn(new StringBuilder().append("[...]").append(responseBuffer.substring(from, to)).append("[...]").toString());
 		}
 		return responseBuffer;
 	}

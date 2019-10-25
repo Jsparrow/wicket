@@ -64,14 +64,7 @@ class InlineEnclosureTest extends WicketTestCase
 	private <T> int childrenByType(MarkupContainer parent, Class<T> filter)
 	{
 		final AtomicInteger count = new AtomicInteger(0);
-		parent.visitChildren(filter, new IVisitor<Component, Void>()
-		{
-			@Override
-			public void component(Component object, IVisit<Void> visit)
-			{
-				count.incrementAndGet();
-			}
-		});
+		parent.visitChildren(filter, (Component object, IVisit<Void> visit) -> count.incrementAndGet());
 
 		return count.get();
 	}

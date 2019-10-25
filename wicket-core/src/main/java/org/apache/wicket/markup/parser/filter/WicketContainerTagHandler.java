@@ -56,15 +56,11 @@ public class WicketContainerTagHandler extends AbstractMarkupFilter
 	@Override
 	protected final MarkupElement onComponentTag(ComponentTag tag) throws ParseException
 	{
-		if (usesDevelopmentConfig)
-		{
-			if (tag instanceof WicketTag)
+		if (usesDevelopmentConfig && tag instanceof WicketTag) {
+			WicketTag wtag = (WicketTag)tag;
+			if (tag.isOpen() && wtag.isContainerTag())
 			{
-				WicketTag wtag = (WicketTag)tag;
-				if (tag.isOpen() && wtag.isContainerTag())
-				{
-					handleContainerTag(wtag);
-				}
+				handleContainerTag(wtag);
 			}
 		}
 

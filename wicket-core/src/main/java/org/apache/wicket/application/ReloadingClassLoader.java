@@ -51,15 +51,34 @@ public class ReloadingClassLoader extends URLClassLoader
 
 	private static final List<String> patterns = new ArrayList<>();
 
-	private IChangeListener<Class<?>> listener;
-
-	private final IModificationWatcher watcher;
-
 	static
 	{
 		addClassLoaderUrls(ReloadingClassLoader.class.getClassLoader());
 		excludePattern("org.apache.wicket.*");
 		includePattern("org.apache.wicket.examples.*");
+	}
+
+	private IChangeListener<Class<?>> listener;
+
+	private final IModificationWatcher watcher;
+
+	/**
+	 * Create a new reloading ClassLoader from a list of URLs, and initialize the
+	 * ModificationWatcher to detect class file modifications
+	 * 
+	 * @param parent
+	 *            the parent classloader in case the class file cannot be loaded from the above
+	 *            locations
+	 */
+	public ReloadingClassLoader(ClassLoader parent)
+	{
+		super(new URL[] { }, parent);
+		// probably doubles from this class, but just in case
+		addClassLoaderUrls(parent);
+
+		urls.forEach(url -> addURL(url));
+		Duration pollFrequency = Duration.ofSeconds(3);
+		watcher = new ModificationWatcher(pollFrequency);
 	}
 
 	/**
@@ -93,7 +112,7 @@ public class ReloadingClassLoader extends URLClassLoader
 					continue;
 				}
 				// FIXME it seems that only "includes" are handled. "Excludes" are ignored
-				boolean isInclude = rawpattern.substring(0, 1).equals("+");
+				boolean isInclude = "+".equals(rawpattern.substring(0, 1));
 				String pattern = rawpattern.substring(1);
 				if (WildcardMatcherHelper.match(pattern, name) != null)
 				{
@@ -166,45 +185,23 @@ public class ReloadingClassLoader extends URLClassLoader
 	 */
 	private static void addClassLoaderUrls(ClassLoader loader)
 	{
-		if (loader != null)
-		{
-			final Enumeration<URL> resources;
-			try
-			{
-				resources = loader.getResources("");
-			}
-			catch (IOException e)
-			{
-				throw new RuntimeException(e);
-			}
-			while (resources.hasMoreElements())
-			{
-				URL location = resources.nextElement();
-				ReloadingClassLoader.addLocation(location);
-			}
+		if (loader == null) {
+			return;
 		}
-	}
-
-	/**
-	 * Create a new reloading ClassLoader from a list of URLs, and initialize the
-	 * ModificationWatcher to detect class file modifications
-	 * 
-	 * @param parent
-	 *            the parent classloader in case the class file cannot be loaded from the above
-	 *            locations
-	 */
-	public ReloadingClassLoader(ClassLoader parent)
-	{
-		super(new URL[] { }, parent);
-		// probably doubles from this class, but just in case
-		addClassLoaderUrls(parent);
-
-		for (URL url : urls)
+		final Enumeration<URL> resources;
+		try
 		{
-			addURL(url);
+			resources = loader.getResources("");
 		}
-		Duration pollFrequency = Duration.ofSeconds(3);
-		watcher = new ModificationWatcher(pollFrequency);
+		catch (IOException e)
+		{
+			throw new RuntimeException(e);
+		}
+		while (resources.hasMoreElements())
+		{
+			URL location = resources.nextElement();
+			ReloadingClassLoader.addLocation(location);
+		}
 	}
 
 	/**
@@ -316,41 +313,29 @@ public class ReloadingClassLoader extends URLClassLoader
 	 */
 	private void watchForModifications(final Class<?> clz)
 	{
-		// Watch class in the future
-		Iterator<URL> locationsIterator = urls.iterator();
 		File clzFile = null;
-		while (locationsIterator.hasNext())
-		{
-			// FIXME only works for directories, but JARs etc could be checked
-			// as well
-			URL location = locationsIterator.next();
-			String clzLocation = location.getFile() + clz.getName().replaceAll("\\.", "/") +
-				".class";
+		for (URL location : urls) {
+			String clzLocation = new StringBuilder().append(location.getFile()).append(clz.getName().replaceAll("\\.", "/")).append(".class").toString();
 			log.debug("clzLocation=" + clzLocation);
 			clzFile = new File(clzLocation);
 			final File finalClzFile = clzFile;
 			if (clzFile.exists())
 			{
 				log.info("Watching changes of class " + clzFile);
-				watcher.add(clzFile, new IChangeListener<IModifiable>()
-				{
-					@Override
-					public void onChange(IModifiable modifiable)
+				watcher.add(clzFile, (IModifiable modifiable) -> {
+					log.info(new StringBuilder().append("Class file ").append(finalClzFile).append(" has changed, reloading").toString());
+					try
 					{
-						log.info("Class file " + finalClzFile + " has changed, reloading");
-						try
-						{
-							listener.onChange(clz);
-						}
-						catch (Exception e)
-						{
-							log.error("Could not notify listener", e);
-							// If an error occurs when the listener is notified,
-							// remove the watched object to avoid rethrowing the
-							// exception at next check
-							// FIXME check if class file has been deleted
-							watcher.remove(finalClzFile);
-						}
+						listener.onChange(clz);
+					}
+					catch (Exception e)
+					{
+						log.error("Could not notify listener", e);
+						// If an error occurs when the listener is notified,
+						// remove the watched object to avoid rethrowing the
+						// exception at next check
+						// FIXME check if class file has been deleted
+						watcher.remove(finalClzFile);
 					}
 				});
 				break;

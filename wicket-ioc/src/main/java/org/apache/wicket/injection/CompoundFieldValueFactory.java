@@ -112,14 +112,7 @@ public class CompoundFieldValueFactory implements IFieldValueFactory
 	@Override
 	public boolean supportsField(final Field field)
 	{
-		for (IFieldValueFactory factory : delegates)
-		{
-			if (factory.supportsField(field))
-			{
-				return true;
-			}
-		}
-		return false;
+		return delegates.stream().anyMatch(factory -> factory.supportsField(field));
 	}
 
 }

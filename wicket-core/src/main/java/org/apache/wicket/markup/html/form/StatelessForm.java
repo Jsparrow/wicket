@@ -99,33 +99,22 @@ public class StatelessForm<T> extends Form<T>
 
 		super.process(submittingComponent);
 
-		if (parameters != null)
+		if (parameters == null) {
+			return;
+		}
+		visitFormComponents((final FormComponent<?> formComponent, final IVisit<Void> visit) -> parameters.remove(formComponent.getInputName()));
+		if (submittingComponent instanceof AbstractSubmitLink)
 		{
-			visitFormComponents(new IVisitor<FormComponent<?>, Void>()
+			AbstractSubmitLink submitLink = (AbstractSubmitLink)submittingComponent;
+			parameters.remove(submitLink.getInputName());
+		}
+		// remove the special parameter for IRequestListener
+		List<INamedParameters.NamedPair> namedParameters = parameters.getAllNamed();
+		for (INamedParameters.NamedPair namedParameter : namedParameters) {
+			if (Strings.isEmpty(namedParameter.getValue()))
 			{
-				@Override
-				public void component(final FormComponent<?> formComponent, final IVisit<Void> visit)
-				{
-					parameters.remove(formComponent.getInputName());
-				}
-			});
-			if (submittingComponent instanceof AbstractSubmitLink)
-			{
-				AbstractSubmitLink submitLink = (AbstractSubmitLink)submittingComponent;
-				parameters.remove(submitLink.getInputName());
-			}
-
-			// remove the special parameter for IRequestListener
-			List<INamedParameters.NamedPair> namedParameters = parameters.getAllNamed();
-			Iterator<INamedParameters.NamedPair> iterator = namedParameters.iterator();
-			while (iterator.hasNext())
-			{
-				INamedParameters.NamedPair namedParameter = iterator.next();
-				if (Strings.isEmpty(namedParameter.getValue()))
-				{
-					parameters.remove(namedParameter.getKey());
-					break;
-				}
+				parameters.remove(namedParameter.getKey());
+				break;
 			}
 		}
 	}

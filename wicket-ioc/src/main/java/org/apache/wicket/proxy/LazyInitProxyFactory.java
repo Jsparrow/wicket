@@ -43,6 +43,8 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.proxy.objenesis.ObjenesisProxyFactory;
 import org.apache.wicket.util.io.IClusterable;
 import org.apache.wicket.util.string.Strings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A factory class that creates lazy init proxies given a type and a {@link IProxyTargetLocator}
@@ -109,6 +111,8 @@ import org.apache.wicket.util.string.Strings;
  */
 public class LazyInitProxyFactory
 {
+	private static final Logger logger = LoggerFactory.getLogger(LazyInitProxyFactory.class);
+
 	/**
 	 * Primitive java types and their object wrappers
 	 */
@@ -155,6 +159,7 @@ public class LazyInitProxyFactory
 			}
 			catch (IllegalArgumentException e)
 			{
+				logger.error(e.getMessage(), e);
 				/*
 				 * STW: In some clustering environments it appears the context classloader fails to
 				 * load the proxied interface (currently seen in BEA WLS 9.x clusters). If this
@@ -209,6 +214,95 @@ public class LazyInitProxyFactory
 	}
 
     /**
+	 * Checks if the method is derived from Object.equals()
+	 * 
+	 * @param method
+	 *            method being tested
+	 * @return true if the method is derived from Object.equals(), false otherwise
+	 */
+	public static boolean isEqualsMethod(final Method method)
+	{
+		return (method.getReturnType() == boolean.class) &&
+			(method.getParameterTypes().length == 1) &&
+			(method.getParameterTypes()[0] == Object.class) && "equals".equals(method.getName());
+	}
+
+	/**
+	 * Checks if the method is derived from Object.hashCode()
+	 * 
+	 * @param method
+	 *            method being tested
+	 * @return true if the method is defined from Object.hashCode(), false otherwise
+	 */
+	public static boolean isHashCodeMethod(final Method method)
+	{
+		return (method.getReturnType() == int.class) && (method.getParameterTypes().length == 0) &&
+			"hashCode".equals(method.getName());
+	}
+
+	/**
+	 * Checks if the method is derived from Object.toString()
+	 * 
+	 * @param method
+	 *            method being tested
+	 * @return true if the method is defined from Object.toString(), false otherwise
+	 */
+	public static boolean isToStringMethod(final Method method)
+	{
+		return (method.getReturnType() == String.class) &&
+			(method.getParameterTypes().length == 0) && "toString".equals(method.getName());
+	}
+
+	/**
+	 * Checks if the method is derived from Object.finalize()
+	 * 
+	 * @param method
+	 *            method being tested
+	 * @return true if the method is defined from Object.finalize(), false otherwise
+	 */
+	public static boolean isFinalizeMethod(final Method method)
+	{
+		return (method.getReturnType() == void.class) && (method.getParameterTypes().length == 0) &&
+			"finalize".equals(method.getName());
+	}
+
+	/**
+	 * Checks if the method is the writeReplace method
+	 * 
+	 * @param method
+	 *            method being tested
+	 * @return true if the method is the writeReplace method, false otherwise
+	 */
+	public static boolean isWriteReplaceMethod(final Method method)
+	{
+		return (method.getReturnType() == Object.class) &&
+			(method.getParameterTypes().length == 0) && "writeReplace".equals(method.getName());
+	}
+
+	private static boolean hasNoArgConstructor(Class<?> type)
+	{
+		for (Constructor<?> constructor : type.getDeclaredConstructors())
+		{
+			if (constructor.getParameterTypes().length == 0) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	private static boolean isObjenesisAvailable()
+	{
+		try {
+			Class.forName("org.objenesis.ObjenesisStd");
+			return true;
+		} catch (Exception ignored) {
+			logger.error(ignored.getMessage(), ignored);
+			return false;
+		}
+	}
+
+	/**
 	 * This interface is used to make the proxy forward writeReplace() call to the handler instead
 	 * of invoking it on itself. This allows us to serialize the replacement object instead of the
 	 * proxy itself in case the proxy subclass is deserialized on a VM that does not have it
@@ -241,6 +335,8 @@ public class LazyInitProxyFactory
 	{
 		private static final long serialVersionUID = 1L;
 
+		private final Logger logger1 = LoggerFactory.getLogger(ProxyReplacement.class);
+
 		private final IProxyTargetLocator locator;
 
 		private final String type;
@@ -268,15 +364,16 @@ public class LazyInitProxyFactory
 				}
 				catch (ClassNotFoundException ignored1)
 				{
+					logger1.error(ignored1.getMessage(), ignored1);
 					try
 					{
 						clazz = Class.forName(type, false, LazyInitProxyFactory.class.getClassLoader());
 					}
 					catch (ClassNotFoundException ignored2)
 					{
+						logger1.error(ignored2.getMessage(), ignored2);
 						ClassNotFoundException cause = new ClassNotFoundException(
-								"Could not resolve type [" + type +
-										"] with the currently configured org.apache.wicket.application.IClassResolver");
+								new StringBuilder().append("Could not resolve type [").append(type).append("] with the currently configured org.apache.wicket.application.IClassResolver").toString());
 						throw new WicketRuntimeException(cause);
 					}
 				}
@@ -318,7 +415,6 @@ public class LazyInitProxyFactory
 		 */
 		public AbstractCGLibInterceptor(final Class<?> type, final IProxyTargetLocator locator)
 		{
-			super();
 			typeName = type.getName();
 			this.locator = locator;
 		}
@@ -471,7 +567,6 @@ public class LazyInitProxyFactory
 		 */
 		public JdkHandler(final Class<?> type, final IProxyTargetLocator locator)
 		{
-			super();
 			this.locator = locator;
 			typeName = type.getName();
 		}
@@ -545,79 +640,12 @@ public class LazyInitProxyFactory
 		}
 	}
 
-	/**
-	 * Checks if the method is derived from Object.equals()
-	 * 
-	 * @param method
-	 *            method being tested
-	 * @return true if the method is derived from Object.equals(), false otherwise
-	 */
-	public static boolean isEqualsMethod(final Method method)
-	{
-		return (method.getReturnType() == boolean.class) &&
-			(method.getParameterTypes().length == 1) &&
-			(method.getParameterTypes()[0] == Object.class) && method.getName().equals("equals");
-	}
-
-	/**
-	 * Checks if the method is derived from Object.hashCode()
-	 * 
-	 * @param method
-	 *            method being tested
-	 * @return true if the method is defined from Object.hashCode(), false otherwise
-	 */
-	public static boolean isHashCodeMethod(final Method method)
-	{
-		return (method.getReturnType() == int.class) && (method.getParameterTypes().length == 0) &&
-			method.getName().equals("hashCode");
-	}
-
-	/**
-	 * Checks if the method is derived from Object.toString()
-	 * 
-	 * @param method
-	 *            method being tested
-	 * @return true if the method is defined from Object.toString(), false otherwise
-	 */
-	public static boolean isToStringMethod(final Method method)
-	{
-		return (method.getReturnType() == String.class) &&
-			(method.getParameterTypes().length == 0) && method.getName().equals("toString");
-	}
-
-	/**
-	 * Checks if the method is derived from Object.finalize()
-	 * 
-	 * @param method
-	 *            method being tested
-	 * @return true if the method is defined from Object.finalize(), false otherwise
-	 */
-	public static boolean isFinalizeMethod(final Method method)
-	{
-		return (method.getReturnType() == void.class) && (method.getParameterTypes().length == 0) &&
-			method.getName().equals("finalize");
-	}
-
-	/**
-	 * Checks if the method is the writeReplace method
-	 * 
-	 * @param method
-	 *            method being tested
-	 * @return true if the method is the writeReplace method, false otherwise
-	 */
-	public static boolean isWriteReplaceMethod(final Method method)
-	{
-		return (method.getReturnType() == Object.class) &&
-			(method.getParameterTypes().length == 0) && method.getName().equals("writeReplace");
-	}
-
 	public static final class WicketNamingPolicy extends DefaultNamingPolicy
 	{
 		public static final WicketNamingPolicy INSTANCE = new WicketNamingPolicy();
 
 		private WicketNamingPolicy()
 		{
-			super();
 		}
 
 		@Override
@@ -627,30 +655,8 @@ public class LazyInitProxyFactory
 			int lastIdxOfDot = prefix.lastIndexOf('.');
 			String packageName = prefix.substring(0, lastIdxOfDot);
 			String className = prefix.substring(lastIdxOfDot + 1);
-			String newPrefix = packageName + ".Wicket_Proxy_" + className;
+			String newPrefix = new StringBuilder().append(packageName).append(".Wicket_Proxy_").append(className).toString();
 			return super.getClassName(newPrefix, source, key, names);
-		}
-	}
-
-
-	private static boolean hasNoArgConstructor(Class<?> type)
-	{
-		for (Constructor<?> constructor : type.getDeclaredConstructors())
-		{
-			if (constructor.getParameterTypes().length == 0)
-				return true;
-		}
-
-		return false;
-	}
-
-	private static boolean isObjenesisAvailable()
-	{
-		try {
-			Class.forName("org.objenesis.ObjenesisStd");
-			return true;
-		} catch (Exception ignored) {
-			return false;
 		}
 	}
 }

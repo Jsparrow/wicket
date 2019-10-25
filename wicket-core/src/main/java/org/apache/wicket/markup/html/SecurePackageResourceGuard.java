@@ -172,13 +172,10 @@ public class SecurePackageResourceGuard extends PackageResourceGuard
 		boolean hit = false;
 		for (SearchPattern pattern : new ReverseListIterator<>(this.pattern))
 		{
-			if ((pattern != null) && pattern.isActive())
-			{
-				if (pattern.matches(path))
-				{
-					hit = pattern.isInclude();
-					break;
-				}
+			boolean condition = (pattern != null) && pattern.isActive() && pattern.matches(path);
+			if (condition) {
+				hit = pattern.isInclude();
+				break;
 			}
 		}
 
@@ -264,19 +261,16 @@ public class SecurePackageResourceGuard extends PackageResourceGuard
 			String regex = Strings.replaceAll(pattern, ".", "#dot#").toString();
 
 			// If path starts with "*/" or "**/"
-			regex = regex.replaceAll("^\\*" + PATH_SEPARATOR, "[^" + PATH_SEPARATOR + "]+" +
-				PATH_SEPARATOR);
-			regex = regex.replaceAll("^[\\*]{2,}" + PATH_SEPARATOR, "([^" + PATH_SEPARATOR +
-				"].#star#" + PATH_SEPARATOR + ")?");
+			regex = regex.replaceAll("^\\*" + PATH_SEPARATOR, new StringBuilder().append("[^").append(PATH_SEPARATOR).append("]+").append(PATH_SEPARATOR).toString());
+			regex = regex.replaceAll("^[\\*]{2,}" + PATH_SEPARATOR, new StringBuilder().append("([^").append(PATH_SEPARATOR).append("].#star#").append(PATH_SEPARATOR).append(")?").toString());
 
 			// Handle "/*/" and "/**/"
-			regex = regex.replaceAll(PATH_SEPARATOR + "\\*" + PATH_SEPARATOR, PATH_SEPARATOR +
-				"[^" + PATH_SEPARATOR + "]+" + PATH_SEPARATOR);
-			regex = regex.replaceAll(PATH_SEPARATOR + "[\\*]{2,}" + PATH_SEPARATOR, "(" +
-				PATH_SEPARATOR + "|" + PATH_SEPARATOR + ".+" + PATH_SEPARATOR + ")");
+			regex = regex.replaceAll(new StringBuilder().append(PATH_SEPARATOR).append("\\*").append(PATH_SEPARATOR).toString(), new StringBuilder().append(PATH_SEPARATOR).append("[^").append(PATH_SEPARATOR).append("]+").append(PATH_SEPARATOR).toString());
+			regex = regex.replaceAll(new StringBuilder().append(PATH_SEPARATOR).append("[\\*]{2,}").append(PATH_SEPARATOR).toString(), new StringBuilder().append("(").append(PATH_SEPARATOR).append("|").append(PATH_SEPARATOR).append(".+").append(PATH_SEPARATOR)
+					.append(")").toString());
 
 			// Handle "*" within dir or file names
-			regex = regex.replaceAll("\\*+", "[^" + PATH_SEPARATOR + "]*");
+			regex = regex.replaceAll("\\*+", new StringBuilder().append("[^").append(PATH_SEPARATOR).append("]*").toString());
 
 			// replace placeholder
 			regex = Strings.replaceAll(regex, "#dot#", "\\.").toString();
@@ -330,8 +324,7 @@ public class SecurePackageResourceGuard extends PackageResourceGuard
 			else
 			{
 				throw new IllegalArgumentException(
-					"Parameter 'pattern' must start with either '+' or '-'. pattern='" + pattern +
-						"'");
+					new StringBuilder().append("Parameter 'pattern' must start with either '+' or '-'. pattern='").append(pattern).append("'").toString());
 			}
 
 			this.pattern = pattern;
@@ -399,8 +392,8 @@ public class SecurePackageResourceGuard extends PackageResourceGuard
 		@Override
 		public String toString()
 		{
-			return "Pattern: " + pattern + ", Regex: " + regex + ", include:" + include +
-				", fileOnly:" + fileOnly + ", active:" + active;
+			return new StringBuilder().append("Pattern: ").append(pattern).append(", Regex: ").append(regex).append(", include:").append(include)
+					.append(", fileOnly:").append(fileOnly).append(", active:").append(active).toString();
 		}
 	}
 

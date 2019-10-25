@@ -166,89 +166,76 @@ public class BasicResourceReferenceMapper extends AbstractResourceReferenceMappe
 	@Override
 	public Url mapHandler(IRequestHandler requestHandler)
 	{
-		if (requestHandler instanceof ResourceReferenceRequestHandler)
+		if (!(requestHandler instanceof ResourceReferenceRequestHandler)) {
+			return null;
+		}
+		ResourceReferenceRequestHandler referenceRequestHandler = (ResourceReferenceRequestHandler)requestHandler;
+		ResourceReference reference = referenceRequestHandler.getResourceReference();
+		Url url;
+		while (reference instanceof ResourceBundleReference)
 		{
-			ResourceReferenceRequestHandler referenceRequestHandler = (ResourceReferenceRequestHandler)requestHandler;
-			ResourceReference reference = referenceRequestHandler.getResourceReference();
-
-			Url url;
-
-			while (reference instanceof ResourceBundleReference)
+			// unwrap the bundle to render the url for the actual reference
+			reference = ((ResourceBundleReference)reference).getBundleReference();
+		}
+		if (reference instanceof MetaInfStaticResourceReference)
+		{
+			url = ((MetaInfStaticResourceReference)reference).mapHandler(referenceRequestHandler);
+			// if running on Servlet 3.0 engine url is not null
+			if (url != null)
 			{
-				// unwrap the bundle to render the url for the actual reference
-				reference = ((ResourceBundleReference)reference).getBundleReference();
+				return url;
 			}
+			// otherwise it has to be served by the standard wicket way
+		}
+		if (reference.canBeRegistered())
+		{
+			ResourceReferenceRegistry resourceReferenceRegistry = getContext().getResourceReferenceRegistry();
+			resourceReferenceRegistry.registerResourceReference(reference);
+		}
+		url = new Url();
+		List<String> segments = url.getSegments();
+		segments.add(getContext().getNamespace());
+		segments.add(getContext().getResourceIdentifier());
+		segments.add(getClassName(reference.getScope()));
+		// setup resource parameters
+		PageParameters parameters = new PageParameters(referenceRequestHandler.getPageParameters());
+		// need to remove indexed parameters otherwise the URL won't be able to decode
+		parameters.clearIndexed();
+		ResourceUtil.encodeResourceReferenceAttributes(url, reference);
+		StringTokenizer tokens = new StringTokenizer(reference.getName(), "/");
+		while (tokens.hasMoreTokens())
+		{
+			String token = tokens.nextToken();
 
-			if (reference instanceof MetaInfStaticResourceReference)
+			// on the last component of the resource path
+			if (tokens.hasMoreTokens() == false && Strings.isEmpty(token) == false)
 			{
-				url = ((MetaInfStaticResourceReference)reference).mapHandler(referenceRequestHandler);
-				// if running on Servlet 3.0 engine url is not null
-				if (url != null)
+				final IResource resource = reference.getResource();
+
+				// is resource supposed to be cached?
+				if (resource instanceof IStaticCacheableResource)
 				{
-					return url;
-				}
-				// otherwise it has to be served by the standard wicket way
-			}
-
-			if (reference.canBeRegistered())
-			{
-				ResourceReferenceRegistry resourceReferenceRegistry = getContext().getResourceReferenceRegistry();
-				resourceReferenceRegistry.registerResourceReference(reference);
-			}
-
-			url = new Url();
-
-			List<String> segments = url.getSegments();
-			segments.add(getContext().getNamespace());
-			segments.add(getContext().getResourceIdentifier());
-			segments.add(getClassName(reference.getScope()));
-
-			// setup resource parameters
-			PageParameters parameters = new PageParameters(referenceRequestHandler.getPageParameters());
-			// need to remove indexed parameters otherwise the URL won't be able to decode
-			parameters.clearIndexed();
-
-			ResourceUtil.encodeResourceReferenceAttributes(url, reference);
-
-			StringTokenizer tokens = new StringTokenizer(reference.getName(), "/");
-
-			while (tokens.hasMoreTokens())
-			{
-				String token = tokens.nextToken();
-
-				// on the last component of the resource path
-				if (tokens.hasMoreTokens() == false && Strings.isEmpty(token) == false)
-				{
-					final IResource resource = reference.getResource();
-
-					// is resource supposed to be cached?
-					if (resource instanceof IStaticCacheableResource)
+					final IStaticCacheableResource cacheable = (IStaticCacheableResource)resource;
+					
+					// is caching enabled?
+					if(cacheable.isCachingEnabled())
 					{
-						final IStaticCacheableResource cacheable = (IStaticCacheableResource)resource;
-						
-						// is caching enabled?
-						if(cacheable.isCachingEnabled())
-						{
-							// apply caching scheme to resource url
-							final ResourceUrl resourceUrl = new ResourceUrl(token, parameters);
-							getCachingStrategy().decorateUrl(resourceUrl, cacheable);
-							token = resourceUrl.getFileName();
-	
-						  Checks.notEmpty(token, "Caching strategy returned empty name for '%s'", resource);
-						}
+						// apply caching scheme to resource url
+						final ResourceUrl resourceUrl = new ResourceUrl(token, parameters);
+						getCachingStrategy().decorateUrl(resourceUrl, cacheable);
+						token = resourceUrl.getFileName();
+
+					  Checks.notEmpty(token, "Caching strategy returned empty name for '%s'", resource);
 					}
 				}
-				segments.add(token);
 			}
-
-			if (parameters.isEmpty() == false)
-			{
-				url = encodePageParameters(url, parameters, pageParametersEncoder);
-			}
-
-			return url;
+			segments.add(token);
 		}
-		return null;
+		if (parameters.isEmpty() == false)
+		{
+			url = encodePageParameters(url, parameters, pageParametersEncoder);
+		}
+		return url;
 	}
 
 	@Override

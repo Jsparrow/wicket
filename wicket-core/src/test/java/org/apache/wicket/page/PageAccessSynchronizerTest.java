@@ -139,6 +139,8 @@ class PageAccessSynchronizerTest
 
 		class Worker extends Thread
 		{
+			private final Logger logger1 = LoggerFactory.getLogger(Worker.class);
+
 			@Override
 			public void run()
 			{
@@ -178,8 +180,8 @@ class PageAccessSynchronizerTest
 						}
 						catch (InterruptedException e)
 						{
-							error[0] = "Worker :" + Thread.currentThread().getName() +
-								" interrupted";
+							logger1.error(e.getMessage(), e);
+							error[0] = new StringBuilder().append("Worker :").append(Thread.currentThread().getName()).append(" interrupted").toString();
 						}
 
 						// decrement the counts
@@ -190,6 +192,7 @@ class PageAccessSynchronizerTest
 					}
 					catch (CouldNotLockPageException e)
 					{
+						logger1.error(e.getMessage(), e);
 						// ignore
 					}
 					finally
@@ -202,6 +205,7 @@ class PageAccessSynchronizerTest
 
 		class Monitor extends Thread
 		{
+			private final Logger logger1 = LoggerFactory.getLogger(Monitor.class);
 			volatile boolean stop = false;
 
 			@Override
@@ -215,7 +219,7 @@ class PageAccessSynchronizerTest
 
 						if (count < 0 || count > 1)
 						{
-							error[0] = "Detected count of: " + count + " for page: " + i;
+							error[0] = new StringBuilder().append("Detected count of: ").append(count).append(" for page: ").append(i).toString();
 							return;
 						}
 					}
@@ -225,6 +229,7 @@ class PageAccessSynchronizerTest
 					}
 					catch (InterruptedException e)
 					{
+						logger1.error(e.getMessage(), e);
 						error[0] = "Monitor thread interrupted";
 					}
 				}
@@ -347,7 +352,7 @@ class PageAccessSynchronizerTest
 	void failToReleaseUnderLoad() throws Exception
 	{
 		final Duration duration = Duration.ofSeconds(20); /* seconds */
-		final ConcurrentLinkedQueue<Exception> errors = new ConcurrentLinkedQueue<Exception>();
+		final ConcurrentLinkedQueue<Exception> errors = new ConcurrentLinkedQueue<>();
 		final long endTime = System.currentTimeMillis() + duration.toMillis();
 
 		// set the synchronizer timeout one second longer than the test runs to prevent
@@ -396,10 +401,10 @@ class PageAccessSynchronizerTest
 			}.start();
 		}
 		latch.await();
-		if (!errors.isEmpty())
-		{
-			logger.error("Number of lock errors that occurred: {}", errors.size());
-			throw errors.remove();
+		if (errors.isEmpty()) {
+			return;
 		}
+		logger.error("Number of lock errors that occurred: {}", errors.size());
+		throw errors.remove();
 	}
 }

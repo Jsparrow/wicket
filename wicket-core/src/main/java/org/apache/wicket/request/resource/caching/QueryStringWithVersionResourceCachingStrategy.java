@@ -110,19 +110,18 @@ public class QueryStringWithVersionResourceCachingStrategy implements IResourceC
 	{
 		final INamedParameters parameters = url.getParameters();
 		
-		if (parameters != null)
-		{
-			// store the version in the request cycle
-			StringValue versionValue = parameters.get(versionParameter);
-			RequestCycle requestCycle = RequestCycle.get();
-			if (versionValue.isEmpty() == false && requestCycle != null)
-			{
-				requestCycle.setMetaData(URL_VERSION, versionValue.toString());
-			}
-
-			// undecorate
-			parameters.remove(versionParameter);
+		if (parameters == null) {
+			return;
 		}
+		// store the version in the request cycle
+		StringValue versionValue = parameters.get(versionParameter);
+		RequestCycle requestCycle = RequestCycle.get();
+		if (versionValue.isEmpty() == false && requestCycle != null)
+		{
+			requestCycle.setMetaData(URL_VERSION, versionValue.toString());
+		}
+		// undecorate
+		parameters.remove(versionParameter);
 	}
 
 	@Override
@@ -130,11 +129,11 @@ public class QueryStringWithVersionResourceCachingStrategy implements IResourceC
 	{
 		String requestedVersion = RequestCycle.get().getMetaData(URL_VERSION);
 		String calculatedVersion = this.resourceVersion.getVersion(resource);
-		if (calculatedVersion != null && calculatedVersion.equals(requestedVersion))
-		{
-			response.setCacheDurationToMaximum();
-			response.setCacheScope(WebResponse.CacheScope.PUBLIC);
+		if (!(calculatedVersion != null && calculatedVersion.equals(requestedVersion))) {
+			return;
 		}
+		response.setCacheDurationToMaximum();
+		response.setCacheScope(WebResponse.CacheScope.PUBLIC);
 	}
 
 	@Override

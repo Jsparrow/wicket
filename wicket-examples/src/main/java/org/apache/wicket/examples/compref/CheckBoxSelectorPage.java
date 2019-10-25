@@ -124,6 +124,7 @@ public class CheckBoxSelectorPage extends WicketExamplePage
 				setEnabled(extensibleChoices.size() > 1);
 			}
 			
+			@Override
 			public void onSubmit()
 			{
 				

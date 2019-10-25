@@ -40,6 +40,8 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.resource.DynamicImageResource;
 import org.apache.wicket.util.io.IClusterable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -49,89 +51,16 @@ import org.apache.wicket.util.io.IClusterable;
  */
 public class CaptchaImageResource extends DynamicImageResource
 {
-	/**
-	 * This class is used to encapsulate all the filters that a character will get when rendered.
-	 * The changes are kept so that the size of the shapes can be properly recorded and reproduced
-	 * later, since it dynamically generates the size of the captcha image. The reason I did it this
-	 * way is because none of the JFC graphics classes are serializable, so they cannot be instance
-	 * variables here.
-	 */
-	private static final class CharAttributes implements IClusterable
-	{
-		private static final long serialVersionUID = 1L;
-		private final char c;
-		private final String name;
-		private final int rise;
-		private final double rotation;
-		private final double shearX;
-		private final double shearY;
-
-		CharAttributes(final char c, final String name, final double rotation, final int rise,
-				final double shearX, final double shearY)
-		{
-			this.c = c;
-			this.name = name;
-			this.rotation = rotation;
-			this.rise = rise;
-			this.shearX = shearX;
-			this.shearY = shearY;
-		}
-
-		char getChar()
-		{
-			return c;
-		}
-
-		String getName()
-		{
-			return name;
-		}
-
-		int getRise()
-		{
-			return rise;
-		}
-
-		double getRotation()
-		{
-			return rotation;
-		}
-
-		double getShearX()
-		{
-			return shearX;
-		}
-
-		double getShearY()
-		{
-			return shearY;
-		}
-	}
-
 	private static final long serialVersionUID = 1L;
-
-	private static int randomInt(final Random rng, final int min, final int max)
-	{
-		return (int) (rng.nextDouble() * (max - min) + min);
-	}
-
-	private static String randomString(final Random rng, final int min, final int max)
-	{
-		int num = randomInt(rng, min, max);
-		byte b[] = new byte[num];
-		for (int i = 0; i < num; i++)
-		{
-			b[i] = (byte) randomInt(rng, 'a', 'z');
-		}
-		return new String(b);
-	}
 
 	private static final RandomNumberGeneratorFactory RNG_FACTORY = new RandomNumberGeneratorFactory();
 
 	private final IModel<String> challengeId;
 
 	private final List<String> fontNames = Arrays.asList("Helvetica", "Arial", "Courier");
+
 	private final int fontSize;
+
 	private final int fontStyle;
 
 	/**
@@ -140,6 +69,7 @@ public class CaptchaImageResource extends DynamicImageResource
 	private transient SoftReference<byte[]> imageData;
 
 	private final int margin;
+
 	private final Random rng;
 
 	/**
@@ -205,6 +135,22 @@ public class CaptchaImageResource extends DynamicImageResource
 	public CaptchaImageResource(final String challengeId, final int fontSize, final int margin)
 	{
 		this(Model.of(challengeId), fontSize, margin);
+	}
+
+	private static int randomInt(final Random rng, final int min, final int max)
+	{
+		return (int) (rng.nextDouble() * (max - min) + min);
+	}
+
+	private static String randomString(final Random rng, final int min, final int max)
+	{
+		int num = randomInt(rng, min, max);
+		byte b[] = new byte[num];
+		for (int i = 0; i < num; i++)
+		{
+			b[i] = (byte) randomInt(rng, 'a', 'z');
+		}
+		return new String(b);
 	}
 
 	protected Random newRandomNumberGenerator()
@@ -356,6 +302,65 @@ public class CaptchaImageResource extends DynamicImageResource
 	}
 
 	/**
+	 * This class is used to encapsulate all the filters that a character will get when rendered.
+	 * The changes are kept so that the size of the shapes can be properly recorded and reproduced
+	 * later, since it dynamically generates the size of the captcha image. The reason I did it this
+	 * way is because none of the JFC graphics classes are serializable, so they cannot be instance
+	 * variables here.
+	 */
+	private static final class CharAttributes implements IClusterable
+	{
+		private static final long serialVersionUID = 1L;
+		private final char c;
+		private final String name;
+		private final int rise;
+		private final double rotation;
+		private final double shearX;
+		private final double shearY;
+
+		CharAttributes(final char c, final String name, final double rotation, final int rise,
+				final double shearX, final double shearY)
+		{
+			this.c = c;
+			this.name = name;
+			this.rotation = rotation;
+			this.rise = rise;
+			this.shearX = shearX;
+			this.shearY = shearY;
+		}
+
+		char getChar()
+		{
+			return c;
+		}
+
+		String getName()
+		{
+			return name;
+		}
+
+		int getRise()
+		{
+			return rise;
+		}
+
+		double getRotation()
+		{
+			return rotation;
+		}
+
+		double getShearX()
+		{
+			return shearX;
+		}
+
+		double getShearY()
+		{
+			return shearY;
+		}
+	}
+
+	/**
 	 * The {@code RandomNumberGeneratorFactory} uses {@link java.security.SecureRandom} as RNG and {@code NativePRNG}
 	 * on unix and {@code Windows-PRNG} on windows if it exists. Else it will fallback to {@code SHA1PRNG}.
 	 * <p/>
@@ -365,6 +370,7 @@ public class CaptchaImageResource extends DynamicImageResource
 	 */
 	private static final class RandomNumberGeneratorFactory
 	{
+		private final Logger logger = LoggerFactory.getLogger(RandomNumberGeneratorFactory.class);
 		private final Provider.Service service;
 
 		RandomNumberGeneratorFactory()
@@ -426,6 +432,7 @@ public class CaptchaImageResource extends DynamicImageResource
 				}
 				catch (NoSuchAlgorithmException nsax)
 				{
+					logger.error(nsax.getMessage(), nsax);
 					// this shouldn't happen, because 'detectBestFittingService' has checked for existing provider and
 					// algorithms.
 				}

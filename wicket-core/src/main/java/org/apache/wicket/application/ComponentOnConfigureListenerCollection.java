@@ -32,13 +32,6 @@ public class ComponentOnConfigureListenerCollection extends
 	@Override
 	public void onConfigure(final Component component)
 	{
-		notify(new INotifier<IComponentOnConfigureListener>()
-		{
-			@Override
-			public void notify(IComponentOnConfigureListener listener)
-			{
-				listener.onConfigure(component);
-			}
-		});
+		notify((IComponentOnConfigureListener listener) -> listener.onConfigure(component));
 	}
 }

@@ -111,7 +111,7 @@ public class LinkPage extends WebPage
 		});
 
 		// AjaxSubmitLink
-		final Form<Void> form = new Form<Void>("form");
+		final Form<Void> form = new Form<>("form");
 		add(form);
 		final AjaxSubmitLink submit = new AjaxSubmitLink("submit")
 		{

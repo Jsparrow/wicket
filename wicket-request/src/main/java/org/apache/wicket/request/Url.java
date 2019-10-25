@@ -96,21 +96,6 @@ public class Url implements Serializable
 	private boolean contextRelative;
 
 	/**
-	 * Modes with which urls can be stringized
-	 * 
-	 * @author igor
-	 */
-	public static enum StringMode {
-		/** local urls are rendered without the host name */
-		LOCAL,
-		/**
-		 * full urls are written with hostname. if the hostname is not set or one of segments is
-		 * {@literal ..} an {@link IllegalStateException} is thrown.
-		 */
-		FULL;
-	}
-
-	/**
 	 * Construct.
 	 */
 	public Url()
@@ -129,7 +114,6 @@ public class Url implements Serializable
 		this();
 		setCharset(charset);
 	}
-
 
 	/**
 	 * copy constructor
@@ -507,7 +491,7 @@ public class Url implements Serializable
 	 */
 	public boolean isDataUrl()
 	{
-		return (getProtocol() != null && getProtocol().equals("data")) || (!getSegments().isEmpty() && getSegments()
+		return (getProtocol() != null && "data".equals(getProtocol())) || (!getSegments().isEmpty() && getSegments()
 				.get(0).startsWith("data"));
 	}
 
@@ -587,11 +571,11 @@ public class Url implements Serializable
 	 */
 	public void addQueryParameter(final String name, final Object value)
 	{
-		if (value != null)
-		{
-			QueryParameter parameter = new QueryParameter(name, value.toString());
-			getQueryParameters().add(parameter);
+		if (value == null) {
+			return;
 		}
+		QueryParameter parameter = new QueryParameter(name, value.toString());
+		getQueryParameters().add(parameter);
 	}
 
 	/**
@@ -603,14 +587,7 @@ public class Url implements Serializable
 	 */
 	public QueryParameter getQueryParameter(final String name)
 	{
-		for (QueryParameter parameter : parameters)
-		{
-			if (Objects.equal(name, parameter.getName()))
-			{
-				return parameter;
-			}
-		}
-		return null;
+		return parameters.stream().filter(parameter -> Objects.equal(name, parameter.getName())).findFirst().orElse(null);
 	}
 
 	/**
@@ -737,8 +714,7 @@ public class Url implements Serializable
 		{
 			if (Strings.isEmpty(host))
 			{
-				throw new IllegalStateException("Cannot render this url in " +
-					StringMode.FULL.name() + " mode because it does not have a host set.");
+				throw new IllegalStateException(new StringBuilder().append("Cannot render this url in ").append(StringMode.FULL.name()).append(" mode because it does not have a host set.").toString());
 			}
 
 			if (Strings.isEmpty(protocol) == false)
@@ -760,8 +736,7 @@ public class Url implements Serializable
 
 			if (segments.contains(".."))
 			{
-				throw new IllegalStateException("Cannot render this url in " +
-					StringMode.FULL.name() + " mode because it has a `..` segment: " + toString());
+				throw new IllegalStateException(new StringBuilder().append("Cannot render this url in ").append(StringMode.FULL.name()).append(" mode because it has a `..` segment: ").append(toString()).toString());
 			}
 
 			if (!path.startsWith("/"))
@@ -836,7 +811,7 @@ public class Url implements Serializable
 			return false;
 		}
 		String last = segments.get(segments.size() - 1);
-		return last.length() == 0;
+		return last.isEmpty();
 	}
 
 	/**
@@ -855,14 +830,7 @@ public class Url implements Serializable
 	 */
 	private boolean isAtLeastOneSegmentReal(final List<String> segments)
 	{
-		for (String s : segments)
-		{
-			if ((s.length() > 0) && !".".equals(s) && !"..".equals(s))
-			{
-				return true;
-			}
-		}
-		return false;
+		return segments.stream().anyMatch(s -> (s.length() > 0) && !".".equals(s) && !"..".equals(s));
 	}
 
 	/**
@@ -904,114 +872,9 @@ public class Url implements Serializable
 			}
 		}
 
-		if ((this.segments.size() == 1) && (this.segments.get(0).length() == 0))
+		if ((this.segments.size() == 1) && (this.segments.get(0).isEmpty()))
 		{
 			this.segments.clear();
-		}
-	}
-
-	/**
-	 * Represents a single query parameter
-	 * 
-	 * @author Matej Knopp
-	 */
-	public final static class QueryParameter implements Serializable
-	{
-		private static final long serialVersionUID = 1L;
-
-		private final String name;
-		private final String value;
-
-		/**
-		 * Creates new {@link QueryParameter} instance. The <code>name</code> and <code>value</code>
-		 * parameters must not be <code>null</code>, though they can be empty strings.
-		 * 
-		 * @param name
-		 *            parameter name
-		 * @param value
-		 *            parameter value
-		 */
-		public QueryParameter(final String name, final String value)
-		{
-			Args.notNull(name, "name");
-			Args.notNull(value, "value");
-
-			this.name = name;
-			this.value = value;
-		}
-
-		/**
-		 * Returns query parameter name.
-		 * 
-		 * @return query parameter name
-		 */
-		public String getName()
-		{
-			return name;
-		}
-
-		/**
-		 * Returns query parameter value.
-		 * 
-		 * @return query parameter value
-		 */
-		public String getValue()
-		{
-			return value;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(final Object obj)
-		{
-			if (this == obj)
-			{
-				return true;
-			}
-			if ((obj instanceof QueryParameter) == false)
-			{
-				return false;
-			}
-			QueryParameter rhs = (QueryParameter)obj;
-			return Objects.equal(getName(), rhs.getName()) &&
-				Objects.equal(getValue(), rhs.getValue());
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int hashCode()
-		{
-			return Objects.hashCode(getName(), getValue());
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String toString()
-		{
-			return toString(Charset.forName(DEFAULT_CHARSET_NAME));
-		}
-
-		/**
-		 * 
-		 * @param charset
-		 * @return see toString()
-		 */
-		public String toString(final Charset charset)
-		{
-			StringBuilder result = new StringBuilder();
-			result.append(encodeParameter(getName(), charset));
-			if (!Strings.isEmpty(getValue()))
-			{
-				result.append('=');
-				result.append(encodeParameter(getValue(), charset));
-			}
-			return result.toString();
 		}
 	}
 
@@ -1231,14 +1094,13 @@ public class Url implements Serializable
 		{
 			StringBuilder query = new StringBuilder();
 
-			for (QueryParameter parameter : queryParameters)
-			{
+			queryParameters.forEach(parameter -> {
 				if (query.length() != 0)
 				{
 					query.append('&');
 				}
 				query.append(parameter.toString(charset));
-			}
+			});
 			queryString = query.toString();
 		}
 		return queryString;
@@ -1320,5 +1182,125 @@ public class Url implements Serializable
 			}
 		}
 		return url;
+	}
+
+	/**
+	 * Modes with which urls can be stringized
+	 * 
+	 * @author igor
+	 */
+	public static enum StringMode {
+		/** local urls are rendered without the host name */
+		LOCAL,
+		/**
+		 * full urls are written with hostname. if the hostname is not set or one of segments is
+		 * {@literal ..} an {@link IllegalStateException} is thrown.
+		 */
+		FULL;
+	}
+
+	/**
+	 * Represents a single query parameter
+	 * 
+	 * @author Matej Knopp
+	 */
+	public static final class QueryParameter implements Serializable
+	{
+		private static final long serialVersionUID = 1L;
+
+		private final String name;
+		private final String value;
+
+		/**
+		 * Creates new {@link QueryParameter} instance. The <code>name</code> and <code>value</code>
+		 * parameters must not be <code>null</code>, though they can be empty strings.
+		 * 
+		 * @param name
+		 *            parameter name
+		 * @param value
+		 *            parameter value
+		 */
+		public QueryParameter(final String name, final String value)
+		{
+			Args.notNull(name, "name");
+			Args.notNull(value, "value");
+
+			this.name = name;
+			this.value = value;
+		}
+
+		/**
+		 * Returns query parameter name.
+		 * 
+		 * @return query parameter name
+		 */
+		public String getName()
+		{
+			return name;
+		}
+
+		/**
+		 * Returns query parameter value.
+		 * 
+		 * @return query parameter value
+		 */
+		public String getValue()
+		{
+			return value;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(final Object obj)
+		{
+			if (this == obj)
+			{
+				return true;
+			}
+			if ((obj instanceof QueryParameter) == false)
+			{
+				return false;
+			}
+			QueryParameter rhs = (QueryParameter)obj;
+			return Objects.equal(getName(), rhs.getName()) &&
+				Objects.equal(getValue(), rhs.getValue());
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int hashCode()
+		{
+			return Objects.hashCode(getName(), getValue());
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString()
+		{
+			return toString(Charset.forName(DEFAULT_CHARSET_NAME));
+		}
+
+		/**
+		 * 
+		 * @param charset
+		 * @return see toString()
+		 */
+		public String toString(final Charset charset)
+		{
+			StringBuilder result = new StringBuilder();
+			result.append(encodeParameter(getName(), charset));
+			if (!Strings.isEmpty(getValue()))
+			{
+				result.append('=');
+				result.append(encodeParameter(getValue(), charset));
+			}
+			return result.toString();
+		}
 	}
 }

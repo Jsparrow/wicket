@@ -43,7 +43,7 @@ public class RequestCycleListenerDetachOrderTest
 	@Test
     void pageDetachedBeforeListener()
 	{
-		List<Event> events = new ArrayList<Event>();
+		List<Event> events = new ArrayList<>();
 
 		WicketTester tester = new WicketTester();
 		tester.getApplication().getRequestCycleListeners().add(new TestListener(events));
@@ -51,6 +51,10 @@ public class RequestCycleListenerDetachOrderTest
 
 		assertEquals(Event.PAGE_DETACHED, events.get(0));
 		assertEquals(Event.LISTENER_DETACHED, events.get(1));
+	}
+
+	private static enum Event {
+		PAGE_DETACHED, LISTENER_DETACHED
 	}
 
 	private static class TestListener implements IRequestCycleListener
@@ -91,9 +95,5 @@ public class RequestCycleListenerDetachOrderTest
 		{
 			return new StringResourceStream("<html></html>");
 		}
-	}
-
-	private static enum Event {
-		PAGE_DETACHED, LISTENER_DETACHED
 	};
 }

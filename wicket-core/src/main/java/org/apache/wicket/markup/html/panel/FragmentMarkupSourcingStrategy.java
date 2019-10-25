@@ -80,14 +80,13 @@ public class FragmentMarkupSourcingStrategy extends AbstractMarkupSourcingStrate
 		ComponentTag fragmentOpenTag = stream.getTag();
 
 		// if it is an open close tag, skip this fragment.
-		if (!fragmentOpenTag.isOpenClose())
-		{
-			// We'll completely ignore the fragments open tag. It'll not be rendered
-			stream.next();
-
-			// Render the body of the fragment
-			component.onComponentTagBody(stream, fragmentOpenTag);
+		if (fragmentOpenTag.isOpenClose()) {
+			return;
 		}
+		// We'll completely ignore the fragments open tag. It'll not be rendered
+		stream.next();
+		// Render the body of the fragment
+		component.onComponentTagBody(stream, fragmentOpenTag);
 	}
 
 	/**
@@ -122,8 +121,7 @@ public class FragmentMarkupSourcingStrategy extends AbstractMarkupSourcingStrate
 		IMarkupFragment markup = chooseMarkup(container);
 		if (markup == null)
 		{
-			throw new MarkupException("The fragments markup provider has no associated markup. " +
-				"No markup to search for fragment markup with id: " + markupId);
+			throw new MarkupException(new StringBuilder().append("The fragments markup provider has no associated markup. ").append("No markup to search for fragment markup with id: ").append(markupId).toString());
 		}
 
 		// Search for the fragment markup
@@ -145,17 +143,14 @@ public class FragmentMarkupSourcingStrategy extends AbstractMarkupSourcingStrate
 
 		if (childMarkup == null)
 		{
-			throw new MarkupNotFoundException("No Markup found for Fragment " + markupId +
-				" in providing markup container " + getMarkupProvider(container));
+			throw new MarkupNotFoundException(new StringBuilder().append("No Markup found for Fragment ").append(markupId).append(" in providing markup container ").append(getMarkupProvider(container)).toString());
 		}
 		else
 		{
 			MarkupElement fragmentTag = childMarkup.get(0);
 			if ((fragmentTag instanceof WicketTag && ((WicketTag)fragmentTag).isFragmentTag()) == false)
 			{
-				throw new MarkupNotFoundException("Markup found for Fragment '" + markupId
-					+ "' in providing markup container " + getMarkupProvider(container)
-					+ " is not a <wicket:fragment> tag");
+				throw new MarkupNotFoundException(new StringBuilder().append("Markup found for Fragment '").append(markupId).append("' in providing markup container ").append(getMarkupProvider(container)).append(" is not a <wicket:fragment> tag").toString());
 			}
 		}
 

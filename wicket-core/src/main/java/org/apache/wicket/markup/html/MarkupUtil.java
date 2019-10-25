@@ -48,20 +48,15 @@ public class MarkupUtil
 		Page page = container.getPage();
 
 		final boolean rtn[] = new boolean[] { true };
-		page.visitChildren(MarkupContainer.class, new IVisitor<MarkupContainer, Void>()
-		{
-			@Override
-			public void component(final MarkupContainer comp, final IVisit<Void> visit)
+		page.visitChildren(MarkupContainer.class, (final MarkupContainer comp, final IVisit<Void> visit) -> {
+			IMarkupFragment associatedMarkup = comp.getAssociatedMarkup();
+			if (associatedMarkup != null)
 			{
-				IMarkupFragment associatedMarkup = comp.getAssociatedMarkup();
-				if (associatedMarkup != null)
+				MarkupResourceStream rs = associatedMarkup.getMarkupResourceStream();
+				if (rs.isHtml5() == false)
 				{
-					MarkupResourceStream rs = associatedMarkup.getMarkupResourceStream();
-					if (rs.isHtml5() == false)
-					{
-						rtn[0] = false;
-						visit.stop();
-					}
+					rtn[0] = false;
+					visit.stop();
 				}
 			}
 		});

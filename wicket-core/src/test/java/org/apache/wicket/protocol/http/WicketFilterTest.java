@@ -81,11 +81,14 @@ import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.xml.sax.SAXException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  */
 public class WicketFilterTest
 {
+	private static final Logger logger = LoggerFactory.getLogger(WicketFilterTest.class);
 	private static WebApplication application;
 	private final DateFormat headerDateFormat = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss z",
 		Locale.UK);
@@ -96,11 +99,11 @@ public class WicketFilterTest
 	@AfterEach
 	void after() throws Exception
 	{
-		if (application != null)
-		{
-			application.internalDestroy();
-			application = null;
+		if (application == null) {
+			return;
 		}
+		application.internalDestroy();
+		application = null;
 	}
 
 	/**
@@ -196,17 +199,10 @@ public class WicketFilterTest
 			};
 			application.getSharedResources().add("foo.gif", resource);
 			MockHttpServletRequest request = new MockHttpServletRequest(application, null, null);
-			request.setURL(request.getContextPath() + request.getServletPath() +
-				"/wicket/resource/" + Application.class.getName() + "/foo.gif");
+			request.setURL(new StringBuilder().append(request.getContextPath()).append(request.getServletPath()).append("/wicket/resource/").append(Application.class.getName()).append("/foo.gif").toString());
 			setIfModifiedSinceToNextWeek(request);
 			MockHttpServletResponse response = new MockHttpServletResponse(request);
-			filter.doFilter(request, response, new FilterChain()
-			{
-				@Override
-				public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse)
-					throws IOException, ServletException
-				{
-				}
+			filter.doFilter(request, response, (ServletRequest servletRequest, ServletResponse servletResponse) -> {
 			});
 			assertEquals(HttpServletResponse.SC_NOT_MODIFIED, response.getStatus());
 			String responseExpiresHeader = response.getHeader("Expires");
@@ -252,8 +248,7 @@ public class WicketFilterTest
 			};
 			application.getSharedResources().add("foo.txt", resource);
 			MockHttpServletRequest request = new MockHttpServletRequest(application, null, null);
-			request.setURL(request.getContextPath() + request.getServletPath() +
-				"/wicket/resource/" + Application.class.getName() + "/foo.txt");
+			request.setURL(new StringBuilder().append(request.getContextPath()).append(request.getServletPath()).append("/wicket/resource/").append(Application.class.getName()).append("/foo.txt").toString());
 			setIfModifiedSinceToNextWeek(request);
 			MockHttpServletResponse response = new MockHttpServletResponse(request)
 			{
@@ -263,13 +258,7 @@ public class WicketFilterTest
 					throw new IOException("caused by test");
 				}
 			};
-			filter.doFilter(request, response, new FilterChain()
-			{
-				@Override
-				public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse)
-					throws IOException, ServletException
-				{
-				}
+			filter.doFilter(request, response, (ServletRequest servletRequest, ServletResponse servletResponse) -> {
 			});
 		}
 		finally
@@ -303,17 +292,10 @@ public class WicketFilterTest
 			// check OPTIONS request is processed correctly
 
 			MockHttpServletRequest request = new MockHttpServletRequest(application, null, null);
-			request.setURL(request.getContextPath() + request.getServletPath() +
-				"/wicket/resource/" + Application.class.getName() + "/foo.txt");
+			request.setURL(new StringBuilder().append(request.getContextPath()).append(request.getServletPath()).append("/wicket/resource/").append(Application.class.getName()).append("/foo.txt").toString());
 			request.setMethod("OPtioNS"); // test that we do not care about case
 			MockHttpServletResponse response = new MockHttpServletResponse(request);
-			filter.doFilter(request, response, new FilterChain()
-			{
-				@Override
-				public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse)
-					throws IOException, ServletException
-				{
-				}
+			filter.doFilter(request, response, (ServletRequest servletRequest, ServletResponse servletResponse) -> {
 			});
 
 			assertEquals(HttpServletResponse.SC_OK, response.getStatus());
@@ -325,18 +307,11 @@ public class WicketFilterTest
 			// try with a GET request to make sure we fail correctly
 
 			request = new MockHttpServletRequest(application, null, null);
-			request.setURL(request.getContextPath() + request.getServletPath() +
-				"/wicket/resource/" + Application.class.getName() + "/foo.txt");
+			request.setURL(new StringBuilder().append(request.getContextPath()).append(request.getServletPath()).append("/wicket/resource/").append(Application.class.getName()).append("/foo.txt").toString());
 			response = new MockHttpServletResponse(request);
 			try
 			{
-				filter.doFilter(request, response, new FilterChain()
-				{
-					@Override
-					public void doFilter(ServletRequest servletRequest,
-						ServletResponse servletResponse) throws IOException, ServletException
-					{
-					}
+				filter.doFilter(request, response, (ServletRequest servletRequest, ServletResponse servletResponse) -> {
 				});
 			}
 			catch (AssertionError e)
@@ -372,63 +347,7 @@ public class WicketFilterTest
 		}
 	}
 
-    public static class FilterTestingConfig implements FilterConfig
-	{
-		private final Map<String, String> initParameters = new HashMap<>();
-
-        public FilterTestingConfig()
-		{
-			initParameters.put(WicketFilter.APP_FACT_PARAM,
-				FilterTestingApplicationFactory.class.getName());
-			initParameters.put(WicketFilter.FILTER_MAPPING_PARAM, "/servlet/*");
-			initParameters.put(ContextParamWebApplicationFactory.APP_CLASS_PARAM,
-				MockApplication.class.getName());
-			initParameters.put(WicketFilter.IGNORE_PATHS_PARAM, "/css,/js,images");
-		}
-
-		@Override
-		public String getFilterName()
-		{
-			return getClass().getName();
-		}
-
-		@Override
-		public ServletContext getServletContext()
-		{
-			return new MockServletContext(null, null);
-		}
-
-		@Override
-		public String getInitParameter(String s)
-		{
-			return initParameters.get(s);
-		}
-
-		@Override
-		public Enumeration<String> getInitParameterNames()
-		{
-			throw new UnsupportedOperationException("Not implemented");
-		}
-	}
-
-	/**
-	 */
-    public static class FilterTestingApplicationFactory implements IWebApplicationFactory
-	{
-		@Override
-		public WebApplication createApplication(WicketFilter filter)
-		{
-			return application;
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public void destroy(WicketFilter filter)
-		{
-		}
-	}
-
-	/**
+    /**
 	 * testCheckRedirect_1()
 	 */
 	@Test
@@ -439,45 +358,6 @@ public class WicketFilterTest
 		// Simulate url-pattern = "/*" and request = http://localhost:8080 => null == no redirect
 		filter.setFilterPath("");
 		assertNull(filter.checkIfRedirectRequired("/", ""));
-	}
-
-	private static class CheckRedirectWorker implements Runnable
-	{
-		private final WicketFilter filter;
-		private final CountDownLatch startLatch;
-		private final CountDownLatch finishLatch;
-		private final AtomicInteger successCount;
-
-		CheckRedirectWorker(WicketFilter filter, CountDownLatch startLatch,
-							CountDownLatch finishLatch, AtomicInteger successCount)
-		{
-			this.filter = filter;
-			this.startLatch = startLatch;
-			this.finishLatch = finishLatch;
-			this.successCount = successCount;
-		}
-
-		@Override
-		public void run()
-		{
-			try
-			{
-				try
-				{
-					startLatch.await(2, TimeUnit.SECONDS);
-				}
-				catch (InterruptedException e)
-				{
-					fail();
-				}
-				assertEquals("/filter/", filter.checkIfRedirectRequired("/filter", ""));
-				successCount.incrementAndGet();
-			}
-			finally
-			{
-				finishLatch.countDown();
-			}
-		}
 	}
 
 	/**
@@ -505,6 +385,7 @@ public class WicketFilterTest
 		}
 		catch (InterruptedException e)
 		{
+			logger.error(e.getMessage(), e);
 			fail();
 		}
 		assertEquals(0, finishLatch.getCount(), "all threads finished");
@@ -642,6 +523,103 @@ public class WicketFilterTest
 
 		s = WicketFilter.canonicaliseFilterPath("/wicket///foobar/");
 		assertEquals("wicket///foobar/", s); // ok we're not perfect!
+	}
+
+	public static class FilterTestingConfig implements FilterConfig
+	{
+		private final Map<String, String> initParameters = new HashMap<>();
+
+        public FilterTestingConfig()
+		{
+			initParameters.put(WicketFilter.APP_FACT_PARAM,
+				FilterTestingApplicationFactory.class.getName());
+			initParameters.put(WicketFilter.FILTER_MAPPING_PARAM, "/servlet/*");
+			initParameters.put(ContextParamWebApplicationFactory.APP_CLASS_PARAM,
+				MockApplication.class.getName());
+			initParameters.put(WicketFilter.IGNORE_PATHS_PARAM, "/css,/js,images");
+		}
+
+		@Override
+		public String getFilterName()
+		{
+			return getClass().getName();
+		}
+
+		@Override
+		public ServletContext getServletContext()
+		{
+			return new MockServletContext(null, null);
+		}
+
+		@Override
+		public String getInitParameter(String s)
+		{
+			return initParameters.get(s);
+		}
+
+		@Override
+		public Enumeration<String> getInitParameterNames()
+		{
+			throw new UnsupportedOperationException("Not implemented");
+		}
+	}
+
+	/**
+	 */
+    public static class FilterTestingApplicationFactory implements IWebApplicationFactory
+	{
+		@Override
+		public WebApplication createApplication(WicketFilter filter)
+		{
+			return application;
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public void destroy(WicketFilter filter)
+		{
+		}
+	}
+
+	private static class CheckRedirectWorker implements Runnable
+	{
+		private final Logger logger = LoggerFactory.getLogger(CheckRedirectWorker.class);
+		private final WicketFilter filter;
+		private final CountDownLatch startLatch;
+		private final CountDownLatch finishLatch;
+		private final AtomicInteger successCount;
+
+		CheckRedirectWorker(WicketFilter filter, CountDownLatch startLatch,
+							CountDownLatch finishLatch, AtomicInteger successCount)
+		{
+			this.filter = filter;
+			this.startLatch = startLatch;
+			this.finishLatch = finishLatch;
+			this.successCount = successCount;
+		}
+
+		@Override
+		public void run()
+		{
+			try
+			{
+				try
+				{
+					startLatch.await(2, TimeUnit.SECONDS);
+				}
+				catch (InterruptedException e)
+				{
+					logger.error(e.getMessage(), e);
+					fail();
+				}
+				assertEquals("/filter/", filter.checkIfRedirectRequired("/filter", ""));
+				successCount.incrementAndGet();
+			}
+			finally
+			{
+				finishLatch.countDown();
+			}
+		}
 	}
 
 }

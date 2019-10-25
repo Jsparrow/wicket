@@ -50,8 +50,7 @@ public abstract class AbstractFormValidator extends Behavior implements IFormVal
 	{
 		if (!(component instanceof Form))
 		{
-			throw new WicketRuntimeException("Behavior " + getClass().getName()
-				+ " can only be added to an instance of a Form");
+			throw new WicketRuntimeException(new StringBuilder().append("Behavior ").append(getClass().getName()).append(" can only be added to an instance of a Form").toString());
 		}
 	}
 
@@ -145,36 +144,32 @@ public abstract class AbstractFormValidator extends Behavior implements IFormVal
 	{
 		FormComponent<?>[] formComponents = getDependentFormComponents();
 
-		if (formComponents != null && formComponents.length > 0)
+		if (!(formComponents != null && formComponents.length > 0)) {
+			return new HashMap<>(2);
+		}
+		Map<String, Object> args = new HashMap<>(formComponents.length * 3);
+		for (int i = 0; i < formComponents.length; i++)
 		{
-			Map<String, Object> args = new HashMap<String, Object>(formComponents.length * 3);
-			for (int i = 0; i < formComponents.length; i++)
+			final FormComponent<?> formComponent = formComponents[i];
+
+			String arg = "label" + i;
+			IModel<?> label = formComponent.getLabel();
+			if (label != null)
 			{
-				final FormComponent<?> formComponent = formComponents[i];
-
-				String arg = "label" + i;
-				IModel<?> label = formComponent.getLabel();
-				if (label != null)
-				{
-					args.put(arg, label.getObject());
-				}
-				else
-				{
-					args.put(
-						arg,
-						formComponent.getLocalizer().getString(formComponent.getId(),
-							formComponent.getParent(), formComponent.getId()));
-				}
-
-				args.put("input" + i, formComponent.getInput());
-				args.put("name" + i, formComponent.getId());
+				args.put(arg, label.getObject());
 			}
-			return args;
+			else
+			{
+				args.put(
+					arg,
+					formComponent.getLocalizer().getString(formComponent.getId(),
+						formComponent.getParent(), formComponent.getId()));
+			}
+
+			args.put("input" + i, formComponent.getInput());
+			args.put("name" + i, formComponent.getId());
 		}
-		else
-		{
-			return new HashMap<String, Object>(2);
-		}
+		return args;
 	}
 
 	/**

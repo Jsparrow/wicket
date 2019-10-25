@@ -117,14 +117,13 @@ public abstract class AbstractAjaxTimerBehavior extends AbstractDefaultAjaxBehav
 		// timerId is no longer valid after timer has triggered
 		timerId = null;
 		
+		if (!shouldTrigger()) {
+			return;
+		}
+		onTimer(target);
 		if (shouldTrigger())
 		{
-			onTimer(target);
-
-			if (shouldTrigger())
-			{
-				setTimeout(target.getHeaderResponse());
-			}
+			setTimeout(target.getHeaderResponse());
 		}
 	}
 
@@ -186,7 +185,7 @@ public abstract class AbstractAjaxTimerBehavior extends AbstractDefaultAjaxBehav
 	{
 		Component component = getComponent();
 
-		return component.getMarkupId() + "." + component.getBehaviorId(this);
+		return new StringBuilder().append(component.getMarkupId()).append(".").append(component.getBehaviorId(this)).toString();
 	}
 
 	/**
@@ -217,13 +216,12 @@ public abstract class AbstractAjaxTimerBehavior extends AbstractDefaultAjaxBehav
 
 	private void clearTimeout(IHeaderResponse headerResponse)
 	{
-		if (timerId != null)
-		{
-			headerResponse
-				.render(OnLoadHeaderItem.forScript("Wicket.Timer.clear('" + timerId + "');"));
-
-			timerId = null;
+		if (timerId == null) {
+			return;
 		}
+		headerResponse
+			.render(OnLoadHeaderItem.forScript(new StringBuilder().append("Wicket.Timer.clear('").append(timerId).append("');").toString()));
+		timerId = null;
 	}
 
 	/**
@@ -234,14 +232,13 @@ public abstract class AbstractAjaxTimerBehavior extends AbstractDefaultAjaxBehav
 	 */
 	public final void stop(final IPartialPageRequestHandler target)
 	{
-		if (stopped == false)
+		if (stopped != false) {
+			return;
+		}
+		stopped = true;
+		if (target != null)
 		{
-			stopped = true;
-
-			if (target != null)
-			{
-				clearTimeout(target.getHeaderResponse());
-			}
+			clearTimeout(target.getHeaderResponse());
 		}
 	}
 

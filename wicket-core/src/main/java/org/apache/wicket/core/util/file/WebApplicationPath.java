@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
  */
 public final class WebApplicationPath implements IResourceFinder
 {
-	private final static Logger log = LoggerFactory.getLogger(WebApplicationPath.class);
+	private static final Logger log = LoggerFactory.getLogger(WebApplicationPath.class);
 
 	private static final String WEB_INF = "WEB-INF/";
 
@@ -88,6 +88,7 @@ public final class WebApplicationPath implements IResourceFinder
 			}
 			catch (Exception ex)
 			{
+				log.error(ex.getMessage(), ex);
 				// ignore, file couldn't be found
 			}
 		}
@@ -102,6 +103,6 @@ public final class WebApplicationPath implements IResourceFinder
 	@Override
 	public String toString()
 	{
-		return "[webapppath: " + path + "]";
+		return new StringBuilder().append("[webapppath: ").append(path).append("]").toString();
 	}
 }

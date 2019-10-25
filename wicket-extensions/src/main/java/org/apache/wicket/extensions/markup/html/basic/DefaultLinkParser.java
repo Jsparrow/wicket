@@ -38,57 +38,39 @@ public class DefaultLinkParser extends LinkParser
 	 * Email address render strategy.<br/>
 	 * Renders &lt;a href="mailto:{EMAIL}"&gt;{EMAIL}&lt;/a&gt;
 	 */
-	public static final ILinkRenderStrategy EMAIL_RENDER_STRATEGY = new ILinkRenderStrategy()
-	{
-		@Override
-		public String buildLink(final String linkTarget)
-		{
-			return "<a href=\"mailto:" + linkTarget + "\">" + linkTarget + "</a>";
-		}
-	};
+	public static final ILinkRenderStrategy EMAIL_RENDER_STRATEGY = (final String linkTarget) -> new StringBuilder().append("<a href=\"mailto:").append(linkTarget).append("\">").append(linkTarget).append("</a>").toString();
 
 	/**
 	 * Email address render strategy. Similar to <code>EMAIL_RENDER_STRATEGY</code>, but encrypts
 	 * the email address with html entities.
 	 */
-	public static final ILinkRenderStrategy ENCRYPTED_EMAIL_RENDER_STRATEGY = new ILinkRenderStrategy()
-	{
-		@Override
-		public String buildLink(final String linkTarget)
+	public static final ILinkRenderStrategy ENCRYPTED_EMAIL_RENDER_STRATEGY = (final String linkTarget) -> {
+		AppendingStringBuffer cryptedEmail = new AppendingStringBuffer(64);
+		for (int i = 0; i < linkTarget.length(); i++)
 		{
-			AppendingStringBuffer cryptedEmail = new AppendingStringBuffer(64);
-			for (int i = 0; i < linkTarget.length(); i++)
-			{
-				cryptedEmail.append("&#");
-				cryptedEmail.append(Integer.toString(linkTarget.charAt(i)));
-				cryptedEmail.append(";");
-			}
-
-			AppendingStringBuffer result = new AppendingStringBuffer(256);
-			result.append("<a href=\"mailto:");
-			result.append(cryptedEmail.toString());
-			result.append("\">");
-			result.append(cryptedEmail.toString());
-			result.append("</a>");
-
-			return result.toString();
+			cryptedEmail.append("&#");
+			cryptedEmail.append(Integer.toString(linkTarget.charAt(i)));
+			cryptedEmail.append(";");
 		}
+
+		AppendingStringBuffer result = new AppendingStringBuffer(256);
+		result.append("<a href=\"mailto:");
+		result.append(cryptedEmail.toString());
+		result.append("\">");
+		result.append(cryptedEmail.toString());
+		result.append("</a>");
+
+		return result.toString();
 	};
 
 	/**
 	 * Url render strategy.<br/>
 	 * Renders &lt;a href="{URL}"&gt;{URL}&lt;/a&gt;
 	 */
-	public static final ILinkRenderStrategy URL_RENDER_STRATEGY = new ILinkRenderStrategy()
-	{
-		@Override
-		public String buildLink(final String linkTarget)
-		{
-			int indexOfQuestion = linkTarget.indexOf('?');
-			return "<a href=\"" + linkTarget + "\">" +
-				(indexOfQuestion == -1 ? linkTarget : linkTarget.substring(0, indexOfQuestion)) +
-				"</a>";
-		}
+	public static final ILinkRenderStrategy URL_RENDER_STRATEGY = (final String linkTarget) -> {
+		int indexOfQuestion = linkTarget.indexOf('?');
+		return new StringBuilder().append("<a href=\"").append(linkTarget).append("\">").append(indexOfQuestion == -1 ? linkTarget : linkTarget.substring(0, indexOfQuestion)).append("</a>")
+				.toString();
 	};
 
 	/**

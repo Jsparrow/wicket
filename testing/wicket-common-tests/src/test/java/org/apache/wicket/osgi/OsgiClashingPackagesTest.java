@@ -16,6 +16,8 @@ import java.util.jar.JarFile;
 import org.apache.wicket.util.string.Strings;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A test that verifies that there are no non-empty packages with the same name in two or more
@@ -25,6 +27,8 @@ import org.junit.jupiter.api.Test;
  */
 public class OsgiClashingPackagesTest
 {
+
+	private static final Logger logger = LoggerFactory.getLogger(OsgiClashingPackagesTest.class);
 
 	@Test
 	public void collectProjectPackages() throws IOException
@@ -56,14 +60,13 @@ public class OsgiClashingPackagesTest
 		}
 
 		Set<Entry<String, List<Project>>> entrySet = projectBuckets.entrySet();
-		for (Entry<String, List<Project>> entry : entrySet)
-		{
+		entrySet.forEach(entry -> {
 			List<Project> projects = entry.getValue();
 			if (projects.size() > 1)
 			{
 				fail(entry);
 			}
-		}
+		});
 	}
 
 	private void fail(Entry<String, List<Project>> entry)
@@ -72,10 +75,7 @@ public class OsgiClashingPackagesTest
 		String packageName = entry.getKey();
 		builder.append("Package '").append(packageName).append(
 			"' has files in two or more modules: ");
-		for (Project conflict : entry.getValue())
-		{
-			builder.append(conflict.getName()).append(", ");
-		}
+		entry.getValue().forEach(conflict -> builder.append(conflict.getName()).append(", "));
 		try
 		{
 			builder.append("\nResources:\n");
@@ -88,7 +88,7 @@ public class OsgiClashingPackagesTest
 		}
 		catch (IOException e)
 		{
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 		}
 		Assertions.fail(builder.toString());
 	}
@@ -116,14 +116,10 @@ public class OsgiClashingPackagesTest
 		 */
 		public void addTo(Map<String, List<Project>> projectBuckets)
 		{
-			for (String packageWithContent : packagesWithContent)
-			{
-				if (!projectBuckets.containsKey(packageWithContent))
-				{
-					projectBuckets.put(packageWithContent, new ArrayList<>());
-				}
+			packagesWithContent.forEach(packageWithContent -> {
+				projectBuckets.putIfAbsent(packageWithContent, new ArrayList<>());
 				projectBuckets.get(packageWithContent).add(this);
-			}
+			});
 		}
 
 		/**
@@ -155,7 +151,7 @@ public class OsgiClashingPackagesTest
 		@Override
 		public String toString()
 		{
-			return "Project{" + "name='" + name + '\'' + '}';
+			return new StringBuilder().append("Project{").append("name='").append(name).append('\'').append('}').toString();
 		}
 
 		private boolean shouldCollect(final String entryName)

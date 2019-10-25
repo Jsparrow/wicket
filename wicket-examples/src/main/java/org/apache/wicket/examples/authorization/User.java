@@ -91,6 +91,6 @@ public class User implements IClusterable
 	@Override
 	public String toString()
 	{
-		return uid + " " + roles;
+		return new StringBuilder().append(uid).append(" ").append(roles).toString();
 	}
 }

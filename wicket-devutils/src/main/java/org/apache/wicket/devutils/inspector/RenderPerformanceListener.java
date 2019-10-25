@@ -80,11 +80,11 @@ public class RenderPerformanceListener implements IComponentInstantiationListene
 		public void beforeRender(final Component component)
 		{
 			super.beforeRender(component);
-			if (component.isAuto() == false)
-			{
-				Long now = System.currentTimeMillis();
-				component.setMetaData(PageView.RENDER_KEY, now);
+			if (component.isAuto() != false) {
+				return;
 			}
+			Long now = System.currentTimeMillis();
+			component.setMetaData(PageView.RENDER_KEY, now);
 		}
 
 		@Override
@@ -93,17 +93,16 @@ public class RenderPerformanceListener implements IComponentInstantiationListene
 			super.afterRender(component);
 			Long renderEnd = System.currentTimeMillis();
 			Long renderStart = component.getMetaData(PageView.RENDER_KEY);
-			if (renderStart != null && component.isAuto() == false)
+			if (!(renderStart != null && component.isAuto() == false)) {
+				return;
+			}
+			Long duration = renderEnd - renderStart;
+			component.setMetaData(PageView.RENDER_KEY, duration);
+			if (log.isDebugEnabled())
 			{
-				Long duration = renderEnd - renderStart;
-				component.setMetaData(PageView.RENDER_KEY, duration);
-
-				if (log.isDebugEnabled())
-				{
-					String componentPath = (component instanceof Page) ? Classes.simpleName(component.getClass())
-							+ " page" : component.getPageRelativePath();
-					log.debug("rendered '{}' for {}ms", componentPath, duration);
-				}
+				String componentPath = (component instanceof Page) ? Classes.simpleName(component.getClass())
+						+ " page" : component.getPageRelativePath();
+				log.debug("rendered '{}' for {}ms", componentPath, duration);
 			}
 		}
 	}

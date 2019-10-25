@@ -101,8 +101,6 @@ public class WebClientInfo extends ClientInfo
 	 */
 	public WebClientInfo(final RequestCycle requestCycle, final String userAgent, final ClientProperties properties)
 	{
-		super();
-
 		this.userAgent = userAgent;
 
 		this.properties = properties;
@@ -175,6 +173,7 @@ public class WebClientInfo extends ClientInfo
 			}
 			catch (UnknownHostException e)
 			{
+				log.error(e.getMessage(), e);
 				remoteAddr = req.getRemoteAddr();
 			}
 		}

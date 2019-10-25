@@ -32,6 +32,13 @@ import org.apache.wicket.util.lang.Args;
 public interface IResource extends IClusterable
 {
 	/**
+	 * Renders this resource to response using the provided attributes.
+	 * 
+	 * @param attributes
+	 */
+	void respond(Attributes attributes);
+
+	/**
 	 * Attributes that are provided to resource in the {@link IResource#respond(Attributes)} method.
 	 * Attributes are set by the {@link ResourceRequestHandler}.
 	 * 
@@ -106,11 +113,4 @@ public interface IResource extends IClusterable
 			return parameters;
 		}
 	}
-
-	/**
-	 * Renders this resource to response using the provided attributes.
-	 * 
-	 * @param attributes
-	 */
-	void respond(Attributes attributes);
 }

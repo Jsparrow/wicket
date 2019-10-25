@@ -42,6 +42,8 @@ import org.apache.wicket.request.http.WebRequest;
 import org.apache.wicket.request.http.WebResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Tests for the calculation whether or not to redirect or directly render a page
@@ -49,6 +51,7 @@ import org.junit.jupiter.api.Test;
 class WebPageRendererTest
 {
 
+	private static final Logger logger = LoggerFactory.getLogger(WebPageRendererTest.class);
 	private RenderPageRequestHandler handler;
 	private RequestCycle requestCycle;
 	private UrlRenderer urlRenderer;
@@ -725,30 +728,9 @@ class WebPageRendererTest
 	void shouldRenderPageAndWriteResponseVariation() {
 
 		String match =
-						"    X       X   " +
-						"    XXXX    XXXX" +
-						"    X       X   " +
-						"    XXXX    XXXX" +
-						"                " +
-						"                " +
-						"                " +
-						"                " +
-						"XXXXXXXXXXXXXXXX" +
-						"XXXXXXXXXXXXXXXX" +
-						"XXXXXXXXXXXXXXXX" +
-						"XXXXXXXXXXXXXXXX" +
-						"                " +
-						"                " +
-						"                " +
-						"                " +
-						"    X   XXXXXXXX" +
-						"    XXXXXXXXXXXX" +
-						"XXXXXXXXXXXXXXXX" +
-						"XXXXXXXXXXXXXXXX" +
-						"                " +
-						"                " +
-						"                " +
-						"                ";
+						new StringBuilder().append("    X       X   ").append("    XXXX    XXXX").append("    X       X   ").append("    XXXX    XXXX").append("                ").append("                ").append("                ").append("                ")
+				.append("XXXXXXXXXXXXXXXX").append("XXXXXXXXXXXXXXXX").append("XXXXXXXXXXXXXXXX").append("XXXXXXXXXXXXXXXX").append("                ").append("                ").append("                ").append("                ").append("    X   XXXXXXXX")
+				.append("    XXXXXXXXXXXX").append("XXXXXXXXXXXXXXXX").append("XXXXXXXXXXXXXXXX").append("                ").append("                ").append("                ").append("                ").toString();
 
 		checkVariations(match, new ShouldRenderPageAndWriteResponseVariations());
 	}
@@ -763,18 +745,8 @@ class WebPageRendererTest
 	void testShouldRedirectToTargetUrl() {
 
 		String match =
-						"XXXXXXXXXXXXXXXX" +
-						"XXXXXXXXXXXXXXXX" +
-						"   XXXXX        " +
-						"XXXXXXXXXXXXXXXX" +
-						"   XXXXX        " +
-						"XXXXXXXXXXXXXXXX" +
-						"XXXXXXXXXXXXXXXX" +
-						"XXXXXXXXXXXXXXXX" +
-						"   XXXXXXXXXXXXX" +
-						"XXXXXXXXXXXXXXXX" +
-						"   XXXXXXXXXXXXX" +
-						"XXXXXXXXXXXXXXXX";
+						new StringBuilder().append("XXXXXXXXXXXXXXXX").append("XXXXXXXXXXXXXXXX").append("   XXXXX        ").append("XXXXXXXXXXXXXXXX").append("   XXXXX        ").append("XXXXXXXXXXXXXXXX").append("XXXXXXXXXXXXXXXX").append("XXXXXXXXXXXXXXXX")
+				.append("   XXXXXXXXXXXXX").append("XXXXXXXXXXXXXXXX").append("   XXXXXXXXXXXXX").append("XXXXXXXXXXXXXXXX").toString();
 
 		checkVariations(match, new ShouldRedirectToTargetUrl());
 	}
@@ -881,17 +853,17 @@ class WebPageRendererTest
 
 	void printVariations(AbstractVariations variations) {
 		int idx=0;
-		System.out.print("\"");
+		logger.info("\"");
 		while (variations.hasNextVariation()) {
-			System.out.print(variations.getResult() ? 'X': ' ');
+			logger.info(String.valueOf(variations.getResult() ? 'X': ' '));
 			variations.nextVariation();
 			idx++;
 			if (idx>=16) {
-				System.out.print("\"+\n\"");
+				logger.info("\"+\n\"");
 				idx=0;
 			}
 		}
-		System.out.println("\";");
+		logger.info("\";");
 	}
 
 	/**

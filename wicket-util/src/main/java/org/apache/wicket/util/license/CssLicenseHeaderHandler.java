@@ -17,11 +17,11 @@
 package org.apache.wicket.util.license;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.wicket.util.diff.Diff;
 import org.apache.wicket.util.diff.Revision;
+import java.util.Collections;
 
 
 
@@ -65,7 +65,7 @@ class CssLicenseHeaderHandler extends AbstractLicenseHeaderHandler
 	@Override
 	public List<String> getSuffixes()
 	{
-		return Arrays.asList("css");
+		return Collections.singletonList("css");
 	}
 
 	@Override

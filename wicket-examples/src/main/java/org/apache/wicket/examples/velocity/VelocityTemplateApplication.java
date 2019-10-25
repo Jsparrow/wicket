@@ -54,6 +54,13 @@ public class VelocityTemplateApplication extends WebApplication
 	}
 
 	/**
+	 * Constructor.
+	 */
+	public VelocityTemplateApplication()
+	{
+	}
+
+	/**
 	 * @return Fields
 	 */
 	public static List<Field> getFields()
@@ -69,13 +76,6 @@ public class VelocityTemplateApplication extends WebApplication
 	public static List<Person> getPersons()
 	{
 		return persons;
-	}
-
-	/**
-	 * Constructor.
-	 */
-	public VelocityTemplateApplication()
-	{
 	}
 
 	/**

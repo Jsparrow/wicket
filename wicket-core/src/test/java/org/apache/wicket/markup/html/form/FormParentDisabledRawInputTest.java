@@ -34,6 +34,24 @@ class FormParentDisabledRawInputTest extends WicketTestCase
 {
 	/**
 	 */
+	@Test
+	void disabledParent() {
+		TestPage page = new TestPage();
+		page.enabled = false;
+		tester.startPage(page);
+		tester.assertContains("checked=\"checked\"");
+		tester.assertContains("disabled=\"disabled\"");
+		Component check = tester.getComponentFromLastRenderedPage("container:form:check");
+		assertTrue(check.isEnabled());
+		assertFalse(check.isEnabledInHierarchy());
+
+		// nothing should change with a submit that changes no values
+
+		assertThrows(ListenerInvocationNotAllowedException.class, () -> tester.newFormTester("container:form").submit());
+	}
+
+	/**
+	 */
 	public static class TestPage extends WebPage
 	{
 		private static final long serialVersionUID = 1L;
@@ -62,25 +80,5 @@ class FormParentDisabledRawInputTest extends WicketTestCase
 			form.add(new CheckBox("check", new PropertyModel<Boolean>(this, "property")));
 			add(container);
 		}
-	}
-
-	/**
-	 */
-	@Test
-	void disabledParent() {
-		TestPage page = new TestPage();
-		page.enabled = false;
-		tester.startPage(page);
-		tester.assertContains("checked=\"checked\"");
-		tester.assertContains("disabled=\"disabled\"");
-		Component check = tester.getComponentFromLastRenderedPage("container:form:check");
-		assertTrue(check.isEnabled());
-		assertFalse(check.isEnabledInHierarchy());
-
-		// nothing should change with a submit that changes no values
-
-		assertThrows(ListenerInvocationNotAllowedException.class, () -> {
-			tester.newFormTester("container:form").submit();
-		});
 	}
 }

@@ -69,7 +69,6 @@ public class EditableLabelPage extends BasePage
 				return new IConverter<Integer>() {
 					@Override
 					public Integer convertToObject(String value, Locale locale)
-						throws ConversionException
 					{
 						return Integer.parseInt(value);
 					}
@@ -84,7 +83,7 @@ public class EditableLabelPage extends BasePage
 		});
 		
 
-		form.add(new Label("refresh-counter", () -> "" + refreshCounter));
+		form.add(new Label("refresh-counter", () -> Integer.toString(refreshCounter)));
 
 		form.add(new Link<Void>("refresh-link")
 		{

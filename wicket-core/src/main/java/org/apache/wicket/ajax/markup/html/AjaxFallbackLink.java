@@ -146,15 +146,13 @@ public abstract class AjaxFallbackLink<T> extends Link<T>
 		tag.remove("onclick");
 
 		String tagName = tag.getName();
-		if (isEnabledInHierarchy() &&
-			!("a".equalsIgnoreCase(tagName) || "area".equalsIgnoreCase(tagName) || "link".equalsIgnoreCase(tagName)))
-		{
-			String msg = String.format(
-				"%s must be used only with <a>, <area> or <link> markup elements. "
-					+ "The fallback functionality doesn't work for other markup elements. "
-					+ "Component path: %s, markup element: <%s>.",
-				AjaxFallbackLink.class.getSimpleName(), getClassRelativePath(), tagName);
-			findMarkupStream().throwMarkupException(msg);
+		if (!(isEnabledInHierarchy() &&
+			!("a".equalsIgnoreCase(tagName) || "area".equalsIgnoreCase(tagName) || "link".equalsIgnoreCase(tagName)))) {
+			return;
 		}
+		String msg = String.format(
+			new StringBuilder().append("%s must be used only with <a>, <area> or <link> markup elements. ").append("The fallback functionality doesn't work for other markup elements. ").append("Component path: %s, markup element: <%s>.").toString(),
+			AjaxFallbackLink.class.getSimpleName(), getClassRelativePath(), tagName);
+		findMarkupStream().throwMarkupException(msg);
 	}
 }

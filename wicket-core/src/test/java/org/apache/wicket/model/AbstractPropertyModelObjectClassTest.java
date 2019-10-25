@@ -51,7 +51,7 @@ public class AbstractPropertyModelObjectClassTest
 	@Test
 	void testCompoundPropertyModelBind()
 	{
-		CompoundPropertyModel<CustomBean> compoundPropertyModel = new CompoundPropertyModel<CustomBean>(
+		CompoundPropertyModel<CustomBean> compoundPropertyModel = new CompoundPropertyModel<>(
 			new CustomBean());
 		IModel<?> modelForCustomTypeObject = compoundPropertyModel.bind("customType");
 		assertPropertyModelTargetTypeIsInteger(modelForCustomTypeObject);
@@ -87,10 +87,10 @@ public class AbstractPropertyModelObjectClassTest
 	@Test
 	void testLazyClassResolution()
 	{
-		Model<CustomBean> modelCustomBean = new Model<CustomBean>(null);
-		PropertyModel<CustomType> customTypeModel = new PropertyModel<CustomType>(modelCustomBean,
+		Model<CustomBean> modelCustomBean = new Model<>(null);
+		PropertyModel<CustomType> customTypeModel = new PropertyModel<>(modelCustomBean,
 			"customType");
-		PropertyModel<Integer> somePropertyModel = new PropertyModel<Integer>(customTypeModel,
+		PropertyModel<Integer> somePropertyModel = new PropertyModel<>(customTypeModel,
 			"someProperty");
 		assertNull(somePropertyModel.getObjectClass());
 		modelCustomBean.setObject(new CustomBean());

@@ -56,7 +56,7 @@ public abstract class AbstractConverter<C> implements IConverter<C>
 
 		if (position.getIndex() != stringValue.length())
 		{
-			throw newConversionException("Cannot parse '" + value + "' using format " + format,
+			throw newConversionException(new StringBuilder().append("Cannot parse '").append(value).append("' using format ").append(format).toString(),
 				value, locale).setFormat(format);
 		}
 		return result;

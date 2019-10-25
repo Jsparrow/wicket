@@ -57,8 +57,7 @@ public class ImageUtil
 		{
 			byte[] bytes = IOUtils.toByteArray(inputStream);
 			String base64EncodedImage = Base64.getEncoder().encodeToString(bytes);
-			return "data:" + resourceStream.getContentType() + ";base64," +
-				(removeWhitespaces ? base64EncodedImage.replaceAll("\\s", "") : base64EncodedImage);
+			return new StringBuilder().append("data:").append(resourceStream.getContentType()).append(";base64,").append(removeWhitespaces ? base64EncodedImage.replaceAll("\\s", "") : base64EncodedImage).toString();
 		}
 		finally
 		{

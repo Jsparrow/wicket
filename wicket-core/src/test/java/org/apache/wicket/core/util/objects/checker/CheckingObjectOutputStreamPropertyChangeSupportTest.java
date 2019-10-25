@@ -41,7 +41,7 @@ class CheckingObjectOutputStreamPropertyChangeSupportTest {
         serializer.serialize(new ObjectToPersist());
     }
 
-    static abstract class AbstractObjectToPersist implements Serializable {
+    abstract static class AbstractObjectToPersist implements Serializable {
 
         private static final long serialVersionUID = 1L;
 
@@ -49,7 +49,6 @@ class CheckingObjectOutputStreamPropertyChangeSupportTest {
         private PropertyChangeSupport propertyChangeSupport;
 
         protected AbstractObjectToPersist() {
-            super();
             // if we use PropertyChangeSupport directly, the JVM crash is not reproducible, weird !
             propertyChangeSupport = new ExtendedPropertyChangeSupport(this);
         }
@@ -71,10 +70,9 @@ class CheckingObjectOutputStreamPropertyChangeSupportTest {
         private Future<Object> future;
 
         ObjectToPersist() {
-            super();
-
-            future = new FutureTask<Object>(new Callable() {
-                public Object call() throws Exception {
+            future = new FutureTask<>(new Callable() {
+                @Override
+				public Object call() throws Exception {
                     return new Object();
                 }
             });

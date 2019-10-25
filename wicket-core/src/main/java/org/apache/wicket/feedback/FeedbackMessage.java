@@ -271,9 +271,8 @@ public class FeedbackMessage implements IDetachable
 	@Override
 	public String toString()
 	{
-		return "[FeedbackMessage message = \"" + getMessage() + "\", reporter = " +
-			((getReporter() == null) ? "null" : getReporter().getId()) + ", level = " +
-			getLevelAsString() + ']';
+		return new StringBuilder().append("[FeedbackMessage message = \"").append(getMessage()).append("\", reporter = ").append((getReporter() == null) ? "null" : getReporter().getId()).append(", level = ")
+				.append(getLevelAsString()).append(']').toString();
 	}
 
 	@Override

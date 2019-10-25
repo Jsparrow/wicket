@@ -21,6 +21,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link UrlValidator} test
@@ -29,12 +31,76 @@ import org.junit.jupiter.api.Test;
  */
 class UrlValidatorTest
 {
+	private static final Logger logger = LoggerFactory.getLogger(UrlValidatorTest.class);
+
 	private final boolean printStatus = false;
 
 	private final boolean printIndex = false; // print index that indicates current
 	// scheme,host,port,path,
 
 	private final boolean printDebug = true;
+
+	// -------------------- Test data for creating a composite URL
+	/**
+	 * The data given below approximates the 4 parts of a URL <scheme>://<authority><path>?<query>
+	 * except that the port number is broken out of authority to increase the number of
+	 * permutations. A complete URL is composed of a scheme+authority+port+path+query, all of which
+	 * must be individually valid for the entire URL to be considered valid.
+	 */
+	private ResultPair[] testUrlScheme = { new ResultPair("http://", true), new ResultPair("ftp://", true),
+			new ResultPair("h3t://", true), new ResultPair("3ht://", false),
+			new ResultPair("http:/", false), new ResultPair("http:", false),
+			new ResultPair("http/", false), new ResultPair("://", false), new ResultPair("", true) };
+
+	private ResultPair[] testUrlAuthority = { new ResultPair("www.google.com", true),
+			new ResultPair("go.com", true), new ResultPair("go.au", true),
+			new ResultPair("0.0.0.0", true), new ResultPair("255.255.255.255", true),
+			new ResultPair("256.256.256.256", false), new ResultPair("255.com", true),
+			new ResultPair("1.2.3.4.5", false), new ResultPair("1.2.3.4.", false),
+			new ResultPair("1.2.3", false), new ResultPair(".1.2.3.4", false),
+			new ResultPair("go.a", false), new ResultPair("go.a1a", true),
+			new ResultPair("go.1aa", false), new ResultPair("aaa.", false),
+			new ResultPair(".aaa", false), new ResultPair("aaa", true),
+			new ResultPair("go.local", true)
+	/*
+	 * , new ResultPair("", false) In combination with "http:/" + "/test1" the expected result is
+	 * true
+	 */};
+
+	private ResultPair[] testUrlPort = { new ResultPair(":80", true), new ResultPair(":65535", true),
+			new ResultPair(":0", true), new ResultPair("", true), new ResultPair(":-1", false),
+			new ResultPair(":65636", true), new ResultPair(":65a", false) };
+
+	private ResultPair[] testPath = { new ResultPair("/test1", true), new ResultPair("/t123", true),
+			new ResultPair("/$23", true), new ResultPair("/..", false),
+			new ResultPair("/../", false), new ResultPair("/test1/", true),
+			new ResultPair("", true), new ResultPair("/test1/file", true),
+			new ResultPair("/..//file", false), new ResultPair("/test1//file", false),
+			new ResultPair("/this_one_is_tricky...but...still.....valid", true) };
+
+	// Test allow2slash, noFragment
+	private ResultPair[] testUrlPathOptions = { new ResultPair("/test1", true),
+			new ResultPair("/t123", true), new ResultPair("/$23", true),
+			new ResultPair("/..", false), new ResultPair("/../", false),
+			new ResultPair("/test1/", true), new ResultPair("/#", false), new ResultPair("", true),
+			new ResultPair("/test1/file", true), new ResultPair("/t123/file", true),
+			new ResultPair("/$23/file", true), new ResultPair("/../file", false),
+			new ResultPair("/..//file", false), new ResultPair("/test1//file", true),
+			new ResultPair("/#/file", false) };
+
+	private ResultPair[] testUrlQuery = { new ResultPair("?action=view", true),
+			new ResultPair("?action=edit&mode=up", true), new ResultPair("", true) };
+
+	private Object[] testUrlParts = { testUrlScheme, testUrlAuthority, testUrlPort, testPath, testUrlQuery };
+
+	private Object[] testUrlPartsOptions = { testUrlScheme, testUrlAuthority, testUrlPort,
+			testUrlPathOptions, testUrlQuery };
+
+	private int[] testPartsIndex = { 0, 0, 0, 0, 0 };
+
+	// ---------------- Test data for individual url parts ----------------
+	private ResultPair[] testScheme = { new ResultPair("http", true), new ResultPair("ftp", false),
+			new ResultPair("httpd", false), new ResultPair("telnet", false) };
 
 	/**
 	 * 
@@ -81,7 +147,7 @@ class UrlValidatorTest
 	{
 		if (printStatus)
 		{
-			System.out.print("\n testIsValidScheme() ");
+			logger.info("\n testIsValidScheme() ");
 		}
 		String[] schemes = { "http", "gopher" };
 		// UrlValidator urlVal = new UrlValidator(schemes,false,false,false);
@@ -94,11 +160,11 @@ class UrlValidatorTest
 			{
 				if (result == testPair.valid)
 				{
-					System.out.print('.');
+					logger.info(String.valueOf('.'));
 				}
 				else
 				{
-					System.out.print('X');
+					logger.info(String.valueOf('X'));
 				}
 			}
 		}
@@ -151,31 +217,31 @@ class UrlValidatorTest
 				expected &= part[index].valid;
 				if (printDebug)
 				{
-					output += "" + part[index].valid + ":";
+					output += new StringBuilder().append("").append(part[index].valid).append(":").toString();
 				}
 			}
 			String url = testBuffer.toString();
 			boolean result = urlVal.isValid(url);
 			if (printDebug && (expected != result))
 			{
-				System.out.println(output + " - " + expected + " - " + url);
+				logger.info(new StringBuilder().append(output).append(" - ").append(expected).append(" - ").append(url).toString());
 			}
 			assertEquals(expected, result, url);
 			if (printStatus)
 			{
 				if (printIndex)
 				{
-					System.out.print(testPartsIndextoString());
+					logger.info(testPartsIndextoString());
 				}
 				else
 				{
 					if (result == expected)
 					{
-						System.out.print('.');
+						logger.info(String.valueOf('.'));
 					}
 					else
 					{
-						System.out.print('X');
+						logger.info(String.valueOf('X'));
 					}
 				}
 				printed++;
@@ -283,64 +349,6 @@ class UrlValidatorTest
 		return carryMsg.toString();
 
 	}
-
-	// -------------------- Test data for creating a composite URL
-	/**
-	 * The data given below approximates the 4 parts of a URL <scheme>://<authority><path>?<query>
-	 * except that the port number is broken out of authority to increase the number of
-	 * permutations. A complete URL is composed of a scheme+authority+port+path+query, all of which
-	 * must be individually valid for the entire URL to be considered valid.
-	 */
-	private ResultPair[] testUrlScheme = { new ResultPair("http://", true), new ResultPair("ftp://", true),
-			new ResultPair("h3t://", true), new ResultPair("3ht://", false),
-			new ResultPair("http:/", false), new ResultPair("http:", false),
-			new ResultPair("http/", false), new ResultPair("://", false), new ResultPair("", true) };
-
-	private ResultPair[] testUrlAuthority = { new ResultPair("www.google.com", true),
-			new ResultPair("go.com", true), new ResultPair("go.au", true),
-			new ResultPair("0.0.0.0", true), new ResultPair("255.255.255.255", true),
-			new ResultPair("256.256.256.256", false), new ResultPair("255.com", true),
-			new ResultPair("1.2.3.4.5", false), new ResultPair("1.2.3.4.", false),
-			new ResultPair("1.2.3", false), new ResultPair(".1.2.3.4", false),
-			new ResultPair("go.a", false), new ResultPair("go.a1a", true),
-			new ResultPair("go.1aa", false), new ResultPair("aaa.", false),
-			new ResultPair(".aaa", false), new ResultPair("aaa", true),
-			new ResultPair("go.local", true)
-	/*
-	 * , new ResultPair("", false) In combination with "http:/" + "/test1" the expected result is
-	 * true
-	 */};
-	private ResultPair[] testUrlPort = { new ResultPair(":80", true), new ResultPair(":65535", true),
-			new ResultPair(":0", true), new ResultPair("", true), new ResultPair(":-1", false),
-			new ResultPair(":65636", true), new ResultPair(":65a", false) };
-	private ResultPair[] testPath = { new ResultPair("/test1", true), new ResultPair("/t123", true),
-			new ResultPair("/$23", true), new ResultPair("/..", false),
-			new ResultPair("/../", false), new ResultPair("/test1/", true),
-			new ResultPair("", true), new ResultPair("/test1/file", true),
-			new ResultPair("/..//file", false), new ResultPair("/test1//file", false),
-			new ResultPair("/this_one_is_tricky...but...still.....valid", true) };
-	// Test allow2slash, noFragment
-	private ResultPair[] testUrlPathOptions = { new ResultPair("/test1", true),
-			new ResultPair("/t123", true), new ResultPair("/$23", true),
-			new ResultPair("/..", false), new ResultPair("/../", false),
-			new ResultPair("/test1/", true), new ResultPair("/#", false), new ResultPair("", true),
-			new ResultPair("/test1/file", true), new ResultPair("/t123/file", true),
-			new ResultPair("/$23/file", true), new ResultPair("/../file", false),
-			new ResultPair("/..//file", false), new ResultPair("/test1//file", true),
-			new ResultPair("/#/file", false) };
-
-	private ResultPair[] testUrlQuery = { new ResultPair("?action=view", true),
-			new ResultPair("?action=edit&mode=up", true), new ResultPair("", true) };
-
-	private Object[] testUrlParts = { testUrlScheme, testUrlAuthority, testUrlPort, testPath, testUrlQuery };
-	private Object[] testUrlPartsOptions = { testUrlScheme, testUrlAuthority, testUrlPort,
-			testUrlPathOptions, testUrlQuery };
-	private int[] testPartsIndex = { 0, 0, 0, 0, 0 };
-
-	// ---------------- Test data for individual url parts ----------------
-	private ResultPair[] testScheme = { new ResultPair("http", true), new ResultPair("ftp", false),
-			new ResultPair("httpd", false), new ResultPair("telnet", false) };
-
 
 	class ResultPair
 	{

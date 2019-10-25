@@ -132,10 +132,7 @@ public class Recorder<T> extends HiddenField<String>
 
 		// reduce number of method calls by building a lookup table
 		final Map<T, String> idForChoice = new HashMap<>(choices.size());
-		for (final T choice : choices)
-		{
-			idForChoice.put(choice, renderer.getIdValue(choice, 0));
-		}
+		choices.forEach((final T choice) -> idForChoice.put(choice, renderer.getIdValue(choice, 0)));
 
 		for (final String id : Strings.split(getValue(), ','))
 		{
@@ -168,15 +165,14 @@ public class Recorder<T> extends HiddenField<String>
 		final List<T> unselected = new ArrayList<>(choices.size());
 		final Set<String> ids = new TreeSet<>(Arrays.asList(Strings.split(getValue(), ',')));
 
-		for (final T choice : choices)
-		{
+		choices.forEach((final T choice) -> {
 			final String choiceId = renderer.getIdValue(choice, 0);
 
 			if (ids.contains(choiceId) == false)
 			{
 				unselected.add(choice);
 			}
-		}
+		});
 
 		return unselected;
 	}

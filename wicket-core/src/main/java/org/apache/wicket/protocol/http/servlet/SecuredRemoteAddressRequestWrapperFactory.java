@@ -91,32 +91,7 @@ public class SecuredRemoteAddressRequestWrapperFactory extends AbstractRequestWr
 	/** Logger */
 	private static final Logger log = LoggerFactory.getLogger(SecuredRemoteAddressRequestWrapperFactory.class);
 
-	private final static String SECURED_REMOTE_ADDRESSES_PARAMETER = "securedRemoteAddresses";
-
-	public static class Config
-	{
-		/** @see #setSecuredRemoteAdresses(String) */
-		private Pattern[] securedRemoteAddresses = new Pattern[] {
-				Pattern.compile("10\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}"),
-				Pattern.compile("192\\.168\\.\\d{1,3}\\.\\d{1,3}"),
-				Pattern.compile("172\\.(?:1[6-9]|2\\d|3[0-1]).\\d{1,3}.\\d{1,3}"),
-				Pattern.compile("169\\.254\\.\\d{1,3}\\.\\d{1,3}"),
-				Pattern.compile("127\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}") };
-
-		/**
-		 * Comma delimited list of secured remote addresses. Expressed with regular expressions.
-		 * <p>
-		 * Default value : 10\.\d{1,3}\.\d{1,3}\.\d{1,3}, 192\.168\.\d{1,3}\.\d{1,3},
-		 * 172\\.(?:1[6-9]|2\\d|3[0-1]).\\d{1,3}.\\d{1,3}, 169\.254\.\d{1,3}\.\d{1,3},
-		 * 127\.\d{1,3}\.\d{1,3}\.\d{1,3}
-		 * 
-		 * @param comaDelimitedSecuredRemoteAddresses
-		 */
-		public void setSecuredRemoteAdresses(final String comaDelimitedSecuredRemoteAddresses)
-		{
-			securedRemoteAddresses = commaDelimitedListToPatternArray(comaDelimitedSecuredRemoteAddresses);
-		}
-	}
+	private static final String SECURED_REMOTE_ADDRESSES_PARAMETER = "securedRemoteAddresses";
 
 	// Filter Config
 	private Config config = new Config();
@@ -153,9 +128,8 @@ public class SecuredRemoteAddressRequestWrapperFactory extends AbstractRequestWr
 
 		if (log.isDebugEnabled())
 		{
-			log.debug("Incoming request uri=" + request.getRequestURI() + " with originalSecure='" +
-				request.isSecure() + "', remoteAddr='" + request.getRemoteAddr() +
-				"' will be seen with newSecure='" + xRequest.isSecure() + "'");
+			log.debug(new StringBuilder().append("Incoming request uri=").append(request.getRequestURI()).append(" with originalSecure='").append(request.isSecure()).append("', remoteAddr='").append(request.getRemoteAddr())
+					.append("' will be seen with newSecure='").append(xRequest.isSecure()).append("'").toString());
 		}
 
 		return xRequest;
@@ -195,6 +169,31 @@ public class SecuredRemoteAddressRequestWrapperFactory extends AbstractRequestWr
 		if (comaDelimitedSecuredRemoteAddresses != null)
 		{
 			config.setSecuredRemoteAdresses(comaDelimitedSecuredRemoteAddresses);
+		}
+	}
+
+	public static class Config
+	{
+		/** @see #setSecuredRemoteAdresses(String) */
+		private Pattern[] securedRemoteAddresses = new Pattern[] {
+				Pattern.compile("10\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}"),
+				Pattern.compile("192\\.168\\.\\d{1,3}\\.\\d{1,3}"),
+				Pattern.compile("172\\.(?:1[6-9]|2\\d|3[0-1]).\\d{1,3}.\\d{1,3}"),
+				Pattern.compile("169\\.254\\.\\d{1,3}\\.\\d{1,3}"),
+				Pattern.compile("127\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}") };
+
+		/**
+		 * Comma delimited list of secured remote addresses. Expressed with regular expressions.
+		 * <p>
+		 * Default value : 10\.\d{1,3}\.\d{1,3}\.\d{1,3}, 192\.168\.\d{1,3}\.\d{1,3},
+		 * 172\\.(?:1[6-9]|2\\d|3[0-1]).\\d{1,3}.\\d{1,3}, 169\.254\.\d{1,3}\.\d{1,3},
+		 * 127\.\d{1,3}\.\d{1,3}\.\d{1,3}
+		 * 
+		 * @param comaDelimitedSecuredRemoteAddresses
+		 */
+		public void setSecuredRemoteAdresses(final String comaDelimitedSecuredRemoteAddresses)
+		{
+			securedRemoteAddresses = commaDelimitedListToPatternArray(comaDelimitedSecuredRemoteAddresses);
 		}
 	}
 }

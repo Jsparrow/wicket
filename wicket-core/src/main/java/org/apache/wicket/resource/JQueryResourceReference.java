@@ -51,6 +51,11 @@ public class JQueryResourceReference extends JavaScriptResourceReference
 	public static final JQueryResourceReference INSTANCE_2 = new JQueryResourceReference(VERSION_2);
 	public static final JQueryResourceReference INSTANCE_3 = new JQueryResourceReference(VERSION_3);
 
+	protected JQueryResourceReference(final String version)
+	{
+		super(JQueryResourceReference.class, version);
+	}
+
 	public static JQueryResourceReference getV1()
 	{
 		return INSTANCE_1;
@@ -64,10 +69,5 @@ public class JQueryResourceReference extends JavaScriptResourceReference
 	public static JQueryResourceReference getV3()
 	{
 		return INSTANCE_3;
-	}
-
-	protected JQueryResourceReference(final String version)
-	{
-		super(JQueryResourceReference.class, version);
 	}
 }

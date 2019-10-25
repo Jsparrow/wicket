@@ -22,6 +22,8 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import org.apache.wicket.mock.MockWebResponse;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Test for {@link HeaderBufferingWebResponse}.
@@ -30,6 +32,8 @@ import org.junit.jupiter.api.Test;
  */
 class HeaderBufferingWebResponseTest
 {
+
+	private static final Logger logger = LoggerFactory.getLogger(HeaderBufferingWebResponseTest.class);
 
 	/**
 	 * WICKET-4927
@@ -79,6 +83,7 @@ class HeaderBufferingWebResponseTest
 		}
 		catch (IllegalStateException expected)
 		{
+			logger.error(expected.getMessage(), expected);
 		}
 	}
 }

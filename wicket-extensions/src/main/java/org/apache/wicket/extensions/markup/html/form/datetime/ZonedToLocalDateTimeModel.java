@@ -65,12 +65,11 @@ public class ZonedToLocalDateTimeModel implements IModel<LocalDateTime>
 	protected ZoneId getClientTimeZone()
 	{
 		ClientInfo info = Session.get().getClientInfo();
-		if (info instanceof WebClientInfo)
-		{
-			TimeZone timeZone = ((WebClientInfo)info).getProperties().getTimeZone();
-			return timeZone != null ? timeZone.toZoneId() : null;
+		if (!(info instanceof WebClientInfo)) {
+			return ZoneId.systemDefault();
 		}
-		return ZoneId.systemDefault();
+		TimeZone timeZone = ((WebClientInfo)info).getProperties().getTimeZone();
+		return timeZone != null ? timeZone.toZoneId() : null;
 	}
 
 	/**

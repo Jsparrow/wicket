@@ -292,8 +292,7 @@ class CryptoMapperTest extends AbstractMapperTest
 		IRequestHandler requestHandler = new BookmarkableListenerRequestHandler(provider);
 		Url plainUrl = mapper.getDelegateMapper().mapHandler(requestHandler);
 		assertTrue(plainUrl.toString().startsWith(PLAIN_BOOKMARKABLE_URL),
-			"Plain text request listener URL for bookmarkable page does not start with: " +
-				PLAIN_BOOKMARKABLE_URL + ": " + plainUrl.toString());
+			new StringBuilder().append("Plain text request listener URL for bookmarkable page does not start with: ").append(PLAIN_BOOKMARKABLE_URL).append(": ").append(plainUrl.toString()).toString());
 		assertNull(mapper.mapRequest(getRequest(plainUrl)));
 	}
 
@@ -404,14 +403,7 @@ class CryptoMapperTest extends AbstractMapperTest
 		assertEquals(Url.parse(MOUNTED_URL).getSegments(), encryptedUrl.getSegments());
 		assertTrue(encryptedUrl.getQueryParameters().size() > 0);
 
-		for (Url.QueryParameter qp : encryptedUrl.getQueryParameters())
-		{
-			if (Strings.isEmpty(qp.getValue()))
-			{
-				PageComponentInfo pci = PageComponentInfo.parse(qp.getName());
-				assertNull(pci, "PageComponentInfo query parameter not encrypted");
-			}
-		}
+		encryptedUrl.getQueryParameters().stream().filter(qp -> Strings.isEmpty(qp.getValue())).map(qp -> PageComponentInfo.parse(qp.getName())).forEach(pci -> assertNull(pci, "PageComponentInfo query parameter not encrypted"));
 
 		requestHandler = mapper.mapRequest(getRequest(encryptedUrl));
 
@@ -675,9 +667,7 @@ class CryptoMapperTest extends AbstractMapperTest
 		encryptedUrl.getSegments().remove(0);
 		encryptedUrl.getSegments().add(0, "crypt.no decryptable");
 
-		assertThrows(PageExpiredException.class, () -> {
-			mapper.mapRequest(getRequest(encryptedUrl));
-		});
+		assertThrows(PageExpiredException.class, () -> mapper.mapRequest(getRequest(encryptedUrl)));
 	}
 
 	/**

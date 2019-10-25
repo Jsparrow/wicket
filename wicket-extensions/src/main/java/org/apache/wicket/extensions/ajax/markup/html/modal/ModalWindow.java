@@ -127,10 +127,10 @@ public class ModalWindow extends Panel
 	private static final long serialVersionUID = 1L;
 
 	/** CSS class for window with blue border. */
-	public final static String CSS_CLASS_BLUE = "w_blue";
+	public static final String CSS_CLASS_BLUE = "w_blue";
 
 	/** CSS class for window with gray border. */
-	public final static String CSS_CLASS_GRAY = "w_silver";
+	public static final String CSS_CLASS_GRAY = "w_silver";
 
 	private static final ResourceReference JAVASCRIPT = new JavaScriptResourceReference(
 		ModalWindow.class, "res/modal.js");
@@ -165,67 +165,6 @@ public class ModalWindow extends Panel
 	private PageCreator pageCreator = null;
 	private CloseButtonCallback closeButtonCallback = null;
 	private WindowClosedCallback windowClosedCallback = null;
-
-	/**
-	 * Interface for lazy page creation. The advantage of creating page using this interface over
-	 * just passing a page instance is that page created in <code>{@link #createPage()}</code> will
-	 * have the pagemap automatically set to the pagemap specified for
-	 * <code>{@link ModalWindow}</code>.
-	 * 
-	 * @author Matej Knopp
-	 */
-	public interface PageCreator extends IClusterable
-	{
-		/**
-		 * Creates a new instance of content page.
-		 * 
-		 * @return new page instance
-		 */
-		Page createPage();
-	}
-
-	/**
-	 * Callback for close button that contains a method that is invoked after the button has been
-	 * clicked. If no callback instance is specified using
-	 * <code>{@link ModalWindow#setCloseButtonCallback(ModalWindow.CloseButtonCallback)}</code>, no
-	 * ajax request will be fired. Clicking the button will just close the window.
-	 * 
-	 * @author Matej Knopp
-	 */
-	public interface CloseButtonCallback extends IClusterable
-	{
-		/**
-		 * Methods invoked after the button has been clicked. The invocation is done using an ajax
-		 * call, so <code>{@link org.apache.wicket.ajax.AjaxRequestTarget}</code> instance is
-		 * available.
-		 * 
-		 * @param target
-		 *            <code>{@link org.apache.wicket.ajax.AjaxRequestTarget}</code> instance bound
-		 *            with the ajax request.
-		 * 
-		 * @return True if the window can be closed (will close the window), false otherwise
-		 */
-		boolean onCloseButtonClicked(AjaxRequestTarget target);
-	}
-
-	/**
-	 * Callback called after the window has been closed. If no callback instance is specified using
-	 * {@link ModalWindow#setWindowClosedCallback(ModalWindow.WindowClosedCallback)}, no ajax
-	 * request will be fired.
-	 * 
-	 * @author Matej Knopp
-	 */
-	public interface WindowClosedCallback extends IClusterable
-	{
-		/**
-		 * Called after the window has been closed.
-		 * 
-		 * @param target
-		 *            <code>{@link org.apache.wicket.ajax.AjaxRequestTarget}</code> instance bound
-		 *            with the ajax request.
-		 */
-		void onClose(AjaxRequestTarget target);
-	}
 
 	/**
 	 * Creates a new modal window component.
@@ -311,7 +250,6 @@ public class ModalWindow extends Panel
 		return shown;
 	}
 
-
 	/**
 	 * Sets the <code>{@link PageCreator}</code> instance. The instance is only used when no custom
 	 * component has been added to the dialog.
@@ -361,13 +299,13 @@ public class ModalWindow extends Panel
 	 */
 	public void show(final IPartialPageRequestHandler target)
 	{
-		if (shown == false)
-		{
-			getContent().setVisible(true);
-			target.add(this);
-			target.appendJavaScript(getWindowOpenJavaScript());
-			shown = true;
+		if (shown != false) {
+			return;
 		}
+		getContent().setVisible(true);
+		target.add(this);
+		target.appendJavaScript(getWindowOpenJavaScript());
+		shown = true;
 	}
 
 	/**
@@ -407,26 +345,15 @@ public class ModalWindow extends Panel
 	 */
 	protected CharSequence getShowJavaScript()
 	{
-		return "window.setTimeout(function(){\n" + "  Wicket.Window.create(settings).show();\n"
-			+ "}, 0);\n";
+		return new StringBuilder().append("window.setTimeout(function(){\n").append("  Wicket.Window.create(settings).show();\n").append("}, 0);\n").toString();
 	}
 
 	private static String getCloseJavacriptInternal()
 	{
-		return "var win;\n" //
-			+ "try {\n" + "	win = window.parent.Wicket.Window;\n"
-			+ "} catch (ignore) {\n"
-			+ "}\n"
-			+ "if (typeof(win) == \"undefined\" || typeof(win.current) == \"undefined\") {\n"
-			+ "  try {\n" + "     win = window.Wicket.Window;\n"
-			+ "  } catch (ignore) {\n"
-			+ "  }\n"
-			+ "}\n"
-			+ "if (win && win.current) {\n"
-			+ " var close = function(w) { w.setTimeout(function() {\n"
-			+ "		win.current.close();\n"
-			+ "	}, 0);  };\n"
-			+ "	try { close(window.parent); } catch (ignore) { close(window); }\n" + "}";
+		return new StringBuilder().append("var win;\n" //
+).append("try {\n").append("	win = window.parent.Wicket.Window;\n").append("} catch (ignore) {\n").append("}\n").append("if (typeof(win) == \"undefined\" || typeof(win.current) == \"undefined\") {\n").append("  try {\n").append("     win = window.Wicket.Window;\n")
+				.append("  } catch (ignore) {\n").append("  }\n").append("}\n").append("if (win && win.current) {\n").append(" var close = function(w) { w.setTimeout(function() {\n").append("		win.current.close();\n").append("	}, 0);  };\n").append("	try { close(window.parent); } catch (ignore) { close(window); }\n").append("}")
+				.toString();
 	}
 
 	/**
@@ -773,37 +700,6 @@ public class ModalWindow extends Panel
 	}
 
 	/**
-	 * Mask is the element behind the window, that prevents user from interacting the rest of page.
-	 * Mask can be either
-	 * <ul>
-	 * <li><code>{@link #TRANSPARENT}</code> - the mask is invisible
-	 * <li><code>{@link #SEMI_TRANSPARENT}</code> - the mask is black with small opacity (10%)
-	 * </ul>
-	 * 
-	 * @author Matej Knopp
-	 */
-	public static final class MaskType extends EnumeratedType
-	{
-		private static final long serialVersionUID = 1L;
-
-		/** Transparent mask (not visible). */
-		public static final MaskType TRANSPARENT = new MaskType("TRANSPARENT");
-
-		/** Visible mask (black with low opacity). */
-		public static final MaskType SEMI_TRANSPARENT = new MaskType("SEMI_TRANSPARENT");
-
-		/**
-		 * Constructor.
-		 * 
-		 * @param name
-		 */
-		public MaskType(final String name)
-		{
-			super(name);
-		}
-	}
-
-	/**
 	 * Sets the mask type of the window.
 	 * 
 	 * @param mask
@@ -932,8 +828,7 @@ public class ModalWindow extends Panel
 	{
 		if (component.getId().equals(getContentId()) == false)
 		{
-			throw new WicketRuntimeException("Modal window content id is wrong. Component ID:" +
-				component.getId() + "; content ID: " + getContentId());
+			throw new WicketRuntimeException(new StringBuilder().append("Modal window content id is wrong. Component ID:").append(component.getId()).append("; content ID: ").append(getContentId()).toString());
 		}
 		else if (component instanceof AbstractRepeater)
 		{
@@ -947,47 +842,6 @@ public class ModalWindow extends Panel
 		shown = false;
 		pageCreator = null;
 		return this;
-	}
-
-	/**
-	 * @author Matej Knopp
-	 */
-	private class WindowClosedBehavior extends AbstractDefaultAjaxBehavior
-	{
-		private static final long serialVersionUID = 1L;
-
-		@Override
-		protected void respond(final AjaxRequestTarget target)
-		{
-			shown = false;
-
-			if (windowClosedCallback != null)
-			{
-				windowClosedCallback.onClose(target);
-			}
-		}
-	}
-
-	/**
-	 * @author Matej Knopp
-	 */
-	protected class CloseButtonBehavior extends AbstractDefaultAjaxBehavior
-	{
-		private static final long serialVersionUID = 1L;
-
-		public CloseButtonBehavior()
-		{
-		}
-
-		@Override
-		protected final void respond(final AjaxRequestTarget target)
-		{
-			if ((closeButtonCallback == null) ||
-				(closeButtonCallback.onCloseButtonClicked(target)))
-			{
-				close(target);
-			}
-		}
 	}
 
 	/**
@@ -1060,7 +914,7 @@ public class ModalWindow extends Panel
 		}
 		else
 		{
-			settings.put("element", new JSONFunction("document.getElementById(\"" + getContentMarkupId() + "\")"));
+			settings.put("element", new JSONFunction(new StringBuilder().append("document.getElementById(\"").append(getContentMarkupId()).append("\")").toString()));
 		}
 
 		if (getCookieName() != null)
@@ -1095,7 +949,7 @@ public class ModalWindow extends Panel
 		if (windowClosedCallback != null)
 		{
 			WindowClosedBehavior behavior = getBehaviors(WindowClosedBehavior.class).get(0);
-			settings.put("onClose", new JSONFunction("function() { " + behavior.getCallbackScript() + " }"));
+			settings.put("onClose", new JSONFunction(new StringBuilder().append("function() { ").append(behavior.getCallbackScript()).append(" }").toString()));
 
 			haveCloseCallback = true;
 		}
@@ -1105,7 +959,7 @@ public class ModalWindow extends Panel
 		if ((closeButtonCallback != null) || (haveCloseCallback == false))
 		{
 			CloseButtonBehavior behavior = getBehaviors(CloseButtonBehavior.class).get(0);
-			settings.put("onCloseButton", new JSONFunction("function() { " + behavior.getCallbackScript() + "; return false; }"));
+			settings.put("onCloseButton", new JSONFunction(new StringBuilder().append("function() { ").append(behavior.getCallbackScript()).append("; return false; }").toString()));
 		}
 
 		postProcessSettings(settings);
@@ -1178,5 +1032,138 @@ public class ModalWindow extends Panel
 	protected CloseButtonBehavior newCloseButtonBehavior()
 	{
 		return new CloseButtonBehavior();
+	}
+
+	/**
+	 * Interface for lazy page creation. The advantage of creating page using this interface over
+	 * just passing a page instance is that page created in <code>{@link #createPage()}</code> will
+	 * have the pagemap automatically set to the pagemap specified for
+	 * <code>{@link ModalWindow}</code>.
+	 * 
+	 * @author Matej Knopp
+	 */
+	public interface PageCreator extends IClusterable
+	{
+		/**
+		 * Creates a new instance of content page.
+		 * 
+		 * @return new page instance
+		 */
+		Page createPage();
+	}
+
+	/**
+	 * Callback for close button that contains a method that is invoked after the button has been
+	 * clicked. If no callback instance is specified using
+	 * <code>{@link ModalWindow#setCloseButtonCallback(ModalWindow.CloseButtonCallback)}</code>, no
+	 * ajax request will be fired. Clicking the button will just close the window.
+	 * 
+	 * @author Matej Knopp
+	 */
+	public interface CloseButtonCallback extends IClusterable
+	{
+		/**
+		 * Methods invoked after the button has been clicked. The invocation is done using an ajax
+		 * call, so <code>{@link org.apache.wicket.ajax.AjaxRequestTarget}</code> instance is
+		 * available.
+		 * 
+		 * @param target
+		 *            <code>{@link org.apache.wicket.ajax.AjaxRequestTarget}</code> instance bound
+		 *            with the ajax request.
+		 * 
+		 * @return True if the window can be closed (will close the window), false otherwise
+		 */
+		boolean onCloseButtonClicked(AjaxRequestTarget target);
+	}
+
+	/**
+	 * Callback called after the window has been closed. If no callback instance is specified using
+	 * {@link ModalWindow#setWindowClosedCallback(ModalWindow.WindowClosedCallback)}, no ajax
+	 * request will be fired.
+	 * 
+	 * @author Matej Knopp
+	 */
+	public interface WindowClosedCallback extends IClusterable
+	{
+		/**
+		 * Called after the window has been closed.
+		 * 
+		 * @param target
+		 *            <code>{@link org.apache.wicket.ajax.AjaxRequestTarget}</code> instance bound
+		 *            with the ajax request.
+		 */
+		void onClose(AjaxRequestTarget target);
+	}
+
+	/**
+	 * Mask is the element behind the window, that prevents user from interacting the rest of page.
+	 * Mask can be either
+	 * <ul>
+	 * <li><code>{@link #TRANSPARENT}</code> - the mask is invisible
+	 * <li><code>{@link #SEMI_TRANSPARENT}</code> - the mask is black with small opacity (10%)
+	 * </ul>
+	 * 
+	 * @author Matej Knopp
+	 */
+	public static final class MaskType extends EnumeratedType
+	{
+		private static final long serialVersionUID = 1L;
+
+		/** Transparent mask (not visible). */
+		public static final MaskType TRANSPARENT = new MaskType("TRANSPARENT");
+
+		/** Visible mask (black with low opacity). */
+		public static final MaskType SEMI_TRANSPARENT = new MaskType("SEMI_TRANSPARENT");
+
+		/**
+		 * Constructor.
+		 * 
+		 * @param name
+		 */
+		public MaskType(final String name)
+		{
+			super(name);
+		}
+	}
+
+	/**
+	 * @author Matej Knopp
+	 */
+	private class WindowClosedBehavior extends AbstractDefaultAjaxBehavior
+	{
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		protected void respond(final AjaxRequestTarget target)
+		{
+			shown = false;
+
+			if (windowClosedCallback != null)
+			{
+				windowClosedCallback.onClose(target);
+			}
+		}
+	}
+
+	/**
+	 * @author Matej Knopp
+	 */
+	protected class CloseButtonBehavior extends AbstractDefaultAjaxBehavior
+	{
+		private static final long serialVersionUID = 1L;
+
+		public CloseButtonBehavior()
+		{
+		}
+
+		@Override
+		protected final void respond(final AjaxRequestTarget target)
+		{
+			if ((closeButtonCallback == null) ||
+				(closeButtonCallback.onCloseButtonClicked(target)))
+			{
+				close(target);
+			}
+		}
 	}
 }

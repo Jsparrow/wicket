@@ -33,12 +33,18 @@ public class ResourceNameKey implements IKey
 	@Override
 	public boolean equals(Object o)
 	{
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
 
 		ResourceNameKey that = (ResourceNameKey) o;
 
-		if (!resourceName.equals(that.resourceName)) return false;
+		if (!resourceName.equals(that.resourceName)) {
+			return false;
+		}
 
 		return true;
 	}

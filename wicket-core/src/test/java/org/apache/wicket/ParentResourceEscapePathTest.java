@@ -66,7 +66,7 @@ class ParentResourceEscapePathTest extends WicketTestCase
 
 	private void assertContains(String html, String expected)
 	{
-		assertTrue(html.contains(expected), "Expected to find \"" + expected + "\" in \"" + html + "\"");
+		assertTrue(html.contains(expected), new StringBuilder().append("Expected to find \"").append(expected).append("\" in \"").append(html).append("\"").toString());
 	}
 
 	/**

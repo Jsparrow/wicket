@@ -32,7 +32,6 @@ public class HomePage extends WicketExamplePage
 	 */
 	public HomePage()
 	{
-		super();
 	}
 	
 	@Override

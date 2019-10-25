@@ -42,7 +42,7 @@ public class MyPanel extends Panel
 	{
 		super(id);
 
-		Form<Void> form = new Form<Void>("form3");
+		Form<Void> form = new Form<>("form3");
 		form.setOutputMarkupId(true);
 		add(form);
 

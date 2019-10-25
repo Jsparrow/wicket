@@ -97,9 +97,7 @@ public class PropertyValidator<T> extends Behavior implements INullAcceptingVali
 	 */
 	private String createUnresolvablePropertyMessage(FormComponent<T> component)
 	{
-		String baseMessage = "Could not resolve Bean Property from component: " + component
-			+ ". (Hints:) Possible causes are a typo in the PropertyExpression, a null reference or a model that does not work in combination with a "
-			+ IPropertyResolver.class.getSimpleName() + ".";
+		String baseMessage = new StringBuilder().append("Could not resolve Bean Property from component: ").append(component).append(". (Hints:) Possible causes are a typo in the PropertyExpression, a null reference or a model that does not work in combination with a ").append(IPropertyResolver.class.getSimpleName()).append(".").toString();
 		IModel<?> model = ValidationModelResolver.resolvePropertyModelFrom(component);
 		if (model != null)
 		{
@@ -138,8 +136,7 @@ public class PropertyValidator<T> extends Behavior implements INullAcceptingVali
 		if (this.component != null)
 		{
 			throw new IllegalStateException( //
-				"This validator has already been added to component: " + this.component
-					+ ". This validator does not support reusing instances, please create a new one");
+				new StringBuilder().append("This validator has already been added to component: ").append(this.component).append(". This validator does not support reusing instances, please create a new one").toString());
 		}
 
 		if (!(component instanceof FormComponent))
@@ -160,18 +157,17 @@ public class PropertyValidator<T> extends Behavior implements INullAcceptingVali
 	public void onConfigure(Component component)
 	{
 		super.onConfigure(component);
-		if (requiredFlagSet == false)
+		if (requiredFlagSet != false) {
+			return;
+		}
+		// "Required" flag is calculated upon component's model property, so
+		// we must ensure,
+		// that model object is accessible (i.e. component is already added
+		// in a page).
+		requiredFlagSet = true;
+		if (isRequired())
 		{
-			// "Required" flag is calculated upon component's model property, so
-			// we must ensure,
-			// that model object is accessible (i.e. component is already added
-			// in a page).
-			requiredFlagSet = true;
-
-			if (isRequired())
-			{
-				this.component.setRequired(true);
-			}
+			this.component.setRequired(true);
 		}
 	}
 
@@ -196,7 +192,7 @@ public class PropertyValidator<T> extends Behavior implements INullAcceptingVali
 	{
 		BeanValidationContext config = BeanValidationConfiguration.get();
 
-		HashSet<Class<?>> groups = new HashSet<Class<?>>(Arrays.asList(getGroups()));
+		HashSet<Class<?>> groups = new HashSet<>(Arrays.asList(getGroups()));
 
 		Iterator<ConstraintDescriptor<?>> it = new ConstraintIterator(config.getValidator(), getProperty());
 		while (it.hasNext())

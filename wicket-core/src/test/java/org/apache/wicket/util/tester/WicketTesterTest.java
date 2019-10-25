@@ -83,6 +83,8 @@ import org.apache.wicket.util.tester.apps_6.ResultPage;
 import org.apache.wicket.util.tester.apps_8.ComponentFeedbackResourceTestingPage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @see WicketTesterCookieTest for cookie related test
@@ -90,6 +92,7 @@ import org.junit.jupiter.api.Test;
  */
 class WicketTesterTest extends WicketTestCase
 {
+	private static final Logger logger = LoggerFactory.getLogger(WicketTesterTest.class);
 	private boolean eventExecuted;
 
 	/**
@@ -253,7 +256,7 @@ class WicketTesterTest extends WicketTestCase
 		}
 		catch (AssertionError ex)
 		{
-			;
+			logger.error(ex.getMessage(), ex);
 		}
 	}
 
@@ -277,7 +280,7 @@ class WicketTesterTest extends WicketTestCase
 		}
 		catch (AssertionError ex)
 		{
-			;
+			logger.error(ex.getMessage(), ex);
 		}
 	}
 
@@ -301,7 +304,7 @@ class WicketTesterTest extends WicketTestCase
 		}
 		catch (AssertionError ex)
 		{
-			;
+			logger.error(ex.getMessage(), ex);
 		}
 	}
 
@@ -325,7 +328,7 @@ class WicketTesterTest extends WicketTestCase
 		}
 		catch (AssertionError ex)
 		{
-			;
+			logger.error(ex.getMessage(), ex);
 		}
 	}
 
@@ -354,7 +357,7 @@ class WicketTesterTest extends WicketTestCase
 		}
 		catch (AssertionError ex)
 		{
-			;
+			logger.error(ex.getMessage(), ex);
 		}
 
 		try
@@ -364,7 +367,7 @@ class WicketTesterTest extends WicketTestCase
 		}
 		catch (AssertionError ex)
 		{
-			;
+			logger.error(ex.getMessage(), ex);
 		}
 	}
 
@@ -848,12 +851,9 @@ class WicketTesterTest extends WicketTestCase
 	@Test
 	void loadPageMarkupTemplate()
 	{
-		String url = "wicket/resource/" + BlockedResourceLinkPage.class.getName() + "/" +
-			BlockedResourceLinkPage.class.getSimpleName() + ".html";
+		String url = new StringBuilder().append("wicket/resource/").append(BlockedResourceLinkPage.class.getName()).append("/").append(BlockedResourceLinkPage.class.getSimpleName()).append(".html").toString();
 
-		assertThrows(PackageResourceBlockedException.class, () -> {
-			tester.executeUrl(url);
-		});
+		assertThrows(PackageResourceBlockedException.class, () -> tester.executeUrl(url));
 	}
 
 	/**
@@ -862,7 +862,7 @@ class WicketTesterTest extends WicketTestCase
 	@Test
 	void loadNonPageMarkupTemplate()
 	{
-		String url = "wicket/resource/" + BlockedResourceLinkPage.class.getName() + "/test.html";
+		String url = new StringBuilder().append("wicket/resource/").append(BlockedResourceLinkPage.class.getName()).append("/test.html").toString();
 		tester.executeUrl(url);
 		assertEquals("This is a test!", tester.getLastResponseAsString());
 	}
@@ -874,8 +874,7 @@ class WicketTesterTest extends WicketTestCase
 	@Test
 	void clickResourceLinkWithSomeCommaAppendedUrl()
 	{
-		String url = "wicket/resource/" + BlockedResourceLinkPage.class.getName() + "/" +
-			BlockedResourceLinkPage.class.getSimpleName() + ".html,xml";
+		String url = new StringBuilder().append("wicket/resource/").append(BlockedResourceLinkPage.class.getName()).append("/").append(BlockedResourceLinkPage.class.getSimpleName()).append(".html,xml").toString();
 
 		tester.getRequest().setURL(url);
 		assertFalse(tester.processRequest(),
@@ -1033,16 +1032,18 @@ class WicketTesterTest extends WicketTestCase
 			public <T extends IRequestableComponent> boolean isInstantiationAuthorized(
 				Class<T> componentClass)
 			{
-				if (componentClass == AccessDeniedPage.class)
+				if (componentClass == AccessDeniedPage.class) {
 					return true;
+				}
 				return allowed || !WebPage.class.isAssignableFrom(componentClass);
 			}
 
 			@Override
 			public boolean isActionAuthorized(Component component, Action action)
 			{
-				if (component instanceof AccessDeniedPage)
+				if (component instanceof AccessDeniedPage) {
 					return true;
+				}
 				return allowed || !(component instanceof WebPage);
 			}
 		}
@@ -1068,7 +1069,7 @@ class WicketTesterTest extends WicketTestCase
 		String content = "content";
 		ByteArrayResource resource = new ByteArrayResource("text/plain", content.getBytes(),
 			"fileName.txt");
-		ResourceLink<Void> link = new ResourceLink<Void>(MockPageWithLink.LINK_ID, resource);
+		ResourceLink<Void> link = new ResourceLink<>(MockPageWithLink.LINK_ID, resource);
 		page.add(link);
 		tester.startPage(page);
 		tester.clickLink(MockPageWithLink.LINK_ID, false);
@@ -1097,7 +1098,7 @@ class WicketTesterTest extends WicketTestCase
 				return resource;
 			}
 		};
-		ResourceLink<Void> link = new ResourceLink<Void>(MockPageWithLink.LINK_ID, reference);
+		ResourceLink<Void> link = new ResourceLink<>(MockPageWithLink.LINK_ID, reference);
 		page.add(link);
 		tester.startPage(page);
 		tester.clickLink(MockPageWithLink.LINK_ID, false);
@@ -1166,6 +1167,7 @@ class WicketTesterTest extends WicketTestCase
 		}
 		catch (AssertionError e)
 		{
+			logger.error(e.getMessage(), e);
 			caught = true;
 		}
 		assertTrue(caught);
@@ -1290,6 +1292,7 @@ class WicketTesterTest extends WicketTestCase
 		}
 		catch (Exception expected)
 		{
+			logger.error(expected.getMessage(), expected);
 		}
 
 		tester.startPage(new MockPageParameterPage(new PageParameters()));

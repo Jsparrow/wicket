@@ -165,8 +165,7 @@ public class AttributeAppender extends AttributeModifier
 	public String toString()
 	{
 		String attributeModifier = super.toString();
-		attributeModifier = attributeModifier.substring(0, attributeModifier.length() - 2) +
-			", separator=" + separator + "]";
+		attributeModifier = new StringBuilder().append(attributeModifier.substring(0, attributeModifier.length() - 2)).append(", separator=").append(separator).append("]").toString();
 		return attributeModifier;
 	}
 }

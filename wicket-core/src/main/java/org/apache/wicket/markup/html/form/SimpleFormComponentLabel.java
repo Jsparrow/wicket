@@ -42,9 +42,7 @@ public class SimpleFormComponentLabel extends FormComponentLabel
 		super(id, labelProvider);
 		if (labelProvider.getLabel() == null)
 		{
-			throw new IllegalStateException("Provided form component does not have a label set. "
-				+ "Use FormComponent.setLabel(IModel) to set the model "
-				+ "that will feed this label");
+			throw new IllegalStateException(new StringBuilder().append("Provided form component does not have a label set. ").append("Use FormComponent.setLabel(IModel) to set the model ").append("that will feed this label").toString());
 		}
 		setDefaultModel(labelProvider.getLabel());
 	}

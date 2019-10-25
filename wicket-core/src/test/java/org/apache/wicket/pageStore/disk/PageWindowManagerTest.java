@@ -36,15 +36,33 @@ import org.junit.jupiter.api.Test;
  */
 public class PageWindowManagerTest
 {
+	/** how many operations to execute */
+	private static final int EXECUTIONS = 10000;
+
+	/** used to wait the executions */
+	private static final CountDownLatch LATCH = new CountDownLatch(EXECUTIONS);
+
+	private static final SecureRandom RND = new SecureRandom();
+
+	private final PageWindowManager pageWindowManager = new PageWindowManager(1000L);
+
+	/** the execution types */
+	private final Runnable[] tasks = new Runnable[]
+	{
+		new CreatePageWindowTask(pageWindowManager),
+		new GetPageWindowTask(pageWindowManager),
+		new RemovePageInSessionTask(pageWindowManager)
+	};
+
 	/**
 	 * https://issues.apache.org/jira/browse/WICKET-4572
 	 */
 	@Test
 	void removeObsoleteIndices()
 	{
-		int page0id = 0,
-			page1id = 1,
-			page2id = 2;
+		int page0id = 0;
+		int page1id = 1;
+		int page2id = 2;
 		int maxSize = 10;
 
 		PageWindowManager manager = new PageWindowManager(maxSize);
@@ -184,30 +202,11 @@ public class PageWindowManagerTest
 		assertWindow(window, 8, 50, 10);
 	}
 
-
 	private void assertWindow(FileWindow window, int pageId, int filePartOffset, int filePartSize)
 	{
 		assertTrue(window.getPageId() == pageId && window.getFilePartOffset() == filePartOffset &&
 			window.getFilePartSize() == filePartSize);
 	}
-
-	/** how many operations to execute */
-	private static final int EXECUTIONS = 10000;
-
-	/** used to wait the executions */
-	private static final CountDownLatch LATCH = new CountDownLatch(EXECUTIONS);
-
-	private final PageWindowManager pageWindowManager = new PageWindowManager(1000L);
-
-	/** the execution types */
-	private final Runnable[] TASKS = new Runnable[]
-	{
-		new CreatePageWindowTask(pageWindowManager),
-		new GetPageWindowTask(pageWindowManager),
-		new RemovePageInSessionTask(pageWindowManager)
-	};
-
-	private static final SecureRandom RND = new SecureRandom();
 
 	/**
 	 * Executes random mutator and accessor operations on {@link org.apache.wicket.pageStore.AsynchronousPageStore} validating
@@ -222,14 +221,14 @@ public class PageWindowManagerTest
 
 		for (int i = 0; i < EXECUTIONS; i++)
 		{
-			Runnable task = TASKS[RND.nextInt(TASKS.length)];
+			Runnable task = tasks[RND.nextInt(tasks.length)];
 			executorService.submit(task);
 		}
 		LATCH.await();
 		executorService.shutdown();
 	}
 
-	private static abstract class AbstractTask implements Runnable
+	private abstract static class AbstractTask implements Runnable
 	{
 		/** the ids for the stored/removed pages */
 		private static final int[] PAGE_IDS = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };

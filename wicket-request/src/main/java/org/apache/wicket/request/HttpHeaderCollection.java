@@ -40,10 +40,10 @@ import org.apache.wicket.util.time.Instants;
  */
 public class HttpHeaderCollection
 {
-	private final Map<HeaderKey, List<Object>> headers;
-
 	/** returned in case no header values were found */
 	private static final String[] NO_VALUES = new String[0];
+
+	private final Map<HeaderKey, List<Object>> headers;
 
 	/**
 	 * Constructor.
@@ -184,14 +184,7 @@ public class HttpHeaderCollection
 		final HeaderKey searchKey = new HeaderKey(name);
 
 		// get the header value (case might differ)
-		for (HeaderKey key : headers.keySet())
-		{
-			if (key.equals(searchKey))
-			{
-				return true;
-			}
-		}
-		return false;
+		return headers.keySet().stream().anyMatch(key -> key.equals(searchKey));
 	}
 
 	/**
@@ -208,10 +201,7 @@ public class HttpHeaderCollection
 
 		final Set<String> names = new HashSet<>(headers.size());
 
-		for (HeaderKey key : headers.keySet())
-		{
-			names.add(key.getName());
-		}
+		headers.keySet().forEach(key -> names.add(key.getName()));
 		return names;
 	}
 
@@ -329,16 +319,19 @@ public class HttpHeaderCollection
 		@Override
 		public boolean equals(Object o)
 		{
-			if (this == o)
+			if (this == o) {
 				return true;
+			}
 
-			if (!(o instanceof HeaderKey))
+			if (!(o instanceof HeaderKey)) {
 				return false;
+			}
 
 			HeaderKey that = (HeaderKey)o;
 
-			if (!key.equals(that.key))
+			if (!key.equals(that.key)) {
 				return false;
+			}
 
 			return true;
 		}

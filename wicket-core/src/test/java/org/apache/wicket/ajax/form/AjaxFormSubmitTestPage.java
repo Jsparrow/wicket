@@ -58,16 +58,6 @@ public class AjaxFormSubmitTestPage extends WebPage
 	private int formSubmitted;
 
 	/**
-	 * Returns the component(s) that handled the form submit.
-	 * 
-	 * @return flag indicating the component(s)
-	 */
-	public final int getFormSubmitted()
-	{
-		return formSubmitted;
-	}
-
-	/**
 	 * Construct.
 	 */
 	public AjaxFormSubmitTestPage(boolean defaultProcessing)
@@ -103,16 +93,28 @@ public class AjaxFormSubmitTestPage extends WebPage
 				formSubmitted = formSubmitted | BUTTON_SUBMIT;
 			}
 
+			@Override
 			protected void onError(Optional<AjaxRequestTarget> target) {
 				assertEquals(target.isPresent(), getRequestCycle().find(AjaxRequestTarget.class).isPresent());
 
 				formSubmitted = formSubmitted | BUTTON_ERROR;
 			}
 
+			@Override
 			protected void onAfterSubmit(Optional<AjaxRequestTarget> target) {
 				assertEquals(target.isPresent(), getRequestCycle().find(AjaxRequestTarget.class).isPresent());
 			}
 		}.setDefaultFormProcessing(defaultProcessing));
+	}
+
+	/**
+	 * Returns the component(s) that handled the form submit.
+	 * 
+	 * @return flag indicating the component(s)
+	 */
+	public final int getFormSubmitted()
+	{
+		return formSubmitted;
 	}
 
 

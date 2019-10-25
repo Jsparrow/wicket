@@ -120,7 +120,7 @@ public class Enclosure extends WebMarkupContainer implements IComponentResolver
 	 */
 	public final String getChildId()
 	{
-		return childId.toString();
+		return childId;
 	}
 
 	protected final Component getChild()
@@ -242,18 +242,10 @@ public class Enclosure extends WebMarkupContainer implements IComponentResolver
 							if (fullChildId.equals(tagId))
 							{
 								ComponentTag fullComponentTag = new ComponentTag(tag);
-								fullComponentTag.setId(childId.toString());
+								fullComponentTag.setId(childId);
 
 								controller = ComponentResolvers.resolve(enclosureParent,
-									markupStream, fullComponentTag, new ResolverFilter()
-									{
-										@Override
-										public boolean ignoreResolver(
-											final IComponentResolver resolver)
-										{
-											return resolver instanceof EnclosureHandler;
-										}
-									});
+									markupStream, fullComponentTag, (final IComponentResolver resolver) -> resolver instanceof EnclosureHandler);
 								break;
 							}
 							else if (fullChildId.startsWith(tagId + PATH_SEPARATOR))
@@ -292,8 +284,7 @@ public class Enclosure extends WebMarkupContainer implements IComponentResolver
 	{
 		if (controller == null)
 		{
-			throw new WicketRuntimeException("Could not find child with id: " + childId +
-				" in the wicket:enclosure");
+			throw new WicketRuntimeException(new StringBuilder().append("Could not find child with id: ").append(childId).append(" in the wicket:enclosure").toString());
 		}
 		else if (controller == this)
 		{

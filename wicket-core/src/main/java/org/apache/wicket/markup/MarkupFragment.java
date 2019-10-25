@@ -124,8 +124,7 @@ public class MarkupFragment extends AbstractMarkupFragment
 
 		if (endIndex >= markupSize)
 		{
-			throw new MarkupException("Unable to find close tag for: '" + startTag.toString() +
-				"' in " + getRootMarkup().getMarkupResourceStream().toString());
+			throw new MarkupException(new StringBuilder().append("Unable to find close tag for: '").append(startTag.toString()).append("' in ").append(getRootMarkup().getMarkupResourceStream().toString()).toString());
 		}
 
 		size = endIndex - startIndex + 1;
@@ -136,8 +135,7 @@ public class MarkupFragment extends AbstractMarkupFragment
 	{
 		if ((index < 0) || (index > size))
 		{
-			throw new IndexOutOfBoundsException("Parameter 'index' is out of range: 0 <= " + index +
-				" <= " + size);
+			throw new IndexOutOfBoundsException(new StringBuilder().append("Parameter 'index' is out of range: 0 <= ").append(index).append(" <= ").append(size).toString());
 		}
 
 		// Ask the parent markup

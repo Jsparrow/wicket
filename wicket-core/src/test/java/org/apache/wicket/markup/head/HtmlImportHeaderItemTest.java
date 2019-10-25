@@ -33,11 +33,11 @@ class HtmlImportHeaderItemTest
 
 		MetaDataHeaderItem result = HtmlImportHeaderItem.forImportLinkTag(url);
 
-		assertEquals("<link rel=\"import\" href=\"" + url + "\" />\n", result.generateString());
+		assertEquals(new StringBuilder().append("<link rel=\"import\" href=\"").append(url).append("\" />\n").toString(), result.generateString());
 
 		result = HtmlImportHeaderItem.forImportLinkTag(url, true);
 
-		assertEquals("<link rel=\"import\" href=\"" + url + "\" async />\n",
+		assertEquals(new StringBuilder().append("<link rel=\"import\" href=\"").append(url).append("\" async />\n").toString(),
 			result.generateString());
 	}
 
@@ -54,7 +54,7 @@ class HtmlImportHeaderItemTest
 		MetaDataHeaderItem importLink = HtmlImportHeaderItem.forImportLinkTag(SimplePage.class,
 			parameters, "monitor", true);
 
-		assertEquals("<link rel=\"import\" href=\"" + pageUrl + "\" media=\"monitor\" async />\n",
+		assertEquals(new StringBuilder().append("<link rel=\"import\" href=\"").append(pageUrl).append("\" media=\"monitor\" async />\n").toString(),
 			importLink.generateString());
 	}
 }

@@ -69,10 +69,7 @@ public class Threads
 		logger.warn(dump.toString());
 
 		Map<Thread, StackTraceElement[]> allStackTraces = Thread.getAllStackTraces();
-		for (Entry<Thread, StackTraceElement[]> entry : allStackTraces.entrySet())
-		{
-			dumpSingleThread(logger, entry.getKey(), entry.getValue());
-		}
+		allStackTraces.entrySet().forEach(entry -> dumpSingleThread(logger, entry.getKey(), entry.getValue()));
 	}
 
 	/**

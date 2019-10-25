@@ -273,6 +273,20 @@ public abstract class ResourceReference implements IClusterable
 		return new LambdaResourceReference(key, resourceSupplier);
 	}
 
+	@Override
+	public String toString()
+	{
+		return data.toString();
+	}
+
+	/**
+	 * @return the resources this ResourceReference depends on.
+	 */
+	public List<HeaderItem> getDependencies()
+	{
+		return new ArrayList<>();
+	}
+
 	public static final class LambdaResourceReference extends ResourceReference
 	{
 		private static final long serialVersionUID = 1826862147241009289L;
@@ -385,7 +399,8 @@ public abstract class ResourceReference implements IClusterable
 		@Override
 		public String toString()
 		{
-			return "locale: " + locale + "; style: " + style + "; variation: " + variation;
+			return new StringBuilder().append("locale: ").append(locale).append("; style: ").append(style).append("; variation: ").append(variation)
+					.toString();
 		}
 	}
 
@@ -536,22 +551,8 @@ public abstract class ResourceReference implements IClusterable
 		@Override
 		public String toString()
 		{
-			return "scope: " + scope + "; name: " + name + "; locale: " + locale + "; style: " +
-				style + "; variation: " + variation;
+			return new StringBuilder().append("scope: ").append(scope).append("; name: ").append(name).append("; locale: ").append(locale)
+					.append("; style: ").append(style).append("; variation: ").append(variation).toString();
 		}
-	}
-
-	@Override
-	public String toString()
-	{
-		return data.toString();
-	}
-
-	/**
-	 * @return the resources this ResourceReference depends on.
-	 */
-	public List<HeaderItem> getDependencies()
-	{
-		return new ArrayList<>();
 	}
 }

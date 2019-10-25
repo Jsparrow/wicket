@@ -122,7 +122,7 @@ public class Person
 	{
 		if (addressList == null)
 		{
-			addressList = new ArrayList<Address>();
+			addressList = new ArrayList<>();
 		}
 		while (addressList.size() < index)
 		{

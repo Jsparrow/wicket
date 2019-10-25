@@ -89,10 +89,7 @@ public class StringResourceModelTest extends WicketTestCase
 	@Test
 	void nullResourceKey()
 	{
-		assertThrows(IllegalArgumentException.class, () -> {
-			new StringResourceModel(null, page);
-
-		});
+		assertThrows(IllegalArgumentException.class, () -> new StringResourceModel(null, page));
 	}
 
 	/** */
@@ -204,9 +201,7 @@ public class StringResourceModelTest extends WicketTestCase
 	void setObject()
 	{
 		StringResourceModel model = new StringResourceModel("simple.text", page);
-		assertThrows(UnsupportedOperationException.class, () -> {
-			model.setObject("Some value");
-		});
+		assertThrows(UnsupportedOperationException.class, () -> model.setObject("Some value"));
 	}
 
 	/** */

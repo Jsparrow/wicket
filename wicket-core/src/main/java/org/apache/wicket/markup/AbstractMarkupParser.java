@@ -169,11 +169,10 @@ public abstract class AbstractMarkupParser
 		markupFilterChain = new RootMarkupFilter(xmlParser, markup.getMarkupResourceStream());
 
 		// Convert the list of markup filters into a chain
-		for (IMarkupFilter filter : getMarkupFilters())
-		{
+		getMarkupFilters().forEach(filter -> {
 			filter.setNextFilter(markupFilterChain);
 			markupFilterChain = filter;
-		}
+		});
 
 		// Initialize the xml parser
 		MarkupResourceStream markupResourceStream = markup.getMarkupResourceStream();
@@ -198,8 +197,7 @@ public abstract class AbstractMarkupParser
 			}
 			else
 			{
-				log.debug(a + ":" + markupResourceStream.getResource() + ". It is safer to use it" +
-					b);
+				log.debug(new StringBuilder().append(a).append(":").append(markupResourceStream.getResource()).append(". It is safer to use it").append(b).toString());
 			}
 		}
 
@@ -430,7 +428,7 @@ public abstract class AbstractMarkupParser
 			Matcher matcher = CONDITIONAL_COMMENT_OPENING.matcher(possibleComment);
 			if (matcher.find())
 			{
-				pos1 = pos1 + matcher.end();
+				pos1 += matcher.end();
 			}
 			else
 			{

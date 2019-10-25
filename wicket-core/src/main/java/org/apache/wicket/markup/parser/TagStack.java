@@ -37,7 +37,7 @@ public class TagStack
 	private static final Logger log = LoggerFactory.getLogger(HtmlHandler.class);
 
 	/** Map of simple tags. */
-	private static final Map<String, Boolean> doesNotRequireCloseTag = new HashMap<String, Boolean>();
+	private static final Map<String, Boolean> doesNotRequireCloseTag = new HashMap<>();
 
 	static
 	{
@@ -52,7 +52,7 @@ public class TagStack
 	}
 
 	/** Tag stack to find balancing tags */
-	final private ArrayDeque<ComponentTag> stack = new ArrayDeque<ComponentTag>();
+	private final ArrayDeque<ComponentTag> stack = new ArrayDeque<>();
 	private boolean debug;
 
 	/**
@@ -73,7 +73,7 @@ public class TagStack
 
 		if (log.isDebugEnabled() && debug)
 		{
-			log.debug("tag: " + tag.toUserDebugString() + ", stack: " + stack);
+			log.debug(new StringBuilder().append("tag: ").append(tag.toUserDebugString()).append(", stack: ").append(stack).toString());
 		}
 
 		// Check tag type
@@ -135,8 +135,7 @@ public class TagStack
 				// it must be a real mismatch.
 				if (mismatch)
 				{
-					throw new ParseException("Tag " + top.toUserDebugString() +
-						" has a mismatched close tag at " + closeTag.toUserDebugString(),
+					throw new ParseException(new StringBuilder().append("Tag ").append(top.toUserDebugString()).append(" has a mismatched close tag at ").append(closeTag.toUserDebugString()).toString(),
 						top.getPos());
 				}
 			}

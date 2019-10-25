@@ -131,7 +131,7 @@ class MoreSpecificResourceMountPathTest
 				}
 			});
 
-			mountResource(path + "/${" + PARAM_ID + "}", new ResourceReference(OWNER_BY_ID_LOADER)
+			mountResource(new StringBuilder().append(path).append("/${").append(PARAM_ID).append("}").toString(), new ResourceReference(OWNER_BY_ID_LOADER)
 			{
 				@Override
 				public IResource getResource()

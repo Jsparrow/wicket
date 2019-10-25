@@ -64,14 +64,7 @@ public abstract class StyleAttributeModifier extends AttributeAppender
 
 		String separator = getSeparator();
 		StringBuilder result = new StringBuilder();
-		for (Map.Entry<String, String> entry : newStyles.entrySet())
-		{
-			result
-				.append(entry.getKey())
-				.append(':')
-				.append(entry.getValue())
-				.append(separator);
-		}
+		newStyles.entrySet().forEach(entry -> result.append(entry.getKey()).append(':').append(entry.getValue()).append(separator));
 		return result.length() > 0 ? result.toString() : VALUELESS_ATTRIBUTE_REMOVE;
 	}
 

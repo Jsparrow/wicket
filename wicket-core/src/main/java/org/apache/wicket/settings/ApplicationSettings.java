@@ -141,7 +141,7 @@ public class ApplicationSettings
 		}
 		checkPageClass(accessDeniedPage);
 
-		this.accessDeniedPage = new WeakReference<Class<? extends Page>>(accessDeniedPage);
+		this.accessDeniedPage = new WeakReference<>(accessDeniedPage);
 		return this;
 	}
 
@@ -240,8 +240,7 @@ public class ApplicationSettings
 		// IPageFactory implementation
 		if (!Page.class.isAssignableFrom(pageClass))
 		{
-			throw new IllegalArgumentException("argument " + pageClass +
-				" must be a subclass of Page");
+			throw new IllegalArgumentException(new StringBuilder().append("argument ").append(pageClass).append(" must be a subclass of Page").toString());
 		}
 	}
 

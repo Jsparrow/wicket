@@ -225,7 +225,7 @@ public class WicketServlet extends HttpServlet
 		// Get the relative URL we need for loading the resource from the servlet context
 		// NOTE: we NEED to put the '/' in front as otherwise some versions of application servers
 		// (e.g. Jetty 5.1.x) will fail for requests like '/mysubdir/myfile.css'
-		if ((url.length() > 0 && url.charAt(0) != '/') || url.length() == 0)
+		if ((url.length() > 0 && url.charAt(0) != '/') || url.isEmpty())
 		{
 			url = '/' + url;
 		}

@@ -55,16 +55,16 @@ public class ConversationExpiryChecker implements IComponentOnBeforeRenderListen
 	@Override
 	public void onBeforeRender(Component component)
 	{
-		if (component instanceof Page || RequestCycle.get().find(IPartialPageRequestHandler.class).isPresent())
+		if (!(component instanceof Page || RequestCycle.get().find(IPartialPageRequestHandler.class).isPresent())) {
+			return;
+		}
+		Page page = component.getPage();
+		String cid = ConversationPropagator.getConversationIdFromPage(page);
+		if (cid != null && !Objects.isEqual(conversation.getId(), cid))
 		{
-			Page page = component.getPage();
-			String cid = ConversationPropagator.getConversationIdFromPage(page);
-			if (cid != null && !Objects.isEqual(conversation.getId(), cid))
-			{
-				logger.info("Conversation {} has expired for {}", cid, page);
-				throw new ConversationExpiredException(null, cid, page, RequestCycle.get()
-						.getActiveRequestHandler());
-			}
+			logger.info("Conversation {} has expired for {}", cid, page);
+			throw new ConversationExpiredException(null, cid, page, RequestCycle.get()
+					.getActiveRequestHandler());
 		}
 	}
 }

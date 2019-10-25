@@ -29,6 +29,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Test {@link CompoundFieldValueFactory}
@@ -38,6 +40,8 @@ import static org.mockito.Mockito.when;
  */
 public class CompoundFieldValueFactoryTest
 {
+	private static final Logger logger = LoggerFactory.getLogger(CompoundFieldValueFactoryTest.class);
+
 	private Integer testField;
 
 	private Field field;
@@ -102,6 +106,7 @@ public class CompoundFieldValueFactoryTest
 		}
 		catch (IllegalArgumentException e)
 		{
+			logger.error(e.getMessage(), e);
 			// noop
 		}
 	}
@@ -125,6 +130,7 @@ public class CompoundFieldValueFactoryTest
 		}
 		catch (IllegalArgumentException e)
 		{
+			logger.error(e.getMessage(), e);
 			// noop
 		}
 
@@ -148,6 +154,7 @@ public class CompoundFieldValueFactoryTest
 		}
 		catch (IllegalArgumentException e)
 		{
+			logger.error(e.getMessage(), e);
 			// noop
 		}
 		try
@@ -157,6 +164,7 @@ public class CompoundFieldValueFactoryTest
 		}
 		catch (IllegalArgumentException e)
 		{
+			logger.error(e.getMessage(), e);
 			// noop
 		}
 
@@ -199,6 +207,7 @@ public class CompoundFieldValueFactoryTest
 		}
 		catch (IllegalArgumentException e)
 		{
+			logger.error(e.getMessage(), e);
 			// noop
 		}
 	}

@@ -43,7 +43,6 @@ public class NonceDemoPage extends WicketExamplePage
 
 	public NonceDemoPage()
 	{
-		super();
 		add(new Label("testNonceScript", getString("testNonceScript")));
 		add(new Label("testNoNonceScript", getString("testNoNonceScript")));
 

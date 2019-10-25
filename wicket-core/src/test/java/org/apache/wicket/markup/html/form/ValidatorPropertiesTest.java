@@ -27,6 +27,8 @@ import org.apache.wicket.properties.TestPage;
 import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.util.tester.WicketTestCase;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 
@@ -38,6 +40,8 @@ import org.junit.jupiter.api.Test;
  */
 class ValidatorPropertiesTest extends WicketTestCase
 {
+
+	private static final Logger logger = LoggerFactory.getLogger(ValidatorPropertiesTest.class);
 
 	@Override
 	protected WebApplication newApplication()
@@ -325,6 +329,7 @@ class ValidatorPropertiesTest extends WicketTestCase
 		}
 		catch (MissingResourceException ex)
 		{
+			logger.error(ex.getMessage(), ex);
 			hit = true;
 		}
 

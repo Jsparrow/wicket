@@ -33,7 +33,7 @@ public final class BreadCrumbModelListenerSupport implements IClusterable
 	private static final long serialVersionUID = 1L;
 
 	/** listeners for bread crumb events. */
-	private final List<IBreadCrumbModelListener> listeners = new ArrayList<IBreadCrumbModelListener>(
+	private final List<IBreadCrumbModelListener> listeners = new ArrayList<>(
 		1);
 
 	/**
@@ -60,10 +60,7 @@ public final class BreadCrumbModelListenerSupport implements IClusterable
 	public final void fireBreadCrumbActivated(final IBreadCrumbParticipant previousParticipant,
 		final IBreadCrumbParticipant breadCrumbParticipant)
 	{
-		for (IBreadCrumbModelListener listener : listeners)
-		{
-			listener.breadCrumbActivated(previousParticipant, breadCrumbParticipant);
-		}
+		listeners.forEach(listener -> listener.breadCrumbActivated(previousParticipant, breadCrumbParticipant));
 	}
 
 	/**
@@ -74,10 +71,7 @@ public final class BreadCrumbModelListenerSupport implements IClusterable
 	 */
 	public final void fireBreadCrumbAdded(final IBreadCrumbParticipant breadCrumbParticipant)
 	{
-		for (IBreadCrumbModelListener listener : listeners)
-		{
-			listener.breadCrumbAdded(breadCrumbParticipant);
-		}
+		listeners.forEach(listener -> listener.breadCrumbAdded(breadCrumbParticipant));
 	}
 
 	/**
@@ -88,10 +82,7 @@ public final class BreadCrumbModelListenerSupport implements IClusterable
 	 */
 	public final void fireBreadCrumbRemoved(final IBreadCrumbParticipant breadCrumbParticipant)
 	{
-		for (IBreadCrumbModelListener listener : listeners)
-		{
-			listener.breadCrumbRemoved(breadCrumbParticipant);
-		}
+		listeners.forEach(listener -> listener.breadCrumbRemoved(breadCrumbParticipant));
 	}
 
 	/**

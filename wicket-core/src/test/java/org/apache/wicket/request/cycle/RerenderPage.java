@@ -29,13 +29,6 @@ public class RerenderPage extends WebPage
 {
 	private static final long serialVersionUID = 1L;
 
-	public static abstract class Supplier<T> implements Serializable
-	{
-		private static final long serialVersionUID = 1L;
-
-		public abstract T get();
-	}
-
 	private Integer newValue = 1;
 
 	private Supplier<Integer> handler = null;
@@ -53,8 +46,9 @@ public class RerenderPage extends WebPage
 	protected void onConfigure()
 	{
 		super.onConfigure();
-		if (handler != null)
+		if (handler != null) {
 			setNewValue(handler.get());
+		}
 	}
 
 	private void setNewValue(Integer newValue)
@@ -72,6 +66,13 @@ public class RerenderPage extends WebPage
 	public void renderHead(IHeaderResponse response)
 	{
 		super.renderHead(response);
-		response.render(new StringHeaderItem("<!-- I should be present " + newValue + " -->"));
+		response.render(new StringHeaderItem(new StringBuilder().append("<!-- I should be present ").append(newValue).append(" -->").toString()));
+	}
+
+	public abstract static class Supplier<T> implements Serializable
+	{
+		private static final long serialVersionUID = 1L;
+
+		public abstract T get();
 	}
 }

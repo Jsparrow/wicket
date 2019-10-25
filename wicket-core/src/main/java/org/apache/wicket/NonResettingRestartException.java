@@ -109,14 +109,14 @@ public class NonResettingRestartException extends RequestHandlerExecutor.Replace
 	{
 		RequestCycle cycle = RequestCycle.get();
 		Response response = cycle.getResponse();
-		if (response instanceof IMetaDataBufferingWebResponse)
+		if (!(response instanceof IMetaDataBufferingWebResponse)) {
+			return;
+		}
+		WebResponse originalResponse = (WebResponse) cycle.getOriginalResponse();
+		if (originalResponse != response)
 		{
-			WebResponse originalResponse = (WebResponse) cycle.getOriginalResponse();
-			if (originalResponse != response)
-			{
-				IMetaDataBufferingWebResponse bufferingWebResponse = (IMetaDataBufferingWebResponse) response;
-				bufferingWebResponse.writeMetaData(originalResponse);
-			}
+			IMetaDataBufferingWebResponse bufferingWebResponse = (IMetaDataBufferingWebResponse) response;
+			bufferingWebResponse.writeMetaData(originalResponse);
 		}
 	}
 

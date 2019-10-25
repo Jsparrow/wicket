@@ -80,13 +80,10 @@ public class CdiWicketTester extends WicketTester
 		Url ret = super.urlFor(handler);
 		final CdiConfiguration configuration = CdiConfiguration.get(getApplication());
 		Page page = ConversationPropagator.getPage(handler);
-		if (configuration.getPropagation().propagatesVia(handler, page))
-		{
-			if (page != null)
-			{
-				String cid = ConversationPropagator.getConversationIdFromPage(page);
-				ret.addQueryParameter(ConversationPropagator.CID, cid);
-			}
+		boolean condition = configuration.getPropagation().propagatesVia(handler, page) && page != null;
+		if (condition) {
+			String cid = ConversationPropagator.getConversationIdFromPage(page);
+			ret.addQueryParameter(ConversationPropagator.CID, cid);
 		}
 		return ret;
 	}
@@ -106,6 +103,7 @@ public class CdiWicketTester extends WicketTester
 		}
 		catch (Throwable t)
 		{
+			logger.error(t.getMessage(), t);
 		}
 	}
 

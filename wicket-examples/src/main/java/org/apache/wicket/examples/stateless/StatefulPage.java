@@ -66,8 +66,7 @@ public class StatefulPage extends WicketExamplePage
 			@Override
 			protected void onSubmit()
 			{
-				info("Submitted text: " + field.getDefaultModelObject() + ", link click count: "
-					+ linkClickCount);
+				info(new StringBuilder().append("Submitted text: ").append(field.getDefaultModelObject()).append(", link click count: ").append(linkClickCount).toString());
 			}
 		};
 		statelessForm.add(field);

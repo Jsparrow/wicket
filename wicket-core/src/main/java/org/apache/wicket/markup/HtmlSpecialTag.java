@@ -162,7 +162,7 @@ public class HtmlSpecialTag extends MarkupElement
 	@Override
 	public final String toString()
 	{
-		return "" + httpTagType + ": '" + xmlTag.toString() + "'";
+		return new StringBuilder().append("").append(httpTagType).append(": '").append(xmlTag.toString()).append("'").toString();
 	}
 
 	/**
@@ -203,12 +203,11 @@ public class HtmlSpecialTag extends MarkupElement
 	@Override
 	public boolean equalTo(final MarkupElement element)
 	{
-		if (element instanceof HtmlSpecialTag)
-		{
-			final HtmlSpecialTag that = (HtmlSpecialTag)element;
-			return getXmlTag().equalTo(that.getXmlTag());
+		if (!(element instanceof HtmlSpecialTag)) {
+			return false;
 		}
-		return false;
+		final HtmlSpecialTag that = (HtmlSpecialTag)element;
+		return getXmlTag().equalTo(that.getXmlTag());
 	}
 
 	/**

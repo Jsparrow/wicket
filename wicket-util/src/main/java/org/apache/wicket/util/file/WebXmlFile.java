@@ -145,10 +145,7 @@ public class WebXmlFile
 			err.append(filterName);
 			err.append("] but found multiple:");
 
-			for (String path : paths)
-			{
-				err.append(" [").append(path).append(']');
-			}
+			paths.forEach(path -> err.append(" [").append(path).append(']'));
 			throw new RuntimeException(err.toString());
 		}
 
@@ -226,20 +223,16 @@ public class WebXmlFile
 				.append(filterName)
 				.append(':');
 
-			for (String urlPattern : urlPatterns)
-			{
+			urlPatterns.forEach(urlPattern -> {
 				msg.append(" [");
 				msg.append(urlPattern);
 				msg.append(']');
-			}
+			});
 			log.info(msg.toString());
 		}
 		Set<String> stripped = new HashSet<>(urlPatterns.size());
 
-		for (String urlPattern : urlPatterns)
-		{
-			stripped.add(urlPattern.substring(1, urlPattern.length() - 1));
-		}
+		urlPatterns.forEach(urlPattern -> stripped.add(urlPattern.substring(1, urlPattern.length() - 1)));
 		return stripped;
 	}
 
@@ -276,12 +269,9 @@ public class WebXmlFile
 				foundFilterName = foundFilterName.trim();
 			}
 
-			if (filterName.equals(foundFilterName))
-			{
-				if (foundUrlPattern != null)
-				{
-					paths.add(foundUrlPattern.trim());
-				}
+			boolean condition = filterName.equals(foundFilterName) && foundUrlPattern != null;
+			if (condition) {
+				paths.add(foundUrlPattern.trim());
 			}
 		}
 		return paths;

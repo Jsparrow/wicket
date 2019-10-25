@@ -84,8 +84,9 @@ public class ResourceReferenceRequestHandler implements IRequestHandler, ILoggab
 	@Override
 	public void detach(IRequestCycle requestCycle)
 	{
-		if (logData == null)
+		if (logData == null) {
 			logData = new ResourceReferenceLogData(this);
+		}
 	}
 
 	@Override
@@ -135,9 +136,6 @@ public class ResourceReferenceRequestHandler implements IRequestHandler, ILoggab
 	@Override
 	public String toString()
 	{
-		return "ResourceReferenceRequestHandler{" +
-				"resourceReference=" + resourceReference +
-				", pageParameters=" + pageParameters +
-				'}';
+		return new StringBuilder().append("ResourceReferenceRequestHandler{").append("resourceReference=").append(resourceReference).append(", pageParameters=").append(pageParameters).append('}').toString();
 	}
 }

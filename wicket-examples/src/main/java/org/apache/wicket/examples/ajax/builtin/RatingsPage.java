@@ -54,6 +54,98 @@ public class RatingsPage extends BasePage
 	private static final long serialVersionUID = 1L;
 
 	/**
+	 * static models for the ratings, not thread safe, but in this case, we don't care.
+	 */
+	private static RatingModel rating1 = new RatingModel();
+
+	/**
+	 * static model for the ratings, not thread safe, but in this case, we don't care.
+	 */
+	private static RatingModel rating2 = new RatingModel();
+
+	/**
+	 * keeps track whether the user has already voted on this page, comes typically from the
+	 * database, or is stored in a cookie on the client side.
+	 */
+	private Boolean hasVoted = Boolean.FALSE;
+
+	/**
+	 * Constructor.
+	 */
+	public RatingsPage()
+	{
+		add(new RatingPanel("rating1", new PropertyModel<Integer>(rating1, "rating"), 5,
+			new PropertyModel<>(rating1, "nrOfVotes"), true)
+		{
+			@Override
+			public boolean onIsStarActive(int star)
+			{
+				return RatingsPage.rating1.isActive(star);
+			}
+
+			@Override
+			public void onRated(int rating, Optional<AjaxRequestTarget> target)
+			{
+				RatingsPage.rating1.addRating(rating);
+			}
+		});
+
+		add(new RatingPanel("rating2", new PropertyModel<Integer>(rating2, "rating"),
+			new Model<>(5), new PropertyModel<>(rating2, "nrOfVotes"),
+			new PropertyModel<>(this, "hasVoted"), true)
+		{
+			@Override
+			protected String getActiveStarUrl(int iteration)
+			{
+				IRequestHandler handler = new ResourceReferenceRequestHandler(WICKETSTAR1);
+				return getRequestCycle().urlFor(handler).toString();
+			}
+
+			@Override
+			protected String getInactiveStarUrl(int iteration)
+			{
+				IRequestHandler handler = new ResourceReferenceRequestHandler(WICKETSTAR0);
+				return getRequestCycle().urlFor(handler).toString();
+			}
+
+			@Override
+			public boolean onIsStarActive(int star)
+			{
+				return RatingsPage.rating2.isActive(star);
+			}
+
+			@Override
+			public void onRated(int rating, Optional<AjaxRequestTarget> target)
+			{
+				// make sure the user can't vote again
+				hasVoted = Boolean.TRUE;
+				RatingsPage.rating2.addRating(rating);
+			}
+		});
+		add(new ResetRatingLink("reset1", new Model<>(rating1)));
+		add(new ResetRatingLink("reset2", new Model<>(rating2)));
+	}
+
+	/**
+	 * Getter for the hasVoted flag.
+	 * 
+	 * @return <code>true</code> when the user has already voted.
+	 */
+	public Boolean getHasVoted()
+	{
+		return hasVoted;
+	}
+
+	/**
+	 * @see org.apache.wicket.Component#isVersioned()
+	 */
+	@Override
+	public boolean isVersioned()
+	{
+		return false;
+	}
+
+	/**
 	 * Link to reset the ratings.
 	 */
 	private final class ResetRatingLink extends Link<RatingModel>
@@ -147,98 +239,6 @@ public class RatingsPage extends BasePage
 		{
 			return sumOfRatings;
 		}
-	}
-
-	/**
-	 * static models for the ratings, not thread safe, but in this case, we don't care.
-	 */
-	private static RatingModel rating1 = new RatingModel();
-
-	/**
-	 * static model for the ratings, not thread safe, but in this case, we don't care.
-	 */
-	private static RatingModel rating2 = new RatingModel();
-
-	/**
-	 * keeps track whether the user has already voted on this page, comes typically from the
-	 * database, or is stored in a cookie on the client side.
-	 */
-	private Boolean hasVoted = Boolean.FALSE;
-
-	/**
-	 * Constructor.
-	 */
-	public RatingsPage()
-	{
-		add(new RatingPanel("rating1", new PropertyModel<Integer>(rating1, "rating"), 5,
-			new PropertyModel<>(rating1, "nrOfVotes"), true)
-		{
-			@Override
-			public boolean onIsStarActive(int star)
-			{
-				return RatingsPage.rating1.isActive(star);
-			}
-
-			@Override
-			public void onRated(int rating, Optional<AjaxRequestTarget> target)
-			{
-				RatingsPage.rating1.addRating(rating);
-			}
-		});
-
-		add(new RatingPanel("rating2", new PropertyModel<Integer>(rating2, "rating"),
-			new Model<>(5), new PropertyModel<>(rating2, "nrOfVotes"),
-			new PropertyModel<>(this, "hasVoted"), true)
-		{
-			@Override
-			protected String getActiveStarUrl(int iteration)
-			{
-				IRequestHandler handler = new ResourceReferenceRequestHandler(WICKETSTAR1);
-				return getRequestCycle().urlFor(handler).toString();
-			}
-
-			@Override
-			protected String getInactiveStarUrl(int iteration)
-			{
-				IRequestHandler handler = new ResourceReferenceRequestHandler(WICKETSTAR0);
-				return getRequestCycle().urlFor(handler).toString();
-			}
-
-			@Override
-			public boolean onIsStarActive(int star)
-			{
-				return RatingsPage.rating2.isActive(star);
-			}
-
-			@Override
-			public void onRated(int rating, Optional<AjaxRequestTarget> target)
-			{
-				// make sure the user can't vote again
-				hasVoted = Boolean.TRUE;
-				RatingsPage.rating2.addRating(rating);
-			}
-		});
-		add(new ResetRatingLink("reset1", new Model<>(rating1)));
-		add(new ResetRatingLink("reset2", new Model<>(rating2)));
-	}
-
-	/**
-	 * Getter for the hasVoted flag.
-	 * 
-	 * @return <code>true</code> when the user has already voted.
-	 */
-	public Boolean getHasVoted()
-	{
-		return hasVoted;
-	}
-
-	/**
-	 * @see org.apache.wicket.Component#isVersioned()
-	 */
-	@Override
-	public boolean isVersioned()
-	{
-		return false;
 	}
 
 

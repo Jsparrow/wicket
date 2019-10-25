@@ -41,6 +41,27 @@ public class CustomResourceLoadingApplication extends WicketExampleApplication
 	private static final Logger log = LoggerFactory.getLogger(CustomResourceLoadingApplication.class);
 
 	/**
+	 * Constructor.
+	 */
+	public CustomResourceLoadingApplication()
+	{
+	}
+
+	@Override
+	public Class<? extends Page> getHomePage()
+	{
+		return Index.class;
+	}
+
+	@Override
+	protected void init()
+	{
+		super.init();
+
+		getResourceSettings().setResourceStreamLocator(new CustomResourceStreamLocator());
+	}
+
+	/**
 	 * Custom implementation of {@link IResourceStreamLocator}.
 	 */
 	private final class CustomResourceStreamLocator extends ResourceStreamLocator
@@ -57,7 +78,7 @@ public class CustomResourceLoadingApplication extends WicketExampleApplication
 				// scheme
 				String extension = path.substring(path.lastIndexOf('.') + 1);
 				String simpleFileName = Strings.lastPathComponent(clazz.getName(), '.');
-				location = "/WEB-INF/templates/" + simpleFileName + "." + extension;
+				location = new StringBuilder().append("/WEB-INF/templates/").append(simpleFileName).append(".").append(extension).toString();
 			}
 			else
 			{
@@ -84,26 +105,5 @@ public class CustomResourceLoadingApplication extends WicketExampleApplication
 			return super.locate(clazz, path);
 		}
 
-	}
-
-	/**
-	 * Constructor.
-	 */
-	public CustomResourceLoadingApplication()
-	{
-	}
-
-	@Override
-	public Class<? extends Page> getHomePage()
-	{
-		return Index.class;
-	}
-
-	@Override
-	protected void init()
-	{
-		super.init();
-
-		getResourceSettings().setResourceStreamLocator(new CustomResourceStreamLocator());
 	}
 }

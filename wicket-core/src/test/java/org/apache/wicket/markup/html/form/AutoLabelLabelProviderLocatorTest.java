@@ -36,6 +36,48 @@ import org.junit.jupiter.api.Test;
 @SuppressWarnings({ "rawtypes", "serial" })
 class AutoLabelLabelProviderLocatorTest extends WicketTestCase
 {
+	@Test
+	void testILabelProviderLocator()
+	{
+		List<IEditPanelProvider> providers = new ArrayList<>();
+
+		providers.add(new IEditPanelProvider()
+		{
+			@Override
+			public IModel<String> getLabelText()
+			{
+				return Model.of("Example1");
+			}
+
+			@Override
+			public Panel createEditPanel(String id)
+			{
+				return new ILabelProviderLocatorPanel1(id);
+			}
+		});
+
+		providers.add(new IEditPanelProvider()
+		{
+			@Override
+			public IModel<String> getLabelText()
+			{
+				return Model.of("Example2");
+			}
+
+			@Override
+			public Panel createEditPanel(String id)
+			{
+				return new ILabelProviderLocatorPanel2(id);
+			}
+		});
+
+		EditPage editPage = new EditPage(providers);
+		tester.startPage(editPage);
+		tester.assertRenderedPage(EditPage.class);
+		tester.assertContains("for=\"dummy_text\"><span wicket:id=\"label\">Example1</span>");
+		tester.assertContains("for=\"dummy_dummy1_text\"><span wicket:id=\"label\">Example2</span>");
+	}
+
 	static class ILabelProviderLocatorPanel1 extends Panel implements ILabelProviderLocator
 	{
 
@@ -100,55 +142,13 @@ class AutoLabelLabelProviderLocatorTest extends WicketTestCase
 			add(form);
 			RepeatingView editRow = new RepeatingView("edit-row");
 			form.add(editRow);
-			for (IEditPanelProvider panelProvider: editPanelProviders) {
+			editPanelProviders.forEach(panelProvider -> {
 				WebMarkupContainer mc = new WebMarkupContainer(editRow.newChildId());
 				mc.add(new Label("label", panelProvider.getLabelText()));
 				mc.add(panelProvider.createEditPanel("edit-component"));
 				editRow.add(mc);
-			}
+			});
 		}
-	}
-
-	@Test
-	void testILabelProviderLocator()
-	{
-		List<IEditPanelProvider> providers = new ArrayList<>();
-
-		providers.add(new IEditPanelProvider()
-		{
-			@Override
-			public IModel<String> getLabelText()
-			{
-				return Model.of("Example1");
-			}
-
-			@Override
-			public Panel createEditPanel(String id)
-			{
-				return new ILabelProviderLocatorPanel1(id);
-			}
-		});
-
-		providers.add(new IEditPanelProvider()
-		{
-			@Override
-			public IModel<String> getLabelText()
-			{
-				return Model.of("Example2");
-			}
-
-			@Override
-			public Panel createEditPanel(String id)
-			{
-				return new ILabelProviderLocatorPanel2(id);
-			}
-		});
-
-		EditPage editPage = new EditPage(providers);
-		tester.startPage(editPage);
-		tester.assertRenderedPage(EditPage.class);
-		tester.assertContains("for=\"dummy_text\"><span wicket:id=\"label\">Example1</span>");
-		tester.assertContains("for=\"dummy_dummy1_text\"><span wicket:id=\"label\">Example2</span>");
 	}
 
 }

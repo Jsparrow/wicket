@@ -62,7 +62,7 @@ public final class StringResourceStream extends AbstractStringResourceStream
 	@Override
 	public String toString()
 	{
-		return super.toString() + ": " + string.toString();
+		return new StringBuilder().append(super.toString()).append(": ").append(string.toString()).toString();
 	}
 
 	/**

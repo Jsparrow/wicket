@@ -25,10 +25,13 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.repeater.RepeatingView;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @SuppressWarnings({ "javadoc", "serial" })
 public class LazyLoadingPage extends BasePage
 {
+	private static final Logger logger = LoggerFactory.getLogger(LazyLoadingPage.class);
 	private Random r = new Random();
 	private WebMarkupContainer nonblocking;
 	private WebMarkupContainer blocking;
@@ -90,7 +93,7 @@ public class LazyLoadingPage extends BasePage
 	{
 		nonBlockingRepeater.removeAll();
 
-		for (int i = 0; i < 10; i++)
+		for (int i = 0; i < 10; i++) {
 			nonBlockingRepeater.add(new AjaxLazyLoadPanel<Label>(nonBlockingRepeater.newChildId())
 			{
 				private static final long serialVersionUID = 1L;
@@ -115,9 +118,10 @@ public class LazyLoadingPage extends BasePage
 				@Override
 				public Label getLazyLoadComponent(String id)
 				{
-					return new Label(id, "Lazy Loaded after " + seconds + " seconds");
+					return new Label(id, new StringBuilder().append("Lazy Loaded after ").append(seconds).append(" seconds").toString());
 				}
 			});
+		}
 		
 		getRequestCycle().find(AjaxRequestTarget.class).ifPresent(t -> t.add(nonblocking));
 	}
@@ -126,7 +130,7 @@ public class LazyLoadingPage extends BasePage
 	{
 		blockingRepeater.removeAll();
 
-		for (int i = 0; i < 5; i++)
+		for (int i = 0; i < 5; i++) {
 			blockingRepeater.add(new AjaxLazyLoadPanel<Label>(blockingRepeater.newChildId())
 			{
 				private static final long serialVersionUID = 1L;
@@ -142,11 +146,13 @@ public class LazyLoadingPage extends BasePage
 					}
 					catch (InterruptedException e)
 					{
+						logger.error(e.getMessage(), e);
 					}
 					return new Label(markupId,
-						"Lazy loaded after blocking the Wicket thread for " + seconds + " seconds");
+						new StringBuilder().append("Lazy loaded after blocking the Wicket thread for ").append(seconds).append(" seconds").toString());
 				}
 			});
+		}
 		
 		getRequestCycle().find(AjaxRequestTarget.class).ifPresent(t -> t.add(blocking));
 	}

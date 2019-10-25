@@ -20,6 +20,8 @@ import java.io.IOException;
 
 import org.apache.wicket.util.resource.FileResourceStream;
 import org.apache.wicket.util.resource.IResourceStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -30,6 +32,7 @@ import org.apache.wicket.util.resource.IResourceStream;
  */
 public class Path implements IResourceFinder
 {
+	private static final Logger logger = LoggerFactory.getLogger(Path.class);
 	private final Folder folder;
 
 	/**
@@ -53,7 +56,7 @@ public class Path implements IResourceFinder
 	{
 		if (!folder.exists())
 		{
-			throw new IllegalArgumentException("Folder " + folder + " does not exist");
+			throw new IllegalArgumentException(new StringBuilder().append("Folder ").append(folder).append(" does not exist").toString());
 		}
 		this.folder = folder;
 	}
@@ -90,10 +93,11 @@ public class Path implements IResourceFinder
 	{
 		try
 		{
-			return "[Path: folder = " + folder.getCanonicalPath() + "]";
+			return new StringBuilder().append("[Path: folder = ").append(folder.getCanonicalPath()).append("]").toString();
 		}
 		catch (IOException e)
 		{
+			logger.error(e.getMessage(), e);
 			return "[Path: exception while inspecting folder]";
 		}
 	}

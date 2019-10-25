@@ -86,16 +86,8 @@ public abstract class EnumeratedType extends StringValue
 	 */
 	public Object readResolve() throws java.io.ObjectStreamException
 	{
-		EnumeratedType result = this;
 		List<EnumeratedType> values = getValues(getClass());
-		for (EnumeratedType value : values)
-		{
-			if ((value.toString() != null) && value.toString().equals(this.toString()))
-			{
-				result = value;
-				break;
-			}
-		}
+		EnumeratedType result = values.stream().filter(value -> (value.toString() != null) && value.toString().equals(this.toString())).findFirst().orElse(this);
 		return result;
 	}
 }

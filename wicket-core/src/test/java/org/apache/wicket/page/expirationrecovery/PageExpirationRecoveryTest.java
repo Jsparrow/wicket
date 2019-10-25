@@ -67,9 +67,7 @@ class PageExpirationRecoveryTest extends WicketTestCase
 
 		assertFalse(page.linkClicked.get());
 
-		assertThrows(PageExpiredException.class, () -> {
-			tester.clickLink("link", false);
-		});
+		assertThrows(PageExpiredException.class, () -> tester.clickLink("link", false));
 	}
 
 	@Test

@@ -31,6 +31,8 @@ import org.apache.wicket.request.resource.ResourceReference;
 import org.apache.wicket.request.resource.ResourceStreamResource;
 import org.apache.wicket.util.resource.IResourceStream;
 import org.apache.wicket.util.resource.StringResourceStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Ajax download.
@@ -329,6 +331,7 @@ public class AjaxDownloadPage extends BasePage
 	public static class StaticResource extends ResourceStreamResource
 	{
 		private static final long serialVersionUID = 1L;
+		private final Logger logger = LoggerFactory.getLogger(StaticResource.class);
 
 		StaticResource() {
 			setFileName("File-from-ResourceReference");
@@ -354,6 +357,7 @@ public class AjaxDownloadPage extends BasePage
 			}
 			catch (InterruptedException e)
 			{
+				logger.error(e.getMessage(), e);
 			}
 
 			return new StringResourceStream("downloaded via ajax with resource reference");
@@ -363,6 +367,8 @@ public class AjaxDownloadPage extends BasePage
 	private class ExampleResource extends ResourceStreamResource
 	{
 		private static final long serialVersionUID = 1L;
+
+		private final Logger logger = LoggerFactory.getLogger(ExampleResource.class);
 
 		private String content;
 
@@ -385,6 +391,7 @@ public class AjaxDownloadPage extends BasePage
 			}
 			catch (InterruptedException e)
 			{
+				logger.error(e.getMessage(), e);
 			}
 
 			count++;

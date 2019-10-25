@@ -41,8 +41,6 @@ import org.apache.wicket.request.resource.ResourceReference;
  * @author Carl-Eric Menzel <cmenzel@wicketbuch.de>
  */
 public abstract class AbstractCheckSelector extends LabeledWebMarkupContainer
-	implements
-		IHeaderContributor
 {
 	private static final long serialVersionUID = 1L;
 
@@ -97,13 +95,11 @@ public abstract class AbstractCheckSelector extends LabeledWebMarkupContainer
 		String findCheckboxes = getFindCheckboxesFunction().toString();
 
 		// initialize the selector
-		response.render(OnLoadHeaderItem.forScript("Wicket.CheckboxSelector.initializeSelector('" +
-			this.getMarkupId() + "', " + findCheckboxes + ");"));
+		response.render(OnLoadHeaderItem.forScript(new StringBuilder().append("Wicket.CheckboxSelector.initializeSelector('").append(this.getMarkupId()).append("', ").append(findCheckboxes).append(");").toString()));
 		if (wantAutomaticUpdate())
 		{
 			// initialize the handlers for automatic updating of the selector state
-			response.render(OnLoadHeaderItem.forScript("Wicket.CheckboxSelector.attachUpdateHandlers('" +
-				this.getMarkupId() + "', " + findCheckboxes + ");"));
+			response.render(OnLoadHeaderItem.forScript(new StringBuilder().append("Wicket.CheckboxSelector.attachUpdateHandlers('").append(this.getMarkupId()).append("', ").append(findCheckboxes).append(");").toString()));
 		}
 	}
 

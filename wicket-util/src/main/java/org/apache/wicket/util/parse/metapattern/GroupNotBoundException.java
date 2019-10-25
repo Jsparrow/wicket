@@ -30,6 +30,5 @@ public final class GroupNotBoundException extends RuntimeException
 	 */
 	public GroupNotBoundException()
 	{
-		super();
 	}
 }

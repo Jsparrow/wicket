@@ -17,6 +17,8 @@
 package org.apache.wicket.request.mapper.info;
 
 import org.apache.wicket.util.string.Strings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Possible string representation of PageInfo:
@@ -28,6 +30,7 @@ import org.apache.wicket.util.string.Strings;
  */
 public class PageInfo
 {
+	private static final Logger logger = LoggerFactory.getLogger(PageInfo.class);
 	private final Integer pageId;
 
 	/**
@@ -91,6 +94,7 @@ public class PageInfo
 			}
 			catch (NumberFormatException e)
 			{
+				logger.error(e.getMessage(), e);
 				return null;
 			}
 		}

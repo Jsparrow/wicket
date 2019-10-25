@@ -97,9 +97,7 @@ public abstract class AjaxFormSubmitBehavior extends AjaxEventBehavior
 			if (__form == null)
 			{
 				throw new IllegalStateException(
-					"form was not specified in the constructor and cannot " +
-						"be found in the hierarchy of the component this behavior " +
-						"is attached to: Component=" + getComponent().toString(false));
+					new StringBuilder().append("form was not specified in the constructor and cannot ").append("be found in the hierarchy of the component this behavior ").append("is attached to: Component=").append(getComponent().toString(false)).toString());
 			}
 		}
 		return __form;
@@ -160,11 +158,11 @@ public abstract class AjaxFormSubmitBehavior extends AjaxEventBehavior
 		}
 
 		IFormSubmittingComponent submittingComponent = getFormSubmittingComponent();
-		if (submittingComponent != null)
-		{
-			String submittingComponentName = submittingComponent.getInputName();
-			attributes.setSubmittingComponentName(submittingComponentName);
+		if (submittingComponent == null) {
+			return;
 		}
+		String submittingComponentName = submittingComponent.getInputName();
+		attributes.setSubmittingComponentName(submittingComponentName);
 	}
 
 	@Override
@@ -174,6 +172,78 @@ public abstract class AjaxFormSubmitBehavior extends AjaxEventBehavior
 		Form<?> form = getForm();
 		
 		form.getRootForm().onFormSubmitted(submitter);
+	}
+
+	/**
+	 * Override this method to provide special submit handling in a multi-button form. This method
+	 * will be called <em>after</em> the form's onSubmit method.
+	 * @param target the {@link AjaxRequestTarget}
+	 */
+	protected void onAfterSubmit(AjaxRequestTarget target)
+	{
+	}
+
+	/**
+	 * Override this method to provide special submit handling in a multi-button form. This method
+	 * will be called <em>before</em> the form's onSubmit method.
+	 * @param target the {@link AjaxRequestTarget}
+	 */
+	protected void onSubmit(AjaxRequestTarget target)
+	{
+	}
+
+	/**
+	 * Listener method invoked when the form has been processed and errors occurred
+	 * 
+	 * @param target
+	 */
+	protected void onError(AjaxRequestTarget target)
+	{
+	}
+
+	/**
+	 * @see Button#getDefaultFormProcessing()
+	 * 
+	 * @return {@code true} for default processing
+	 */
+	public boolean getDefaultProcessing()
+	{
+		return defaultProcessing;
+	}
+
+	/**
+	 * @see Button#setDefaultFormProcessing(boolean)
+	 * @param defaultProcessing
+	 */
+	public void setDefaultProcessing(boolean defaultProcessing)
+	{
+		this.defaultProcessing = defaultProcessing;
+	}
+
+	/**
+	 * Creates an {@link AjaxFormSubmitBehavior} based on lambda expressions
+	 * 
+	 * @param eventName
+	 *            the event name
+	 * @param onSubmit
+	 *            the {@code SerializableConsumer} which accepts the {@link AjaxRequestTarget}
+	 * @return the {@link AjaxFormSubmitBehavior}
+	 */
+	public static AjaxFormSubmitBehavior onSubmit(String eventName,
+		SerializableConsumer<AjaxRequestTarget> onSubmit)
+	{
+		Args.notNull(onSubmit, "onSubmit");
+
+		return new AjaxFormSubmitBehavior(eventName)
+		{
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			protected void onSubmit(AjaxRequestTarget target)
+			{
+				onSubmit.accept(target);
+			}
+		};
 	}
 
 	/**
@@ -228,78 +298,5 @@ public abstract class AjaxFormSubmitBehavior extends AjaxEventBehavior
 		{
 			submitBehavior.onAfterSubmit(target);
 		}
-	}
-
-	/**
-	 * Override this method to provide special submit handling in a multi-button form. This method
-	 * will be called <em>after</em> the form's onSubmit method.
-	 * @param target the {@link AjaxRequestTarget}
-	 */
-	protected void onAfterSubmit(AjaxRequestTarget target)
-	{
-	}
-
-	/**
-	 * Override this method to provide special submit handling in a multi-button form. This method
-	 * will be called <em>before</em> the form's onSubmit method.
-	 * @param target the {@link AjaxRequestTarget}
-	 */
-	protected void onSubmit(AjaxRequestTarget target)
-	{
-	}
-
-
-	/**
-	 * Listener method invoked when the form has been processed and errors occurred
-	 * 
-	 * @param target
-	 */
-	protected void onError(AjaxRequestTarget target)
-	{
-	}
-
-	/**
-	 * @see Button#getDefaultFormProcessing()
-	 * 
-	 * @return {@code true} for default processing
-	 */
-	public boolean getDefaultProcessing()
-	{
-		return defaultProcessing;
-	}
-
-	/**
-	 * @see Button#setDefaultFormProcessing(boolean)
-	 * @param defaultProcessing
-	 */
-	public void setDefaultProcessing(boolean defaultProcessing)
-	{
-		this.defaultProcessing = defaultProcessing;
-	}
-
-	/**
-	 * Creates an {@link AjaxFormSubmitBehavior} based on lambda expressions
-	 * 
-	 * @param eventName
-	 *            the event name
-	 * @param onSubmit
-	 *            the {@code SerializableConsumer} which accepts the {@link AjaxRequestTarget}
-	 * @return the {@link AjaxFormSubmitBehavior}
-	 */
-	public static AjaxFormSubmitBehavior onSubmit(String eventName,
-		SerializableConsumer<AjaxRequestTarget> onSubmit)
-	{
-		Args.notNull(onSubmit, "onSubmit");
-
-		return new AjaxFormSubmitBehavior(eventName)
-		{
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			protected void onSubmit(AjaxRequestTarget target)
-			{
-				onSubmit.accept(target);
-			}
-		};
 	}
 }

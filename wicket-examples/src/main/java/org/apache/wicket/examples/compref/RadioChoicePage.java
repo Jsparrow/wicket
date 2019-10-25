@@ -80,6 +80,18 @@ public class RadioChoicePage extends WicketExamplePage
 		form.add(sites);
 	}
 
+	/**
+	 * Override base method to provide an explanation
+	 */
+	@Override
+	protected void explain()
+	{
+		String html = new StringBuilder().append("<span valign=\"top\" wicket:id=\"site\">\n").append("  <input type=\"radio\">site 1</input>\n").append("  <input type=\"radio\">site 2</input>\n").append("</span>").toString();
+		String code = new StringBuilder().append("private static final List SITES = Arrays.asList(new String[] { \"The Server Side\", \"Java Lobby\", \"Java.Net\" });\n").append("...\n").append("&nbsp;&nbsp;&nbsp;&nbsp;// Add a radio choice component that uses the model object's 'site' property to designate the\n").append("&nbsp;&nbsp;&nbsp;&nbsp;// current selection, and that uses the SITES list for the available options.\n").append("&nbsp;&nbsp;&nbsp;&nbsp;form.add(new RadioChoice(\"site\", SITES));").toString();
+		add(new ExplainPanel(html, code));
+
+	}
+
 	/** Simple data class that acts as a model for the input fields. */
 	private static class Input implements IClusterable
 	{
@@ -92,26 +104,8 @@ public class RadioChoicePage extends WicketExamplePage
 		@Override
 		public String toString()
 		{
-			return "site = '" + site + "'";
+			return new StringBuilder().append("site = '").append(site).append("'").toString();
 		}
-	}
-
-	/**
-	 * Override base method to provide an explanation
-	 */
-	@Override
-	protected void explain()
-	{
-		String html = "<span valign=\"top\" wicket:id=\"site\">\n"
-			+ "  <input type=\"radio\">site 1</input>\n"
-			+ "  <input type=\"radio\">site 2</input>\n" + "</span>";
-		String code = "private static final List SITES = Arrays.asList(new String[] { \"The Server Side\", \"Java Lobby\", \"Java.Net\" });\n"
-			+ "...\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;// Add a radio choice component that uses the model object's 'site' property to designate the\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;// current selection, and that uses the SITES list for the available options.\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;form.add(new RadioChoice(\"site\", SITES));";
-		add(new ExplainPanel(html, code));
-
 	}
 
 }

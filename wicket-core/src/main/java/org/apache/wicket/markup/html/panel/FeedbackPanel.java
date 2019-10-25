@@ -45,78 +45,6 @@ import org.apache.wicket.model.IModel;
  */
 public class FeedbackPanel extends Panel implements IFeedback
 {
-	/**
-	 * List for messages.
-	 */
-	private final class MessageListView extends ListView<FeedbackMessage>
-	{
-		private static final long serialVersionUID = 1L;
-
-		/**
-		 * @see org.apache.wicket.Component#Component(String)
-		 */
-		public MessageListView(final String id)
-		{
-			super(id);
-			setDefaultModel(newFeedbackMessagesModel());
-		}
-
-		@Override
-		protected IModel<FeedbackMessage> getListItemModel(
-			final IModel<? extends List<FeedbackMessage>> listViewModel, final int index)
-		{
-			return new IModel<FeedbackMessage>()
-			{
-				private static final long serialVersionUID = 1L;
-
-				/**
-				 * WICKET-4258 Feedback messages might be cleared already.
-				 * 
-				 * @see org.apache.wicket.settings.ApplicationSettings#setFeedbackMessageCleanupFilter(org.apache.wicket.feedback.IFeedbackMessageFilter)
-				 */
-				@Override
-				public FeedbackMessage getObject()
-				{
-					if (index >= listViewModel.getObject().size())
-					{
-						return null;
-					}
-					else
-					{
-						return listViewModel.getObject().get(index);
-					}
-				}
-			};
-		}
-
-		@Override
-		protected void populateItem(final ListItem<FeedbackMessage> listItem)
-		{
-			final FeedbackMessage message = listItem.getModelObject();
-			message.markRendered();
-			final Component label = newMessageDisplayComponent("message", message);
-			final AttributeModifier levelModifier = AttributeModifier.append("class",
-				getCSSClass(message));
-			listItem.add(levelModifier);
-			listItem.add(label);
-		}
-
-		/**
-		 * WICKET-4831 - Overridable to allow customization
-		 * 
-		 * @param index
-		 *            The index of the item
-		 * @param itemModel
-		 *            object in the list that the item represents
-		 * @return
-		 */
-		@Override
-		protected ListItem<FeedbackMessage> newItem(int index, IModel<FeedbackMessage> itemModel)
-		{
-			return FeedbackPanel.this.newMessageItem(index, itemModel);
-		}
-    }
-
 	private static final long serialVersionUID = 1L;
 
 	/** Message view */
@@ -194,15 +122,7 @@ public class FeedbackPanel extends Panel implements IFeedback
 	{
 		List<FeedbackMessage> msgs = getCurrentMessages();
 
-		for (FeedbackMessage msg : msgs)
-		{
-			if (msg.isLevel(level))
-			{
-				return true;
-			}
-		}
-
-		return false;
+		return msgs.stream().anyMatch(msg -> msg.isLevel(level));
 	}
 
 	/**
@@ -374,5 +294,77 @@ public class FeedbackPanel extends Panel implements IFeedback
 	 */
 	protected ListItem<FeedbackMessage> newMessageItem(int index, IModel<FeedbackMessage> itemModel) {
         return new ListItem<>(index, itemModel);
+    }
+
+	/**
+	 * List for messages.
+	 */
+	private final class MessageListView extends ListView<FeedbackMessage>
+	{
+		private static final long serialVersionUID = 1L;
+
+		/**
+		 * @see org.apache.wicket.Component#Component(String)
+		 */
+		public MessageListView(final String id)
+		{
+			super(id);
+			setDefaultModel(newFeedbackMessagesModel());
+		}
+
+		@Override
+		protected IModel<FeedbackMessage> getListItemModel(
+			final IModel<? extends List<FeedbackMessage>> listViewModel, final int index)
+		{
+			return new IModel<FeedbackMessage>()
+			{
+				private static final long serialVersionUID = 1L;
+
+				/**
+				 * WICKET-4258 Feedback messages might be cleared already.
+				 * 
+				 * @see org.apache.wicket.settings.ApplicationSettings#setFeedbackMessageCleanupFilter(org.apache.wicket.feedback.IFeedbackMessageFilter)
+				 */
+				@Override
+				public FeedbackMessage getObject()
+				{
+					if (index >= listViewModel.getObject().size())
+					{
+						return null;
+					}
+					else
+					{
+						return listViewModel.getObject().get(index);
+					}
+				}
+			};
+		}
+
+		@Override
+		protected void populateItem(final ListItem<FeedbackMessage> listItem)
+		{
+			final FeedbackMessage message = listItem.getModelObject();
+			message.markRendered();
+			final Component label = newMessageDisplayComponent("message", message);
+			final AttributeModifier levelModifier = AttributeModifier.append("class",
+				getCSSClass(message));
+			listItem.add(levelModifier);
+			listItem.add(label);
+		}
+
+		/**
+		 * WICKET-4831 - Overridable to allow customization
+		 * 
+		 * @param index
+		 *            The index of the item
+		 * @param itemModel
+		 *            object in the list that the item represents
+		 * @return
+		 */
+		@Override
+		protected ListItem<FeedbackMessage> newItem(int index, IModel<FeedbackMessage> itemModel)
+		{
+			return FeedbackPanel.this.newMessageItem(index, itemModel);
+		}
     }
 }

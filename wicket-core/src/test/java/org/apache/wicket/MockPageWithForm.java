@@ -31,22 +31,6 @@ import org.apache.wicket.model.Model;
  */
 public class MockPageWithForm extends WebPage
 {
-	private final class MyForm extends Form<Void>
-	{
-		private static final long serialVersionUID = 1L;
-
-		private MyForm(String id)
-		{
-			super(id);
-		}
-
-		@Override
-		protected void onSubmit()
-		{
-			submitted = true;
-		}
-	}
-
 	private static final long serialVersionUID = 1L;
 
 	private boolean selected;
@@ -58,10 +42,10 @@ public class MockPageWithForm extends WebPage
 	 */
 	public MockPageWithForm()
 	{
-		List<String> list = new ArrayList<String>();
+		List<String> list = new ArrayList<>();
 		list.add("Select me");
 		MyForm form = new MyForm("form");
-		DropDownChoice<String> dropDown = new DropDownChoice<String>("dropdown", new Model<String>(), list);
+		DropDownChoice<String> dropDown = new DropDownChoice<>("dropdown", new Model<String>(), list);
 		dropDown.add(new FormComponentUpdatingBehavior() {
 			@Override
 			protected void onUpdate()
@@ -89,5 +73,21 @@ public class MockPageWithForm extends WebPage
 	public boolean isSubmitted()
 	{
 		return submitted;
+	}
+
+	private final class MyForm extends Form<Void>
+	{
+		private static final long serialVersionUID = 1L;
+
+		private MyForm(String id)
+		{
+			super(id);
+		}
+
+		@Override
+		protected void onSubmit()
+		{
+			submitted = true;
+		}
 	}
 }

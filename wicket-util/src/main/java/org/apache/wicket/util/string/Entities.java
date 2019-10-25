@@ -25,6 +25,8 @@ import java.util.TreeMap;
 
 import org.apache.wicket.util.collections.IntHashMap;
 import org.apache.wicket.util.lang.Generics;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>
@@ -48,6 +50,8 @@ import org.apache.wicket.util.lang.Generics;
 // Copy from commons-lang ver. 2.6. Non-modified.
 class Entities
 {
+
+	private static final Logger logger = LoggerFactory.getLogger(Entities.class);
 
 	private static final String[][] BASIC_ARRAY = { { "quot", "34" }, // " - double-quote
 			{ "amp", "38" }, // & - ampersand
@@ -406,400 +410,6 @@ class Entities
 		HTML40 = html40;
 	}
 
-	/**
-	 * <p>
-	 * Fills the specified entities instance with HTML 40 entities.
-	 * </p>
-	 * 
-	 * @param entities
-	 *            the instance to be filled.
-	 */
-	static void fillWithHtml40Entities(Entities entities)
-	{
-		entities.addEntities(BASIC_ARRAY);
-		entities.addEntities(ISO8859_1_ARRAY);
-		entities.addEntities(HTML40_ARRAY);
-	}
-
-	static interface EntityMap
-	{
-		/**
-		 * <p>
-		 * Add an entry to this entity map.
-		 * </p>
-		 * 
-		 * @param name
-		 *            the entity name
-		 * @param value
-		 *            the entity value
-		 */
-		void add(String name, int value);
-
-		/**
-		 * <p>
-		 * Returns the name of the entity identified by the specified value.
-		 * </p>
-		 * 
-		 * @param value
-		 *            the value to locate
-		 * @return entity name associated with the specified value
-		 */
-		String name(int value);
-
-		/**
-		 * <p>
-		 * Returns the value of the entity identified by the specified name.
-		 * </p>
-		 * 
-		 * @param name
-		 *            the name to locate
-		 * @return entity value associated with the specified name
-		 */
-		int value(String name);
-	}
-
-	static class PrimitiveEntityMap implements EntityMap
-	{
-		private final Map<String, Integer> mapNameToValue = Generics.newHashMap();
-
-		private final IntHashMap<String> mapValueToName = new IntHashMap<>();
-
-		// TODO not thread-safe as there is a window between changing the two maps
-		@Override
-		public void add(String name, int value)
-		{
-			mapNameToValue.put(name, Integer.valueOf(value));
-			mapValueToName.put(value, name);
-		}
-
-		@Override
-		public String name(int value)
-		{
-			return mapValueToName.get(value);
-		}
-
-		@Override
-		public int value(String name)
-		{
-			Integer value = mapNameToValue.get(name);
-			if (value == null)
-			{
-				return -1;
-			}
-			return value.intValue();
-		}
-	}
-
-	static abstract class MapIntMap implements Entities.EntityMap
-	{
-		protected final Map<String, Integer> mapNameToValue;
-
-		protected final Map<Integer, String> mapValueToName;
-
-		/**
-		 * Construct a new instance with specified maps.
-		 * 
-		 * @param nameToValue
-		 *            name to value map
-		 * @param valueToName
-		 *            value to namee map
-		 */
-		MapIntMap(Map<String, Integer> nameToValue, Map<Integer, String> valueToName)
-		{
-			mapNameToValue = nameToValue;
-			mapValueToName = valueToName;
-		}
-
-		@Override
-		public void add(String name, int value)
-		{
-			mapNameToValue.put(name, value);
-			mapValueToName.put(value, name);
-		}
-
-		@Override
-		public String name(int value)
-		{
-			return mapValueToName.get(value);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int value(String name)
-		{
-			Integer value = mapNameToValue.get(name);
-			if (value == null)
-			{
-				return -1;
-			}
-			return value.intValue();
-		}
-	}
-
-	static class HashEntityMap extends MapIntMap
-	{
-		/**
-		 * Constructs a new instance of <code>HashEntityMap</code>.
-		 */
-		public HashEntityMap()
-		{
-			super(new HashMap<String, Integer>(), new HashMap<Integer, String>());
-		}
-	}
-
-	static class TreeEntityMap extends MapIntMap
-	{
-		/**
-		 * Constructs a new instance of <code>TreeEntityMap</code>.
-		 */
-		public TreeEntityMap()
-		{
-			super(new TreeMap<String, Integer>(), new TreeMap<Integer, String>());
-		}
-	}
-
-	static class LookupEntityMap extends PrimitiveEntityMap
-	{
-		// TODO this class is not thread-safe
-		private String[] lookupTable;
-
-		private static final int LOOKUP_TABLE_SIZE = 256;
-
-		@Override
-		public String name(int value)
-		{
-			if (value < LOOKUP_TABLE_SIZE)
-			{
-				return lookupTable()[value];
-			}
-			return super.name(value);
-		}
-
-		/**
-		 * Returns the lookup table for this entity map. The lookup table is created if it has not
-		 * been previously.
-		 * 
-		 * @return the lookup table
-		 */
-		private String[] lookupTable()
-		{
-			if (lookupTable == null)
-			{
-				createLookupTable();
-			}
-			return lookupTable;
-		}
-
-		/**
-		 * Creates an entity lookup table of LOOKUP_TABLE_SIZE elements, initialized with entity
-		 * names.
-		 */
-		private void createLookupTable()
-		{
-			lookupTable = new String[LOOKUP_TABLE_SIZE];
-			for (int i = 0; i < LOOKUP_TABLE_SIZE; ++i)
-			{
-				lookupTable[i] = super.name(i);
-			}
-		}
-	}
-
-	static class ArrayEntityMap implements EntityMap
-	{
-		// TODO this class is not thread-safe
-		protected final int growBy;
-
-		protected int size = 0;
-
-		protected String[] names;
-
-		protected int[] values;
-
-		/**
-		 * Constructs a new instance of <code>ArrayEntityMap</code>.
-		 */
-		public ArrayEntityMap()
-		{
-			growBy = 100;
-			names = new String[growBy];
-			values = new int[growBy];
-		}
-
-		/**
-		 * Constructs a new instance of <code>ArrayEntityMap</code> specifying the size by which the
-		 * array should grow.
-		 * 
-		 * @param growBy
-		 *            array will be initialized to and will grow by this amount
-		 */
-		public ArrayEntityMap(int growBy)
-		{
-			this.growBy = growBy;
-			names = new String[growBy];
-			values = new int[growBy];
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public void add(String name, int value)
-		{
-			ensureCapacity(size + 1);
-			names[size] = name;
-			values[size] = value;
-			size++;
-		}
-
-		/**
-		 * Verifies the capacity of the entity array, adjusting the size if necessary.
-		 * 
-		 * @param capacity
-		 *            size the array should be
-		 */
-		protected void ensureCapacity(int capacity)
-		{
-			if (capacity > names.length)
-			{
-				int newSize = Math.max(capacity, size + growBy);
-				String[] newNames = new String[newSize];
-				System.arraycopy(names, 0, newNames, 0, size);
-				names = newNames;
-				int[] newValues = new int[newSize];
-				System.arraycopy(values, 0, newValues, 0, size);
-				values = newValues;
-			}
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String name(int value)
-		{
-			for (int i = 0; i < size; ++i)
-			{
-				if (values[i] == value)
-				{
-					return names[i];
-				}
-			}
-			return null;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int value(String name)
-		{
-			for (int i = 0; i < size; ++i)
-			{
-				if (names[i].equals(name))
-				{
-					return values[i];
-				}
-			}
-			return -1;
-		}
-	}
-
-	static class BinaryEntityMap extends ArrayEntityMap
-	{
-
-		// TODO - not thread-safe, because parent is not. Also references size.
-
-		/**
-		 * Constructs a new instance of <code>BinaryEntityMap</code>.
-		 */
-		public BinaryEntityMap()
-		{
-			super();
-		}
-
-		/**
-		 * Constructs a new instance of <code>ArrayEntityMap</code> specifying the size by which the
-		 * underlying array should grow.
-		 * 
-		 * @param growBy
-		 *            array will be initialized to and will grow by this amount
-		 */
-		public BinaryEntityMap(int growBy)
-		{
-			super(growBy);
-		}
-
-		/**
-		 * Performs a binary search of the entity array for the specified key. This method is based
-		 * on code in {@link java.util.Arrays}.
-		 * 
-		 * @param key
-		 *            the key to be found
-		 * @return the index of the entity array matching the specified key
-		 */
-		private int binarySearch(int key)
-		{
-			int low = 0;
-			int high = size - 1;
-
-			while (low <= high)
-			{
-				int mid = (low + high) >>> 1;
-				int midVal = values[mid];
-
-				if (midVal < key)
-				{
-					low = mid + 1;
-				}
-				else if (midVal > key)
-				{
-					high = mid - 1;
-				}
-				else
-				{
-					return mid; // key found
-				}
-			}
-			return -(low + 1); // key not found.
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public void add(String name, int value)
-		{
-			ensureCapacity(size + 1);
-			int insertAt = binarySearch(value);
-			if (insertAt > 0)
-			{
-				return; // note: this means you can't insert the same value twice
-			}
-			insertAt = -(insertAt + 1); // binarySearch returns it negative and off-by-one
-			System.arraycopy(values, insertAt, values, insertAt + 1, size - insertAt);
-			values[insertAt] = value;
-			System.arraycopy(names, insertAt, names, insertAt + 1, size - insertAt);
-			names[insertAt] = name;
-			size++;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String name(int value)
-		{
-			int index = binarySearch(value);
-			if (index < 0)
-			{
-				return null;
-			}
-			return names[index];
-		}
-	}
-
 	private final EntityMap map;
 
 	/**
@@ -823,6 +433,21 @@ class Entities
 
 	/**
 	 * <p>
+	 * Fills the specified entities instance with HTML 40 entities.
+	 * </p>
+	 * 
+	 * @param entities
+	 *            the instance to be filled.
+	 */
+	static void fillWithHtml40Entities(Entities entities)
+	{
+		entities.addEntities(BASIC_ARRAY);
+		entities.addEntities(ISO8859_1_ARRAY);
+		entities.addEntities(HTML40_ARRAY);
+	}
+
+	/**
+	 * <p>
 	 * Adds entities to this entity.
 	 * </p>
 	 * 
@@ -831,9 +456,8 @@ class Entities
 	 */
 	public void addEntities(String[][] entityArray)
 	{
-		for (int i = 0; i < entityArray.length; ++i)
-		{
-			addEntity(entityArray[i][0], Integer.parseInt(entityArray[i][1]));
+		for (String[] anEntityArray : entityArray) {
+			addEntity(anEntityArray[0], Integer.parseInt(anEntityArray[1]));
 		}
 	}
 
@@ -1110,6 +734,7 @@ class Entities
 							}
 							catch (NumberFormatException e)
 							{
+								logger.error(e.getMessage(), e);
 								entityValue = -1;
 							}
 						}
@@ -1136,6 +761,384 @@ class Entities
 			{
 				writer.write(c);
 			}
+		}
+	}
+
+	static interface EntityMap
+	{
+		/**
+		 * <p>
+		 * Add an entry to this entity map.
+		 * </p>
+		 * 
+		 * @param name
+		 *            the entity name
+		 * @param value
+		 *            the entity value
+		 */
+		void add(String name, int value);
+
+		/**
+		 * <p>
+		 * Returns the name of the entity identified by the specified value.
+		 * </p>
+		 * 
+		 * @param value
+		 *            the value to locate
+		 * @return entity name associated with the specified value
+		 */
+		String name(int value);
+
+		/**
+		 * <p>
+		 * Returns the value of the entity identified by the specified name.
+		 * </p>
+		 * 
+		 * @param name
+		 *            the name to locate
+		 * @return entity value associated with the specified name
+		 */
+		int value(String name);
+	}
+
+	static class PrimitiveEntityMap implements EntityMap
+	{
+		private final Map<String, Integer> mapNameToValue = Generics.newHashMap();
+
+		private final IntHashMap<String> mapValueToName = new IntHashMap<>();
+
+		// TODO not thread-safe as there is a window between changing the two maps
+		@Override
+		public void add(String name, int value)
+		{
+			mapNameToValue.put(name, Integer.valueOf(value));
+			mapValueToName.put(value, name);
+		}
+
+		@Override
+		public String name(int value)
+		{
+			return mapValueToName.get(value);
+		}
+
+		@Override
+		public int value(String name)
+		{
+			Integer value = mapNameToValue.get(name);
+			if (value == null)
+			{
+				return -1;
+			}
+			return value.intValue();
+		}
+	}
+
+	abstract static class MapIntMap implements Entities.EntityMap
+	{
+		protected final Map<String, Integer> mapNameToValue;
+
+		protected final Map<Integer, String> mapValueToName;
+
+		/**
+		 * Construct a new instance with specified maps.
+		 * 
+		 * @param nameToValue
+		 *            name to value map
+		 * @param valueToName
+		 *            value to namee map
+		 */
+		MapIntMap(Map<String, Integer> nameToValue, Map<Integer, String> valueToName)
+		{
+			mapNameToValue = nameToValue;
+			mapValueToName = valueToName;
+		}
+
+		@Override
+		public void add(String name, int value)
+		{
+			mapNameToValue.put(name, value);
+			mapValueToName.put(value, name);
+		}
+
+		@Override
+		public String name(int value)
+		{
+			return mapValueToName.get(value);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int value(String name)
+		{
+			Integer value = mapNameToValue.get(name);
+			if (value == null)
+			{
+				return -1;
+			}
+			return value.intValue();
+		}
+	}
+
+	static class HashEntityMap extends MapIntMap
+	{
+		/**
+		 * Constructs a new instance of <code>HashEntityMap</code>.
+		 */
+		public HashEntityMap()
+		{
+			super(new HashMap<String, Integer>(), new HashMap<Integer, String>());
+		}
+	}
+
+	static class TreeEntityMap extends MapIntMap
+	{
+		/**
+		 * Constructs a new instance of <code>TreeEntityMap</code>.
+		 */
+		public TreeEntityMap()
+		{
+			super(new TreeMap<String, Integer>(), new TreeMap<Integer, String>());
+		}
+	}
+
+	static class LookupEntityMap extends PrimitiveEntityMap
+	{
+		private static final int LOOKUP_TABLE_SIZE = 256;
+
+		// TODO this class is not thread-safe
+		private String[] lookupTable;
+
+		@Override
+		public String name(int value)
+		{
+			if (value < LOOKUP_TABLE_SIZE)
+			{
+				return lookupTable()[value];
+			}
+			return super.name(value);
+		}
+
+		/**
+		 * Returns the lookup table for this entity map. The lookup table is created if it has not
+		 * been previously.
+		 * 
+		 * @return the lookup table
+		 */
+		private String[] lookupTable()
+		{
+			if (lookupTable == null)
+			{
+				createLookupTable();
+			}
+			return lookupTable;
+		}
+
+		/**
+		 * Creates an entity lookup table of LOOKUP_TABLE_SIZE elements, initialized with entity
+		 * names.
+		 */
+		private void createLookupTable()
+		{
+			lookupTable = new String[LOOKUP_TABLE_SIZE];
+			for (int i = 0; i < LOOKUP_TABLE_SIZE; ++i)
+			{
+				lookupTable[i] = super.name(i);
+			}
+		}
+	}
+
+	static class ArrayEntityMap implements EntityMap
+	{
+		// TODO this class is not thread-safe
+		protected final int growBy;
+
+		protected int size = 0;
+
+		protected String[] names;
+
+		protected int[] values;
+
+		/**
+		 * Constructs a new instance of <code>ArrayEntityMap</code>.
+		 */
+		public ArrayEntityMap()
+		{
+			growBy = 100;
+			names = new String[growBy];
+			values = new int[growBy];
+		}
+
+		/**
+		 * Constructs a new instance of <code>ArrayEntityMap</code> specifying the size by which the
+		 * array should grow.
+		 * 
+		 * @param growBy
+		 *            array will be initialized to and will grow by this amount
+		 */
+		public ArrayEntityMap(int growBy)
+		{
+			this.growBy = growBy;
+			names = new String[growBy];
+			values = new int[growBy];
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void add(String name, int value)
+		{
+			ensureCapacity(size + 1);
+			names[size] = name;
+			values[size] = value;
+			size++;
+		}
+
+		/**
+		 * Verifies the capacity of the entity array, adjusting the size if necessary.
+		 * 
+		 * @param capacity
+		 *            size the array should be
+		 */
+		protected void ensureCapacity(int capacity)
+		{
+			if (capacity <= names.length) {
+				return;
+			}
+			int newSize = Math.max(capacity, size + growBy);
+			String[] newNames = new String[newSize];
+			System.arraycopy(names, 0, newNames, 0, size);
+			names = newNames;
+			int[] newValues = new int[newSize];
+			System.arraycopy(values, 0, newValues, 0, size);
+			values = newValues;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String name(int value)
+		{
+			for (int i = 0; i < size; ++i)
+			{
+				if (values[i] == value)
+				{
+					return names[i];
+				}
+			}
+			return null;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int value(String name)
+		{
+			for (int i = 0; i < size; ++i)
+			{
+				if (names[i].equals(name))
+				{
+					return values[i];
+				}
+			}
+			return -1;
+		}
+	}
+
+	static class BinaryEntityMap extends ArrayEntityMap
+	{
+
+		// TODO - not thread-safe, because parent is not. Also references size.
+
+		/**
+		 * Constructs a new instance of <code>BinaryEntityMap</code>.
+		 */
+		public BinaryEntityMap()
+		{
+		}
+
+		/**
+		 * Constructs a new instance of <code>ArrayEntityMap</code> specifying the size by which the
+		 * underlying array should grow.
+		 * 
+		 * @param growBy
+		 *            array will be initialized to and will grow by this amount
+		 */
+		public BinaryEntityMap(int growBy)
+		{
+			super(growBy);
+		}
+
+		/**
+		 * Performs a binary search of the entity array for the specified key. This method is based
+		 * on code in {@link java.util.Arrays}.
+		 * 
+		 * @param key
+		 *            the key to be found
+		 * @return the index of the entity array matching the specified key
+		 */
+		private int binarySearch(int key)
+		{
+			int low = 0;
+			int high = size - 1;
+
+			while (low <= high)
+			{
+				int mid = (low + high) >>> 1;
+				int midVal = values[mid];
+
+				if (midVal < key)
+				{
+					low = mid + 1;
+				}
+				else if (midVal > key)
+				{
+					high = mid - 1;
+				}
+				else
+				{
+					return mid; // key found
+				}
+			}
+			return -(low + 1); // key not found.
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void add(String name, int value)
+		{
+			ensureCapacity(size + 1);
+			int insertAt = binarySearch(value);
+			if (insertAt > 0)
+			{
+				return; // note: this means you can't insert the same value twice
+			}
+			insertAt = -(insertAt + 1); // binarySearch returns it negative and off-by-one
+			System.arraycopy(values, insertAt, values, insertAt + 1, size - insertAt);
+			values[insertAt] = value;
+			System.arraycopy(names, insertAt, names, insertAt + 1, size - insertAt);
+			names[insertAt] = name;
+			size++;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String name(int value)
+		{
+			int index = binarySearch(value);
+			if (index < 0)
+			{
+				return null;
+			}
+			return names[index];
 		}
 	}
 

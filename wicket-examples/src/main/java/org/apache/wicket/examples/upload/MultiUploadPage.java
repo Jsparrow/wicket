@@ -39,6 +39,8 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.util.file.Files;
 import org.apache.wicket.util.file.Folder;
 import org.apache.wicket.util.lang.Bytes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -48,114 +50,6 @@ import org.apache.wicket.util.lang.Bytes;
  */
 public class MultiUploadPage extends WicketExamplePage
 {
-	/**
-	 * List view for files in upload folder.
-	 */
-	private class FileListView extends ListView<File>
-	{
-		/**
-		 * Construct.
-		 * 
-		 * @param name
-		 *            Component name
-		 * @param files
-		 *            The file list model
-		 */
-		public FileListView(String name, final IModel<List<File>> files)
-		{
-			super(name, files);
-		}
-
-		@Override
-		protected void populateItem(ListItem<File> listItem)
-		{
-			final File file = listItem.getModelObject();
-			listItem.add(new Label("file", file.getName()));
-			listItem.add(new Link<Void>("delete")
-			{
-				private static final long serialVersionUID = 1L;
-
-				@Override
-				public void onClick()
-				{
-					Files.remove(file);
-					info("Deleted " + file);
-				}
-			});
-		}
-	}
-
-	/**
-	 * Form for uploads.
-	 */
-	private class FileUploadForm extends Form<Void>
-	{
-		// collection that will hold uploaded FileUpload objects
-		private final Collection<FileUpload> uploads = new ArrayList<>();
-
-		/**
-		 * TODO
-		 * 
-		 * @return Collection
-		 */
-		public Collection<FileUpload> getUploads()
-		{
-			return uploads;
-		}
-
-		/**
-		 * Construct.
-		 * 
-		 * @param id
-		 *            Component id
-		 */
-		public FileUploadForm(String id)
-		{
-			super(id);
-
-			// set this form to multipart mode (always needed for uploads!)
-			setMultiPart(true);
-
-			// Add one multi-file upload field
-			add(new MultiFileUploadField("fileInput", new PropertyModel<>(
-				this, "uploads"), 5, true));
-
-			// Set maximum size to 100K for demo purposes
-			setMaxSize(Bytes.kilobytes(100));
-
-			// Set maximum size per file to 90K for demo purposes
-			setFileMaxSize(Bytes.kilobytes(90));
-		}
-
-		/**
-		 * @see org.apache.wicket.markup.html.form.Form#onSubmit()
-		 */
-		@Override
-		protected void onSubmit()
-		{
-			for (FileUpload upload : uploads)
-			{
-				// Create a new file
-				File newFile = new File(getUploadFolder(), upload.getClientFileName());
-
-				// Check new file, delete if it already existed
-				checkFileExists(newFile);
-				try
-				{
-					// Save to new file
-					newFile.createNewFile();
-					upload.writeTo(newFile);
-
-					MultiUploadPage.this.info("saved file: " + upload.getClientFileName());
-				}
-				catch (Exception e)
-				{
-					throw new IllegalStateException("Unable to write file");
-				}
-			}
-		}
-	}
-
 	/** Reference to listview for easy access. */
 	private final FileListView fileListView;
 
@@ -202,18 +96,125 @@ public class MultiUploadPage extends WicketExamplePage
 	 */
 	private void checkFileExists(File newFile)
 	{
-		if (newFile.exists())
-		{
-			// Try to delete the file
-			if (!Files.remove(newFile))
-			{
-				throw new IllegalStateException("Unable to overwrite " + newFile.getAbsolutePath());
-			}
+		boolean condition = newFile.exists() && !Files.remove(newFile);
+		// Try to delete the file
+		if (condition) {
+			throw new IllegalStateException("Unable to overwrite " + newFile.getAbsolutePath());
 		}
 	}
 
 	private Folder getUploadFolder()
 	{
 		return ((UploadApplication)Application.get()).getUploadFolder();
+	}
+
+	/**
+	 * List view for files in upload folder.
+	 */
+	private class FileListView extends ListView<File>
+	{
+		/**
+		 * Construct.
+		 * 
+		 * @param name
+		 *            Component name
+		 * @param files
+		 *            The file list model
+		 */
+		public FileListView(String name, final IModel<List<File>> files)
+		{
+			super(name, files);
+		}
+
+		@Override
+		protected void populateItem(ListItem<File> listItem)
+		{
+			final File file = listItem.getModelObject();
+			listItem.add(new Label("file", file.getName()));
+			listItem.add(new Link<Void>("delete")
+			{
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				public void onClick()
+				{
+					Files.remove(file);
+					info("Deleted " + file);
+				}
+			});
+		}
+	}
+
+	/**
+	 * Form for uploads.
+	 */
+	private class FileUploadForm extends Form<Void>
+	{
+		private final Logger logger = LoggerFactory.getLogger(FileUploadForm.class);
+		// collection that will hold uploaded FileUpload objects
+		private final Collection<FileUpload> uploads = new ArrayList<>();
+
+		/**
+		 * Construct.
+		 * 
+		 * @param id
+		 *            Component id
+		 */
+		public FileUploadForm(String id)
+		{
+			super(id);
+
+			// set this form to multipart mode (always needed for uploads!)
+			setMultiPart(true);
+
+			// Add one multi-file upload field
+			add(new MultiFileUploadField("fileInput", new PropertyModel<>(
+				this, "uploads"), 5, true));
+
+			// Set maximum size to 100K for demo purposes
+			setMaxSize(Bytes.kilobytes(100));
+
+			// Set maximum size per file to 90K for demo purposes
+			setFileMaxSize(Bytes.kilobytes(90));
+		}
+
+		/**
+		 * TODO
+		 * 
+		 * @return Collection
+		 */
+		public Collection<FileUpload> getUploads()
+		{
+			return uploads;
+		}
+
+		/**
+		 * @see org.apache.wicket.markup.html.form.Form#onSubmit()
+		 */
+		@Override
+		protected void onSubmit()
+		{
+			for (FileUpload upload : uploads)
+			{
+				// Create a new file
+				File newFile = new File(getUploadFolder(), upload.getClientFileName());
+
+				// Check new file, delete if it already existed
+				checkFileExists(newFile);
+				try
+				{
+					// Save to new file
+					newFile.createNewFile();
+					upload.writeTo(newFile);
+
+					MultiUploadPage.this.info("saved file: " + upload.getClientFileName());
+				}
+				catch (Exception e)
+				{
+					logger.error(e.getMessage(), e);
+					throw new IllegalStateException("Unable to write file");
+				}
+			}
+		}
 	}
 }

@@ -29,7 +29,6 @@ public class MarkupInheritanceBase_3 extends MarkupInheritanceBaseBase_3
 	 */
     MarkupInheritanceBase_3()
 	{
-		super();
 
 		// add(new Label("label3", "base label 3"));
 		// add(new Label("label4", "base label 4"));

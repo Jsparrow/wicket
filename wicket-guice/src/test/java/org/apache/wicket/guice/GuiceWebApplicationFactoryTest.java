@@ -42,26 +42,6 @@ public class GuiceWebApplicationFactoryTest
 		new GuiceWebApplicationFactory().createApplication(createFilter());
 	}
 
-	/**
-	 */
-	public static class TestModule extends AbstractModule
-	{
-
-		@Override
-		protected void configure()
-		{
-			bind(WebApplication.class).toInstance(new WebApplication()
-			{
-				@Override
-				public Class<? extends Page> getHomePage()
-				{
-					return null;
-				}
-			});
-		}
-	}
-
-
 	private WicketFilter createFilter()
 	{
 		return new WicketFilter()
@@ -103,5 +83,24 @@ public class GuiceWebApplicationFactoryTest
 			}
 
 		};
+	}
+
+	/**
+	 */
+	public static class TestModule extends AbstractModule
+	{
+
+		@Override
+		protected void configure()
+		{
+			bind(WebApplication.class).toInstance(new WebApplication()
+			{
+				@Override
+				public Class<? extends Page> getHomePage()
+				{
+					return null;
+				}
+			});
+		}
 	}
 }

@@ -26,8 +26,6 @@ public class BorderWithFormPage extends WebPage {
 	private TextField<String> field;
 
 	public BorderWithFormPage(IModel<String> model) {
-		super();
-		
 		WebMarkupContainer container = new WebMarkupContainer("borderContainer");
 		
 		BorderWithForm border = new BorderWithForm("formBorder");

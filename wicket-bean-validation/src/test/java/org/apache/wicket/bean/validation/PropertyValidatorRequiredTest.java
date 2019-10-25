@@ -17,17 +17,18 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.util.Collections;
 
 public class PropertyValidatorRequiredTest
 {
 	@RegisterExtension
 	public WicketTesterExtension scope = new WicketTesterExtension()
 	{
+		@Override
 		protected WicketTester create()
 		{
 			return new WicketTester(new TestApplication());
@@ -103,9 +104,27 @@ public class PropertyValidatorRequiredTest
 	{
 
 		private TestBean bean = new TestBean();
-		private FormComponent<String> input1, input2, input3, input4, input5, input6, input7,
-			input8, input9, input10, input11, input12, input13, input14, input15, input16, input17,
-			input18, input19, input20, input21;
+		private FormComponent<String> input1;
+		private FormComponent<String> input2;
+		private FormComponent<String> input3;
+		private FormComponent<String> input4;
+		private FormComponent<String> input5;
+		private FormComponent<String> input6;
+		private FormComponent<String> input7;
+		private FormComponent<String> input8;
+		private FormComponent<String> input9;
+		private FormComponent<String> input10;
+		private FormComponent<String> input11;
+		private FormComponent<String> input12;
+		private FormComponent<String> input13;
+		private FormComponent<String> input14;
+		private FormComponent<String> input15;
+		private FormComponent<String> input16;
+		private FormComponent<String> input17;
+		private FormComponent<String> input18;
+		private FormComponent<String> input19;
+		private FormComponent<String> input20;
+		private FormComponent<String> input21;
 
 		public TestPage()
 		{
@@ -200,7 +219,7 @@ public class PropertyValidatorRequiredTest
 	{
 		@Valid
 		@NotNull
-		List<TestContainedBean> subBeanList = Arrays.asList(new TestContainedBean());
+		List<TestContainedBean> subBeanList = Collections.singletonList(new TestContainedBean());
 
 		@NotNull
 		String property;

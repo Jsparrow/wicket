@@ -62,15 +62,10 @@ class DequeueingTransparentWebMarkupContainerTest extends WicketTestCase
 		Page lastRenderedPage = tester.getLastRenderedPage();
 		
 		//test if page contains the queued label
-		boolean containsQueuedLabel = lastRenderedPage.visitChildren(new IVisitor<Component, Boolean>()
-		{
-			@Override
-			public void component(Component component, IVisit<Boolean> visit)
+		boolean containsQueuedLabel = lastRenderedPage.visitChildren((Component component, IVisit<Boolean> visit) -> {
+			if(component instanceof Label)
 			{
-				if(component instanceof Label)
-				{
-					visit.stop(true);
-				}
+				visit.stop(true);
 			}
 		});
 		

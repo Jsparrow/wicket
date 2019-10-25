@@ -100,6 +100,7 @@ public final class SerializedPage implements IManageablePage
 	@Override
 	public String toString()
 	{
-		return "[SerializedPage id = " + pageId + ", type=" + pageType + ", size=" + data.length + "]";
+		return new StringBuilder().append("[SerializedPage id = ").append(pageId).append(", type=").append(pageType).append(", size=").append(data.length)
+				.append("]").toString();
 	}
 }

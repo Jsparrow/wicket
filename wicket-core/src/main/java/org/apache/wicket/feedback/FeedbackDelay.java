@@ -116,10 +116,11 @@ public class FeedbackDelay implements Serializable, AutoCloseable
 	 */
 	@Override
 	public void close() {
-		if (cycle != null) {
-			cycle.setMetaData(KEY, null);
-			cycle = null;
-			feedbacks.clear();
+		if (cycle == null) {
+			return;
 		}
+		cycle.setMetaData(KEY, null);
+		cycle = null;
+		feedbacks.clear();
 	}
 }

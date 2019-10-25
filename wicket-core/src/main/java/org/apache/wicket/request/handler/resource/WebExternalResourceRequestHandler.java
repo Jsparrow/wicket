@@ -65,12 +65,11 @@ public class WebExternalResourceRequestHandler extends ResourceStreamRequestHand
 	@Override
 	public boolean equals(Object obj)
 	{
-		if (obj instanceof WebExternalResourceRequestHandler)
-		{
-			WebExternalResourceRequestHandler that = (WebExternalResourceRequestHandler)obj;
-			return uri.equals(that.uri);
+		if (!(obj instanceof WebExternalResourceRequestHandler)) {
+			return false;
 		}
-		return false;
+		WebExternalResourceRequestHandler that = (WebExternalResourceRequestHandler)obj;
+		return uri.equals(that.uri);
 	}
 
 	@Override
@@ -84,6 +83,6 @@ public class WebExternalResourceRequestHandler extends ResourceStreamRequestHand
 	@Override
 	public String toString()
 	{
-		return "[WebExternalResourceRequestTarget@" + hashCode() + " " + uri + "]";
+		return new StringBuilder().append("[WebExternalResourceRequestTarget@").append(hashCode()).append(" ").append(uri).append("]").toString();
 	}
 }

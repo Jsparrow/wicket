@@ -255,35 +255,34 @@ public class ResourceMapper extends AbstractBookmarkableMapper
 		final int lastSegmentAt = segments.size() - 1;
 		final String filename = segments.get(lastSegmentAt);
 
-		if (Strings.isEmpty(filename) == false)
+		if (Strings.isEmpty(filename) != false) {
+			return;
+		}
+		final IResource resource = resourceReference.getResource();
+		if (resource instanceof IStaticCacheableResource)
 		{
-			final IResource resource = resourceReference.getResource();
-
-			if (resource instanceof IStaticCacheableResource)
+			final IStaticCacheableResource cacheable = (IStaticCacheableResource)resource;
+			
+			if(cacheable.isCachingEnabled())
 			{
-				final IStaticCacheableResource cacheable = (IStaticCacheableResource)resource;
-				
-				if(cacheable.isCachingEnabled())
+				final ResourceUrl cacheUrl = new ResourceUrl(filename, parameters);
+
+				getCachingStrategy().decorateUrl(cacheUrl, cacheable);
+
+				if (Strings.isEmpty(cacheUrl.getFileName()))
 				{
-					final ResourceUrl cacheUrl = new ResourceUrl(filename, parameters);
-	
-					getCachingStrategy().decorateUrl(cacheUrl, cacheable);
-	
-					if (Strings.isEmpty(cacheUrl.getFileName()))
+					if (Application.exists() && Application.get().usesDeploymentConfig())
 					{
-						if (Application.exists() && Application.get().usesDeploymentConfig())
-						{
-							throw new AbortWithHttpErrorCodeException(HttpServletResponse.SC_NOT_FOUND,
-								"caching strategy returned empty name for " + resource);
-						}
-						else
-						{
-							throw new IllegalStateException(
-									"caching strategy returned empty name for " + resource);
-						}
+						throw new AbortWithHttpErrorCodeException(HttpServletResponse.SC_NOT_FOUND,
+							"caching strategy returned empty name for " + resource);
 					}
-					segments.set(lastSegmentAt, cacheUrl.getFileName());
+					else
+					{
+						throw new IllegalStateException(
+								"caching strategy returned empty name for " + resource);
+					}
 				}
+				segments.set(lastSegmentAt, cacheUrl.getFileName());
 			}
 		}
 	}
@@ -292,32 +291,27 @@ public class ResourceMapper extends AbstractBookmarkableMapper
 	{
 		final List<String> segments = url.getSegments();
 
-		if (segments.isEmpty() == false)
-		{
-			// get filename (the last segment)
-			final int lastSegmentAt = segments.size() - 1;
-			String filename = segments.get(lastSegmentAt);
-
-			// ignore requests with empty filename
-			if (Strings.isEmpty(filename))
-			{
-				return;
-			}
-
-			// create resource url from filename and query parameters
-			final ResourceUrl resourceUrl = new ResourceUrl(filename, parameters);
-
-			// remove caching information from request
-			getCachingStrategy().undecorateUrl(resourceUrl);
-
-			// check for broken caching strategy (this must never happen)
-			if (Strings.isEmpty(resourceUrl.getFileName()))
-			{
-				throw new IllegalStateException("caching strategy returned empty name for " +
-					resourceUrl);
-			}
-
-			segments.set(lastSegmentAt, resourceUrl.getFileName());
+		if (segments.isEmpty() != false) {
+			return;
 		}
+		// get filename (the last segment)
+		final int lastSegmentAt = segments.size() - 1;
+		String filename = segments.get(lastSegmentAt);
+		// ignore requests with empty filename
+		if (Strings.isEmpty(filename))
+		{
+			return;
+		}
+		// create resource url from filename and query parameters
+		final ResourceUrl resourceUrl = new ResourceUrl(filename, parameters);
+		// remove caching information from request
+		getCachingStrategy().undecorateUrl(resourceUrl);
+		// check for broken caching strategy (this must never happen)
+		if (Strings.isEmpty(resourceUrl.getFileName()))
+		{
+			throw new IllegalStateException("caching strategy returned empty name for " +
+				resourceUrl);
+		}
+		segments.set(lastSegmentAt, resourceUrl.getFileName());
 	}
 }

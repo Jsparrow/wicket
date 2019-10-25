@@ -163,13 +163,13 @@ class ValidatorBehaviorTest extends WicketTestCase
 		public void validate(IValidatable<String> validatable)
 		{
 			String value = validatable.getValue();
-			if (value.length() > len)
-			{
-				ValidationError error = new ValidationError();
-				error.setVariable("len", len);
-				error.setMessage("MAX ${len}");
-				validatable.error(error);
+			if (value.length() <= len) {
+				return;
 			}
+			ValidationError error = new ValidationError();
+			error.setVariable("len", len);
+			error.setMessage("MAX ${len}");
+			validatable.error(error);
 		}
 
 		@Override
@@ -190,12 +190,12 @@ class ValidatorBehaviorTest extends WicketTestCase
 		public void validate(IValidatable<String> validatable)
 		{
 			String value = validatable.getValue();
-			if (value.length() < len)
-			{
-				ValidationError error = new ValidationError();
-				error.setMessage("MINIMUM");
-				validatable.error(error);
+			if (value.length() >= len) {
+				return;
 			}
+			ValidationError error = new ValidationError();
+			error.setMessage("MINIMUM");
+			validatable.error(error);
 		}
 	}
 

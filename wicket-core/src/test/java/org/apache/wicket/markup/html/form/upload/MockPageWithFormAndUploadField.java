@@ -42,7 +42,7 @@ public class MockPageWithFormAndUploadField extends WebPage
 	 */
 	public MockPageWithFormAndUploadField()
 	{
-		final ListModel<FileUpload> model = new ListModel<FileUpload>();
+		final ListModel<FileUpload> model = new ListModel<>();
 
 		form = new StatelessForm<Void>(FORM_ID)
 		{

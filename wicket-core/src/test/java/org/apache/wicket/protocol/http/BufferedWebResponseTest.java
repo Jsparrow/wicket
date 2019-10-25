@@ -30,10 +30,6 @@ import org.junit.jupiter.api.Test;
  */
 public class BufferedWebResponseTest extends WicketTestCase
 {
-	enum TestAction {
-		SET_CONTENT_LENGTH, WRITE_RESPONSE, DISABLE_CACHING
-	}
-
 	/**
 	 * Asserting that set header actions are invoked before write in response actions.
 	 * 
@@ -42,7 +38,7 @@ public class BufferedWebResponseTest extends WicketTestCase
 	@Test
 	void testBufferedResponsePostponeWriteResponseAction()
 	{
-		final ArrayList<TestAction> actionsSequence = new ArrayList<TestAction>();
+		final ArrayList<TestAction> actionsSequence = new ArrayList<>();
 		WebResponse originalResponse = new MockWebResponse()
 		{
 			@Override
@@ -73,5 +69,9 @@ public class BufferedWebResponseTest extends WicketTestCase
 		assertEquals(0, actionsSequence.indexOf(TestAction.SET_CONTENT_LENGTH));
 		assertEquals(1, actionsSequence.indexOf(TestAction.DISABLE_CACHING));
 		assertEquals(2, actionsSequence.indexOf(TestAction.WRITE_RESPONSE));
+	}
+
+	enum TestAction {
+		SET_CONTENT_LENGTH, WRITE_RESPONSE, DISABLE_CACHING
 	}
 }

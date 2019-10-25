@@ -48,12 +48,7 @@ public class MockPageStore implements IPageStore
 	@Override
 	public IManageablePage getPage(IPageContext context, int id)
 	{
-		for (IManageablePage page : pages) {
-			if (page.getPageId() == id) {
-				return page;
-			}
-		}
-		return null;
+		return pages.stream().filter(page -> page.getPageId() == id).findFirst().orElse(null);
 	}
 
 	@Override

@@ -57,6 +57,8 @@ import org.apache.wicket.util.value.ValueMap;
  */
 public class MultipartServletWebRequestImpl extends MultipartServletWebRequest
 {
+	private static final String SESSION_KEY = MultipartServletWebRequestImpl.class.getName();
+
 	/** Map of file items. */
 	private final Map<String, List<FileItem>> files;
 
@@ -64,6 +66,7 @@ public class MultipartServletWebRequestImpl extends MultipartServletWebRequest
 	private final ValueMap parameters;
 
 	private final String upload;
+
 	private final FileItemFactory fileItemFactory;
 
 	/**
@@ -261,11 +264,7 @@ public class MultipartServletWebRequestImpl extends MultipartServletWebRequest
 			Collection<Part> parts = request.getParts();
 			if (parts != null)
 			{
-				for (Part part : parts)
-				{
-					FileItem fileItem = new ServletPartFileItem(part);
-					itemsFromParts.add(fileItem);
-				}
+				parts.stream().map(ServletPartFileItem::new).forEach(itemsFromParts::add);
 			}
 		} catch (IOException | ServletException e)
 		{
@@ -301,7 +300,7 @@ public class MultipartServletWebRequestImpl extends MultipartServletWebRequest
 		return fileUpload;
 	}
 
-    /**
+	/**
 	 * Adds a parameter to the parameters value map
 	 * 
 	 * @param name
@@ -356,8 +355,7 @@ public class MultipartServletWebRequestImpl extends MultipartServletWebRequest
 	protected Map<String, List<StringValue>> generatePostParameters()
 	{
 		Map<String, List<StringValue>> res = new HashMap<>();
-		for (Map.Entry<String, Object> entry : parameters.entrySet())
-		{
+		parameters.entrySet().forEach(entry -> {
 			String key = entry.getKey();
 			String[] val = (String[])entry.getValue();
 			if (val != null && val.length > 0)
@@ -369,7 +367,7 @@ public class MultipartServletWebRequestImpl extends MultipartServletWebRequest
 				}
 				res.put(key, items);
 			}
-		}
+		});
 		return res;
 	}
 
@@ -422,6 +420,93 @@ public class MultipartServletWebRequestImpl extends MultipartServletWebRequest
 	protected void onUploadCompleted()
 	{
 		clearUploadInfo(getContainerRequest(), upload);
+	}
+
+	@Override
+	public MultipartServletWebRequest newMultipartWebRequest(Bytes maxSize, String upload)
+		throws FileUploadException
+	{
+		// FIXME mgrigorov: Why these checks are made here ?!
+		// Why they are not done also at org.apache.wicket.protocol.http.servlet.MultipartServletWebRequestImpl.newMultipartWebRequest(org.apache.wicket.util.lang.Bytes, java.lang.String, org.apache.wicket.util.upload.FileItemFactory)() ?
+		// Why there is no check that the summary of all files' sizes is less than the set maxSize ?
+		// Setting a breakpoint here never breaks with the standard upload examples.
+
+		Bytes fileMaxSize = getFileMaxSize();
+		for (Map.Entry<String, List<FileItem>> entry : files.entrySet())
+		{
+			List<FileItem> fileItems = entry.getValue();
+			for (FileItem fileItem : fileItems)
+			{
+				if (fileMaxSize != null && fileItem.getSize() > fileMaxSize.bytes())
+				{
+					String fieldName = entry.getKey();
+					FileUploadException fslex = new FileUploadBase.FileSizeLimitExceededException(new StringBuilder().append("The field '").append(fieldName).append("' exceeds its maximum permitted size of '").append(maxSize).append("' characters.").toString(), fileItem.getSize(), fileMaxSize.bytes());
+					throw fslex;
+				}
+			}
+		}
+		return this;
+	}
+
+	@Override
+	public MultipartServletWebRequest newMultipartWebRequest(Bytes maxSize, String upload, FileItemFactory factory)
+			throws FileUploadException
+	{
+		return this;
+	}
+
+	private static String getSessionKey(String upload)
+	{
+		return new StringBuilder().append(SESSION_KEY).append(":").append(upload).toString();
+	}
+
+	/**
+	 * Retrieves {@link UploadInfo} from session, null if not found.
+	 * 
+	 * @param req
+	 *            http servlet request, not null
+	 * @param upload
+	 *            upload identifier
+	 * @return {@link UploadInfo} object from session, or null if not found
+	 */
+	public static UploadInfo getUploadInfo(final HttpServletRequest req, String upload)
+	{
+		Args.notNull(req, "req");
+		return (UploadInfo)req.getSession().getAttribute(getSessionKey(upload));
+	}
+
+	/**
+	 * Sets the {@link UploadInfo} object into session.
+	 * 
+	 * @param req
+	 *            http servlet request, not null
+	 * @param upload
+	 *            upload identifier
+	 * @param uploadInfo
+	 *            {@link UploadInfo} object to be put into session, not null
+	 */
+	public static void setUploadInfo(final HttpServletRequest req, String upload,
+		final UploadInfo uploadInfo)
+	{
+		Args.notNull(req, "req");
+		Args.notNull(upload, "upload");
+		Args.notNull(uploadInfo, "uploadInfo");
+		req.getSession().setAttribute(getSessionKey(upload), uploadInfo);
+	}
+
+	/**
+	 * Clears the {@link UploadInfo} object from session if one exists.
+	 * 
+	 * @param req
+	 *            http servlet request, not null
+	 * @param upload
+	 *            upload identifier
+	 */
+	public static void clearUploadInfo(final HttpServletRequest req, String upload)
+	{
+		Args.notNull(req, "req");
+		Args.notNull(upload, "upload");
+		req.getSession().removeAttribute(getSessionKey(upload));
 	}
 
 	/**
@@ -481,97 +566,6 @@ public class MultipartServletWebRequestImpl extends MultipartServletWebRequest
 			return read;
 		}
 
-	}
-
-	@Override
-	public MultipartServletWebRequest newMultipartWebRequest(Bytes maxSize, String upload)
-		throws FileUploadException
-	{
-		// FIXME mgrigorov: Why these checks are made here ?!
-		// Why they are not done also at org.apache.wicket.protocol.http.servlet.MultipartServletWebRequestImpl.newMultipartWebRequest(org.apache.wicket.util.lang.Bytes, java.lang.String, org.apache.wicket.util.upload.FileItemFactory)() ?
-		// Why there is no check that the summary of all files' sizes is less than the set maxSize ?
-		// Setting a breakpoint here never breaks with the standard upload examples.
-
-		Bytes fileMaxSize = getFileMaxSize();
-		for (Map.Entry<String, List<FileItem>> entry : files.entrySet())
-		{
-			List<FileItem> fileItems = entry.getValue();
-			for (FileItem fileItem : fileItems)
-			{
-				if (fileMaxSize != null && fileItem.getSize() > fileMaxSize.bytes())
-				{
-					String fieldName = entry.getKey();
-					FileUploadException fslex = new FileUploadBase.FileSizeLimitExceededException("The field '" +
-							fieldName + "' exceeds its maximum permitted size of '" +
-							maxSize + "' characters.", fileItem.getSize(), fileMaxSize.bytes());
-					throw fslex;
-				}
-			}
-		}
-		return this;
-	}
-
-	@Override
-	public MultipartServletWebRequest newMultipartWebRequest(Bytes maxSize, String upload, FileItemFactory factory)
-			throws FileUploadException
-	{
-		return this;
-	}
-
-	private static final String SESSION_KEY = MultipartServletWebRequestImpl.class.getName();
-
-	private static String getSessionKey(String upload)
-	{
-		return SESSION_KEY + ":" + upload;
-	}
-
-	/**
-	 * Retrieves {@link UploadInfo} from session, null if not found.
-	 * 
-	 * @param req
-	 *            http servlet request, not null
-	 * @param upload
-	 *            upload identifier
-	 * @return {@link UploadInfo} object from session, or null if not found
-	 */
-	public static UploadInfo getUploadInfo(final HttpServletRequest req, String upload)
-	{
-		Args.notNull(req, "req");
-		return (UploadInfo)req.getSession().getAttribute(getSessionKey(upload));
-	}
-
-	/**
-	 * Sets the {@link UploadInfo} object into session.
-	 * 
-	 * @param req
-	 *            http servlet request, not null
-	 * @param upload
-	 *            upload identifier
-	 * @param uploadInfo
-	 *            {@link UploadInfo} object to be put into session, not null
-	 */
-	public static void setUploadInfo(final HttpServletRequest req, String upload,
-		final UploadInfo uploadInfo)
-	{
-		Args.notNull(req, "req");
-		Args.notNull(upload, "upload");
-		Args.notNull(uploadInfo, "uploadInfo");
-		req.getSession().setAttribute(getSessionKey(upload), uploadInfo);
-	}
-
-	/**
-	 * Clears the {@link UploadInfo} object from session if one exists.
-	 * 
-	 * @param req
-	 *            http servlet request, not null
-	 * @param upload
-	 *            upload identifier
-	 */
-	public static void clearUploadInfo(final HttpServletRequest req, String upload)
-	{
-		Args.notNull(req, "req");
-		Args.notNull(upload, "upload");
-		req.getSession().removeAttribute(getSessionKey(upload));
 	}
 
 }

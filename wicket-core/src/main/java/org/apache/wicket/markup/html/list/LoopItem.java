@@ -105,13 +105,13 @@ public class LoopItem extends AbstractItem
 	 */
 	public final void setIndex(int index)
 	{
-		if (this.index != index)
-		{
-			if (isVersioned())
-			{
-				addStateChange();
-			}
-			this.index = index;
+		if (this.index == index) {
+			return;
 		}
+		if (isVersioned())
+		{
+			addStateChange();
+		}
+		this.index = index;
 	}
 }

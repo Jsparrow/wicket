@@ -31,6 +31,20 @@ import org.junit.jupiter.api.Test;
 @SuppressWarnings({ "rawtypes", "unchecked" })
 class AutoLabelWithContentTest extends WicketTestCase
 {
+	@Test
+    void labelWithMessage() throws Exception
+	{
+		tester.startPage(LabelWithMessagePage.class);
+		tester.assertContains("<label wicket:for=\"textfield\" id=\"textfield2-w-lbl\" for=\"textfield2\"><wicket:message key=\"foo\">my test text</wicket:message></label>");
+	}
+
+	@Test
+    void labelWithNestedComponent()
+	{
+		tester.startPage(LabelWithNestedComponentsPage.class);
+		tester.assertContains("<label wicket:for=\"textfield\" id=\"textfield2-w-lbl\" for=\"textfield2\"><input type=\"text\" wicket:id=\"textfield\" value=\"\" name=\"textfield\" id=\"textfield2\"/></label>");
+	}
+
 	public static class LabelWithMessagePage extends WebPage
 	{
 		public LabelWithMessagePage()
@@ -41,13 +55,6 @@ class AutoLabelWithContentTest extends WicketTestCase
 		}
 	}
 
-	@Test
-    void labelWithMessage() throws Exception
-	{
-		tester.startPage(LabelWithMessagePage.class);
-		tester.assertContains("<label wicket:for=\"textfield\" id=\"textfield2-w-lbl\" for=\"textfield2\"><wicket:message key=\"foo\">my test text</wicket:message></label>");
-	}
-
 	public static class LabelWithNestedComponentsPage extends WebPage
 	{
 		public LabelWithNestedComponentsPage()
@@ -56,12 +63,5 @@ class AutoLabelWithContentTest extends WicketTestCase
 			add(form);
 			form.add(new TextField("textfield", Model.of("")));
 		}
-	}
-
-	@Test
-    void labelWithNestedComponent()
-	{
-		tester.startPage(LabelWithNestedComponentsPage.class);
-		tester.assertContains("<label wicket:for=\"textfield\" id=\"textfield2-w-lbl\" for=\"textfield2\"><input type=\"text\" wicket:id=\"textfield\" value=\"\" name=\"textfield\" id=\"textfield2\"/></label>");
 	}
 }

@@ -183,9 +183,7 @@ class PageInstanceMapperTest extends AbstractMapperTest
 
 		IRequestHandler handler = encoder.mapRequest(getRequest(url));
 
-		assertThrows(StalePageException.class, () -> {
-			((IPageRequestHandler)handler).getPage();
-		});
+		assertThrows(StalePageException.class, () -> ((IPageRequestHandler) handler).getPage());
 	}
 
 	@Test

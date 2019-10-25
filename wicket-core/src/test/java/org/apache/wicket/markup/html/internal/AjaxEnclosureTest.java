@@ -41,10 +41,8 @@ import org.junit.jupiter.api.Test;
 class AjaxEnclosureTest extends WicketTestCase
 {
 	private final String inlineEnclosureIdPrefix = "wicket__InlineEnclosure_";
-	private final String inlineEnclosureHiddenPattern = "<div id=\"" + inlineEnclosureIdPrefix +
-		"\\w+\" style=\"display:none\" data-wicket-placeholder=\"\"></div>";
-	private final String inlineEnclosureVisiblePattern = "<div id=\"" + inlineEnclosureIdPrefix +
-		"\\w+\">";
+	private final String inlineEnclosureHiddenPattern = new StringBuilder().append("<div id=\"").append(inlineEnclosureIdPrefix).append("\\w+\" style=\"display:none\" data-wicket-placeholder=\"\"></div>").toString();
+	private final String inlineEnclosureVisiblePattern = new StringBuilder().append("<div id=\"").append(inlineEnclosureIdPrefix).append("\\w+\">").toString();
 
 	@Override
 	protected WebApplication newApplication()
@@ -276,7 +274,7 @@ class AjaxEnclosureTest extends WicketTestCase
 		AjaxEnclosurePage_4 page = tester.startPage(AjaxEnclosurePage_4.class);
 		tester.clickLink(page.submit);
 		// assert the input tag is part of the ajax response
-		assert (tester.getLastResponseAsString().contains("<component id=\"" + page.nameField.getMarkupId() + "\""));
+		assert (tester.getLastResponseAsString().contains(new StringBuilder().append("<component id=\"").append(page.nameField.getMarkupId()).append("\"").toString()));
 	}
 
 	private void ensureEnclosureIsVisible(Page ajaxPage, AtomicInteger n)
@@ -297,15 +295,10 @@ class AjaxEnclosureTest extends WicketTestCase
 	private <T> T findNthComponent(final Class<T> type, MarkupContainer container, final AtomicInteger n)
 	{
 		// finds the Nth InlineEnclosure in the children
-		Component instance = container.visitChildren(new IVisitor<Component, Component>()
-		{
-			@Override
-			public void component(Component object, IVisit<Component> visit)
+		Component instance = container.visitChildren((Component object, IVisit<Component> visit) -> {
+			if (type.isInstance(object) && n.decrementAndGet() == 0)
 			{
-				if (type.isInstance(object) && n.decrementAndGet() == 0)
-				{
-					visit.stop(object);
-				}
+				visit.stop(object);
 			}
 		});
 		return type.cast(instance);

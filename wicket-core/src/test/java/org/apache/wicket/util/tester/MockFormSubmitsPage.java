@@ -41,7 +41,7 @@ public class MockFormSubmitsPage extends WebPage
 	 */
 	public MockFormSubmitsPage()
 	{
-		form = new Form<Void>("form");
+		form = new Form<>("form");
 		add(form);
 
 		form.add(new TextField("text", new PropertyModel(this, "text")));

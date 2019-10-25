@@ -102,7 +102,7 @@ public class EnumLabel<T extends Enum<T>> extends WebComponent implements IGener
 	 */
 	protected String resourceKey(T value)
 	{
-		return Classes.simpleName(value.getDeclaringClass()) + '.' + value.name();
+		return new StringBuilder().append(Classes.simpleName(value.getDeclaringClass())).append('.').append(value.name()).toString();
 	}
 
 	/**

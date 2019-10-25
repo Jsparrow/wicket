@@ -417,30 +417,43 @@ public abstract class Component
 		private static final long serialVersionUID = 1L;
 	};
 
-	/** Component flags. See FLAG_* for possible non-exclusive flag values. */
-	private int flags = FLAG_VISIBLE | FLAG_ESCAPE_MODEL_STRINGS | FLAG_VERSIONED | FLAG_ENABLED |
-		FLAG_IS_RENDER_ALLOWED | FLAG_VISIBILITY_ALLOWED | FLAG_RESERVED5 /* page's stateless hint */;
-
 	private static final short RFLAG_ENABLED_IN_HIERARCHY_VALUE = 0x1;
+
 	private static final short RFLAG_ENABLED_IN_HIERARCHY_SET = 0x2;
+
 	private static final short RFLAG_ON_CONFIGURE_SUPER_CALL_VERIFIED = 0x4;
+
 	private static final short RFLAG_VISIBLE_IN_HIERARCHY_SET = 0x8;
+
 	/** onconfigure has been called */
 	private static final short RFLAG_CONFIGURED = 0x10;
+
 	private static final short RFLAG_BEFORE_RENDER_SUPER_CALL_VERIFIED = 0x20;
+
 	private static final short RFLAG_INITIALIZE_SUPER_CALL_VERIFIED = 0x40;
+
 	protected static final short RFLAG_CONTAINER_DEQUEING = 0x80;
+
 	private static final short RFLAG_ON_RE_ADD_SUPER_CALL_VERIFIED = 0x100;
+
 	/**
 	 * Flag that makes we are in before-render callback phase Set after component.onBeforeRender is
 	 * invoked (right before invoking beforeRender on children)
 	 */
 	private static final short RFLAG_RENDERING = 0x200;
+
 	private static final short RFLAG_PREPARED_FOR_RENDER = 0x400;
+
 	private static final short RFLAG_AFTER_RENDER_SUPER_CALL_VERIFIED = 0x800;
-	private static final short RFLAG_DETACHING = 0x1000;	
+
+	private static final short RFLAG_DETACHING = 0x1000;
+
 	/** True when a component is being removed from the hierarchy */
 	private static final short RFLAG_REMOVING_FROM_HIERARCHY = 0x2000;
+
+	/** Component flags. See FLAG_* for possible non-exclusive flag values. */
+	private int flags = FLAG_VISIBLE | FLAG_ESCAPE_MODEL_STRINGS | FLAG_VERSIONED | FLAG_ENABLED |
+		FLAG_IS_RENDER_ALLOWED | FLAG_VISIBILITY_ALLOWED | FLAG_RESERVED5 /* page's stateless hint */;
 
 	/**
 	 * Flags that only keep their value during the request. Useful for cache markers, etc. At the
@@ -490,6 +503,55 @@ public abstract class Component
 	 */
 	Object data = null;
 
+	/**
+	 * Constructor. All components have names. A component's id cannot be null. This is the minimal
+	 * constructor of component. It does not register a model.
+	 * 
+	 * @param id
+	 *            The non-null id of this component
+	 * @throws WicketRuntimeException
+	 *             Thrown if the component has been given a null id.
+	 */
+	public Component(final String id)
+	{
+		this(id, null);
+	}
+
+	/**
+	 * Constructor. All components have names. A component's id cannot be null. This constructor
+	 * includes a model.
+	 * 
+	 * @param id
+	 *            The non-null id of this component
+	 * @param model
+	 *            The component's model
+	 * 
+	 * @throws WicketRuntimeException
+	 *             Thrown if the component has been given a null id.
+	 */
+	public Component(final String id, final IModel<?> model)
+	{
+		checkId(id);
+		this.id = id;
+
+		init();
+
+		Application application = getApplication();
+		application.getComponentInstantiationListeners().onInstantiation(this);
+
+		final DebugSettings debugSettings = application.getDebugSettings();
+		if (debugSettings.isLinePreciseReportingOnNewComponentEnabled() && debugSettings.getComponentUseCheck())
+		{
+			setMetaData(CONSTRUCTED_AT_KEY,
+				ComponentStrings.toString(this, new MarkupException("constructed")));
+		}
+
+		if (model != null)
+		{
+			setModelImpl(wrap(model));
+		}
+	}
+
 	final int data_start()
 	{
 		return getFlag(FLAG_MODEL_SET) ? 1 : 0;
@@ -536,8 +598,7 @@ public abstract class Component
 	{
 		if (index > data_length() - 1)
 		{
-			throw new IndexOutOfBoundsException("can not set data at " + index +
-				" when data_length() is " + data_length());
+			throw new IndexOutOfBoundsException(new StringBuilder().append("can not set data at ").append(index).append(" when data_length() is ").append(data_length()).toString());
 		}
 		else if (index == 0 && !(data instanceof Object[] && !(data instanceof MetaDataEntry<?>[])))
 		{
@@ -564,8 +625,7 @@ public abstract class Component
 		}
 		if (position > currentLength)
 		{
-			throw new IndexOutOfBoundsException("can not insert data at " + position +
-				" when data_length() is " + currentLength);
+			throw new IndexOutOfBoundsException(new StringBuilder().append("can not insert data at ").append(position).append(" when data_length() is ").append(currentLength).toString());
 		}
 		if (currentLength == 0)
 		{
@@ -642,55 +702,6 @@ public abstract class Component
 				final int left = currentLength - position - 1;
 				System.arraycopy(current, position + 1, data, position, left);
 			}
-		}
-	}
-
-	/**
-	 * Constructor. All components have names. A component's id cannot be null. This is the minimal
-	 * constructor of component. It does not register a model.
-	 * 
-	 * @param id
-	 *            The non-null id of this component
-	 * @throws WicketRuntimeException
-	 *             Thrown if the component has been given a null id.
-	 */
-	public Component(final String id)
-	{
-		this(id, null);
-	}
-
-	/**
-	 * Constructor. All components have names. A component's id cannot be null. This constructor
-	 * includes a model.
-	 * 
-	 * @param id
-	 *            The non-null id of this component
-	 * @param model
-	 *            The component's model
-	 * 
-	 * @throws WicketRuntimeException
-	 *             Thrown if the component has been given a null id.
-	 */
-	public Component(final String id, final IModel<?> model)
-	{
-		checkId(id);
-		this.id = id;
-
-		init();
-
-		Application application = getApplication();
-		application.getComponentInstantiationListeners().onInstantiation(this);
-
-		final DebugSettings debugSettings = application.getDebugSettings();
-		if (debugSettings.isLinePreciseReportingOnNewComponentEnabled() && debugSettings.getComponentUseCheck())
-		{
-			setMetaData(CONSTRUCTED_AT_KEY,
-				ComponentStrings.toString(this, new MarkupException("constructed")));
-		}
-
-		if (model != null)
-		{
-			setModelImpl(wrap(model));
 		}
 	}
 
@@ -978,32 +989,20 @@ public abstract class Component
 	 */
 	public final void configure()
 	{
-		if (!getRequestFlag(RFLAG_CONFIGURED))
-		{
-			clearEnabledInHierarchyCache();
-			clearVisibleInHierarchyCache();
-			
-			setRequestFlag(RFLAG_ON_CONFIGURE_SUPER_CALL_VERIFIED, false);
-			onConfigure();
-			verifySuperCall("onConfigure", RFLAG_ON_CONFIGURE_SUPER_CALL_VERIFIED);
-			
-			for (Behavior behavior : getBehaviors())
-			{
-				if (isBehaviorAccepted(behavior))
-				{
-					behavior.onConfigure(this);
-				}
-			}
-
-			// check authorization
-			setRenderAllowed();
-
-			internalOnAfterConfigure();
-
-			getApplication().getComponentOnConfigureListeners().onConfigure(this);
-
-			setRequestFlag(RFLAG_CONFIGURED, true);
+		if (getRequestFlag(RFLAG_CONFIGURED)) {
+			return;
 		}
+		clearEnabledInHierarchyCache();
+		clearVisibleInHierarchyCache();
+		setRequestFlag(RFLAG_ON_CONFIGURE_SUPER_CALL_VERIFIED, false);
+		onConfigure();
+		verifySuperCall("onConfigure", RFLAG_ON_CONFIGURE_SUPER_CALL_VERIFIED);
+		getBehaviors().stream().filter(this::isBehaviorAccepted).forEach(behavior -> behavior.onConfigure(this));
+		// check authorization
+		setRenderAllowed();
+		internalOnAfterConfigure();
+		getApplication().getComponentOnConfigureListeners().onConfigure(this);
+		setRequestFlag(RFLAG_CONFIGURED, true);
 	}
 
 	/**
@@ -1085,10 +1084,7 @@ public abstract class Component
 		setFlag(FLAG_REMOVED, true);
 		if (getRequestFlag(RFLAG_REMOVING_FROM_HIERARCHY))
 		{
-			throw new IllegalStateException(Component.class.getName() +
-				" has not been properly removed from hierachy. Something in the hierarchy of " +
-				getClass().getName() +
-				" has not called super.onRemove() in the override of onRemove() method");
+			throw new IllegalStateException(new StringBuilder().append(Component.class.getName()).append(" has not been properly removed from hierachy. Something in the hierarchy of ").append(getClass().getName()).append(" has not called super.onRemove() in the override of onRemove() method").toString());
 		}
 		new Behaviors(this).onRemove(this);
 		removeChildren();
@@ -1107,10 +1103,7 @@ public abstract class Component
 			onDetach();
 			if (getRequestFlag(RFLAG_DETACHING))
 			{
-				throw new IllegalStateException(Component.class.getName() +
-						" has not been properly detached. Something in the hierarchy of " +
-						getClass().getName() +
-						" has not called super.onDetach() in the override of onDetach() method");
+				throw new IllegalStateException(new StringBuilder().append(Component.class.getName()).append(" has not been properly detached. Something in the hierarchy of ").append(getClass().getName()).append(" has not called super.onDetach() in the override of onDetach() method").toString());
 			}
 
 			// always detach models because they can be attached without the
@@ -1161,19 +1154,18 @@ public abstract class Component
 	private void detachFeedback()
 	{
 		FeedbackMessages feedback = getMetaData(FEEDBACK_KEY);
-		if (feedback != null)
+		if (feedback == null) {
+			return;
+		}
+		feedback.clear(getApplication().getApplicationSettings()
+			.getFeedbackMessageCleanupFilter());
+		if (feedback.isEmpty())
 		{
-			feedback.clear(getApplication().getApplicationSettings()
-				.getFeedbackMessageCleanupFilter());
-
-			if (feedback.isEmpty())
-			{
-				setMetaData(FEEDBACK_KEY, null);
-			}
-			else
-			{
-				feedback.detach();
-			}
+			setMetaData(FEEDBACK_KEY, null);
+		}
+		else
+		{
+			feedback.detach();
 		}
 	}
 
@@ -1291,7 +1283,7 @@ public abstract class Component
 	 */
 	public final String getClassRelativePath()
 	{
-		return getClass().getName() + PATH_SEPARATOR + getPageRelativePath();
+		return new StringBuilder().append(getClass().getName()).append(PATH_SEPARATOR).append(getPageRelativePath()).toString();
 	}
 
 	/**
@@ -1419,13 +1411,12 @@ public abstract class Component
 	public final ValueMap getMarkupAttributes()
 	{
 		ComponentTag tag = getMarkupTag();
-		if (tag != null)
-		{
-			ValueMap attrs = new ValueMap(tag.getAttributes());
-			attrs.makeImmutable();
-			return attrs;
+		if (tag == null) {
+			return ValueMap.EMPTY_MAP;
 		}
-		return ValueMap.EMPTY_MAP;
+		ValueMap attrs = new ValueMap(tag.getAttributes());
+		attrs.makeImmutable();
+		return attrs;
 	}
 
 	/**
@@ -1689,8 +1680,7 @@ public abstract class Component
 		if (page == null)
 		{
 			// Give up with a nice exception
-			throw new WicketRuntimeException("No Page found for component: " + this.toString(true)
-					+ ". You probably forgot to add it to its parent component.");
+			throw new WicketRuntimeException(new StringBuilder().append("No Page found for component: ").append(this.toString(true)).append(". You probably forgot to add it to its parent component.").toString());
 		}
 
 		return page;
@@ -2061,15 +2051,12 @@ public abstract class Component
 		}
 		else
 		{
+			boolean condition = parent != null && !parent.isVersioned();
+			// Check if the parent is unversioned. If any parent
+			// (recursively) is unversioned, then this component is too
 			// If there's a parent and this component is versioned
-			if (parent != null)
-			{
-				// Check if the parent is unversioned. If any parent
-				// (recursively) is unversioned, then this component is too
-				if (!parent.isVersioned())
-				{
-					return false;
-				}
+			if (condition) {
+				return false;
 			}
 			return true;
 		}
@@ -2183,7 +2170,7 @@ public abstract class Component
 	{
 		if (parent == null)
 		{
-			throw new IllegalStateException("Cannot remove " + this + " from null parent!");
+			throw new IllegalStateException(new StringBuilder().append("Cannot remove ").append(this).append(" from null parent!").toString());
 		}
 		parent.remove(this);
 	}
@@ -2331,20 +2318,16 @@ public abstract class Component
 	{
 		// Call each behaviors onException() to allow the
 		// behavior to clean up
-		for (Behavior behavior : getBehaviors())
-		{
-			if (isBehaviorAccepted(behavior))
+		getBehaviors().stream().filter(this::isBehaviorAccepted).forEach(behavior -> {
+			try
 			{
-				try
-				{
-					behavior.onException(this, ex);
-				}
-				catch (Exception ex2)
-				{
-					log.error("Error while cleaning up after exception", ex2);
-				}
+				behavior.onException(this, ex);
 			}
-		}
+			catch (Exception ex2)
+			{
+				log.error("Error while cleaning up after exception", ex2);
+			}
+		});
 
 		// Re-throw the exception
 		throw ex;
@@ -2361,7 +2344,7 @@ public abstract class Component
 	 */
 	protected void renderPlaceholderTag(final ComponentTag tag, final Response response)
 	{
-		String name = Strings.isEmpty(tag.getNamespace()) ? tag.getName() : tag.getNamespace() + ':' + tag.getName();
+		String name = Strings.isEmpty(tag.getNamespace()) ? tag.getName() : new StringBuilder().append(tag.getNamespace()).append(':').append(tag.getName()).toString();
 
 		response.write("<");
 		response.write(name);
@@ -2371,7 +2354,6 @@ public abstract class Component
 		response.write(name);
 		response.write(">");
 	}
-
 
 	/**
 	 * Returns the id of the markup region that will be updated via ajax. This can be different to
@@ -2391,12 +2373,9 @@ public abstract class Component
 				break;
 			}
 		}
-		if (markupId == null)
-		{
-			if (this instanceof IAjaxRegionMarkupIdProvider)
-			{
-				markupId = ((IAjaxRegionMarkupIdProvider)this).getAjaxRegionMarkupId(this);
-			}
+		boolean condition = markupId == null && this instanceof IAjaxRegionMarkupIdProvider;
+		if (condition) {
+			markupId = ((IAjaxRegionMarkupIdProvider)this).getAjaxRegionMarkupId(this);
 		}
 		if (markupId == null)
 		{
@@ -2404,7 +2383,6 @@ public abstract class Component
 		}
 		return markupId;
 	}
-
 
 	/**
 	 * THIS METHOD IS NOT PART OF THE WICKET PUBLIC API. DO NOT USE IT!
@@ -2609,59 +2587,51 @@ public abstract class Component
 	 */
 	public void internalRenderHead(final HtmlHeaderContainer container)
 	{
-		if (isVisibleInHierarchy() && isRenderAllowed())
+		if (!(isVisibleInHierarchy() && isRenderAllowed())) {
+			return;
+		}
+		if (log.isDebugEnabled())
 		{
-			if (log.isDebugEnabled())
+			log.debug("internalRenderHead: {}", toString(false));
+		}
+		IHeaderResponse response = container.getHeaderResponse();
+		// Allow component to contribute
+		boolean wasRendered = response.wasRendered(this);
+		if (wasRendered == false)
+		{
+			StringResponse markupHeaderResponse = new StringResponse();
+			Response oldResponse = getResponse();
+			RequestCycle.get().setResponse(markupHeaderResponse);
+			try
 			{
-				log.debug("internalRenderHead: {}", toString(false));
-			}
-
-			IHeaderResponse response = container.getHeaderResponse();
-
-			// Allow component to contribute
-			boolean wasRendered = response.wasRendered(this);
-			if (wasRendered == false)
-			{
-				StringResponse markupHeaderResponse = new StringResponse();
-				Response oldResponse = getResponse();
-				RequestCycle.get().setResponse(markupHeaderResponse);
-				try
+				// Make sure the markup source strategy contributes to the header first
+				// to be backward compatible. WICKET-3761
+				getMarkupSourcingStrategy().renderHead(this, container);
+				CharSequence headerContribution = markupHeaderResponse.getBuffer();
+				if (Strings.isEmpty(headerContribution) == false)
 				{
-					// Make sure the markup source strategy contributes to the header first
-					// to be backward compatible. WICKET-3761
-					getMarkupSourcingStrategy().renderHead(this, container);
-					CharSequence headerContribution = markupHeaderResponse.getBuffer();
-					if (Strings.isEmpty(headerContribution) == false)
-					{
-						response.render(StringHeaderItem.forString(headerContribution));
-					}
-				}
-				finally
-				{
-					RequestCycle.get().setResponse(oldResponse);
-				}
-				// Then let the component itself to contribute to the header
-				renderHead(response);
-			}
-
-			// Then ask all behaviors
-			for (Behavior behavior : getBehaviors())
-			{
-				if (isBehaviorAccepted(behavior))
-				{
-					if (response.wasRendered(behavior) == false)
-					{
-						behavior.renderHead(this, response);
-						List<IClusterable> pair = Arrays.asList(this, behavior);
-						response.markRendered(pair);
-					}
+					response.render(StringHeaderItem.forString(headerContribution));
 				}
 			}
-			
-			if (wasRendered == false)
+			finally
 			{
-				response.markRendered(this);
+				RequestCycle.get().setResponse(oldResponse);
 			}
+			// Then let the component itself to contribute to the header
+			renderHead(response);
+		}
+		// Then ask all behaviors
+		getBehaviors().forEach(behavior -> {
+			boolean condition = isBehaviorAccepted(behavior) && response.wasRendered(behavior) == false;
+			if (condition) {
+				behavior.renderHead(this, response);
+				List<IClusterable> pair = Arrays.asList(this, behavior);
+				response.markRendered(pair);
+			}
+		});
+		if (wasRendered == false)
+		{
+			response.markRendered(this);
 		}
 	}
 
@@ -2689,8 +2659,7 @@ public abstract class Component
 		if (!getId().equals(replacement.getId()))
 		{
 			throw new IllegalArgumentException(
-				"Replacement component must have the same id as the component it will replace. Replacement id [[" +
-					replacement.getId() + "]], replaced id [[" + getId() + "]].");
+				new StringBuilder().append("Replacement component must have the same id as the component it will replace. Replacement id [[").append(replacement.getId()).append("]], replaced id [[").append(getId()).append("]].").toString());
 		}
 		if (parent == null)
 		{
@@ -3001,9 +2970,7 @@ public abstract class Component
 		if (model == null)
 		{
 			throw new IllegalStateException(
-				"Attempt to set a model object on a component without a model! " +
-				"Either pass an IModel to the constructor or use #setDefaultModel(new SomeModel(object)). " +
-				"Component: " + getPageRelativePath());
+				new StringBuilder().append("Attempt to set a model object on a component without a model! ").append("Either pass an IModel to the constructor or use #setDefaultModel(new SomeModel(object)). ").append("Component: ").append(getPageRelativePath()).toString());
 		}
 
 		// Check authorization
@@ -3177,7 +3144,6 @@ public abstract class Component
 	{
 		clearVisibleInHierarchyCache();
 	}
-
 
 	/**
 	 * Gets the string representation of this component.
@@ -3392,7 +3358,7 @@ public abstract class Component
 		// Start here
 		MarkupContainer current = getParent();
 
-		Visit<R> visit = new Visit<R>();
+		Visit<R> visit = new Visit<>();
 
 		// Walk up containment hierarchy
 		while (current != null)
@@ -3432,13 +3398,7 @@ public abstract class Component
 	 */
 	private void notifyBehaviorsComponentBeforeRender()
 	{
-		for (Behavior behavior : getBehaviors())
-		{
-			if (isBehaviorAccepted(behavior))
-			{
-				behavior.beforeRender(this);
-			}
-		}
+		getBehaviors().stream().filter(this::isBehaviorAccepted).forEach(behavior -> behavior.beforeRender(this));
 	}
 
 	/**
@@ -3448,13 +3408,7 @@ public abstract class Component
 	private void notifyBehaviorsComponentRendered()
 	{
 		// notify the behaviors that component has been rendered
-		for (Behavior behavior : getBehaviors())
-		{
-			if (isBehaviorAccepted(behavior))
-			{
-				behavior.afterRender(this);
-			}
-		}
+		getBehaviors().stream().filter(this::isBehaviorAccepted).forEach(behavior -> behavior.afterRender(this));
 	}
 
 	/**
@@ -3485,14 +3439,13 @@ public abstract class Component
 	 */
 	protected final void checkComponentTag(final ComponentTag tag, final String name)
 	{
-		if (!tag.getName().equalsIgnoreCase(name))
-		{
-			String msg = String.format("Component [%s] (path = [%s]) must be "
-				+ "applied to a tag of type [%s], not: %s", getId(), getPath(), name,
-				tag.toUserDebugString());
-
-			findMarkupStream().throwMarkupException(msg);
+		if (tag.getName().equalsIgnoreCase(name)) {
+			return;
 		}
+		String msg = String.format("Component [%s] (path = [%s]) must be "
+			+ "applied to a tag of type [%s], not: %s", getId(), getPath(), name,
+			tag.toUserDebugString());
+		findMarkupStream().throwMarkupException(msg);
 	}
 
 	/**
@@ -3510,31 +3463,29 @@ public abstract class Component
 	protected final void checkComponentTagAttribute(final ComponentTag tag, final String key,
 		final String... values)
 	{
-		if (key != null)
+		if (key == null) {
+			return;
+		}
+		final String tagAttributeValue = tag.getAttributes().getString(key);
+		boolean found = false;
+		if (tagAttributeValue != null)
 		{
-			final String tagAttributeValue = tag.getAttributes().getString(key);
-
-			boolean found = false;
-			if (tagAttributeValue != null)
+			for (String value : values)
 			{
-				for (String value : values)
+				if (value.equalsIgnoreCase(tagAttributeValue))
 				{
-					if (value.equalsIgnoreCase(tagAttributeValue))
-					{
-						found = true;
-						break;
-					}
+					found = true;
+					break;
 				}
 			}
+		}
+		if (found == false)
+		{
+			String msg = String.format("Component [%s] (path = [%s]) must be applied to a tag "
+					+ "with [%s] attribute matching any of %s, not [%s]", getId(), getPath(), key,
+					Arrays.toString(values), tagAttributeValue);
 
-			if (found == false)
-			{
-				String msg = String.format("Component [%s] (path = [%s]) must be applied to a tag "
-						+ "with [%s] attribute matching any of %s, not [%s]", getId(), getPath(), key,
-						Arrays.toString(values), tagAttributeValue);
-
-				findMarkupStream().throwMarkupException(msg);
-			}
+			findMarkupStream().throwMarkupException(msg);
 		}
 	}
 
@@ -3582,7 +3533,7 @@ public abstract class Component
 	 */
 	protected final String exceptionMessage(final String message)
 	{
-		return message + ":\n" + toString();
+		return new StringBuilder().append(message).append(":\n").append(toString()).toString();
 	}
 
 	/**
@@ -3659,12 +3610,12 @@ public abstract class Component
 	protected final IModel<?> getInnermostModel(final IModel<?> model)
 	{
 		IModel<?> nested = model;
-		while (nested != null && nested instanceof IWrapModel)
+		while (nested instanceof IWrapModel)
 		{
 			final IModel<?> next = ((IWrapModel<?>)nested).getWrappedModel();
 			if (nested == next)
 			{
-				throw new WicketRuntimeException("Model for " + nested + " is self-referential");
+				throw new WicketRuntimeException(new StringBuilder().append("Model for ").append(nested).append(" is self-referential").toString());
 			}
 			nested = next;
 		}
@@ -3905,78 +3856,75 @@ public abstract class Component
 	 */
 	protected final void renderComponentTag(ComponentTag tag)
 	{
-		if (needToRenderTag(tag))
-		{
-			// apply behaviors that are attached to the component tag.
-			if (tag.hasBehaviors())
-			{
-				Iterator<? extends Behavior> tagBehaviors = tag.getBehaviors();
-				while (tagBehaviors.hasNext())
-				{
-					final Behavior behavior = tagBehaviors.next();
-					if (behavior.isEnabled(this))
-					{
-						behavior.onComponentTag(this, tag);
-					}
-					behavior.detach(this);
-				}
-			}
-
-			// Apply behavior modifiers
-			List<? extends Behavior> behaviors = getBehaviors();
-			if ((behaviors != null) && !behaviors.isEmpty() && !tag.isClose() &&
-				(isIgnoreAttributeModifier() == false))
-			{
-				tag = tag.mutable();
-				for (Behavior behavior : behaviors)
-				{
-					// Components may reject some behavior components
-					if (isBehaviorAccepted(behavior))
-					{
-						behavior.onComponentTag(this, tag);
-					}
-				}
-			}
-
-			if ((tag instanceof WicketTag) && !tag.isClose() &&
-				!getFlag(FLAG_IGNORE_ATTRIBUTE_MODIFIER))
-			{
-				ExceptionSettings.NotRenderableErrorStrategy notRenderableErrorStrategy = ExceptionSettings.NotRenderableErrorStrategy.LOG_WARNING;
-				if (Application.exists())
-				{
-					notRenderableErrorStrategy = getApplication().getExceptionSettings().getNotRenderableErrorStrategy();
-				}
-
-				String tagName = tag.getNamespace() + ":" + tag.getName();
-				String componentId = getId();
-				if (getFlag(FLAG_OUTPUT_MARKUP_ID))
-				{
-					String message = String.format("Markup id set on a component that is usually not rendered into markup. " +
-					                               "Markup id: %s, component id: %s, component tag: %s.",
-					                               getMarkupId(), componentId, tagName);
-					if (notRenderableErrorStrategy == ExceptionSettings.NotRenderableErrorStrategy.THROW_EXCEPTION)
-					{
-						throw new IllegalStateException(message);
-					}
-					log.warn(message);
-				}
-				if (getFlag(FLAG_PLACEHOLDER))
-				{
-					String message = String.format(
-							"Placeholder tag set on a component that is usually not rendered into markup. " +
-							"Component id: %s, component tag: %s.", componentId, tagName);
-					if (notRenderableErrorStrategy == ExceptionSettings.NotRenderableErrorStrategy.THROW_EXCEPTION)
-					{
-						throw new IllegalStateException(message);
-					}
-					log.warn(message);
-				}
-			}
-
-			// Write the tag
-			tag.writeOutput(getResponse(), !needToRenderTag(null),
-				getMarkup().getMarkupResourceStream().getWicketNamespace());
+		if (!needToRenderTag(tag)) {
+			return;
 		}
+		// apply behaviors that are attached to the component tag.
+		if (tag.hasBehaviors())
+		{
+			Iterator<? extends Behavior> tagBehaviors = tag.getBehaviors();
+			while (tagBehaviors.hasNext())
+			{
+				final Behavior behavior = tagBehaviors.next();
+				if (behavior.isEnabled(this))
+				{
+					behavior.onComponentTag(this, tag);
+				}
+				behavior.detach(this);
+			}
+		}
+		// Apply behavior modifiers
+		List<? extends Behavior> behaviors = getBehaviors();
+		if ((behaviors != null) && !behaviors.isEmpty() && !tag.isClose() &&
+			(isIgnoreAttributeModifier() == false))
+		{
+			tag = tag.mutable();
+			for (Behavior behavior : behaviors)
+			{
+				// Components may reject some behavior components
+				if (isBehaviorAccepted(behavior))
+				{
+					behavior.onComponentTag(this, tag);
+				}
+			}
+		}
+		if ((tag instanceof WicketTag) && !tag.isClose() &&
+			!getFlag(FLAG_IGNORE_ATTRIBUTE_MODIFIER))
+		{
+			ExceptionSettings.NotRenderableErrorStrategy notRenderableErrorStrategy = ExceptionSettings.NotRenderableErrorStrategy.LOG_WARNING;
+			if (Application.exists())
+			{
+				notRenderableErrorStrategy = getApplication().getExceptionSettings().getNotRenderableErrorStrategy();
+			}
+
+			String tagName = new StringBuilder().append(tag.getNamespace()).append(":").append(tag.getName()).toString();
+			String componentId = getId();
+			if (getFlag(FLAG_OUTPUT_MARKUP_ID))
+			{
+				String message = String.format("Markup id set on a component that is usually not rendered into markup. " +
+				                               "Markup id: %s, component id: %s, component tag: %s.",
+				                               getMarkupId(), componentId, tagName);
+				if (notRenderableErrorStrategy == ExceptionSettings.NotRenderableErrorStrategy.THROW_EXCEPTION)
+				{
+					throw new IllegalStateException(message);
+				}
+				log.warn(message);
+			}
+			if (getFlag(FLAG_PLACEHOLDER))
+			{
+				String message = String.format(
+						"Placeholder tag set on a component that is usually not rendered into markup. " +
+						"Component id: %s, component tag: %s.", componentId, tagName);
+				if (notRenderableErrorStrategy == ExceptionSettings.NotRenderableErrorStrategy.THROW_EXCEPTION)
+				{
+					throw new IllegalStateException(message);
+				}
+				log.warn(message);
+			}
+		}
+		// Write the tag
+		tag.writeOutput(getResponse(), !needToRenderTag(null),
+			getMarkup().getMarkupResourceStream().getWicketNamespace());
 	}
 
 	/**
@@ -4017,19 +3965,14 @@ public abstract class Component
 			getResponse().write(body);
 		}
 
+		boolean condition = tag.isOpen() && (markupOpenTag != null) && markupOpenTag.isOpen() && !markupStream.atCloseTag();
+		// If it was an open tag in the markup, than there must be
+		// a close tag as well.
 		// If we had an open tag (and not an openclose tag) and we found a
 		// close tag, we're good
-		if (tag.isOpen())
-		{
-			// If it was an open tag in the markup, than there must be
-			// a close tag as well.
-			if ((markupOpenTag != null) && markupOpenTag.isOpen() && !markupStream.atCloseTag())
-			{
-				// There must be a component in this discarded body
-				markupStream.throwMarkupException("Expected close tag for '" + markupOpenTag +
-					"' Possible attempt to embed component(s) '" + markupStream.get() +
-					"' in the body of this component which discards its body");
-			}
+		if (condition) {
+			// There must be a component in this discarded body
+			markupStream.throwMarkupException(new StringBuilder().append("Expected close tag for '").append(markupOpenTag).append("' Possible attempt to embed component(s) '").append(markupStream.get()).append("' in the body of this component which discards its body").toString());
 		}
 	}
 
@@ -4137,7 +4080,7 @@ public abstract class Component
 	public Component get(final String path)
 	{
 		// Path to this component is an empty path
-		if (path.length() == 0)
+		if (path.isEmpty())
 		{
 			return this;
 		}
@@ -4235,12 +4178,9 @@ public abstract class Component
 	 */
 	private void checkId(final String id)
 	{
-		if (!(this instanceof Page))
-		{
-			if (Strings.isEmpty(id))
-			{
-				throw new WicketRuntimeException("Null or empty component ID's are not allowed.");
-			}
+		boolean condition = !(this instanceof Page) && Strings.isEmpty(id);
+		if (condition) {
+			throw new WicketRuntimeException("Null or empty component ID's are not allowed.");
 		}
 
 		if ((id != null) && (id.indexOf(':') != -1 || id.indexOf('~') != -1))
@@ -4265,7 +4205,7 @@ public abstract class Component
 	{
 		if (this.parent != null && log.isDebugEnabled())
 		{
-			log.debug("Replacing parent " + this.parent + " with " + parent);
+			log.debug(new StringBuilder().append("Replacing parent ").append(this.parent).append(" with ").append(parent).toString());
 		}
 		this.parent = parent;
 	}
@@ -4331,7 +4271,6 @@ public abstract class Component
 		return isVisible() && isRenderAllowed() && isVisibilityAllowed();
 	}
 
-
 	/**
 	 * Calculates enabled state of the component taking its hierarchy into account. A component is
 	 * enabled iff it is itself enabled ({@link #isEnabled()} and {@link #isEnableAllowed()} both
@@ -4361,7 +4300,7 @@ public abstract class Component
 		setRequestFlag(RFLAG_ENABLED_IN_HIERARCHY_VALUE, state);
 		return state;
 	}
-	
+
 	/**
 	 * Says if the component is rendering currently.
 	 * 
@@ -4483,6 +4422,7 @@ public abstract class Component
         	return getApplication().getPageSettings()
         		.getCallListenerAfterExpiry() || isStateless();
 	}
+
 	/**
 	 * This method is called whenever a component is re-added to the page's component tree, if it
 	 * had been removed at some earlier time, i.e., if it is already initialized

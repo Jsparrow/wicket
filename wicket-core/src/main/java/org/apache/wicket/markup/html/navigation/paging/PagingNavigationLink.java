@@ -91,7 +91,7 @@ public class PagingNavigationLink<T> extends Link<T>
 		long idx = pageNumber;
 		if (idx < 0)
 		{
-			idx = pageable.getPageCount() + idx;
+			idx += pageable.getPageCount();
 		}
 
 		if (idx > (pageable.getPageCount() - 1))

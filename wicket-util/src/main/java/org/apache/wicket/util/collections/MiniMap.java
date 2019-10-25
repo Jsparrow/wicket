@@ -186,19 +186,15 @@ public class MiniMap<K, V> implements Map<K, V>, Serializable
 		// Search for key
 		final int index = findKey(key);
 
-		if (index != -1)
-		{
-			// Store value
-			final V oldValue = values[index];
-
-			keys[index] = null;
-			values[index] = null;
-			size--;
-
-			return oldValue;
+		if (!(index != -1)) {
+			return null;
 		}
-
-		return null;
+		// Store value
+		final V oldValue = values[index];
+		keys[index] = null;
+		values[index] = null;
+		size--;
+		return oldValue;
 	}
 
 	/**

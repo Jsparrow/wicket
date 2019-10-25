@@ -144,7 +144,7 @@ public class PropertiesFactory implements IPropertiesFactory
 			while ((properties == null) && iter.hasNext())
 			{
 				IPropertiesLoader loader = iter.next();
-				String fullPath = path + "." + loader.getFileExtension();
+				String fullPath = new StringBuilder().append(path).append(".").append(loader.getFileExtension()).toString();
 
 				// If not in the cache than try to load properties
 				IResourceStream resourceStream = context.getResourceStreamLocator()
@@ -253,32 +253,25 @@ public class PropertiesFactory implements IPropertiesFactory
 	protected void addToWatcher(final String path, final IResourceStream resourceStream,
 		final IModificationWatcher watcher)
 	{
-		watcher.add(resourceStream, new IChangeListener<IModifiable>()
-		{
-			@Override
-			public void onChange(IModifiable modifiable)
-			{
-				log.info("A properties files has changed. Removing all entries " +
-					"from the cache. Resource: " + resourceStream);
+		watcher.add(resourceStream, (IModifiable modifiable) -> {
+			log.info(new StringBuilder().append("A properties files has changed. Removing all entries ").append("from the cache. Resource: ").append(resourceStream).toString());
 
-				// Clear the whole cache as associated localized files may
-				// be affected and may need reloading as well.
-				clearCache();
+			// Clear the whole cache as associated localized files may
+			// be affected and may need reloading as well.
+			clearCache();
 
-				// Inform all listeners
-				for (IPropertiesChangeListener listener : afterReloadListeners)
+			// Inform all listeners
+			afterReloadListeners.forEach(listener -> {
+				try
 				{
-					try
-					{
-						listener.propertiesChanged(path);
-					}
-					catch (Exception ex)
-					{
-						PropertiesFactory.log.error("PropertiesReloadListener has thrown an exception: " +
-							ex.getMessage());
-					}
+					listener.propertiesChanged(path);
 				}
-			}
+				catch (Exception ex)
+				{
+					PropertiesFactory.log.error("PropertiesReloadListener has thrown an exception: " +
+						ex.getMessage());
+				}
+			});
 		});
 	}
 

@@ -133,7 +133,7 @@ public class ConversationPropagatorTest extends WicketCdiTestCase
 		String pageId = tester.getLastRenderedPage().getId();
 		String cid = conversation.getId();
 
-		tester.executeUrl("segment/hybrid?"+pageId+"&cid="+cid);
+		tester.executeUrl(new StringBuilder().append("segment/hybrid?").append(pageId).append("&cid=").append(cid).toString());
 
 		assertEquals(pageId, tester.getLastRenderedPage().getId());
 	}

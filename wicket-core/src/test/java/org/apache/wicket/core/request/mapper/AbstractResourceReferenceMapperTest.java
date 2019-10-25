@@ -27,13 +27,6 @@ import org.junit.jupiter.api.BeforeEach;
  */
 public abstract class AbstractResourceReferenceMapperTest extends AbstractMapperTest
 {
-	/**
-	 * Construct.
-	 */
-	AbstractResourceReferenceMapperTest()
-	{
-	}
-
 	final IResource resource1 = new IResource()
 	{
 		private static final long serialVersionUID = 1L;
@@ -108,7 +101,7 @@ public abstract class AbstractResourceReferenceMapperTest extends AbstractMapper
 		}
 	};
 
-	private ResourceReference reference1_a = new ResourceReference(
+	private ResourceReference reference1A = new ResourceReference(
 		AbstractResourceReferenceMapperTest.class, "reference1", Locale.ENGLISH, null, null)
 	{
 		private static final long serialVersionUID = 1L;
@@ -120,7 +113,7 @@ public abstract class AbstractResourceReferenceMapperTest extends AbstractMapper
 		}
 	};
 
-	private ResourceReference reference1_b = new ResourceReference(
+	private ResourceReference reference1B = new ResourceReference(
 		AbstractResourceReferenceMapperTest.class, "reference1", null, "style", null)
 	{
 		private static final long serialVersionUID = 1L;
@@ -145,7 +138,7 @@ public abstract class AbstractResourceReferenceMapperTest extends AbstractMapper
 		}
 	};
 
-	private ResourceReference reference2_a = new ResourceReference(
+	private ResourceReference reference2A = new ResourceReference(
 		AbstractResourceReferenceMapperTest.class, "reference2/name2", new Locale("en", "en"),
 		"style", null)
 	{
@@ -207,14 +200,21 @@ public abstract class AbstractResourceReferenceMapperTest extends AbstractMapper
 		}
 	};
 
+	/**
+	 * Construct.
+	 */
+	AbstractResourceReferenceMapperTest()
+	{
+	}
+
 	@BeforeEach
 	public void before() throws Exception
 	{
 		context.getResourceReferenceRegistry().registerResourceReference(reference1);
-		context.getResourceReferenceRegistry().registerResourceReference(reference1_a);
-		context.getResourceReferenceRegistry().registerResourceReference(reference1_b);
+		context.getResourceReferenceRegistry().registerResourceReference(reference1A);
+		context.getResourceReferenceRegistry().registerResourceReference(reference1B);
 		context.getResourceReferenceRegistry().registerResourceReference(reference2);
-		context.getResourceReferenceRegistry().registerResourceReference(reference2_a);
+		context.getResourceReferenceRegistry().registerResourceReference(reference2A);
 		context.getResourceReferenceRegistry().registerResourceReference(reference3);
 		context.getResourceReferenceRegistry().registerResourceReference(reference4);
 		context.getResourceReferenceRegistry().registerResourceReference(reference5);

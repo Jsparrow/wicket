@@ -38,34 +38,6 @@ public class MockFormFileUploadPage extends WebPage
 {
 	private static final long serialVersionUID = 1L;
 
-	/**
-	 * Model object used in this test.
-	 * 
-	 * @author frankbille
-	 */
-	public static class MockDomainObjectFileUpload implements Serializable
-	{
-		private static final long serialVersionUID = 1L;
-
-		private String text;
-
-		/**
-		 * @return text
-		 */
-		public String getText()
-		{
-			return text;
-		}
-
-		/**
-		 * @param text
-		 */
-		public void setText(String text)
-		{
-			this.text = text;
-		}
-	}
-
 	private final MockDomainObjectFileUpload domainObject;
 
 	private final FileUploadField fileUploadField;
@@ -125,6 +97,34 @@ public class MockFormFileUploadPage extends WebPage
 	public FileUpload getFileUpload()
 	{
 		return fileUpload;
+	}
+
+	/**
+	 * Model object used in this test.
+	 * 
+	 * @author frankbille
+	 */
+	public static class MockDomainObjectFileUpload implements Serializable
+	{
+		private static final long serialVersionUID = 1L;
+
+		private String text;
+
+		/**
+		 * @return text
+		 */
+		public String getText()
+		{
+			return text;
+		}
+
+		/**
+		 * @param text
+		 */
+		public void setText(String text)
+		{
+			this.text = text;
+		}
 	}
 
 }

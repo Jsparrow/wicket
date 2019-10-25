@@ -92,14 +92,7 @@ class InstantiationPermissionsTest
 	void testRemove2()
 	{
 		MetaDataRoleAuthorizationStrategy strategy = new MetaDataRoleAuthorizationStrategy(
-			new IRoleCheckingStrategy()
-			{
-				@Override
-				public boolean hasAnyRole(Roles roles)
-				{
-					return false;
-				}
-			});
+			(Roles roles) -> false);
 		tester.getApplication().setMetaData(
 			MetaDataRoleAuthorizationStrategy.INSTANTIATION_PERMISSIONS,
 			new InstantiationPermissions());
@@ -115,14 +108,7 @@ class InstantiationPermissionsTest
 	void testRemove3()
 	{
 		MetaDataRoleAuthorizationStrategy strategy = new MetaDataRoleAuthorizationStrategy(
-			new IRoleCheckingStrategy()
-			{
-				@Override
-				public boolean hasAnyRole(Roles roles)
-				{
-					return false;
-				}
-			});
+			(Roles roles) -> false);
 		tester.getApplication().setMetaData(
 			MetaDataRoleAuthorizationStrategy.INSTANTIATION_PERMISSIONS,
 			new InstantiationPermissions());

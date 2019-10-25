@@ -66,6 +66,33 @@ abstract class RequestHandlerExecutorTest
 		return new MockRequestCycle(response);
 	}
 
+	protected RequestHandlerExecutor newStack(final IRequestCycle requestCycle)
+	{
+		return new RequestHandlerExecutor()
+		{
+			@Override
+			protected void respond(IRequestHandler handler)
+			{
+				Response originalResponse = requestCycle.getResponse();
+				try
+				{
+					handler.respond(requestCycle);
+				}
+				finally
+				{
+					requestCycle.setResponse(originalResponse);
+				}
+			}
+
+			@Override
+			protected void detach(IRequestHandler handler)
+			{
+				handler.detach(requestCycle);
+			}
+
+		};
+	}
+
 	private class MockRequestCycle implements IRequestCycle
 	{
 		Response response;
@@ -106,32 +133,5 @@ abstract class RequestHandlerExecutorTest
 			return null;
 		}
 
-	}
-
-	protected RequestHandlerExecutor newStack(final IRequestCycle requestCycle)
-	{
-		return new RequestHandlerExecutor()
-		{
-			@Override
-			protected void respond(IRequestHandler handler)
-			{
-				Response originalResponse = requestCycle.getResponse();
-				try
-				{
-					handler.respond(requestCycle);
-				}
-				finally
-				{
-					requestCycle.setResponse(originalResponse);
-				}
-			}
-
-			@Override
-			protected void detach(IRequestHandler handler)
-			{
-				handler.detach(requestCycle);
-			}
-
-		};
 	}
 }

@@ -95,10 +95,7 @@ public class SimpleWebSocketConnectionRegistry implements IWebSocketConnectionRe
 		ConcurrentMap<String, ConcurrentMap<IKey, IWebSocketConnection>> connectionsBySession = application.getMetaData(KEY);
 		if (connectionsBySession != null)
 		{
-			for (ConcurrentMap<IKey, IWebSocketConnection> connectionsByPage : connectionsBySession.values())
-			{
-				connections.addAll(connectionsByPage.values());
-			}
+			connectionsBySession.values().forEach(connectionsByPage -> connections.addAll(connectionsByPage.values()));
 		}
 		return connections;
 	}

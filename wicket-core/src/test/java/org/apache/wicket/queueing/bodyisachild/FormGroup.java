@@ -40,14 +40,21 @@ import org.apache.wicket.util.visit.IVisitor;
  */
 class FormGroup extends Border
 {
-    private Component label;
-    private Component help;
-    private Component feedback;
-    private String stateClassName;
-    private final IModel<String> labelModel;
-    private final IModel<String> helpModel;
-
     /**
+     * ordered list of all feedback message types.
+     */
+    private static final List<Integer> messageTypes = Arrays.asList(
+            FeedbackMessage.FATAL, FeedbackMessage.ERROR, FeedbackMessage.WARNING, FeedbackMessage.SUCCESS,
+            FeedbackMessage.INFO, FeedbackMessage.DEBUG, FeedbackMessage.UNDEFINED
+    );
+	private Component label;
+	private Component help;
+	private Component feedback;
+	private String stateClassName;
+	private final IModel<String> labelModel;
+	private final IModel<String> helpModel;
+
+	/**
      * Construct.
      *
      * @param id    the wicket component id
@@ -58,7 +65,7 @@ class FormGroup extends Border
         this(id, label, Model.of(""));
     }
 
-    /**
+	/**
      * Construct.
      *
      * @param id the wicket component id
@@ -72,7 +79,7 @@ class FormGroup extends Border
         this.stateClassName = "";
     }
 
-    /**
+	/**
      * creates a new label
      *
      * @param id the component id
@@ -84,7 +91,7 @@ class FormGroup extends Border
         return new Label(id, model);
     }
 
-    /**
+	/**
      * creates a new container for a feedback message
      *
      * @param id the component id
@@ -95,7 +102,7 @@ class FormGroup extends Border
         return new Label(id, new Model<String>());
     }
 
-    /**
+	/**
      * creates a new help label that contains a help message for the form field. This field
      * will be set to invisible if there is no content.
      *
@@ -108,7 +115,7 @@ class FormGroup extends Border
         return new Label(id, model);
     }
 
-    @Override
+	@Override
     protected void onComponentTag(ComponentTag tag)
     {
         super.onComponentTag(tag);
@@ -118,7 +125,7 @@ class FormGroup extends Border
         tag.append("class", stateClassName, " ");
     }
 
-    @Override
+	@Override
     protected void onInitialize()
     {
         super.onInitialize();
@@ -132,43 +139,41 @@ class FormGroup extends Border
         final List<FormComponent<?>> formComponents = findFormComponents();
         final int size = formComponents.size();
 
-        if (size > 0)
-        {
-            addOutputMarkupId(formComponents);
-
-            final FormComponent<?> formComponent = formComponents.get(size - 1);
-            label.add(new AttributeModifier("for", formComponent.getMarkupId()));
-
-            final boolean useFormComponentLabel = true;
-            if (useFormComponentLabel)
-            {
-                label.setDefaultModel(new LoadableDetachableModel<String>()
-                {
-                    @Override
-                    protected String load() {
-                        if (formComponent.getLabel() != null && !Strings.isEmpty(formComponent.getLabel().getObject()))
-                        {
-                            return formComponent.getLabel().getObject();
-                        }
-                        else
-                        {
-                            String text = formComponent.getDefaultLabel("wicket:unknown");
-                            if (!"wicket:unknown".equals(text) && !Strings.isEmpty(text))
-                            {
-                                return text;
-                            }
-                            else
-                            {
-                                return labelModel.getObject();
-                            }
-                        }
-                    }
-                });
-            }
-        }
+        if (size <= 0) {
+			return;
+		}
+		addOutputMarkupId(formComponents);
+		final FormComponent<?> formComponent = formComponents.get(size - 1);
+		label.add(new AttributeModifier("for", formComponent.getMarkupId()));
+		final boolean useFormComponentLabel = true;
+		if (useFormComponentLabel)
+		{
+		    label.setDefaultModel(new LoadableDetachableModel<String>()
+		    {
+		        @Override
+		        protected String load() {
+		            if (formComponent.getLabel() != null && !Strings.isEmpty(formComponent.getLabel().getObject()))
+		            {
+		                return formComponent.getLabel().getObject();
+		            }
+		            else
+		            {
+		                String text = formComponent.getDefaultLabel("wicket:unknown");
+		                if (!"wicket:unknown".equals(text) && !Strings.isEmpty(text))
+		                {
+		                    return text;
+		                }
+		                else
+		                {
+		                    return labelModel.getObject();
+		                }
+		            }
+		        }
+		    });
+		}
     }
 
-    /**
+	/**
      * sets the output markup id flag to true for all given formComponents. This is necessary to
      * reference them in a "for" attribute on client side.
      *
@@ -182,7 +187,7 @@ class FormGroup extends Border
         }
     }
 
-    @Override
+	@Override
     protected void onConfigure()
     {
         super.onConfigure();
@@ -213,33 +218,18 @@ class FormGroup extends Border
         }
     }
 
-    /**
+	/**
      * @return all form components that are assigned to this {@link FormGroup}
      */
     private List<FormComponent<?>> findFormComponents()
     {
         final List<FormComponent<?>> components = new ArrayList<>();
-        getBodyContainer().visitChildren(FormComponent.class, new IVisitor<FormComponent, Void>()
-        {
-            @Override
-            public void component(FormComponent formComponent, IVisit<Void> visit)
-            {
-                components.add(formComponent);
-            }
-        });
+        getBodyContainer().visitChildren(FormComponent.class, (FormComponent formComponent, IVisit<Void> visit) -> components.add(formComponent));
 
         return components;
     }
 
-    /**
-     * ordered list of all feedback message types.
-     */
-    private static final List<Integer> messageTypes = Arrays.asList(
-            FeedbackMessage.FATAL, FeedbackMessage.ERROR, FeedbackMessage.WARNING, FeedbackMessage.SUCCESS,
-            FeedbackMessage.INFO, FeedbackMessage.DEBUG, FeedbackMessage.UNDEFINED
-    );
-
-    /**
+	/**
      * returns the worst message that is available.
      *
      * @param messages all current feedback messages

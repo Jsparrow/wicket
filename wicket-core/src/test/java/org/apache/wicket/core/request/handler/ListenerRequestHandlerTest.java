@@ -44,6 +44,8 @@ import org.apache.wicket.util.resource.ResourceStreamNotFoundException;
 import org.apache.wicket.util.resource.StringResourceStream;
 import org.apache.wicket.util.tester.WicketTestCase;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Tests for {@link ListenerRequestHandler}
@@ -154,6 +156,8 @@ public class ListenerRequestHandlerTest extends WicketTestCase
 	{
 		private static final long serialVersionUID = 1L;
 
+		private final Logger logger = LoggerFactory.getLogger(AjaxLinkExpirePage.class);
+
 		private AjaxLink<Void> link;
 
 		/**
@@ -168,7 +172,7 @@ public class ListenerRequestHandlerTest extends WicketTestCase
 				@Override
 				public void onClick(AjaxRequestTarget target)
 				{
-					System.err.println("clicked");
+					logger.error("clicked");
 				}
 			});
 		}
@@ -195,6 +199,7 @@ public class ListenerRequestHandlerTest extends WicketTestCase
 			super(pageParameters);
 			add(new StatelessLink<Object>("statelessLink")
 			{
+				@Override
 				public void onClick()
 				{
 					invoked = true;

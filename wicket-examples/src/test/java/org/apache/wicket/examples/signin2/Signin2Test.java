@@ -72,13 +72,7 @@ public class Signin2Test
 			// this.assertCookiePresent("signInPanel.signInForm.password");
 
 			Collection<Cookie> cookies = tester.getLastResponse().getCookies();
-			for (Cookie cookie : cookies)
-			{
-				if ("signInPanel.signInForm.username".equals(cookie.getName()))
-				{
-					assertEquals("wicket", cookie.getValue());
-				}
-			}
+			cookies.stream().filter(cookie -> "signInPanel.signInForm.username".equals(cookie.getName())).forEach(cookie -> assertEquals("wicket", cookie.getValue()));
 
 			tester.startPage(SignOut.class);
 			tester.assertRenderedPage(SignOut.class);

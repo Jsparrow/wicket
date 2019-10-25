@@ -30,64 +30,6 @@ import org.junit.jupiter.api.Test;
 class NestedFormSubmitTest extends WicketTestCase
 {
 
-	class TestForm<S> extends Form<S>
-	{
-		private final IModel<Boolean> submitted;
-		private final Button submit;
-		private final boolean wantInclusion;
-		private final boolean wantExclusion;
-
-		TestForm(String id, IModel<Boolean> submitted, boolean wantInclusion, boolean wantExclusion)
-		{
-			super(id);
-			this.submitted = submitted;
-			this.wantInclusion = wantInclusion;
-			this.wantExclusion = wantExclusion;
-
-			submit = new Button("submit");
-			add(submit);
-		}
-
-		@Override
-		protected void onSubmit()
-		{
-			super.onSubmit();
-			submitted.setObject(Boolean.TRUE);
-		}
-
-		@Override
-		public boolean wantSubmitOnNestedFormSubmit()
-		{
-			return wantInclusion;
-		}
-
-		@Override
-		public boolean wantSubmitOnParentFormSubmit()
-		{
-			return wantExclusion;
-		}
-	}
-
-	class TestPage extends WebPage
-	{
-		private final TestForm<?> outer;
-		private final TestForm<?> middle;
-		private final TestForm<?> inner;
-
-		TestPage(IModel<Boolean> submittedOuter, boolean outerWantsInclusion,
-				 IModel<Boolean> submittedMiddle, boolean middleWantsInclusion,
-				 boolean middleWantsExclusion, IModel<Boolean> submittedInner)
-		{
-			outer = new TestForm<Void>("outer", submittedOuter, outerWantsInclusion, true);
-			this.add(outer);
-			middle = new TestForm<Void>("middle", submittedMiddle, middleWantsInclusion,
-				middleWantsExclusion);
-			outer.add(middle);
-			inner = new TestForm<Void>("inner", submittedInner, false, true);
-			middle.add(inner);
-		}
-	}
-
 	private Model<Boolean> submittedOuter;
 	private Model<Boolean> submittedMiddle;
 	private Model<Boolean> submittedInner;
@@ -203,5 +145,63 @@ class NestedFormSubmitTest extends WicketTestCase
 	{
 		page = (TestPage)tester.startPage(new TestPage(submittedOuter, outerWantsInclusion,
 			submittedMiddle, middleWantsInclusion, middleWantsExclusion, submittedInner));
+	}
+
+	class TestForm<S> extends Form<S>
+	{
+		private final IModel<Boolean> submitted;
+		private final Button submit;
+		private final boolean wantInclusion;
+		private final boolean wantExclusion;
+
+		TestForm(String id, IModel<Boolean> submitted, boolean wantInclusion, boolean wantExclusion)
+		{
+			super(id);
+			this.submitted = submitted;
+			this.wantInclusion = wantInclusion;
+			this.wantExclusion = wantExclusion;
+
+			submit = new Button("submit");
+			add(submit);
+		}
+
+		@Override
+		protected void onSubmit()
+		{
+			super.onSubmit();
+			submitted.setObject(Boolean.TRUE);
+		}
+
+		@Override
+		public boolean wantSubmitOnNestedFormSubmit()
+		{
+			return wantInclusion;
+		}
+
+		@Override
+		public boolean wantSubmitOnParentFormSubmit()
+		{
+			return wantExclusion;
+		}
+	}
+
+	class TestPage extends WebPage
+	{
+		private final TestForm<?> outer;
+		private final TestForm<?> middle;
+		private final TestForm<?> inner;
+
+		TestPage(IModel<Boolean> submittedOuter, boolean outerWantsInclusion,
+				 IModel<Boolean> submittedMiddle, boolean middleWantsInclusion,
+				 boolean middleWantsExclusion, IModel<Boolean> submittedInner)
+		{
+			outer = new TestForm<Void>("outer", submittedOuter, outerWantsInclusion, true);
+			this.add(outer);
+			middle = new TestForm<Void>("middle", submittedMiddle, middleWantsInclusion,
+				middleWantsExclusion);
+			outer.add(middle);
+			inner = new TestForm<Void>("inner", submittedInner, false, true);
+			middle.add(inner);
+		}
 	}
 }

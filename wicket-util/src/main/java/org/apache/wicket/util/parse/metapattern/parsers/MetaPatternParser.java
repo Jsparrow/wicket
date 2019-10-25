@@ -94,18 +94,15 @@ public abstract class MetaPatternParser
 
 		// does the pattern match?
 		matcher = pattern.matcher(s);
-		if (matcher.lookingAt())
-		{
-			// Yes, it does. Move the cursor to the end of the
-			// char sequence matched.
-			pos += matcher.end();
-
-			// Found the pattern
-			return true;
+		if (!matcher.lookingAt()) {
+			// Did not find the pattern.
+			return false;
 		}
-
-		// Did not find the pattern.
-		return false;
+		// Yes, it does. Move the cursor to the end of the
+		// char sequence matched.
+		pos += matcher.end();
+		// Found the pattern
+		return true;
 	}
 
 	/**

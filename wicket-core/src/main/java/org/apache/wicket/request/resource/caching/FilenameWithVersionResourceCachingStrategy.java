@@ -173,23 +173,21 @@ public class FilenameWithVersionResourceCachingStrategy implements IResourceCach
 		pos = fullname.lastIndexOf(versionPrefix);
 
 		// remove version string if it exists
-		if (pos != -1 && isVersion(fullname.substring(pos + versionPrefix.length())))
+		if (!(pos != -1 && isVersion(fullname.substring(pos + versionPrefix.length())))) {
+			return;
+		}
+		// get filename before version string
+		final String basename = fullname.substring(0, pos);
+		// create filename without version string 
+		// (required for working resource lookup)
+		url.setFileName(extension == null? basename : basename + extension);
+		// store the version in the request cycle
+		RequestCycle requestCycle = RequestCycle.get();
+		if (requestCycle != null)
 		{
-			// get filename before version string
-			final String basename = fullname.substring(0, pos);
-
-			// create filename without version string 
-			// (required for working resource lookup)
-			url.setFileName(extension == null? basename : basename + extension);
-
-			// store the version in the request cycle
-			RequestCycle requestCycle = RequestCycle.get();
-			if (requestCycle != null)
-			{
-				int idx = fullname.indexOf(versionPrefix);
-				String urlVersion = fullname.substring(idx + versionPrefix.length());
-				requestCycle.setMetaData(URL_VERSION, urlVersion);
-			}
+			int idx = fullname.indexOf(versionPrefix);
+			String urlVersion = fullname.substring(idx + versionPrefix.length());
+			requestCycle.setMetaData(URL_VERSION, urlVersion);
 		}
 	}
 
@@ -209,11 +207,11 @@ public class FilenameWithVersionResourceCachingStrategy implements IResourceCach
 	{
 		String requestedVersion = RequestCycle.get().getMetaData(URL_VERSION);
 		String calculatedVersion = this.resourceVersion.getVersion(resource);
-		if (calculatedVersion != null && calculatedVersion.equals(requestedVersion))
-		{
-			response.setCacheDurationToMaximum();
-			response.setCacheScope(WebResponse.CacheScope.PUBLIC);
+		if (!(calculatedVersion != null && calculatedVersion.equals(requestedVersion))) {
+			return;
 		}
+		response.setCacheDurationToMaximum();
+		response.setCacheScope(WebResponse.CacheScope.PUBLIC);
 	}
 
 	@Override

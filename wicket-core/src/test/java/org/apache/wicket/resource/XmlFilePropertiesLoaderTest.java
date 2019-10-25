@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Test;
  */
 class XmlFilePropertiesLoaderTest extends WicketTestCase
 {
-	static Map<Locale, String> EXPECTED_LOCALIZATIONS = new HashMap<Locale, String>();
+	static Map<Locale, String> EXPECTED_LOCALIZATIONS = new HashMap<>();
 	static
 	{
 		EXPECTED_LOCALIZATIONS.put(Locale.US, "value");
@@ -43,10 +43,9 @@ class XmlFilePropertiesLoaderTest extends WicketTestCase
 	@Test
 	void wicket2035()
 	{
-		for (Locale locale : EXPECTED_LOCALIZATIONS.keySet())
-		{
+		EXPECTED_LOCALIZATIONS.keySet().forEach(locale -> {
 			tester.getSession().setLocale(locale);
 			tester.startPage(PageWithXmlProperties.class);
-		}
+		});
 	}
 }

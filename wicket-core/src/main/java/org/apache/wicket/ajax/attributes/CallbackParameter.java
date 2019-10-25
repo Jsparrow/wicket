@@ -28,6 +28,18 @@ import org.apache.wicket.ajax.AbstractDefaultAjaxBehavior;
  */
 public class CallbackParameter
 {
+	private String functionParameterName;
+	private String ajaxParameterName;
+	private String ajaxParameterCode;
+
+	private CallbackParameter(String functionParameterName, String ajaxParameterName,
+		String ajaxParameterCode)
+	{
+		this.functionParameterName = functionParameterName;
+		this.ajaxParameterName = ajaxParameterName;
+		this.ajaxParameterCode = ajaxParameterCode;
+	}
+
 	/**
 	 * Add a parameter to the function declaration. This parameter will not be passed to the AJAX
 	 * callback. For example, the following code:
@@ -112,18 +124,6 @@ public class CallbackParameter
 	public static CallbackParameter converted(String name, String code)
 	{
 		return new CallbackParameter(name, name, code);
-	}
-
-	private String functionParameterName;
-	private String ajaxParameterName;
-	private String ajaxParameterCode;
-
-	private CallbackParameter(String functionParameterName, String ajaxParameterName,
-		String ajaxParameterCode)
-	{
-		this.functionParameterName = functionParameterName;
-		this.ajaxParameterName = ajaxParameterName;
-		this.ajaxParameterCode = ajaxParameterCode;
 	}
 
 	/**

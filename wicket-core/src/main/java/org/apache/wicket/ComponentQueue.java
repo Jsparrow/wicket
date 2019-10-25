@@ -57,8 +57,7 @@ class ComponentQueue
 			{
 				if (seen[i].equals(component.getId()))
 				{
-					throw new WicketRuntimeException("A component with id: " + component.getId()
-						+ " has already been queued");
+					throw new WicketRuntimeException(new StringBuilder().append("A component with id: ").append(component.getId()).append(" has already been queued").toString());
 				}
 			}
 		}
@@ -73,11 +72,10 @@ class ComponentQueue
 			{
 				Component[] replacement = new Component[queueSize + ADDITIONAL];
 				int pos = 0;
-				for (int i = 0; i < queue.length; i++)
-				{
-					if (queue[i] != null)
+				for (Component aQueue : queue) {
+					if (aQueue != null)
 					{
-						replacement[pos++] = queue[i];
+						replacement[pos++] = aQueue;
 					}
 				}
 				queue = replacement;
@@ -148,9 +146,6 @@ class ComponentQueue
 	@Override
 	public String toString()
 	{
-		return "ComponentQueue{" +
-				"queueSize=" + queueSize +
-				", queue=" + Arrays.toString(queue) +
-				'}';
+		return new StringBuilder().append("ComponentQueue{").append("queueSize=").append(queueSize).append(", queue=").append(Arrays.toString(queue)).append('}').toString();
 	}
 }

@@ -62,9 +62,8 @@ public class ComponentStrings
 		// create a user friendly message, using the location's message as a
 		// differentiator for the message (e.g. "component foo was ***added***"
 		// or "component foo was ***created***")
-		AppendingStringBuffer sb = new AppendingStringBuffer("The " + componentType.toLowerCase(Locale.ROOT) +
-			" with id '" + component.getId() + "' that failed to render was " +
-			location.getMessage() + "\n");
+		AppendingStringBuffer sb = new AppendingStringBuffer(new StringBuilder().append("The ").append(componentType.toLowerCase(Locale.ROOT)).append(" with id '").append(component.getId()).append("' that failed to render was ").append(location.getMessage())
+				.append("\n").toString());
 
 		// a list of stacktrace elements that need to be skipped in the location
 		// stack trace

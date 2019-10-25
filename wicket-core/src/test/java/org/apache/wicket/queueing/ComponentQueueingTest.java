@@ -53,16 +53,22 @@ import org.apache.wicket.util.resource.StringResourceStream;
 import org.apache.wicket.util.tester.FormTester;
 import org.apache.wicket.util.tester.WicketTestCase;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class ComponentQueueingTest extends WicketTestCase
 {
+	private static final Logger logger = LoggerFactory.getLogger(ComponentQueueingTest.class);
+
 	/** {@code [a,b,c] -> [a[b[c]]] } */
 	@Test
 	void dequeue1()
 	{
 		TestPage p = new TestPage();
 		p.setPageMarkup("<p wicket:id='a'><p wicket:id='b'><p wicket:id='c'></p></p></p>");
-		MarkupContainer a = new A(), b = new B(), c = new C();
+		MarkupContainer a = new A();
+		MarkupContainer b = new B();
+		MarkupContainer c = new C();
 
 		p.queue(b, c, a);
 		assertThat(p, hasPath(a, b, c));
@@ -77,7 +83,9 @@ class ComponentQueueingTest extends WicketTestCase
 	{
 		TestPage p = new TestPage();
 		p.setPageMarkup("<p wicket:id='a'><p wicket:id='b'><p wicket:id='c'></p></p></p>");
-		MarkupContainer a = new A(), b = new B(), c = new C();
+		MarkupContainer a = new A();
+		MarkupContainer b = new B();
+		MarkupContainer c = new C();
 		
 		//components are queued before their nested container is added to the page.
 		//this caused a "Detach called on component...while it had a non-empty queue" before WICKET-6361 was fixed
@@ -95,7 +103,9 @@ class ComponentQueueingTest extends WicketTestCase
 	{
 		TestPage p = new TestPage();
 		p.setPageMarkup("<p wicket:id='a'><p wicket:id='b'><p wicket:id='c'></p></p></p>");
-		MarkupContainer a = new A(), b = new B(), c = new C();
+		MarkupContainer a = new A();
+		MarkupContainer b = new B();
+		MarkupContainer c = new C();
 
 		p.queue(a);
 		a.queue(b, c);
@@ -111,7 +121,9 @@ class ComponentQueueingTest extends WicketTestCase
 	{
 		TestPage p = new TestPage();
 		p.setPageMarkup("<p wicket:id='a'><p wicket:id='b'><p wicket:id='c'></p></p></p>");
-		MarkupContainer a = new A(), b = new B(), c = new C();
+		MarkupContainer a = new A();
+		MarkupContainer b = new B();
+		MarkupContainer c = new C();
 
 		p.queue(a);
 		a.queue(b);
@@ -128,7 +140,9 @@ class ComponentQueueingTest extends WicketTestCase
 	{
 		TestPage p = new TestPage();
 		p.setPageMarkup("<p wicket:id='a'><p wicket:id='b'><p wicket:id='c'></p></p></p>");
-		MarkupContainer a = new A(), b = new B(), c = new C();
+		MarkupContainer a = new A();
+		MarkupContainer b = new B();
+		MarkupContainer c = new C();
 
 		p.queue(a, c);
 		a.queue(b);
@@ -144,7 +158,9 @@ class ComponentQueueingTest extends WicketTestCase
 	{
 		TestPage p = new TestPage();
 		p.setPageMarkup("<p wicket:id='a'><p wicket:id='b'><p wicket:id='c'></p></p></p>");
-		MarkupContainer a = new A(), b = new B(), c = new C();
+		MarkupContainer a = new A();
+		MarkupContainer b = new B();
+		MarkupContainer c = new C();
 		p.queue(a, c);
 		a.add(b);
 
@@ -159,7 +175,9 @@ class ComponentQueueingTest extends WicketTestCase
 	{
 		TestPage p = new TestPage();
 		p.setPageMarkup("<p wicket:id='a'><p wicket:id='b'></p><p wicket:id='c'></p></p>");
-		MarkupContainer a = new A(), b = new B(), c = new C();
+		MarkupContainer a = new A();
+		MarkupContainer b = new B();
+		MarkupContainer c = new C();
 
 		p.queue(a, b, c);
 
@@ -179,20 +197,17 @@ class ComponentQueueingTest extends WicketTestCase
 
 		// @formatter:off
 		p.setPageMarkup(
-			"  <p wicket:id='a'>"
-			+ "  <p wicket:id='b'>"
-			+ "    <p wicket:id='c'></p>"
-			+ "    <p wicket:id='d'>"
-			+ "      <p wicket:id='e'></p>"
-			+ "    </p>"
-			+ "    <p wicket:id='f'>"
-			+ "      <p wicket:id='g'></p>"
-			+ "    </p>"
-			+ "  </p>"
-			+ "</p>");
+			new StringBuilder().append("  <p wicket:id='a'>").append("  <p wicket:id='b'>").append("    <p wicket:id='c'></p>").append("    <p wicket:id='d'>").append("      <p wicket:id='e'></p>").append("    </p>").append("    <p wicket:id='f'>").append("      <p wicket:id='g'></p>")
+					.append("    </p>").append("  </p>").append("</p>").toString());
 		// @formatter:on
 
-		MarkupContainer a = new A(), b = new B(), c = new C(), d = new D(), e = new E(), f = new F(), g = new G();
+		MarkupContainer a = new A();
+		MarkupContainer b = new B();
+		MarkupContainer c = new C();
+		MarkupContainer d = new D();
+		MarkupContainer e = new E();
+		MarkupContainer f = new F();
+		MarkupContainer g = new G();
 
 		a.add(b);
 		b.queue(e);
@@ -215,7 +230,9 @@ class ComponentQueueingTest extends WicketTestCase
 	{
 		TestPage p = new TestPage();
 		p.setPageMarkup("<p wicket:id='a'><p wicket:id='b'><p wicket:id='c'></p></p></p>");
-		MarkupContainer a = new A(), b = new B(), c = new C();
+		MarkupContainer a = new A();
+		MarkupContainer b = new B();
+		MarkupContainer c = new C();
 
 		p.queue(b, c);
 		c.queue(a);
@@ -227,6 +244,7 @@ class ComponentQueueingTest extends WicketTestCase
 		}
 		catch (WicketRuntimeException e)
 		{
+			logger.error(e.getMessage(), e);
 			// expected
 		}
 	}
@@ -235,7 +253,9 @@ class ComponentQueueingTest extends WicketTestCase
 	@Test
 	void panel1()
 	{
-		MarkupContainer a = new A(), r = new R(), s = new S();
+		MarkupContainer a = new A();
+		MarkupContainer r = new R();
+		MarkupContainer s = new S();
 
 		TestPanel q = new TestPanel("q");
 		q.setPanelMarkup("<wicket:panel><p wicket:id='r'><p wicket:id='s'></p></p></wicket:panel>");
@@ -297,7 +317,8 @@ class ComponentQueueingTest extends WicketTestCase
 	@Test
 	void nestedPanels()
 	{
-		MarkupContainer r = new R(), s = new S();
+		MarkupContainer r = new R();
+		MarkupContainer s = new S();
 
 		Panel innerPanel = new InnerPanel("inner");
 		innerPanel.queue(s);
@@ -410,7 +431,8 @@ class ComponentQueueingTest extends WicketTestCase
 	{
 		TestPage p = new TestPage();
 		p.setPageMarkup("<p wicket:id='a'><a wicket:id='l'><p wicket:id='b'></p></a></p>");
-		MarkupContainer a = new A(), b = new B();
+		MarkupContainer a = new A();
+		MarkupContainer b = new B();
 		L l = new L();
 		p.queue(a, b, l);
 
@@ -436,6 +458,7 @@ class ComponentQueueingTest extends WicketTestCase
 		}
 		catch (WicketRuntimeException e)
 		{
+			logger.error(e.getMessage(), e);
 			// expected
 		}
 	}
@@ -654,7 +677,10 @@ class ComponentQueueingTest extends WicketTestCase
 	@Test
 	void border1()
 	{
-		MarkupContainer a = new A(), b = new B(), r = new R(), s = new S();
+		MarkupContainer a = new A();
+		MarkupContainer b = new B();
+		MarkupContainer r = new R();
+		MarkupContainer s = new S();
 
 		TestBorder border = new TestBorder("border");
 		border.setBorderMarkup("<wicket:border><b1 wicket:id='r'><b2 wicket:id='s'>" +
@@ -690,7 +716,12 @@ class ComponentQueueingTest extends WicketTestCase
 	@Test
 	void border_nested()
 	{
-		MarkupContainer a = new A(), b = new B(), c= new C(), d = new D(), r = new R(), s = new S();
+		MarkupContainer a = new A();
+		MarkupContainer b = new B();
+		MarkupContainer c= new C();
+		MarkupContainer d = new D();
+		MarkupContainer r = new R();
+		MarkupContainer s = new S();
 
 		Border outerBorder = new OuterBorder("outerBorder");
 
@@ -716,7 +747,10 @@ class ComponentQueueingTest extends WicketTestCase
 
 	@Test
 	void fragment1() {
-		MarkupContainer a = new A(), b = new B(), r = new R(), s = new S();
+		MarkupContainer a = new A();
+		MarkupContainer b = new B();
+		MarkupContainer r = new R();
+		MarkupContainer s = new S();
 		
 		TestPage page = new TestPage();
 		page.setPageMarkup("<a wicket:id='a'></a><f wicket:id='fragment'></f><b wicket:id='b'></b>"
@@ -753,7 +787,8 @@ class ComponentQueueingTest extends WicketTestCase
 	@Test
 	void containerTag1()
 	{
-		MarkupContainer a = new A(), b = new B();
+		MarkupContainer a = new A();
+		MarkupContainer b = new B();
 
 		TestPage page = new TestPage();
 		page.setPageMarkup("<wicket:container wicket:id='a'><b wicket:id='b'></b></wicket:container>");
@@ -767,12 +802,7 @@ class ComponentQueueingTest extends WicketTestCase
 	void queueInsideHeader()
 	{
 		TestPage page = new TestPage();
-		page.setPageMarkup("<html>"
-			+"<head><title wicket:id='title'></title></head>"
-			+ "<body><div>"
-			+ "Hello!"
-			+ "</div></body>"
-			+ "</html>");
+		page.setPageMarkup(new StringBuilder().append("<html>").append("<head><title wicket:id='title'></title></head>").append("<body><div>").append("Hello!").append("</div></body>").append("</html>").toString());
 		
 		page.queue(new Label("title"));
 		
@@ -785,10 +815,7 @@ class ComponentQueueingTest extends WicketTestCase
 	void queueInsideAutoLink()
 	{
 		TestPage page = new TestPage();
-		page.setPageMarkup("<wicket:link>"
-			+ "<a href='test.html'>"
-			+ "<wicket:container wicket:id='test'>test</wicket:container>"
-			+ "</a></wicket:link>");
+		page.setPageMarkup(new StringBuilder().append("<wicket:link>").append("<a href='test.html'>").append("<wicket:container wicket:id='test'>test</wicket:container>").append("</a></wicket:link>").toString());
 		
 		page.queue(new WebMarkupContainer("test"));
 		
@@ -799,10 +826,7 @@ class ComponentQueueingTest extends WicketTestCase
 	void queueInsideLabelComponent()
 	{
 		TestPage page = new TestPage();
-		page.setPageMarkup("<label wicket:for='input'>"
-				+ "label:"
-				+ "<input wicket:id='input'/>"
-				+ "</label>");
+		page.setPageMarkup(new StringBuilder().append("<label wicket:for='input'>").append("label:").append("<input wicket:id='input'/>").append("</label>").toString());
 		
 		page.queue(new TextField<>("input", Model.of("test")));
 		
@@ -813,12 +837,7 @@ class ComponentQueueingTest extends WicketTestCase
 	void queueInsideTransparentContainer() throws Exception
 	{
 		TestPage page = new TestPage();
-		page.setPageMarkup("<div wicket:id='transparentContainer'>"
-			+ "	<div wicket:id='container'>"
-			+ "		<div wicket:id='child'>"
-			+ " 	</div>"
-			+ " </div>"
-			+ "</div>");
+		page.setPageMarkup(new StringBuilder().append("<div wicket:id='transparentContainer'>").append("	<div wicket:id='container'>").append("		<div wicket:id='child'>").append(" 	</div>").append(" </div>").append("</div>").toString());
 		
 		page.add(new TransparentWebMarkupContainer("transparentContainer"));
 		page.add(new WebMarkupContainer("container"));
@@ -831,17 +850,8 @@ class ComponentQueueingTest extends WicketTestCase
 	void queueNestedEnclosure()
 	{
 		TestPage page = new TestPage();
-		page.setPageMarkup( "<div wicket:enclosure='outer'>" +
-			"<div wicket:id='outer'>" +
-			"	<div wicket:enclosure='middle'>" +
-			"		<div wicket:enclosure='inner'>" +
-			"			<div wicket:id='inner'>inner</div>" +
-			"		</div>" +
-			"		<div wicket:id='middle'>middle</div>" +
-			"	</div>" +
-			"	outer" +
-			"</div>" +
-			"</div>");
+		page.setPageMarkup( new StringBuilder().append("<div wicket:enclosure='outer'>").append("<div wicket:id='outer'>").append("	<div wicket:enclosure='middle'>").append("		<div wicket:enclosure='inner'>").append("			<div wicket:id='inner'>inner</div>").append("		</div>").append("		<div wicket:id='middle'>middle</div>").append("	</div>")
+				.append("	outer").append("</div>").append("</div>").toString());
 		
 		WebMarkupContainer container = new WebMarkupContainer("outer");
 		container.add(new WebMarkupContainer("middle"));
@@ -859,12 +869,7 @@ class ComponentQueueingTest extends WicketTestCase
 	void queueComponentInsideWcAndEnclosure()
 	{
 		TestPage page = new TestPage();
-		page.setPageMarkup(" <div wicket:id=\"container\">\n" +
-			"    <div wicket:enclosure=\"child\">\n" +
-			"      <p wicket:id=\"child\">1</p>\n" +
-			"      <a wicket:id=\"child2\">2</a>\n" +
-			"    </div>\n" +
-			"  </div>");
+		page.setPageMarkup(new StringBuilder().append(" <div wicket:id=\"container\">\n").append("    <div wicket:enclosure=\"child\">\n").append("      <p wicket:id=\"child\">1</p>\n").append("      <a wicket:id=\"child2\">2</a>\n").append("    </div>\n").append("  </div>").toString());
 		
 		WebMarkupContainer container = new WebMarkupContainer("container");
 
@@ -892,13 +897,7 @@ class ComponentQueueingTest extends WicketTestCase
 		page.setPageMarkup(" <div wicket:id=\"panel\"></div>");
 		
 		TestPanel panel = new TestPanel("panel");
-		panel.setPanelMarkup("<wicket:panel>\n"
-			+ "<div wicket:id=\"border\">\n" +
-			"    <div wicket:enclosure=\"child\">\n" +
-			"      <p wicket:id=\"child\">1</p>\n" +			
-			"    </div>\n" +
-			"  </div>\n" +
-			"</wicket:panel>");
+		panel.setPanelMarkup(new StringBuilder().append("<wicket:panel>\n").append("<div wicket:id=\"border\">\n").append("    <div wicket:enclosure=\"child\">\n").append("      <p wicket:id=\"child\">1</p>\n").append("    </div>\n").append("  </div>\n").append("</wicket:panel>").toString());
 		
 		TestBorder border = new TestBorder("border");
 		border.setBorderMarkup("<wicket:border><wicket:body/></wicket:border>");
@@ -1013,14 +1012,15 @@ class ComponentQueueingTest extends WicketTestCase
 		}
 	}
 
-	private static abstract class LV extends ListView<Integer>
+	private abstract static class LV extends ListView<Integer>
 	{
 		LV(int size)
 		{
 			super("lv");
 			ArrayList<Integer> values = new ArrayList<>();
-			for (int i = 0; i < size; i++)
+			for (int i = 0; i < size; i++) {
 				values.add(i);
+			}
 			setModel(new Model<>(values));
 		}
 	}
@@ -1051,13 +1051,13 @@ class ComponentQueueingTest extends WicketTestCase
 	{
 		private String markup;
 
-		TestPage()
-		{
-		}
-
 		public TestPage(String markup)
 		{
 			this.markup = markup;
+		}
+
+		TestPage()
+		{
 		}
 
 		String getPageMarkup()

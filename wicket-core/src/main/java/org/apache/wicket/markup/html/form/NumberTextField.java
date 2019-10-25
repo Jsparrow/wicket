@@ -211,11 +211,11 @@ public class NumberTextField<N extends Number & Comparable<N>> extends TextField
 
 		final N min = minimum.getObject();
 		final N max = maximum.getObject();
-		if (min != null || max != null)
-		{
-			validator = RangeValidator.range(min, max);
-			add(validator);
+		if (!(min != null || max != null)) {
+			return;
 		}
+		validator = RangeValidator.range(min, max);
+		add(validator);
 	}
 
 	@SuppressWarnings("unchecked")

@@ -30,39 +30,6 @@ import java.text.ParseException;
  */
 public interface IXmlPullParser
 {
-	/** The last element found */
-	enum HttpTagType {
-		/** next() must be called at least once for the Type to be valid */
-		NOT_INITIALIZED,
-
-		/** <name ...> */
-		TAG,
-
-		/** Tag body in between two tags */
-		BODY,
-
-		/** <!-- ... --> */
-		COMMENT,
-
-		/** <!--[if ] ... --> */
-		CONDITIONAL_COMMENT,
-
-		/** <![endif]--> */
-		CONDITIONAL_COMMENT_ENDIF,
-
-		/** <![CDATA[ .. ]]> */
-		CDATA,
-
-		/** <?...> */
-		PROCESSING_INSTRUCTION,
-
-		/** <!DOCTYPE ...> */
-		DOCTYPE,
-
-		/** all other tags which look like <!.. > */
-		SPECIAL_TAG,
-	}
-
 	/**
 	 * Return the encoding applied while reading the markup resource. The encoding is determined by
 	 * analyzing the &lt;?xml version=".." encoding=".." ?&gt; tag.
@@ -167,4 +134,37 @@ public interface IXmlPullParser
 	 * @param pos
 	 */
 	void setPositionMarker(final int pos);
+
+	/** The last element found */
+	enum HttpTagType {
+		/** next() must be called at least once for the Type to be valid */
+		NOT_INITIALIZED,
+
+		/** <name ...> */
+		TAG,
+
+		/** Tag body in between two tags */
+		BODY,
+
+		/** <!-- ... --> */
+		COMMENT,
+
+		/** <!--[if ] ... --> */
+		CONDITIONAL_COMMENT,
+
+		/** <![endif]--> */
+		CONDITIONAL_COMMENT_ENDIF,
+
+		/** <![CDATA[ .. ]]> */
+		CDATA,
+
+		/** <?...> */
+		PROCESSING_INSTRUCTION,
+
+		/** <!DOCTYPE ...> */
+		DOCTYPE,
+
+		/** all other tags which look like <!.. > */
+		SPECIAL_TAG,
+	}
 }

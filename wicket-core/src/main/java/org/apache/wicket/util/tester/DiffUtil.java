@@ -181,11 +181,7 @@ public final class DiffUtil
 			final MarkupStream bmarkup = new MarkupStream(new MarkupParser(b).parse());
 			return amarkup.equalTo(bmarkup);
 		}
-		catch (IOException e)
-		{
-			log.error(e.getMessage(), e);
-		}
-		catch (ResourceStreamNotFoundException e)
+		catch (ResourceStreamNotFoundException | IOException e)
 		{
 			log.error(e.getMessage(), e);
 		}

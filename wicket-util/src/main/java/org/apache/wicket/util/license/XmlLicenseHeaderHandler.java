@@ -30,7 +30,7 @@ import org.opentest4j.AssertionFailedError;
 class XmlLicenseHeaderHandler extends AbstractLicenseHeaderHandler
 {
 	private final Pattern xmlHeader = Pattern.compile(
-		"^(\\<\\?xml[^" + LINE_ENDING + "]+?)" + LINE_ENDING + "(.*)$",
+		new StringBuilder().append("^(\\<\\?xml[^").append(LINE_ENDING).append("]+?)").append(LINE_ENDING).append("(.*)$").toString(),
 		Pattern.DOTALL | Pattern.MULTILINE);
 
 	/**

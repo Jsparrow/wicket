@@ -70,6 +70,8 @@ import org.apache.wicket.util.io.IOUtils;
 import org.apache.wicket.util.string.StringValue;
 import org.apache.wicket.util.string.Strings;
 import org.apache.wicket.util.value.ValueMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -80,45 +82,11 @@ import org.apache.wicket.util.value.ValueMap;
  */
 public class MockHttpServletRequest implements HttpServletRequest
 {
-	/**
-	 * A holder class for an uploaded file.
-	 * 
-	 * @author Frank Bille (billen)
-	 */
-	private static class UploadedFile
-	{
-		private File file;
-		private String contentType;
+	private static final Logger logger = LoggerFactory.getLogger(MockHttpServletRequest.class);
 
-		/**
-		 * Construct.
-		 * 
-		 * @param fieldName
-		 * @param file
-		 * @param contentType
-		 */
-		public UploadedFile(String fieldName, File file, String contentType)
-		{
-			this.file = file;
-			this.contentType = contentType;
-		}
+	private static final String crlf = "\r\n";
 
-		/**
-		 * @return The content type of the file. Mime type.
-		 */
-		public String getContentType()
-		{
-			return contentType;
-		}
-
-		/**
-		 * @return The uploaded file.
-		 */
-		public File getFile()
-		{
-			return file;
-		}
-	}
+	private static final String boundary = "--abcdefgABCDEFG";
 
 	private final ValueMap attributes = new ValueMap();
 
@@ -158,6 +126,8 @@ public class MockHttpServletRequest implements HttpServletRequest
 
 	private int serverPort = 80;
 
+	private final MockRequestParameters post = new MockRequestParameters();
+
 	/**
 	 * Create the request using the supplied session object. Note that in order for temporary
 	 * sessions to work, the supplied session must be an instance of {@link MockHttpSession}
@@ -178,7 +148,7 @@ public class MockHttpServletRequest implements HttpServletRequest
 		this.context = context;
 		initialize(locale);
 	}
-	
+
 	public MockHttpServletRequest(final Application application, final HttpSession session,
 			final ServletContext context) 
 	{
@@ -374,7 +344,6 @@ public class MockHttpServletRequest implements HttpServletRequest
 		this.useMultiPartContentType = useMultiPartContentType;
 	}
 
-
 	/**
 	 * Return the length of the content. This is always -1 except if useMultiPartContentType set as
 	 * true. Then the length will be the length of the generated request.
@@ -384,13 +353,11 @@ public class MockHttpServletRequest implements HttpServletRequest
 	@Override
 	public int getContentLength()
 	{
-		if (useMultiPartContentType)
-		{
-			byte[] request = buildRequest();
-			return request.length;
+		if (!useMultiPartContentType) {
+			return -1;
 		}
-
-		return -1;
+		byte[] request = buildRequest();
+		return request.length;
 	}
 
 	@Override
@@ -461,7 +428,7 @@ public class MockHttpServletRequest implements HttpServletRequest
 		{
 			return null;
 		}
-		List<Cookie> cookieValues = new ArrayList<Cookie>();
+		List<Cookie> cookieValues = new ArrayList<>();
 		cookieValues.addAll(cookies.values());
 		return cookieValues.toArray(new Cookie[cookieValues.size()]);
 	}
@@ -476,7 +443,7 @@ public class MockHttpServletRequest implements HttpServletRequest
 	 *             If the header cannot be converted
 	 */
 	@Override
-	public long getDateHeader(final String name) throws IllegalArgumentException
+	public long getDateHeader(final String name)
 	{
 		String value = getHeader(name);
 		if (value == null)
@@ -491,8 +458,8 @@ public class MockHttpServletRequest implements HttpServletRequest
 		}
 		catch (ParseException e)
 		{
-			throw new IllegalArgumentException("Can't convert header to date " + name + ": "
-				+ value);
+			logger.error(e.getMessage(), e);
+			throw new IllegalArgumentException(new StringBuilder().append("Can't convert header to date ").append(name).append(": ").append(value).toString());
 		}
 	}
 
@@ -543,7 +510,7 @@ public class MockHttpServletRequest implements HttpServletRequest
 		List<String> list = (List<String>)headers.get(name);
 		if (list == null)
 		{
-			list = new ArrayList<String>();
+			list = new ArrayList<>();
 		}
 		return Collections.enumeration(list);
 	}
@@ -629,7 +596,7 @@ public class MockHttpServletRequest implements HttpServletRequest
 	}
 
 	public void setLocale(Locale locale) {
-		setHeader("Accept-Language", locale.getLanguage() + '-' + locale.getCountry());
+		setHeader("Accept-Language", new StringBuilder().append(locale.getLanguage()).append('-').append(locale.getCountry()).toString());
 	}
 
 	/**
@@ -734,11 +701,9 @@ public class MockHttpServletRequest implements HttpServletRequest
 	{
 		Map<String, String[]> params = new HashMap<>(parameters);
 
-		for (String name : post.getParameterNames())
-		{
+		post.getParameterNames().forEach(name -> {
 			List<StringValue> values = post.getParameterValues(name);
-			for (StringValue value : values)
-			{
+			values.forEach(value -> {
 				String[] present = params.get(name);
 				if (present == null)
 				{
@@ -751,8 +716,8 @@ public class MockHttpServletRequest implements HttpServletRequest
 					newval[newval.length - 1] = value.toString();
 					params.put(name, newval);
 				}
-			}
-		}
+			});
+		});
 
 		return params;
 	}
@@ -1168,14 +1133,7 @@ public class MockHttpServletRequest implements HttpServletRequest
 		}
 		else
 		{
-			return new Principal()
-			{
-				@Override
-				public String getName()
-				{
-					return user;
-				}
-			};
+			return () -> user;
 		}
 	}
 
@@ -1480,14 +1438,11 @@ public class MockHttpServletRequest implements HttpServletRequest
 		addHeader("Accept", "text/xml,application/xml,application/xhtml+xml,"
 			+ "text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5");
 		addHeader("Accept-Charset", "ISO-8859-1,utf-8;q=0.7,*;q=0.7");
-		addHeader("Accept-Language", l.getLanguage().toLowerCase(Locale.ROOT) + "-"
-			+ l.getCountry().toLowerCase(Locale.ROOT) + "," + l.getLanguage().toLowerCase(Locale.ROOT) + ";q=0.5");
+		addHeader("Accept-Language", new StringBuilder().append(l.getLanguage().toLowerCase(Locale.ROOT)).append("-").append(l.getCountry().toLowerCase(Locale.ROOT)).append(",").append(l.getLanguage().toLowerCase(Locale.ROOT)).append(";q=0.5")
+				.toString());
 		addHeader("User-Agent",
 			"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:41.0) Gecko/20100101 Firefox/41.0");
 	}
-
-	private static final String crlf = "\r\n";
-	private static final String boundary = "--abcdefgABCDEFG";
 
 	private void newAttachment(OutputStream out) throws IOException
 	{
@@ -1510,14 +1465,10 @@ public class MockHttpServletRequest implements HttpServletRequest
 				return "".getBytes();
 			}
 			Url url = new Url();
-			for (final String parameterName : post.getParameterNames())
-			{
+			post.getParameterNames().forEach((final String parameterName) -> {
 				List<StringValue> values = post.getParameterValues(parameterName);
-				for (StringValue value : values)
-				{
-					url.addQueryParameter(parameterName, value.toString());
-				}
-			}
+				values.forEach(value -> url.addQueryParameter(parameterName, value.toString()));
+			});
 			String body = url.toString().substring(1);
 			return body.getBytes();
 		}
@@ -1656,7 +1607,7 @@ public class MockHttpServletRequest implements HttpServletRequest
 
 		if (path.startsWith("/") == false)
 		{
-			path = getContextPath() + getServletPath() + '/' + path;
+			path = new StringBuilder().append(getContextPath()).append(getServletPath()).append('/').append(path).toString();
 		}
 		this.url = path;
 
@@ -1678,10 +1629,7 @@ public class MockHttpServletRequest implements HttpServletRequest
 		//
 		// parameters.clear();
 
-		for (QueryParameter parameter : url.getQueryParameters())
-		{
-			addParameter(parameter.getName(), parameter.getValue());
-		}
+		url.getQueryParameters().forEach(parameter -> addParameter(parameter.getName(), parameter.getValue()));
 	}
 
 	/**
@@ -1698,7 +1646,7 @@ public class MockHttpServletRequest implements HttpServletRequest
 		}
 		else
 		{
-			urlString = getRequestURI() + '?' + queryString;
+			urlString = new StringBuilder().append(getRequestURI()).append('?').append(queryString).toString();
 		}
 
 		final Url url = Url.parse(urlString, getCharset());
@@ -1724,8 +1672,6 @@ public class MockHttpServletRequest implements HttpServletRequest
 		return getServletPath().substring(1);
 	}
 
-	private final MockRequestParameters post = new MockRequestParameters();
-
 	/**
 	 * @return ServletContext
 	 */
@@ -1736,14 +1682,13 @@ public class MockHttpServletRequest implements HttpServletRequest
 	}
 
 	@Override
-	public AsyncContext startAsync() throws IllegalStateException
+	public AsyncContext startAsync()
 	{
 		return null;
 	}
 
 	@Override
 	public AsyncContext startAsync(ServletRequest servletRequest, ServletResponse servletResponse)
-		throws IllegalStateException
 	{
 		return null;
 	}
@@ -1770,6 +1715,46 @@ public class MockHttpServletRequest implements HttpServletRequest
 	public DispatcherType getDispatcherType()
 	{
 		return null;
+	}
+
+	/**
+	 * A holder class for an uploaded file.
+	 * 
+	 * @author Frank Bille (billen)
+	 */
+	private static class UploadedFile
+	{
+		private File file;
+		private String contentType;
+
+		/**
+		 * Construct.
+		 * 
+		 * @param fieldName
+		 * @param file
+		 * @param contentType
+		 */
+		public UploadedFile(String fieldName, File file, String contentType)
+		{
+			this.file = file;
+			this.contentType = contentType;
+		}
+
+		/**
+		 * @return The content type of the file. Mime type.
+		 */
+		public String getContentType()
+		{
+			return contentType;
+		}
+
+		/**
+		 * @return The uploaded file.
+		 */
+		public File getFile()
+		{
+			return file;
+		}
 	}
 
 }

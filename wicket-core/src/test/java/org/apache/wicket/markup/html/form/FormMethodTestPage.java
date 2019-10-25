@@ -35,7 +35,7 @@ public class FormMethodTestPage extends WebPage
 	 */
 	public FormMethodTestPage()
 	{
-		postForm = new Form<Void>("formpost");
+		postForm = new Form<>("formpost");
 		add(postForm);
 		
 		getForm = new Form<Void>("formget")

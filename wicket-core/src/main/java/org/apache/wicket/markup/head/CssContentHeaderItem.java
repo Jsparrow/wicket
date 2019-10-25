@@ -87,24 +87,27 @@ public class CssContentHeaderItem extends CssHeaderItem
 	@Override
 	public Iterable<?> getRenderTokens()
 	{
-		if (Strings.isEmpty(getId()))
+		if (Strings.isEmpty(getId())) {
 			return Collections.singletonList(getCss());
+		}
 		return Arrays.asList(getId(), getCss());
 	}
 
 	@Override
 	public String toString()
 	{
-		return "CSSHeaderItem(" + getCss() + ")";
+		return new StringBuilder().append("CSSHeaderItem(").append(getCss()).append(")").toString();
 	}
 
 	@Override
 	public boolean equals(Object o)
 	{
-		if (this == o)
+		if (this == o) {
 			return true;
-		if (o == null || getClass() != o.getClass())
+		}
+		if (o == null || getClass() != o.getClass()) {
 			return false;
+		}
 		CssContentHeaderItem that = (CssContentHeaderItem)o;
 		return Objects.equals(css, that.css);
 	}

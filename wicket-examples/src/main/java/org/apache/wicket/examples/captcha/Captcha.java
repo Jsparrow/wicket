@@ -48,8 +48,9 @@ public class Captcha extends WicketExamplePage
 	{
 		int num = randomInt(min, max);
 		byte b[] = new byte[num];
-		for (int i = 0; i < num; i++)
+		for (int i = 0; i < num; i++) {
 			b[i] = (byte)randomInt('a', 'z');
+		}
 		return new String(b);
 	}
 }

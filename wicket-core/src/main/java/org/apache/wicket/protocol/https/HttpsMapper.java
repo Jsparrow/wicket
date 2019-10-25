@@ -65,7 +65,7 @@ public class HttpsMapper implements IRequestMapperDelegate
 {
 	private final HttpsConfig config;
 	private final IRequestMapper delegate;
-	private final ClassMetaCache<Scheme> cache = new ClassMetaCache<Scheme>();
+	private final ClassMetaCache<Scheme> cache = new ClassMetaCache<>();
 
 	/**
 	 * Constructor

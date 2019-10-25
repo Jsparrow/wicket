@@ -69,7 +69,7 @@ class AbstractTextComponentConvertEmptyStringsToNullTest extends WicketTestCase
 		public StringArrayPage()
 		{
 
-			form = new Form<Void>("form");
+			form = new Form<>("form");
 			add(form);
 
 			form.add(new TextField<String[]>("array", new PropertyModel<String[]>(this, "array"))
@@ -82,6 +82,14 @@ class AbstractTextComponentConvertEmptyStringsToNullTest extends WicketTestCase
 					return new StringArrayConverter();
 				}
 			}.setConvertEmptyInputStringToNull(false));
+		}
+
+		@Override
+		public IResourceStream getMarkupResourceStream(MarkupContainer container,
+			Class<?> containerClass)
+		{
+			return new StringResourceStream(
+				"<html><body><form wicket:id='form'><input type='text' wicket:id='array'/></form></body></html>");
 		}
 
 		private class StringArrayConverter implements IConverter<String[]>
@@ -99,14 +107,6 @@ class AbstractTextComponentConvertEmptyStringsToNullTest extends WicketTestCase
 			{
 				return Strings.join(",", value);
 			}
-		}
-
-		@Override
-		public IResourceStream getMarkupResourceStream(MarkupContainer container,
-			Class<?> containerClass)
-		{
-			return new StringResourceStream(
-				"<html><body><form wicket:id='form'><input type='text' wicket:id='array'/></form></body></html>");
 		}
 	}
 

@@ -73,19 +73,6 @@ public class MarkupCache implements IMarkupCache
 	private final Application application;
 
 	/**
-	 * A convenient helper to get the markup cache registered with the application.
-	 * 
-	 * @see {@link Application#getMarkupSettings()}
-	 * @see {@link MarkupFactory#getMarkupCache()}
-	 * 
-	 * @return The markup cache registered with the {@link Application}
-	 */
-	public static IMarkupCache get()
-	{
-		return Application.get().getMarkupSettings().getMarkupFactory().getMarkupCache();
-	}
-
-	/**
 	 * Constructor.
 	 */
 	protected MarkupCache()
@@ -99,6 +86,19 @@ public class MarkupCache implements IMarkupCache
 		}
 
 		markupKeyCache = newCacheImplementation();
+	}
+
+	/**
+	 * A convenient helper to get the markup cache registered with the application.
+	 * 
+	 * @see {@link Application#getMarkupSettings()}
+	 * @see {@link MarkupFactory#getMarkupCache()}
+	 * 
+	 * @return The markup cache registered with the {@link Application}
+	 */
+	public static IMarkupCache get()
+	{
+		return Application.get().getMarkupSettings().getMarkupFactory().getMarkupCache();
 	}
 
 	@Override
@@ -163,16 +163,13 @@ public class MarkupCache implements IMarkupCache
 			while (iter.hasNext())
 			{
 				IModifiable modifiable = iter.next();
-				if (modifiable instanceof MarkupResourceStream)
-				{
-					if (!isMarkupCached((MarkupResourceStream)modifiable))
-					{
-						iter.remove();
+				boolean condition = modifiable instanceof MarkupResourceStream && !isMarkupCached((MarkupResourceStream)modifiable);
+				if (condition) {
+					iter.remove();
 
-						if (log.isDebugEnabled())
-						{
-							log.debug("Removed from watcher: " + modifiable);
-						}
+					if (log.isDebugEnabled())
+					{
+						log.debug("Removed from watcher: " + modifiable);
 					}
 				}
 			}
@@ -517,21 +514,16 @@ public class MarkupCache implements IMarkupCache
 				.getResourceWatcher(true);
 			if (watcher != null)
 			{
-				watcher.add(markupResourceStream, new IChangeListener<IModifiable>()
-				{
-					@Override
-					public void onChange(IModifiable modifiable)
+				watcher.add(markupResourceStream, (IModifiable modifiable) -> {
+					if (log.isDebugEnabled())
 					{
-						if (log.isDebugEnabled())
-						{
-							log.debug("Remove markup from watcher: " + markupResourceStream);
-						}
-
-						// Remove the markup from the cache. It will be reloaded
-						// next time when the markup is requested.
-						watcher.remove(markupResourceStream);
-						removeMarkup(cacheKey);
+						log.debug("Remove markup from watcher: " + markupResourceStream);
 					}
+
+					// Remove the markup from the cache. It will be reloaded
+					// next time when the markup is requested.
+					watcher.remove(markupResourceStream);
+					removeMarkup(cacheKey);
 				});
 			}
 		}
@@ -574,7 +566,7 @@ public class MarkupCache implements IMarkupCache
 	 */
 	protected <K, V> ICache<K, V> newCacheImplementation()
 	{
-		return new DefaultCacheImplementation<K, V>();
+		return new DefaultCacheImplementation<>();
 	}
 
 	/**
@@ -661,7 +653,7 @@ public class MarkupCache implements IMarkupCache
 	public static class DefaultCacheImplementation<K, V> implements ICache<K, V>
 	{
 		// Neither key nor value are allowed to be null with ConcurrentHashMap
-		private final ConcurrentHashMap<K, V> cache = new ConcurrentHashMap<K, V>();
+		private final ConcurrentHashMap<K, V> cache = new ConcurrentHashMap<>();
 
 		/**
 		 * Construct.

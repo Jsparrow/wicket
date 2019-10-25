@@ -46,9 +46,9 @@ public class RerenderAjaxPage extends WebPage
 		feedback = new FeedbackPanel("feedback");
 		add(feedback.setOutputMarkupPlaceholderTag(true));
 
-		Form<Void> form = new Form<Void>("form");
+		Form<Void> form = new Form<>("form");
 		add(form);
-		TextField<String> username = new TextField<String>("username", Model.of(""));
+		TextField<String> username = new TextField<>("username", Model.of(""));
 
 		// make it so we can never ever have a successful submit
 		username.add(StringValidator.minimumLength(Integer.MAX_VALUE));

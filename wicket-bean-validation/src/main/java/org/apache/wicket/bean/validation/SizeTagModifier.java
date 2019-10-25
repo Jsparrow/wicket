@@ -17,14 +17,13 @@ public class SizeTagModifier implements ITagModifier<Size>
 	@Override
 	public void modify(FormComponent<?> component, ComponentTag tag, Size annotation)
 	{
-		if (hasLengthAttribute(tag.getName()))
+		if (!hasLengthAttribute(tag.getName())) {
+			return;
+		}
+		tag.put("maxlength", annotation.max());
+		if (annotation.min() > 0)
 		{
-			tag.put("maxlength", annotation.max());
-
-			if (annotation.min() > 0)
-			{
-				tag.put("minlength", annotation.min());
-			}
+			tag.put("minlength", annotation.min());
 		}
 	}
 

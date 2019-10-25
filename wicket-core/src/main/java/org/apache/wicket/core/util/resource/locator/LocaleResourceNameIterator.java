@@ -111,7 +111,8 @@ public class LocaleResourceNameIterator implements Iterator<String>
 			state++;
 			if (!Strings.isEmpty(variant))
 			{
-				return '_' + language + '_' + country + '_' + variant;
+				return new StringBuilder().append('_').append(language).append('_').append(country).append('_').append(variant)
+						.toString();
 			}
 		}
 
@@ -123,7 +124,7 @@ public class LocaleResourceNameIterator implements Iterator<String>
 
 			if (!Strings.isEmpty(country))
 			{
-				return '_' + language + '_' + country;
+				return new StringBuilder().append('_').append(language).append('_').append(country).toString();
 			}
 		}
 

@@ -80,10 +80,7 @@ public class ProviderSubset<T> implements Set<T>, IDetachable
 	@Override
 	public void detach()
 	{
-		for (IModel<T> model : models)
-		{
-			model.detach();
-		}
+		models.forEach(IModel::detach);
 	}
 
 	@Override

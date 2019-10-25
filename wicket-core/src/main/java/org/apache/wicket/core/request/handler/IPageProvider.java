@@ -39,7 +39,7 @@ public interface IPageProvider
      *          could not have been found and the constructor used did not provide enough information
      *          to create new page instance
 	 */
-	IRequestablePage getPageInstance()  throws PageExpiredException;
+	IRequestablePage getPageInstance();
 
 	/**
 	 * Returns {@link PageParameters} of the page.
@@ -49,7 +49,7 @@ public interface IPageProvider
      *          could not have been found and the constructor used did not provide enough information
      *          to create new page instance
 	 */
-	PageParameters getPageParameters()  throws PageExpiredException;
+	PageParameters getPageParameters();
 
 	/**
 	 * Returns whether the provided page was expired prior to this access.
@@ -65,7 +65,7 @@ public interface IPageProvider
      *          to create new page instance
 	 * @return page class
 	 */
-	Class<? extends IRequestablePage> getPageClass() throws PageExpiredException;
+	Class<? extends IRequestablePage> getPageClass();
 
 	/**
 	 * Returns the page id.

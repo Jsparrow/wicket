@@ -17,7 +17,6 @@
 package org.apache.wicket.extensions.ajax.markup.html.autocomplete;
 
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -36,6 +35,7 @@ import org.apache.wicket.request.Response;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.resource.JavaScriptResourceReference;
 import org.apache.wicket.request.resource.ResourceReference;
+import java.util.Collections;
 
 /**
  * @since 1.2
@@ -44,71 +44,6 @@ import org.apache.wicket.request.resource.ResourceReference;
  */
 public abstract class AbstractAutoCompleteBehavior extends AbstractDefaultAjaxBehavior
 {
-	/**
-	 * A wrapper for the auto-complete DOM-ready event handler.
-	 * <p>
-	 * A plain OnDomReadyItem would be aggregated by {@link ResourceAggregator}, possible coming
-	 * after the event registration of other behaviors.
-	 */
-	private static final class WrappedHeaderItem extends HeaderItem implements IWrappedHeaderItem
-	{
-		private final OnDomReadyHeaderItem item;
-
-		private WrappedHeaderItem(OnDomReadyHeaderItem onDomReady)
-		{
-			item = onDomReady;
-		}
-
-		@Override
-		public void render(Response response)
-		{
-			item.render(response);
-		}
-
-		@Override
-		public Iterable<?> getRenderTokens()
-		{
-			return item.getRenderTokens();
-		}
-
-		@Override
-		public HeaderItem getWrapped()
-		{
-			return item;
-		}
-
-		@Override
-		public HeaderItem wrap(HeaderItem item)
-		{
-			if (item instanceof OnDomReadyHeaderItem)
-				return new WrappedHeaderItem((OnDomReadyHeaderItem)item);
-			return item;
-		}
-
-		@Override
-		public List<HeaderItem> getDependencies()
-		{
-			ResourceReference wicketAjaxReference = Application.get().
-					getJavaScriptLibrarySettings().getWicketAjaxReference();
-			return Arrays.<HeaderItem>asList(JavaScriptHeaderItem.forReference(wicketAjaxReference));
-		}
-
-		@Override
-		public boolean equals(Object o)
-		{
-			if (this == o) return true;
-			if (o == null || getClass() != o.getClass()) return false;
-			WrappedHeaderItem that = (WrappedHeaderItem) o;
-			return Objects.equals(item, that.item);
-		}
-
-		@Override
-		public int hashCode()
-		{
-			return Objects.hash(item);
-		}
-	}
-
 	public static final ResourceReference AUTOCOMPLETE_JS = new JavaScriptResourceReference(
 		AutoCompleteBehavior.class, "wicket-autocomplete.js");
 
@@ -213,7 +148,7 @@ public abstract class AbstractAutoCompleteBehavior extends AbstractDefaultAjaxBe
 
 		onRequest(val, requestCycle);
 	}
-	
+
 	@Override
     protected void updateAjaxAttributes(AjaxRequestAttributes attributes) 
 	{
@@ -222,4 +157,74 @@ public abstract class AbstractAutoCompleteBehavior extends AbstractDefaultAjaxBe
         attributes.setWicketAjaxResponse(false);
         attributes.setDataType("html");
     }
+
+	/**
+	 * A wrapper for the auto-complete DOM-ready event handler.
+	 * <p>
+	 * A plain OnDomReadyItem would be aggregated by {@link ResourceAggregator}, possible coming
+	 * after the event registration of other behaviors.
+	 */
+	private static final class WrappedHeaderItem extends HeaderItem implements IWrappedHeaderItem
+	{
+		private final OnDomReadyHeaderItem item;
+
+		private WrappedHeaderItem(OnDomReadyHeaderItem onDomReady)
+		{
+			item = onDomReady;
+		}
+
+		@Override
+		public void render(Response response)
+		{
+			item.render(response);
+		}
+
+		@Override
+		public Iterable<?> getRenderTokens()
+		{
+			return item.getRenderTokens();
+		}
+
+		@Override
+		public HeaderItem getWrapped()
+		{
+			return item;
+		}
+
+		@Override
+		public HeaderItem wrap(HeaderItem item)
+		{
+			if (item instanceof OnDomReadyHeaderItem) {
+				return new WrappedHeaderItem((OnDomReadyHeaderItem)item);
+			}
+			return item;
+		}
+
+		@Override
+		public List<HeaderItem> getDependencies()
+		{
+			ResourceReference wicketAjaxReference = Application.get().
+					getJavaScriptLibrarySettings().getWicketAjaxReference();
+			return Collections.<HeaderItem>singletonList(JavaScriptHeaderItem.forReference(wicketAjaxReference));
+		}
+
+		@Override
+		public boolean equals(Object o)
+		{
+			if (this == o) {
+				return true;
+			}
+			if (o == null || getClass() != o.getClass()) {
+				return false;
+			}
+			WrappedHeaderItem that = (WrappedHeaderItem) o;
+			return Objects.equals(item, that.item);
+		}
+
+		@Override
+		public int hashCode()
+		{
+			return Objects.hash(item);
+		}
+	}
 }

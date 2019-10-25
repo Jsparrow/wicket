@@ -33,20 +33,6 @@ import org.apache.wicket.util.value.IValueMap;
  */
 public class XmlTag
 {
-	/**
-	 * Enumerated type for different kinds of component tags.
-	 */
-	public static enum TagType {
-		/** A close tag, like &lt;/TAG&gt;. */
-		CLOSE,
-
-		/** An open tag, like &lt;TAG componentId = "xyz"&gt;. */
-		OPEN,
-
-		/** An open/close tag, like &lt;TAG componentId = "xyz"/&gt;. */
-		OPEN_CLOSE;
-	}
-
 	TextSegment text;
 
 	/** Attribute map. */
@@ -75,7 +61,6 @@ public class XmlTag
 	 */
 	public XmlTag()
 	{
-		super();
 	}
 
 	/**
@@ -418,11 +403,10 @@ public class XmlTag
 	 */
 	public void putAll(final Map<String, Object> map)
 	{
-		for (final Map.Entry<String, Object> entry : map.entrySet())
-		{
+		map.entrySet().forEach((final Map.Entry<String, Object> entry) -> {
 			Object value = entry.getValue();
 			put(entry.getKey(), (value != null) ? value.toString() : null);
-		}
+		});
 	}
 
 	/**
@@ -510,8 +494,8 @@ public class XmlTag
 	 */
 	public String toDebugString()
 	{
-		return "[Tag name = " + name + ", pos = " + text.pos + ", line = " + text.lineNumber +
-			", attributes = [" + getAttributes() + "], type = " + type + "]";
+		return new StringBuilder().append("[Tag name = ").append(name).append(", pos = ").append(text.pos).append(", line = ")
+				.append(text.lineNumber).append(", attributes = [").append(getAttributes()).append("], type = ").append(type).append("]").toString();
 	}
 
 	/**
@@ -545,8 +529,8 @@ public class XmlTag
 	 */
 	public String toUserDebugString()
 	{
-		return " '" + toString() + "' (line " + getLineNumber() + ", column " + getColumnNumber() +
-			")";
+		return new StringBuilder().append(" '").append(toString()).append("' (line ").append(getLineNumber()).append(", column ").append(getColumnNumber())
+				.append(")").toString();
 	}
 
 	/**
@@ -583,6 +567,20 @@ public class XmlTag
 
 		buffer.append('>');
 		return buffer;
+	}
+
+	/**
+	 * Enumerated type for different kinds of component tags.
+	 */
+	public static enum TagType {
+		/** A close tag, like &lt;/TAG&gt;. */
+		CLOSE,
+
+		/** An open tag, like &lt;TAG componentId = "xyz"&gt;. */
+		OPEN,
+
+		/** An open/close tag, like &lt;TAG componentId = "xyz"/&gt;. */
+		OPEN_CLOSE;
 	}
 
 	static class TextSegment

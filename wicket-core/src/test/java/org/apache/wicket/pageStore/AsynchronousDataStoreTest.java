@@ -80,7 +80,7 @@ public class AsynchronousDataStoreTest
 		return new MockPageContext(sessionId);
 	}
 
-	private static abstract class AbstractTask implements Runnable
+	private abstract static class AbstractTask implements Runnable
 	{
 		protected abstract void r();
 

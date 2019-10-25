@@ -47,23 +47,6 @@ public class SecuritySettings
 	 */
 	public static final String DEFAULT_ENCRYPTION_KEY = "WiCkEt-FRAMEwork";
 
-	/** The authorization strategy. */
-	private IAuthorizationStrategy authorizationStrategy = IAuthorizationStrategy.ALLOW_ALL;
-
-	/** The authentication strategy. */
-	private IAuthenticationStrategy authenticationStrategy;
-
-	/** factory for creating crypt objects */
-	private ICryptFactory cryptFactory;
-
-	/**
-	 * Whether mounts should be enforced. If {@code true}, requests for a page will be
-	 * allowed only if the page has been explicitly mounted in {@link Application#init() MyApplication#init()}.
-	 *
-	 * This setting basically disables {@link org.apache.wicket.core.request.mapper.BookmarkableMapper}
-	 */
-	private boolean enforceMounts = false;
-
 	/** Authorizer for component instantiations */
 	private static final IUnauthorizedComponentInstantiationListener DEFAULT_UNAUTHORIZED_COMPONENT_INSTANTIATION_LISTENER = new IUnauthorizedComponentInstantiationListener()
 	{
@@ -81,11 +64,28 @@ public class SecuritySettings
 		}
 	};
 
-	private IUnauthorizedComponentInstantiationListener unauthorizedComponentInstantiationListener =
-			DEFAULT_UNAUTHORIZED_COMPONENT_INSTANTIATION_LISTENER;
-
 	private static final IUnauthorizedResourceRequestListener DEFAULT_UNAUTHORIZED_RESOURCE_REQUEST_LISTENER =
 			new DefaultUnauthorizedResourceRequestListener();
+
+	/** The authorization strategy. */
+	private IAuthorizationStrategy authorizationStrategy = IAuthorizationStrategy.ALLOW_ALL;
+
+	/** The authentication strategy. */
+	private IAuthenticationStrategy authenticationStrategy;
+
+	/** factory for creating crypt objects */
+	private ICryptFactory cryptFactory;
+
+	/**
+	 * Whether mounts should be enforced. If {@code true}, requests for a page will be
+	 * allowed only if the page has been explicitly mounted in {@link Application#init() MyApplication#init()}.
+	 *
+	 * This setting basically disables {@link org.apache.wicket.core.request.mapper.BookmarkableMapper}
+	 */
+	private boolean enforceMounts = false;
+
+	private IUnauthorizedComponentInstantiationListener unauthorizedComponentInstantiationListener =
+			DEFAULT_UNAUTHORIZED_COMPONENT_INSTANTIATION_LISTENER;
 
 	private IUnauthorizedResourceRequestListener unauthorizedResourceRequestListener = DEFAULT_UNAUTHORIZED_RESOURCE_REQUEST_LISTENER;
 

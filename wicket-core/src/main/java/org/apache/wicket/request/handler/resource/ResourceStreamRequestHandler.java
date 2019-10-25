@@ -90,9 +90,10 @@ public class ResourceStreamRequestHandler implements IRequestHandler, ILoggableR
 	@Override
 	public void detach(IRequestCycle requestCycle)
 	{
-		if (logData == null)
+		if (logData == null) {
 			logData = getResourceStream() == null ? new ResourceStreamLogData(this)
 				: new ResourceStreamLogData(this, getResourceStream());
+		}
 	}
 
 	/** {@inheritDoc} */
@@ -180,24 +181,31 @@ public class ResourceStreamRequestHandler implements IRequestHandler, ILoggableR
 	@Override
 	public boolean equals(Object obj)
 	{
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		ResourceStreamRequestHandler other = (ResourceStreamRequestHandler)obj;
-		if (contentDisposition != other.contentDisposition)
+		if (contentDisposition != other.contentDisposition) {
 			return false;
+		}
 		if (fileName == null)
 		{
-			if (other.fileName != null)
+			if (other.fileName != null) {
 				return false;
+			}
 		}
-		else if (!fileName.equals(other.fileName))
+		else if (!fileName.equals(other.fileName)) {
 			return false;
-		if (!resourceStream.equals(other.resourceStream))
+		}
+		if (!resourceStream.equals(other.resourceStream)) {
 			return false;
+		}
 		return true;
 	}
 
@@ -220,8 +228,8 @@ public class ResourceStreamRequestHandler implements IRequestHandler, ILoggableR
 	@Override
 	public String toString()
 	{
-		return "[ResourceStreamRequestTarget[resourceStream=" + resourceStream + ",fileName=" +
-			fileName + ", contentDisposition=" + contentDisposition + "]";
+		return new StringBuilder().append("[ResourceStreamRequestTarget[resourceStream=").append(resourceStream).append(",fileName=").append(fileName).append(", contentDisposition=").append(contentDisposition).append("]")
+				.toString();
 	}
 
 	/**

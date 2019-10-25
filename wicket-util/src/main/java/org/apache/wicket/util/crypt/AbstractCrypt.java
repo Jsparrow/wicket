@@ -90,14 +90,9 @@ public abstract class AbstractCrypt implements ICrypt
 			byte[] encoded = encoder.encode(encrypted);
 			return new String(encoded, CHARACTER_ENCODING);
 		}
-		catch (GeneralSecurityException e)
+		catch (UnsupportedEncodingException | GeneralSecurityException e)
 		{
-			log.error("Unable to encrypt text '" + plainText + "'", e);
-			return null;
-		}
-		catch (UnsupportedEncodingException e)
-		{
-			log.error("Unable to encrypt text '" + plainText + "'", e);
+			log.error(new StringBuilder().append("Unable to encrypt text '").append(plainText).append("'").toString(), e);
 			return null;
 		}
 	}
@@ -153,7 +148,7 @@ public abstract class AbstractCrypt implements ICrypt
 		catch (GeneralSecurityException e)
 		{
 			throw new RuntimeException(
-				"Unable to decrypt the text '" + new String(encrypted) + "'", e);
+				new StringBuilder().append("Unable to decrypt the text '").append(new String(encrypted)).append("'").toString(), e);
 		}
 	}
 

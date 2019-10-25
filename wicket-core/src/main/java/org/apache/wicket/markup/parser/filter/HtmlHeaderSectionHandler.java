@@ -62,40 +62,19 @@ public final class HtmlHeaderSectionHandler extends AbstractMarkupFilter
 	public static final String HEADER_ID = "_header_";
 
 	public static final String HEADER_ID_ITEM = "_header_item_";
-
+	private static final IAutoComponentFactory HTML_HEADER_FACTORY = (MarkupContainer container, ComponentTag tag) -> new HtmlHeaderContainer(tag.getId());
+	private static final IAutoComponentFactory HTML_HEADER_ITEMS_FACTORY = (MarkupContainer container, ComponentTag tag) -> new HtmlHeaderItemsContainer(tag.getId());
 	/** True if &lt;head&gt; has been found already */
 	private boolean foundHead = false;
-
 	/** True if &lt;/head&gt; has been found already */
 	private boolean foundClosingHead = false;
-
 	/** True if &lt;/wicket:header-items&gt; has been found already */
 	private boolean foundHeaderItemsTag = false;
-
 	/** True if all the rest of the markup file can be ignored */
 	private boolean ignoreTheRest = false;
-
 	/** The Markup available so far for the resource */
 	private final Markup markup;
 
-	private static final IAutoComponentFactory HTML_HEADER_FACTORY = new IAutoComponentFactory()
-	{
-		@Override
-		public Component newComponent(MarkupContainer container, ComponentTag tag)
-		{
-			return new HtmlHeaderContainer(tag.getId());
-		}
-	};
-	
-	private static final IAutoComponentFactory HTML_HEADER_ITEMS_FACTORY = new IAutoComponentFactory()
-	{
-		@Override
-		public Component newComponent(MarkupContainer container, ComponentTag tag)
-		{
-			return new HtmlHeaderItemsContainer(tag.getId());
-		}
-	};
-	
 	/**
 	 * Construct.
 	 * 

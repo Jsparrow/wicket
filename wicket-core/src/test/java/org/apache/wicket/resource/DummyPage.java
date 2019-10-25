@@ -33,7 +33,6 @@ public class DummyPage extends WebPage
 	 */
 	public DummyPage()
 	{
-		super();
 	}
 
 }

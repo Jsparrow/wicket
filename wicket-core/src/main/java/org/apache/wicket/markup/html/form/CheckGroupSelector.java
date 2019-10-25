@@ -111,9 +111,7 @@ public class CheckGroupSelector extends AbstractCheckSelector
 		if (group == null)
 		{
 			throw new WicketRuntimeException(
-				"CheckGroupSelector component [" +
-					getPath() +
-					"] cannot find its parent CheckGroup. All CheckGroupSelector components must be a child of or below in the hierarchy of a CheckGroup component.");
+				new StringBuilder().append("CheckGroupSelector component [").append(getPath()).append("] cannot find its parent CheckGroup. All CheckGroupSelector components must be a child of or below in the hierarchy of a CheckGroup component.").toString());
 		}
 
 		// we search the complete form because the CheckGroup might not output its markup tag or be

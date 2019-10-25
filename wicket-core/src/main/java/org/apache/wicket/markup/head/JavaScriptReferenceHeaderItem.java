@@ -95,8 +95,9 @@ public class JavaScriptReferenceHeaderItem extends AbstractJavaScriptReferenceHe
 	@Override
 	public Iterable<? extends HeaderItem> getProvidedResources()
 	{
-		if (getReference() instanceof IResourceBundle)
+		if (getReference() instanceof IResourceBundle) {
 			return ((IResourceBundle)getReference()).getProvidedResources();
+		}
 		return super.getProvidedResources();
 	}
 
@@ -111,16 +112,17 @@ public class JavaScriptReferenceHeaderItem extends AbstractJavaScriptReferenceHe
 	public Iterable<?> getRenderTokens()
 	{
 		String url = Strings.stripJSessionId(getUrl());
-		if (Strings.isEmpty(getId()))
+		if (Strings.isEmpty(getId())) {
 			return Collections.singletonList("javascript-" + url);
-		else
+		} else {
 			return Arrays.asList("javascript-" + getId(), "javascript-" + url);
+		}
 	}
 
 	@Override
 	public String toString()
 	{
-		return "JavaScriptReferenceHeaderItem(" + getReference() + ", " + getPageParameters() + ')';
+		return new StringBuilder().append("JavaScriptReferenceHeaderItem(").append(getReference()).append(", ").append(getPageParameters()).append(')').toString();
 	}
 
 	private String getUrl()
@@ -139,9 +141,15 @@ public class JavaScriptReferenceHeaderItem extends AbstractJavaScriptReferenceHe
 	@Override
 	public boolean equals(Object o)
 	{
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
-		if (!super.equals(o)) return false;
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+		if (!super.equals(o)) {
+			return false;
+		}
 		JavaScriptReferenceHeaderItem that = (JavaScriptReferenceHeaderItem) o;
 		return java.util.Objects.equals(reference, that.reference) &&
 				java.util.Objects.equals(pageParameters, that.pageParameters);

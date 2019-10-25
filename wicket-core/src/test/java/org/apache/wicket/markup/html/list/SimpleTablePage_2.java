@@ -35,8 +35,7 @@ public class SimpleTablePage_2 extends WebPage
 	 */
 	public SimpleTablePage_2()
 	{
-		super();
-		List<String> list = new ArrayList<String>();
+		List<String> list = new ArrayList<>();
 		list.add("one");
 		list.add("two");
 		list.add("three");

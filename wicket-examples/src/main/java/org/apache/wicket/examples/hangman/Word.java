@@ -62,8 +62,7 @@ public class Word implements IClusterable
 	public String asString(final boolean hideUnguessed)
 	{
 		final StringBuilder buffer = new StringBuilder();
-		for (Letter letter : letters)
-		{
+		letters.forEach(letter -> {
 			if (hideUnguessed)
 			{
 				buffer.append(letter.isGuessed() ? letter.asString() : "_");
@@ -72,7 +71,7 @@ public class Word implements IClusterable
 			{
 				buffer.append(letter.asString());
 			}
-		}
+		});
 		return buffer.toString();
 	}
 
@@ -82,12 +81,11 @@ public class Word implements IClusterable
 	@Override
 	public boolean equals(final Object object)
 	{
-		if (object instanceof Word)
-		{
-			final Word that = (Word)object;
-			return this.asString().equalsIgnoreCase(that.asString());
+		if (!(object instanceof Word)) {
+			return false;
 		}
-		return false;
+		final Word that = (Word)object;
+		return this.asString().equalsIgnoreCase(that.asString());
 	}
 
 	/**
@@ -121,19 +119,12 @@ public class Word implements IClusterable
 	 */
 	public boolean isGuessed()
 	{
-		for (Letter letter : letters)
-		{
-			if (!letter.isGuessed())
-			{
-				return false;
-			}
-		}
-		return true;
+		return letters.stream().allMatch(Letter::isGuessed);
 	}
 
 	@Override
 	public String toString()
 	{
-		return "[Word letters = " + letters + "]";
+		return new StringBuilder().append("[Word letters = ").append(letters).append("]").toString();
 	}
 }

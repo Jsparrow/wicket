@@ -96,8 +96,7 @@ public abstract class AbstractRepeater extends WebMarkupContainer
 			if (child == null)
 			{
 				throw new IllegalStateException(
-					"The render iterator returned null for a child. Container: " + this.toString() +
-						"; Iterator=" + it.toString());
+					new StringBuilder().append("The render iterator returned null for a child. Container: ").append(this.toString()).append("; Iterator=").append(it.toString()).toString());
 			}
 			renderChild(child);
 		}

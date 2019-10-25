@@ -23,6 +23,8 @@ import org.apache.wicket.core.request.handler.IPageRequestHandler;
 import org.apache.wicket.request.ILogData;
 import org.apache.wicket.request.component.IRequestablePage;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Contains logging data for request handlers that are related to pages; most likely
@@ -32,6 +34,8 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
  */
 public class PageLogData implements ILogData
 {
+	private static final Logger logger = LoggerFactory.getLogger(PageLogData.class);
+
 	private static final long serialVersionUID = 1L;
 
 	private final Class<? extends IRequestablePage> pageClass;
@@ -52,19 +56,6 @@ public class PageLogData implements ILogData
 		renderCount = pageProvider.getRenderCount();
 	}
 
-	private static Class<? extends IRequestablePage> tryToGetPageClass(IPageProvider pageProvider)
-	{
-		try
-		{
-			return pageProvider.getPageClass();
-		}
-		catch (Exception e)
-		{
-			// getPageClass might fail if the page does not exist (ie session timeout)
-			return null;
-		}
-	}
-
 	/**
 	 * Construct.
 	 *
@@ -76,6 +67,20 @@ public class PageLogData implements ILogData
 		pageId = page.getPageId();
 		pageParameters = page.getPageParameters();
 		renderCount = page.getRenderCount();
+	}
+
+	private static Class<? extends IRequestablePage> tryToGetPageClass(IPageProvider pageProvider)
+	{
+		try
+		{
+			return pageProvider.getPageClass();
+		}
+		catch (Exception e)
+		{
+			logger.error(e.getMessage(), e);
+			// getPageClass might fail if the page does not exist (ie session timeout)
+			return null;
+		}
 	}
 
 	/**

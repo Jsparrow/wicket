@@ -27,15 +27,15 @@ class Path implements Iterable<Path.Segment>
 
 	private List<Segment> segments;
 
-	private Path()
-	{
-		segments = new ArrayList<>();
-	}
-
 	public Path(Component... components)
 	{
 		this();
 		add(components);
+	}
+
+	private Path()
+	{
+		segments = new ArrayList<>();
 	}
 
 	private Path add(Class<?> type, String id)
@@ -58,7 +58,6 @@ class Path implements Iterable<Path.Segment>
 		}
 		return this;
 	}
-
 
 	@Override
 	public Iterator<Path.Segment> iterator()

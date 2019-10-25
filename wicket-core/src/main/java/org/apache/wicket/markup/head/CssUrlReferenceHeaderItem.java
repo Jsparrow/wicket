@@ -16,12 +16,12 @@
  */
 package org.apache.wicket.markup.head;
 
-import java.util.Arrays;
 import java.util.Objects;
 
 import org.apache.wicket.request.Response;
 import org.apache.wicket.request.UrlUtils;
 import org.apache.wicket.request.cycle.RequestCycle;
+import java.util.Collections;
 
 /**
  * {@link HeaderItem} for style tags that are rendered using a fixed URL, for example resources from
@@ -110,14 +110,14 @@ public class CssUrlReferenceHeaderItem extends CssHeaderItem
 	@Override
 	public Iterable<?> getRenderTokens()
 	{
-		return Arrays.asList(
-			"css-" + UrlUtils.rewriteToContextRelative(getUrl(), RequestCycle.get()) + "-" + media);
+		return Collections.singletonList(
+			new StringBuilder().append("css-").append(UrlUtils.rewriteToContextRelative(getUrl(), RequestCycle.get())).append("-").append(media).toString());
 	}
 
 	@Override
 	public String toString()
 	{
-		return "CSSUrlReferenceHeaderItem(" + getUrl() + ")";
+		return new StringBuilder().append("CSSUrlReferenceHeaderItem(").append(getUrl()).append(")").toString();
 	}
 
 	@Override
@@ -129,12 +129,15 @@ public class CssUrlReferenceHeaderItem extends CssHeaderItem
 	@Override
 	public boolean equals(Object o)
 	{
-		if (this == o)
+		if (this == o) {
 			return true;
-		if (o == null || getClass() != o.getClass())
+		}
+		if (o == null || getClass() != o.getClass()) {
 			return false;
-		if (!super.equals(o))
+		}
+		if (!super.equals(o)) {
 			return false;
+		}
 		CssUrlReferenceHeaderItem that = (CssUrlReferenceHeaderItem)o;
 		return Objects.equals(url, that.url) && Objects.equals(media, that.media) &&
 			Objects.equals(rel, that.rel);

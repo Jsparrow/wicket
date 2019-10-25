@@ -152,8 +152,7 @@ class AjaxRequestHandlerTest extends WicketTestCase
 		// This means that it doesn't exist at all
 		if (expectedFile == null)
 		{
-			assertNull(headerContribution, "There was a header contribution on the response " +
-				"(though we didn't expect one): <" + headerContribution + ">");
+			assertNull(headerContribution, new StringBuilder().append("There was a header contribution on the response ").append("(though we didn't expect one): <").append(headerContribution).append(">").toString());
 		}
 		else if (headerContribution == null)
 		{
@@ -240,9 +239,7 @@ class AjaxRequestHandlerTest extends WicketTestCase
 	{
 		tester.startPage(AddDuringRenderPage.class);
 
-		assertThrows(IllegalStateException.class, () -> {
-			tester.clickLink("link");
-	    });
+		assertThrows(IllegalStateException.class, () -> tester.clickLink("link"));
 	}
 
 	/**

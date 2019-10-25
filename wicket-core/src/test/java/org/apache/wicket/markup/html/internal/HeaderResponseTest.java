@@ -112,8 +112,7 @@ class HeaderResponseTest
     void conditionalRenderCSSReference()
     {
         headerResponse.render(CssHeaderItem.forReference(reference, null, "screen", "lt IE 8"));
-        String expected = "<!--[if lt IE 8]><link rel=\"stylesheet\" type=\"text/css\" href=\"" +
-            RESOURCE_NAME + "\" media=\"screen\" /><![endif]-->\n";
+        String expected = new StringBuilder().append("<!--[if lt IE 8]><link rel=\"stylesheet\" type=\"text/css\" href=\"").append(RESOURCE_NAME).append("\" media=\"screen\" /><![endif]-->\n").toString();
         String actual = headerResponse.getResponse().toString();
         assertEquals(expected, actual);
     }
@@ -125,7 +124,7 @@ class HeaderResponseTest
     void conditionalRenderCSSReferenceWithUrl()
     {
         headerResponse.render(CssHeaderItem.forUrl("resource.css", "screen", "lt IE 8"));
-        String expected = "<!--[if lt IE 8]><link rel=\"stylesheet\" type=\"text/css\" href=\""+RESOURCE_NAME+"\" media=\"screen\" /><![endif]-->\n";
+        String expected = new StringBuilder().append("<!--[if lt IE 8]><link rel=\"stylesheet\" type=\"text/css\" href=\"").append(RESOURCE_NAME).append("\" media=\"screen\" /><![endif]-->\n").toString();
         String actual = headerResponse.getResponse().toString();
         assertEquals(expected, actual);
     }
@@ -138,9 +137,7 @@ class HeaderResponseTest
     void conditionalRenderCSSContent()
 	{
 		headerResponse.render(CssHeaderItem.forCSS(".className { font-size: 10px}", "id", "lt IE 8"));
-		String expected = "<!--[if lt IE 8]><style type=\"text/css\" id=\"id\">\n" +
-				".className { font-size: 10px}</style>\n" +
-				"<![endif]-->\n";
+		String expected = new StringBuilder().append("<!--[if lt IE 8]><style type=\"text/css\" id=\"id\">\n").append(".className { font-size: 10px}</style>\n").append("<![endif]-->\n").toString();
 		String actual = headerResponse.getResponse().toString();
 		assertEquals(expected, actual);
 	}
@@ -155,8 +152,7 @@ class HeaderResponseTest
     {
         boolean defer = true;
         headerResponse.render(JavaScriptHeaderItem.forUrl("js-resource.js", "some-id", defer));
-        String expected = "<script type=\"text/javascript\" id=\"some-id\" defer=\"defer\" src=\"" +
-            RESOURCE_NAME + "\"></script>\n";
+        String expected = new StringBuilder().append("<script type=\"text/javascript\" id=\"some-id\" defer=\"defer\" src=\"").append(RESOURCE_NAME).append("\"></script>\n").toString();
         String actual = headerResponse.getResponse().toString();
         assertEquals(expected, actual);
     }
@@ -171,8 +167,7 @@ class HeaderResponseTest
     {
         boolean defer = false;
         headerResponse.render(JavaScriptHeaderItem.forUrl("js-resource.js", "some-id", defer));
-        String expected = "<script type=\"text/javascript\" id=\"some-id\" src=\"" + RESOURCE_NAME +
-            "\"></script>\n";
+        String expected = new StringBuilder().append("<script type=\"text/javascript\" id=\"some-id\" src=\"").append(RESOURCE_NAME).append("\"></script>\n").toString();
         String actual = headerResponse.getResponse().toString();
         assertEquals(expected, actual);
     }
@@ -188,8 +183,7 @@ class HeaderResponseTest
         String charset = "foo";
         headerResponse.render(JavaScriptHeaderItem.forUrl("js-resource.js", "some-id", false,
             charset));
-        String expected = "<script type=\"text/javascript\" id=\"some-id\" charset=\"" + charset +
-            "\" src=\"" + RESOURCE_NAME + "\"></script>\n";
+        String expected = new StringBuilder().append("<script type=\"text/javascript\" id=\"some-id\" charset=\"").append(charset).append("\" src=\"").append(RESOURCE_NAME).append("\"></script>\n").toString();
         String actual = headerResponse.getResponse().toString();
         assertEquals(expected, actual);
     }
@@ -203,8 +197,7 @@ class HeaderResponseTest
     void charsetNotSetJavaScriptReference()
     {
         headerResponse.render(JavaScriptHeaderItem.forUrl("js-resource.js", "some-id", false, null));
-        String expected = "<script type=\"text/javascript\" id=\"some-id\" src=\"" + RESOURCE_NAME +
-            "\"></script>\n";
+        String expected = new StringBuilder().append("<script type=\"text/javascript\" id=\"some-id\" src=\"").append(RESOURCE_NAME).append("\"></script>\n").toString();
         String actual = headerResponse.getResponse().toString();
         assertEquals(expected, actual);
     }
@@ -218,7 +211,7 @@ class HeaderResponseTest
 		headerResponse.render(
 				JavaScriptHeaderItem.forReference(reference, new PageParameters(), "id", false, null, "lt IE 8"));
 
-		String expected = "<!--[if lt IE 8]><script type=\"text/javascript\" id=\"id\" src=\""+RESOURCE_NAME+"\"></script>\n<![endif]-->\n";
+		String expected = new StringBuilder().append("<!--[if lt IE 8]><script type=\"text/javascript\" id=\"id\" src=\"").append(RESOURCE_NAME).append("\"></script>\n<![endif]-->\n").toString();
 
 		String actual = headerResponse.getResponse().toString();
 
@@ -233,8 +226,7 @@ class HeaderResponseTest
 	{
 		headerResponse.render(JavaScriptHeaderItem.forUrl("js-resource.js", "id", true, "cp1251", "lt IE 8"));
 
-		String expected = "<!--[if lt IE 8]><script type=\"text/javascript\" id=\"id\" defer=\"defer\" charset=\"cp1251\" src=\""+RESOURCE_NAME+"\"></script>\n" +
-				"<![endif]-->\n";
+		String expected = new StringBuilder().append("<!--[if lt IE 8]><script type=\"text/javascript\" id=\"id\" defer=\"defer\" charset=\"cp1251\" src=\"").append(RESOURCE_NAME).append("\"></script>\n").append("<![endif]-->\n").toString();
 
 		String actual = headerResponse.getResponse().toString();
 
@@ -250,12 +242,7 @@ class HeaderResponseTest
 	{
 		headerResponse.render(JavaScriptHeaderItem.forScript("someJSMethod();", "id", "lt IE 8"));
 
-		String expected = "<!--[if lt IE 8]><script type=\"text/javascript\" id=\"id\">\n" +
-				"/*<![CDATA[*/\n" +
-				"someJSMethod();\n" +
-				"/*]]>*/\n" +
-				"</script>\n" +
-				"<![endif]-->\n";
+		String expected = new StringBuilder().append("<!--[if lt IE 8]><script type=\"text/javascript\" id=\"id\">\n").append("/*<![CDATA[*/\n").append("someJSMethod();\n").append("/*]]>*/\n").append("</script>\n").append("<![endif]-->\n").toString();
 
 		String actual = headerResponse.getResponse().toString();
 

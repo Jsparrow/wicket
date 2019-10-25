@@ -32,112 +32,6 @@ import org.apache.wicket.util.string.StringValue;
 public interface INamedParameters
 {
 	/**
-	 * A hint where the parameter is read/parsed from.
-	 */
-	enum Type
-	{
-		/**
-		 * The named parameter is set manually in the application code
-		 */
-		MANUAL,
-
-		/**
-		 * The named parameter is read/parsed from the query string
-		 */
-		QUERY_STRING,
-
-		/**
-		 * The named parameter is read/parsed from the url path
-		 */
-		PATH
-	}
-
-	/**
-	 * Represents a named parameter entry. There can be multiple {@link NamedPair}s in
-	 * {@link PageParameters} that have same key.
-	 * 
-	 * @author Matej Knopp
-	 */
-	@SuppressWarnings("serial")
-	class NamedPair implements IClusterable
-	{
-		private final String key;
-		private final String value;
-		private final Type type;
-
-		/**
-		 * Creates a named parameter entry that is set manually in the application code.
-		 * 
-		 * @param key
-		 * @param value
-		 */
-		public NamedPair(final String key, final String value)
-		{
-			this(key, value, Type.MANUAL);
-		}
-
-		/**
-		 * Creates a named parameter entry
-		 * 
-		 * @param key
-		 * @param value
-		 * @param type
-		 */
-		public NamedPair(final String key, final String value, Type type)
-		{
-			this.key = Args.notEmpty(key, "key");
-			this.value = Args.notNull(value, "value");
-			this.type = Args.notNull(type, "type");
-		}
-
-		/**
-		 * @return key
-		 */
-		public String getKey()
-		{
-			return key;
-		}
-
-		/**
-		 * @return value
-		 */
-		public String getValue()
-		{
-			return value;
-		}
-
-		/**
-		 * @return type
-		 */
-		public Type getType()
-		{
-			return type;
-		}
-
-		@Override
-		public boolean equals(Object o)
-		{
-			if (this == o) return true;
-			if (o == null || getClass() != o.getClass()) return false;
-
-			NamedPair namedPair = (NamedPair) o;
-
-			if (key != null ? !key.equals(namedPair.key) : namedPair.key != null) return false;
-			if (value != null ? !value.equals(namedPair.value) : namedPair.value != null) return false;
-
-			return true;
-		}
-
-		@Override
-		public int hashCode()
-		{
-			int result = key != null ? key.hashCode() : 0;
-			result = 31 * result + (value != null ? value.hashCode() : 0);
-			return result;
-		}
-	}
-
-	/**
 	 * Return set of all named parameter names.
 	 * 
 	 * @return named parameter names
@@ -243,5 +137,119 @@ public interface INamedParameters
 	 * @return this
 	 */
 	INamedParameters clearNamed();
+
+	/**
+	 * A hint where the parameter is read/parsed from.
+	 */
+	enum Type
+	{
+		/**
+		 * The named parameter is set manually in the application code
+		 */
+		MANUAL,
+
+		/**
+		 * The named parameter is read/parsed from the query string
+		 */
+		QUERY_STRING,
+
+		/**
+		 * The named parameter is read/parsed from the url path
+		 */
+		PATH
+	}
+
+	/**
+	 * Represents a named parameter entry. There can be multiple {@link NamedPair}s in
+	 * {@link PageParameters} that have same key.
+	 * 
+	 * @author Matej Knopp
+	 */
+	@SuppressWarnings("serial")
+	class NamedPair implements IClusterable
+	{
+		private final String key;
+		private final String value;
+		private final Type type;
+
+		/**
+		 * Creates a named parameter entry that is set manually in the application code.
+		 * 
+		 * @param key
+		 * @param value
+		 */
+		public NamedPair(final String key, final String value)
+		{
+			this(key, value, Type.MANUAL);
+		}
+
+		/**
+		 * Creates a named parameter entry
+		 * 
+		 * @param key
+		 * @param value
+		 * @param type
+		 */
+		public NamedPair(final String key, final String value, Type type)
+		{
+			this.key = Args.notEmpty(key, "key");
+			this.value = Args.notNull(value, "value");
+			this.type = Args.notNull(type, "type");
+		}
+
+		/**
+		 * @return key
+		 */
+		public String getKey()
+		{
+			return key;
+		}
+
+		/**
+		 * @return value
+		 */
+		public String getValue()
+		{
+			return value;
+		}
+
+		/**
+		 * @return type
+		 */
+		public Type getType()
+		{
+			return type;
+		}
+
+		@Override
+		public boolean equals(Object o)
+		{
+			if (this == o) {
+				return true;
+			}
+			if (o == null || getClass() != o.getClass()) {
+				return false;
+			}
+
+			NamedPair namedPair = (NamedPair) o;
+
+			if (key != null ? !key.equals(namedPair.key) : namedPair.key != null) {
+				return false;
+			}
+			if (value != null ? !value.equals(namedPair.value) : namedPair.value != null) {
+				return false;
+			}
+
+			return true;
+		}
+
+		@Override
+		public int hashCode()
+		{
+			int result = key != null ? key.hashCode() : 0;
+			result = 31 * result + (value != null ? value.hashCode() : 0);
+			return result;
+		}
+	}
 
 }

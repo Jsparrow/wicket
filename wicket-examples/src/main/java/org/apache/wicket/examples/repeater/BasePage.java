@@ -52,8 +52,27 @@ public class BasePage extends ExamplePage
 		}
 		else
 		{
-			return selected.getFirstName() + " " + selected.getLastName();
+			return new StringBuilder().append(selected.getFirstName()).append(" ").append(selected.getLastName()).toString();
 		}
+	}
+
+	/**
+	 * @return selected contact
+	 */
+	public Contact getSelected()
+	{
+		return selected;
+	}
+
+	/**
+	 * sets selected contact
+	 * 
+	 * @param selected
+	 */
+	public void setSelected(Contact selected)
+	{
+		addStateChange();
+		this.selected = selected;
 	}
 
 	class ActionPanel extends Panel
@@ -76,24 +95,5 @@ public class BasePage extends ExamplePage
 				}
 			});
 		}
-	}
-
-	/**
-	 * @return selected contact
-	 */
-	public Contact getSelected()
-	{
-		return selected;
-	}
-
-	/**
-	 * sets selected contact
-	 * 
-	 * @param selected
-	 */
-	public void setSelected(Contact selected)
-	{
-		addStateChange();
-		this.selected = selected;
 	}
 }

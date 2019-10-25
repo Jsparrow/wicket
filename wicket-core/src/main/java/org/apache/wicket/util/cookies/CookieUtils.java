@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
  */
 public class CookieUtils
 {
-	private final static Logger log = LoggerFactory.getLogger(CookieUtils.class);
+	private static final Logger log = LoggerFactory.getLogger(CookieUtils.class);
 
 	public static final String DEFAULT_SESSIONID_COOKIE_NAME = "JSESSIONID";
 
@@ -208,18 +208,16 @@ public class CookieUtils
 	 */
 	private void remove(final Cookie cookie)
 	{
-		if (cookie != null)
+		if (cookie == null) {
+			return;
+		}
+		save(cookie);
+		// Delete the cookie by setting its maximum age to zero
+		cookie.setMaxAge(0);
+		cookie.setValue(null);
+		if (log.isDebugEnabled())
 		{
-			save(cookie);
-
-			// Delete the cookie by setting its maximum age to zero
-			cookie.setMaxAge(0);
-			cookie.setValue(null);
-
-			if (log.isDebugEnabled())
-			{
-				log.debug("Removed Cookie: " + cookie.getName());
-			}
+			log.debug("Removed Cookie: " + cookie.getName());
 		}
 	}
 
@@ -241,13 +239,11 @@ public class CookieUtils
 			{
 				if (cookie != null)
 				{
-					log.debug("Found Cookie with name=" + name + " and request URI=" +
-							webRequest.getUrl().toString());
+					log.debug(new StringBuilder().append("Found Cookie with name=").append(name).append(" and request URI=").append(webRequest.getUrl().toString()).toString());
 				}
 				else
 				{
-					log.debug("Unable to find Cookie with name=" + name + " and request URI=" +
-							webRequest.getUrl().toString());
+					log.debug(new StringBuilder().append("Unable to find Cookie with name=").append(name).append(" and request URI=").append(webRequest.getUrl().toString()).toString());
 				}
 			}
 
@@ -255,6 +251,7 @@ public class CookieUtils
 		}
 		catch (NullPointerException ex)
 		{
+			log.error(ex.getMessage(), ex);
 			// Ignore any app server problem here
 		}
 
@@ -297,8 +294,7 @@ public class CookieUtils
 
 		if (log.isDebugEnabled())
 		{
-			log.debug("Cookie saved: " + cookieToDebugString(cookie) + "; request URI=" +
-				getWebRequest().getUrl().toString());
+			log.debug(new StringBuilder().append("Cookie saved: ").append(cookieToDebugString(cookie)).append("; request URI=").append(getWebRequest().getUrl().toString()).toString());
 		}
 
 		return cookie;
@@ -325,8 +321,7 @@ public class CookieUtils
 		}
 
 		ServletWebRequest request = (ServletWebRequest)getWebRequest();
-		String path = request.getContainerRequest().getContextPath() + "/" +
-			request.getFilterPrefix();
+		String path = new StringBuilder().append(request.getContainerRequest().getContextPath()).append("/").append(request.getFilterPrefix()).toString();
 
 		cookie.setPath(path);
 		cookie.setVersion(settings.getVersion());
@@ -371,8 +366,8 @@ public class CookieUtils
 	private String cookieToDebugString(final Cookie cookie)
 	{
 		final LocalDateTime localDateTime = Instant.ofEpochMilli(cookie.getMaxAge()).atZone(ZoneId.systemDefault()).toLocalDateTime();
-		return "[Cookie " + " name = " + cookie.getName() + ", value = " + cookie.getValue() +
-			", domain = " + cookie.getDomain() + ", path = " + cookie.getPath() + ", maxAge = " +
-			localDateTime + "(" + cookie.getMaxAge() + ")" + "]";
+		return new StringBuilder().append("[Cookie ").append(" name = ").append(cookie.getName()).append(", value = ").append(cookie.getValue()).append(", domain = ")
+				.append(cookie.getDomain()).append(", path = ").append(cookie.getPath()).append(", maxAge = ").append(localDateTime).append("(").append(cookie.getMaxAge())
+				.append(")").append("]").toString();
 	}
 }

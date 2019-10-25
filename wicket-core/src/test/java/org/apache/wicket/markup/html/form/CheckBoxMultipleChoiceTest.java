@@ -27,6 +27,7 @@ import org.apache.wicket.util.tester.WicketTestCase;
 import org.apache.wicket.util.value.IValueMap;
 import org.apache.wicket.util.value.ValueMap;
 import org.junit.jupiter.api.Test;
+import java.util.Collections;
 
 /**
  * Test the dynamic prefix/suffix feature introduced with
@@ -36,6 +37,127 @@ import org.junit.jupiter.api.Test;
  */
 class CheckBoxMultipleChoiceTest extends WicketTestCase
 {
+	/** */
+	@Test
+    void noPrefix()
+	{
+		tester.startPage(new TestPage(true, false, false, false));
+		tester.assertContains("<div wicket:id=\"checkWithoutPrefix\"><input name=\"checkWithoutPrefix\"");
+	}
+
+	/** */
+	@Test
+    void fixedPrefix()
+	{
+		tester.startPage(new TestPage(false, true, false, false));
+		tester.assertContains("<div wicket:id=\"checkWithFixedPrefix\">pre<input name=\"checkWithFixedPrefix\"");
+		tester.assertContains("</label>sufpre<input name=\"checkWithFixedPrefix\"");
+		tester.assertContains("</label>suf\n</div>");
+	}
+
+	/** */
+	@Test
+    void dynamicPrefix()
+	{
+		tester.startPage(new TestPage(false, false, true, false));
+		tester.assertContains("<div wicket:id=\"checkWithDynamicPrefix\">pre0a<input name=\"checkWithDynamicPrefix\"");
+		tester.assertContains("</label>suf0apre1b<input name=\"checkWithDynamicPrefix\"");
+		tester.assertContains("</label>suf2c\n</div>");
+	}
+
+	@Test
+    void disabledInHierarchy()
+	{
+		tester.startPage(new TestPage(false, false, false, true));
+		tester.assertContains("disabled=\"disabled\"");
+	}
+
+	@Test
+    void defaultLabelPositionIsAfter() throws Exception
+	{
+		CheckBoxMultipleChoice<Integer> radioChoice = new CheckBoxMultipleChoice<Integer>("testid", Collections.singletonList(1)) {
+			@Override
+			protected IValueMap getAdditionalAttributes(int index, Integer choice)
+			{
+				return new ValueMap("class=input" + index);
+			}
+			@Override
+			protected IValueMap getAdditionalAttributesForLabel(int index, Integer choice)
+			{
+				return new ValueMap("class=label" + index);
+			}
+		};
+		tester.startComponentInPage(radioChoice);
+
+		tester.assertResultPage(
+		        "<span wicket:id=\"testid\"><input name=\"testid\" type=\"checkbox\" value=\"0\" id=\"testid1-testid_0\" class=\"input0\"/><label for=\"testid1-testid_0\" class=\"label0\">1</label>\n</span>");
+	}
+
+	@Test
+    void labelPositionBefore() throws Exception
+	{
+		CheckBoxMultipleChoice<Integer> radioChoice = new CheckBoxMultipleChoice<Integer>("testid", Collections.singletonList(1)) {
+			@Override
+			protected IValueMap getAdditionalAttributes(int index, Integer choice)
+			{
+				return new ValueMap("class=input" + index);
+			}
+			@Override
+			protected IValueMap getAdditionalAttributesForLabel(int index, Integer choice)
+			{
+				return new ValueMap("class=label" + index);
+			}
+		};
+		radioChoice.setLabelPosition(AbstractChoice.LabelPosition.BEFORE);
+		tester.startComponentInPage(radioChoice);
+
+		tester.assertResultPage(
+		        "<span wicket:id=\"testid\"><label for=\"testid1-testid_0\" class=\"label0\">1</label><input name=\"testid\" type=\"checkbox\" value=\"0\" id=\"testid1-testid_0\" class=\"input0\"/>\n</span>");
+	}
+
+	@Test
+    void labelPositionWrapBefore() throws Exception
+	{
+		CheckBoxMultipleChoice<Integer> radioChoice = new CheckBoxMultipleChoice<Integer>("testid", Collections.singletonList(1)) {
+			@Override
+			protected IValueMap getAdditionalAttributes(int index, Integer choice)
+			{
+				return new ValueMap("class=input" + index);
+			}
+			@Override
+			protected IValueMap getAdditionalAttributesForLabel(int index, Integer choice)
+			{
+				return new ValueMap("class=label" + index);
+			}
+		};
+		radioChoice.setLabelPosition(AbstractChoice.LabelPosition.WRAP_BEFORE);
+		tester.startComponentInPage(radioChoice);
+
+		tester.assertResultPage(
+		        "<span wicket:id=\"testid\"><label class=\"label0\">1 <input name=\"testid\" type=\"checkbox\" value=\"0\" id=\"testid1-testid_0\" class=\"input0\"/></label>\n</span>");
+	}
+
+	@Test
+    void labelPositionWrapAfter() throws Exception
+	{
+		CheckBoxMultipleChoice<Integer> radioChoice = new CheckBoxMultipleChoice<Integer>("testid", Collections.singletonList(1)) {
+			@Override
+			protected IValueMap getAdditionalAttributes(int index, Integer choice)
+			{
+				return new ValueMap("class=input" + index);
+			}
+			@Override
+			protected IValueMap getAdditionalAttributesForLabel(int index, Integer choice)
+			{
+				return new ValueMap("class=label" + index);
+			}
+		};
+		radioChoice.setLabelPosition(AbstractChoice.LabelPosition.WRAP_AFTER);
+		tester.startComponentInPage(radioChoice);
+
+		tester.assertResultPage("<span wicket:id=\"testid\"><label class=\"label0\"><input name=\"testid\" type=\"checkbox\" value=\"0\" id=\"testid1-testid_0\" class=\"input0\"/> 1</label>\n</span>");
+	}
+
 	/** */
 	public static class TestPage extends WebPage
 	{
@@ -84,13 +206,13 @@ class CheckBoxMultipleChoiceTest extends WicketTestCase
 				@Override
 				protected String getPrefix(int index, String choice)
 				{
-					return "pre" + index + choice;
+					return new StringBuilder().append("pre").append(index).append(choice).toString();
 				}
 
 				@Override
 				protected String getSuffix(int index, String choice)
 				{
-					return "suf" + index + choice;
+					return new StringBuilder().append("suf").append(index).append(choice).toString();
 				}
 			});
 
@@ -104,133 +226,12 @@ class CheckBoxMultipleChoiceTest extends WicketTestCase
 		@Override
 		public IMarkupFragment getMarkup()
 		{
-			return Markup.of("<html><body>" //
-				+ "<div wicket:id='checkWithoutPrefix'></div>" //
-				+ "<div wicket:id='checkWithFixedPrefix'></div>" //
-				+ "<div wicket:id='checkWithDynamicPrefix'></div>" //
-				+ "<div wicket:id='container'><div wicket:id='disabled'></div></div>" //
-				+ "</body></html>");
+			return Markup.of(new StringBuilder().append("<html><body>" //
+).append("<div wicket:id='checkWithoutPrefix'></div>" //
+).append("<div wicket:id='checkWithFixedPrefix'></div>" //
+).append("<div wicket:id='checkWithDynamicPrefix'></div>" //
+).append("<div wicket:id='container'><div wicket:id='disabled'></div></div>" //
+).append("</body></html>").toString());
 		}
-	}
-
-	/** */
-	@Test
-    void noPrefix()
-	{
-		tester.startPage(new TestPage(true, false, false, false));
-		tester.assertContains("<div wicket:id=\"checkWithoutPrefix\"><input name=\"checkWithoutPrefix\"");
-	}
-
-	/** */
-	@Test
-    void fixedPrefix()
-	{
-		tester.startPage(new TestPage(false, true, false, false));
-		tester.assertContains("<div wicket:id=\"checkWithFixedPrefix\">pre<input name=\"checkWithFixedPrefix\"");
-		tester.assertContains("</label>sufpre<input name=\"checkWithFixedPrefix\"");
-		tester.assertContains("</label>suf\n</div>");
-	}
-
-	/** */
-	@Test
-    void dynamicPrefix()
-	{
-		tester.startPage(new TestPage(false, false, true, false));
-		tester.assertContains("<div wicket:id=\"checkWithDynamicPrefix\">pre0a<input name=\"checkWithDynamicPrefix\"");
-		tester.assertContains("</label>suf0apre1b<input name=\"checkWithDynamicPrefix\"");
-		tester.assertContains("</label>suf2c\n</div>");
-	}
-
-	@Test
-    void disabledInHierarchy()
-	{
-		tester.startPage(new TestPage(false, false, false, true));
-		tester.assertContains("disabled=\"disabled\"");
-	}
-
-	@Test
-    void defaultLabelPositionIsAfter() throws Exception
-	{
-		CheckBoxMultipleChoice<Integer> radioChoice = new CheckBoxMultipleChoice<Integer>("testid", Arrays.asList(1)) {
-			@Override
-			protected IValueMap getAdditionalAttributes(int index, Integer choice)
-			{
-				return new ValueMap("class=input" + index);
-			}
-			@Override
-			protected IValueMap getAdditionalAttributesForLabel(int index, Integer choice)
-			{
-				return new ValueMap("class=label" + index);
-			}
-		};
-		tester.startComponentInPage(radioChoice);
-
-		tester.assertResultPage(
-		        "<span wicket:id=\"testid\"><input name=\"testid\" type=\"checkbox\" value=\"0\" id=\"testid1-testid_0\" class=\"input0\"/><label for=\"testid1-testid_0\" class=\"label0\">1</label>\n</span>");
-	}
-
-	@Test
-    void labelPositionBefore() throws Exception
-	{
-		CheckBoxMultipleChoice<Integer> radioChoice = new CheckBoxMultipleChoice<Integer>("testid", Arrays.asList(1)) {
-			@Override
-			protected IValueMap getAdditionalAttributes(int index, Integer choice)
-			{
-				return new ValueMap("class=input" + index);
-			}
-			@Override
-			protected IValueMap getAdditionalAttributesForLabel(int index, Integer choice)
-			{
-				return new ValueMap("class=label" + index);
-			}
-		};
-		radioChoice.setLabelPosition(AbstractChoice.LabelPosition.BEFORE);
-		tester.startComponentInPage(radioChoice);
-
-		tester.assertResultPage(
-		        "<span wicket:id=\"testid\"><label for=\"testid1-testid_0\" class=\"label0\">1</label><input name=\"testid\" type=\"checkbox\" value=\"0\" id=\"testid1-testid_0\" class=\"input0\"/>\n</span>");
-	}
-
-	@Test
-    void labelPositionWrapBefore() throws Exception
-	{
-		CheckBoxMultipleChoice<Integer> radioChoice = new CheckBoxMultipleChoice<Integer>("testid", Arrays.asList(1)) {
-			@Override
-			protected IValueMap getAdditionalAttributes(int index, Integer choice)
-			{
-				return new ValueMap("class=input" + index);
-			}
-			@Override
-			protected IValueMap getAdditionalAttributesForLabel(int index, Integer choice)
-			{
-				return new ValueMap("class=label" + index);
-			}
-		};
-		radioChoice.setLabelPosition(AbstractChoice.LabelPosition.WRAP_BEFORE);
-		tester.startComponentInPage(radioChoice);
-
-		tester.assertResultPage(
-		        "<span wicket:id=\"testid\"><label class=\"label0\">1 <input name=\"testid\" type=\"checkbox\" value=\"0\" id=\"testid1-testid_0\" class=\"input0\"/></label>\n</span>");
-	}
-
-	@Test
-    void labelPositionWrapAfter() throws Exception
-	{
-		CheckBoxMultipleChoice<Integer> radioChoice = new CheckBoxMultipleChoice<Integer>("testid", Arrays.asList(1)) {
-			@Override
-			protected IValueMap getAdditionalAttributes(int index, Integer choice)
-			{
-				return new ValueMap("class=input" + index);
-			}
-			@Override
-			protected IValueMap getAdditionalAttributesForLabel(int index, Integer choice)
-			{
-				return new ValueMap("class=label" + index);
-			}
-		};
-		radioChoice.setLabelPosition(AbstractChoice.LabelPosition.WRAP_AFTER);
-		tester.startComponentInPage(radioChoice);
-
-		tester.assertResultPage("<span wicket:id=\"testid\"><label class=\"label0\"><input name=\"testid\" type=\"checkbox\" value=\"0\" id=\"testid1-testid_0\" class=\"input0\"/> 1</label>\n</span>");
 	}
 }

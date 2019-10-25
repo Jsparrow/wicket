@@ -24,6 +24,8 @@ import java.nio.charset.UnsupportedCharsetException;
 import java.util.BitSet;
 
 import org.apache.wicket.util.lang.Args;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Adapted from java.net.URLEncoder, but defines instances for query string encoding versus URL path
@@ -38,20 +40,7 @@ import org.apache.wicket.util.lang.Args;
  */
 public class UrlEncoder
 {
-	/**
-	 * encoder types
-	 */
-	public enum Type {
-		QUERY,
-		PATH,
-		HEADER
-	}
-
-	/**
-	 * List of what not to encode, i.e. characters (e.g. A-Z) and other allowed signs (e.g. !)
-	 * that are allowed but don't have a special meaning.
-	 */
-	protected BitSet dontNeedEncoding;
+	private static final Logger logger = LoggerFactory.getLogger(UrlEncoder.class);
 
 	// used in decoding
 	protected static final int caseDiff = ('a' - 'A');
@@ -76,6 +65,12 @@ public class UrlEncoder
 	 * Encoder used to encode a header.
 	 */
 	public static final UrlEncoder HEADER_INSTANCE = new UrlEncoder(Type.HEADER);
+
+	/**
+	 * List of what not to encode, i.e. characters (e.g. A-Z) and other allowed signs (e.g. !)
+	 * that are allowed but don't have a special meaning.
+	 */
+	protected BitSet dontNeedEncoding;
 
 	/**
 	 * Allow subclass to call constructor.
@@ -259,6 +254,7 @@ public class UrlEncoder
 		}
 		catch (IllegalCharsetNameException | UnsupportedCharsetException e)
 		{
+			logger.error(e.getMessage(), e);
 			throw new RuntimeException(new UnsupportedEncodingException(charsetName));
 		}
 
@@ -283,32 +279,29 @@ public class UrlEncoder
 				do
 				{
 					charArrayWriter.write(c);
+					boolean condition = (c >= 0xD800) && (c <= 0xDBFF) && (i + 1) < s.length();
+					/*
+					 * System.out.println(Integer.toHexString(c) + " is high surrogate");
+					 */
 					/*
 					 * If this character represents the start of a Unicode surrogate pair, then pass
 					 * in two characters. It's not clear what should be done if a bytes reserved in
 					 * the surrogate pairs range occurs outside of a legal surrogate pair. For now,
 					 * just treat it as if it were any other character.
 					 */
-					if ((c >= 0xD800) && (c <= 0xDBFF))
-					{
+					if (condition) {
+						int d = s.charAt(i + 1);
 						/*
-						 * System.out.println(Integer.toHexString(c) + " is high surrogate");
+						 * System.out.println("\tExamining " + Integer.toHexString(d));
 						 */
-						if ((i + 1) < s.length())
+						if ((d >= 0xDC00) && (d <= 0xDFFF))
 						{
-							int d = s.charAt(i + 1);
 							/*
-							 * System.out.println("\tExamining " + Integer.toHexString(d));
+							 * System.out.println("\t" + Integer.toHexString(d) + " is low
+							 * surrogate");
 							 */
-							if ((d >= 0xDC00) && (d <= 0xDFFF))
-							{
-								/*
-								 * System.out.println("\t" + Integer.toHexString(d) + " is low
-								 * surrogate");
-								 */
-								charArrayWriter.write(d);
-								i++;
-							}
+							charArrayWriter.write(d);
+							i++;
 						}
 					}
 					i++;
@@ -341,5 +334,14 @@ public class UrlEncoder
 		}
 
 		return out.toString();
+	}
+
+	/**
+	 * encoder types
+	 */
+	public enum Type {
+		QUERY,
+		PATH,
+		HEADER
 	}
 }

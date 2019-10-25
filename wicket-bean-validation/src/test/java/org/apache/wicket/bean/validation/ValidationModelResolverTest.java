@@ -24,21 +24,21 @@ public class ValidationModelResolverTest
     @Test
     public void noModelBoundToComponent()
     {
-        TextField<String> textField = new TextField<String>("field");
+        TextField<String> textField = new TextField<>("field");
         assertNull(ValidationModelResolver.resolvePropertyModelFrom(textField));
     }
 
     @Test
     public void simpleModelBoundToComponent()
     {
-        TextField<String> textField = new TextField<String>("text", new Model<String>());
+        TextField<String> textField = new TextField<>("text", new Model<String>());
         assertNull(ValidationModelResolver.resolvePropertyModelFrom(textField));
     }
 
     @Test
     public void propertyModelBoundToComponent()
     {
-        TextField<String> textField = new TextField<String>("text", new PropertyModel<String>(new TestValidatableBean(), "text"));
+        TextField<String> textField = new TextField<>("text", new PropertyModel<String>(new TestValidatableBean(), "text"));
         IPropertyReflectionAwareModel<?> model = ValidationModelResolver.resolvePropertyModelFrom(textField);
         assertNotNull(model);
         assertEquals("text", model.getPropertyField().getName());

@@ -29,10 +29,14 @@ import java.util.Set;
 import java.util.TimeZone;
 
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("javadoc")
 public class HttpHeaderCollectionTest
 {
+	private static final Logger logger = LoggerFactory.getLogger(HttpHeaderCollectionTest.class);
+
 	@Test
 	public void testHeaderCollection()
 	{
@@ -133,6 +137,7 @@ public class HttpHeaderCollectionTest
 		}
 		catch (IllegalStateException e)
 		{
+			logger.error(e.getMessage(), e);
 			// ok
 		}
 	}

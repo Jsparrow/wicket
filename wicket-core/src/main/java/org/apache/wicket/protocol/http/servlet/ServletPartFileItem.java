@@ -187,14 +187,10 @@ class ServletPartFileItem implements FileItem
 	public FileItemHeaders getHeaders()
 	{
 		FileItemHeadersImpl fileItemHeaders = new FileItemHeadersImpl();
-		for (String headerName : part.getHeaderNames())
-		{
+		part.getHeaderNames().forEach(headerName -> {
 			Collection<String> headerValues = part.getHeaders(headerName);
-			for (String headerValue : headerValues)
-			{
-				fileItemHeaders.addHeader(headerName, headerValue);
-			}
-		}
+			headerValues.forEach(headerValue -> fileItemHeaders.addHeader(headerName, headerValue));
+		});
 		return fileItemHeaders;
 	}
 

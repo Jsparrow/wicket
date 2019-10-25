@@ -31,7 +31,7 @@ public class FormDefaultButtonTestPage extends WebPage
 	 */
 	public FormDefaultButtonTestPage()
 	{
-		Form<Void> form = new Form<Void>("form");
+		Form<Void> form = new Form<>("form");
 		add(form);
 		
 		Button button = new Button("default");

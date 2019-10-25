@@ -188,60 +188,50 @@ public class PackageTextTemplate extends TextTemplate
 	 * Loads the template if it is not loaded yet
 	 */
 	private void load() {
-		if (buffer.length() == 0)
+		if (buffer.length() != 0) {
+			return;
+		}
+		String path = Packages.absolutePath(scope, fileName);
+		Application app = Application.get();
+		// first try default class loading locator to find the resource
+		IResourceStream stream = app.getResourceSettings()
+			.getResourceStreamLocator()
+			.locate(scope, path, getStyle(), getVariation(), getLocale(), null, false);
+		if (stream == null)
 		{
-			String path = Packages.absolutePath(scope, fileName);
-
-			Application app = Application.get();
-
-			// first try default class loading locator to find the resource
-			IResourceStream stream = app.getResourceSettings()
-				.getResourceStreamLocator()
-				.locate(scope, path, getStyle(), getVariation(), getLocale(), null, false);
-
-			if (stream == null)
+			// if the default locator didn't find the resource then fallback
+			stream = new ResourceStreamLocator().locate(scope, path, getStyle(), getVariation(), getLocale(), null, false);
+		}
+		if (stream == null)
+		{
+			throw new IllegalArgumentException(new StringBuilder().append("resource ").append(fileName).append(" not found for scope ").append(scope).append(" (path = ").append(path)
+					.append(")").toString());
+		}
+		setLastModified(stream.lastModifiedTime());
+		try
+		{
+			if (encoding != null)
 			{
-				// if the default locator didn't find the resource then fallback
-				stream = new ResourceStreamLocator().locate(scope, path, getStyle(), getVariation(), getLocale(), null, false);
+				buffer.append(Streams.readString(stream.getInputStream(), encoding));
 			}
-
-			if (stream == null)
+			else
 			{
-				throw new IllegalArgumentException("resource " + fileName + " not found for scope " +
-					scope + " (path = " + path + ")");
+				buffer.append(Streams.readString(stream.getInputStream()));
 			}
-
-			setLastModified(stream.lastModifiedTime());
-
+		}
+		catch (ResourceStreamNotFoundException | IOException e)
+		{
+			throw new RuntimeException(e);
+		}
+		finally
+		{
 			try
 			{
-				if (encoding != null)
-				{
-					buffer.append(Streams.readString(stream.getInputStream(), encoding));
-				}
-				else
-				{
-					buffer.append(Streams.readString(stream.getInputStream()));
-				}
+				stream.close();
 			}
 			catch (IOException e)
 			{
-				throw new RuntimeException(e);
-			}
-			catch (ResourceStreamNotFoundException e)
-			{
-				throw new RuntimeException(e);
-			}
-			finally
-			{
-				try
-				{
-					stream.close();
-				}
-				catch (IOException e)
-				{
-					log.error(e.getMessage(), e);
-				}
+				log.error(e.getMessage(), e);
 			}
 		}
 	}

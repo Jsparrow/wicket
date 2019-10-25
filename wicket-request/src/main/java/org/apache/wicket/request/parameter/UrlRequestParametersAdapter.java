@@ -57,10 +57,7 @@ public class UrlRequestParametersAdapter implements IRequestParameters
 	public Set<String> getParameterNames()
 	{
 		Set<String> result = new LinkedHashSet<>();
-		for (QueryParameter parameter : url.getQueryParameters())
-		{
-			result.add(parameter.getName());
-		}
+		url.getQueryParameters().forEach(parameter -> result.add(parameter.getName()));
 		return Collections.unmodifiableSet(result);
 	}
 

@@ -33,6 +33,8 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Tests for BeanAnnotLocatorFactory
@@ -41,6 +43,8 @@ import static org.junit.jupiter.api.Assertions.fail;
  */
 public abstract class AnnotProxyFieldValueFactoryTest
 {
+	private static final Logger logger = LoggerFactory.getLogger(AnnotProxyFieldValueFactoryTest.class);
+
 	ISpringContextLocator mockCtxLocator = new ISpringContextLocator()
 	{
 		private static final long serialVersionUID = 1L;
@@ -127,6 +131,7 @@ public abstract class AnnotProxyFieldValueFactoryTest
 		}
 		catch (IllegalArgumentException e)
 		{
+			logger.error(e.getMessage(), e);
 			// noop
 		}
 	}
@@ -152,6 +157,7 @@ public abstract class AnnotProxyFieldValueFactoryTest
 		}
 		catch (RuntimeException e)
 		{
+			logger.error(e.getMessage(), e);
 			// expected
 			assertTrue(true);
 		}

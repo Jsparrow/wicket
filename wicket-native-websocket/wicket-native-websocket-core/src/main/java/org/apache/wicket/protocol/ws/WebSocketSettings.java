@@ -62,16 +62,17 @@ public class WebSocketSettings
 	 * use the WicketFilter's filterPath because JSR356 Upgrade connections
 	 * are never passed to the Servlet Filters.
 	 */
-	private static boolean USING_JAVAX_WEB_SOCKET = false;
+	private static boolean usingJavaxWebSocket = false;
 	static
 	{
 		try
 		{
 			Class.forName("org.apache.wicket.protocol.ws.javax.JavaxWebSocketFilter");
-			USING_JAVAX_WEB_SOCKET = true;
+			usingJavaxWebSocket = true;
 			LOG.debug("Using JSR356 Native WebSocket implementation!");
 		} catch (ClassNotFoundException e)
 		{
+			LOG.error(e.getMessage(), e);
 			LOG.debug("Using non-JSR356 Native WebSocket implementation!");
 		}
 	}
@@ -81,35 +82,6 @@ public class WebSocketSettings
 	private final AtomicReference<CharSequence> baseUrl = new AtomicReference<>();
 	private final AtomicInteger port = new AtomicInteger();
 	private final AtomicInteger securePort = new AtomicInteger();
-
-	/**
-	 * Holds this WebSocketSettings in the Application's metadata.
-	 * This way wicket-core module doesn't have reference to wicket-native-websocket.
-	 */
-	public static final class Holder
-	{
-		public static WebSocketSettings get(Application application)
-		{
-			WebSocketSettings settings = application.getMetaData(KEY);
-			if (settings == null)
-			{
-				synchronized (application)
-				{
-					if (settings == null)
-					{
-						settings = new WebSocketSettings();
-						set(application, settings);
-					}
-				}
-			}
-			return settings;
-		}
-
-		public static void set(Application application, WebSocketSettings settings)
-		{
-			application.setMetaData(KEY, settings);
-		}
-	}
 
 	/**
 	 * The executor that handles the processing of Web Socket push message broadcasts.
@@ -293,7 +265,7 @@ public class WebSocketSettings
 	public CharSequence getFilterPrefix() {
 		if (filterPrefix.get() == null)
 		{
-			if (USING_JAVAX_WEB_SOCKET)
+			if (usingJavaxWebSocket)
 			{
 				filterPrefix.compareAndSet(null, "");
 			}
@@ -320,12 +292,11 @@ public class WebSocketSettings
 	}
 
 	public CharSequence getBaseUrl() {
-		if (baseUrl.get() == null)
-		{
-			Url _baseUrl = RequestCycle.get().getUrlRenderer().getBaseUrl();
-			return Strings.escapeMarkup(_baseUrl.toString());
+		if (baseUrl.get() != null) {
+			return baseUrl.get();
 		}
-		return baseUrl.get();
+		Url _baseUrl = RequestCycle.get().getUrlRenderer().getBaseUrl();
+		return Strings.escapeMarkup(_baseUrl.toString());
 	}
 
 	/**
@@ -364,6 +335,35 @@ public class WebSocketSettings
 	public Integer getSecurePort()
 	{
 		return securePort.get();
+	}
+
+	/**
+	 * Holds this WebSocketSettings in the Application's metadata.
+	 * This way wicket-core module doesn't have reference to wicket-native-websocket.
+	 */
+	public static final class Holder
+	{
+		public static WebSocketSettings get(Application application)
+		{
+			WebSocketSettings settings = application.getMetaData(KEY);
+			if (settings == null)
+			{
+				synchronized (application)
+				{
+					if (settings == null)
+					{
+						settings = new WebSocketSettings();
+						set(application, settings);
+					}
+				}
+			}
+			return settings;
+		}
+
+		public static void set(Application application, WebSocketSettings settings)
+		{
+			application.setMetaData(KEY, settings);
+		}
 	}
 
 	/**

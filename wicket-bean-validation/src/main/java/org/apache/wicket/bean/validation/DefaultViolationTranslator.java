@@ -30,10 +30,7 @@ public class DefaultViolationTranslator implements IViolationTranslator
 		List<String> messages = getViolationMessages(violation, desc);
 		addErrorKeys(error, violation.getInvalidValue(), messages);
 
-		for (String key : desc.getAttributes().keySet())
-		{
-			error.setVariable(key, desc.getAttributes().get(key));
-		}
+		desc.getAttributes().keySet().forEach(key -> error.setVariable(key, desc.getAttributes().get(key)));
 		
 		return error;
 	}
@@ -44,7 +41,7 @@ public class DefaultViolationTranslator implements IViolationTranslator
 		String defaultMessage = (String)desc.getAttributes().get("message");
 		String violationMessage = violation.getMessage();
 		String violationMessageTemplate = violation.getMessageTemplate();		
-		List<String> messages = new ArrayList<String>();
+		List<String> messages = new ArrayList<>();
 
 		//violation message is considered only if it is different from
 		//the interpolated message
@@ -67,20 +64,17 @@ public class DefaultViolationTranslator implements IViolationTranslator
 
 	private void addErrorKeys(ValidationError error, Object invalidValue, List<String> messages)
 	{
-		for (String message : messages)
-		{
-			String messageKey = getMessageKey(message);
-
+		messages.stream().map(this::getMessageKey).forEach(messageKey -> {
 			if (messageKey != null)
 			{
 				if (invalidValue != null)
 				{
-					error.addKey(messageKey + "." + invalidValue.getClass().getSimpleName());
+					error.addKey(new StringBuilder().append(messageKey).append(".").append(invalidValue.getClass().getSimpleName()).toString());
 				}
 
 				error.addKey(messageKey);
 			}
-		}
+		});
 	}
 
 	private String getMessageKey(String message)

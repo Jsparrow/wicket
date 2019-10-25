@@ -67,6 +67,14 @@ public final class GuestBook extends WicketExamplePage
 	}
 
 	/**
+	 * Clears the comments.
+	 */
+	public static void clear()
+	{
+		commentList.clear();
+	}
+
+	/**
 	 * A form that allows a user to add a comment.
 	 * 
 	 * @author Jonathan Locke
@@ -120,13 +128,5 @@ public final class GuestBook extends WicketExamplePage
 			// Clear out the text component
 			values.put("text", "");
 		}
-	}
-
-	/**
-	 * Clears the comments.
-	 */
-	public static void clear()
-	{
-		commentList.clear();
 	}
 }

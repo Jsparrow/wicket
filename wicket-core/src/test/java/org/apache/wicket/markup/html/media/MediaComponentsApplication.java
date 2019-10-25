@@ -40,13 +40,13 @@ class MediaComponentsApplication extends WebApplication
 		IPackageResourceGuard packageResourceGuard = org.apache.wicket.Application.get()
 				.getResourceSettings()
 				.getPackageResourceGuard();
-		if (packageResourceGuard instanceof SecurePackageResourceGuard)
-		{
-			SecurePackageResourceGuard securePackageResourceGuard = (SecurePackageResourceGuard)packageResourceGuard;
-			securePackageResourceGuard.addPattern("+*.vtt");
-			securePackageResourceGuard.addPattern("+*.srt");
-			securePackageResourceGuard.addPattern("+*.mp3");
-			securePackageResourceGuard.addPattern("+*.m4a");
+		if (!(packageResourceGuard instanceof SecurePackageResourceGuard)) {
+			return;
 		}
+		SecurePackageResourceGuard securePackageResourceGuard = (SecurePackageResourceGuard)packageResourceGuard;
+		securePackageResourceGuard.addPattern("+*.vtt");
+		securePackageResourceGuard.addPattern("+*.srt");
+		securePackageResourceGuard.addPattern("+*.mp3");
+		securePackageResourceGuard.addPattern("+*.m4a");
 	}
 }

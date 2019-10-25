@@ -100,9 +100,7 @@ class UploadStatusResource extends AbstractResource
 		}
 		else
 		{
-			status = info.getPercentageComplete() +
-				"|" +
-				new StringResourceModel(RESOURCE_STATUS, (Component)null, Model.of(info)).getString();
+			status = new StringBuilder().append(info.getPercentageComplete()).append("|").append(new StringResourceModel(RESOURCE_STATUS, (Component)null, Model.of(info)).getString()).toString();
 		}
 		return status;
 	}

@@ -25,6 +25,8 @@ import static org.junit.jupiter.api.Assertions.fail;
 import org.apache.wicket.WicketRuntimeException;
 import org.apache.wicket.util.tester.WicketTestCase;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Test class for exercising the {@link PropertyModel}.
@@ -33,6 +35,75 @@ import org.junit.jupiter.api.Test;
  */
 public class PropertyModelTest extends WicketTestCase
 {
+	private static final Logger logger = LoggerFactory.getLogger(PropertyModelTest.class);
+
+	/**
+	 * Tests setting a value on a {@link PropertyModel} when a property is <code>null</code> and an
+	 * interface type. This should end in an exception because Wicket can't decide what to
+	 * instantiate on behalf of the program.
+	 */
+	@Test
+	void setWithNullPathInterface()
+	{
+		Person person = new Person();
+		PropertyModel<String> model = new PropertyModel<>(person, "interfaceAddress.street");
+		try
+		{
+			model.setObject("foo");
+			fail("Expected exception");
+		}
+		catch (WicketRuntimeException wre)
+		{
+			logger.error(wre.getMessage(), wre);
+			// ok
+		}
+	}
+
+	/**
+	 * Tests setting a value on a {@link PropertyModel} when a property is <code>null</code> and an
+	 * abstract class type. This should end in an exception because Wicket can't decide what to
+	 * instantiate on behalf of the program.
+	 */
+	@Test
+	void setWithNullPathAbstract()
+	{
+		Person person = new Person();
+		PropertyModel<String> model = new PropertyModel<>(person, "abstractAddress.street");
+		assertThrows(WicketRuntimeException.class, ()->model.setObject("foo"));
+
+	}
+
+	/**
+	 * Tests setting a value on a {@link PropertyModel} when a property is <code>null</code> and a
+	 * concrete type. This should work because Wicket can decide what to instantiate on behalf of
+	 * the program: the concrete class.
+	 */
+	@Test
+	void setWithNullPathConcrete()
+	{
+		Person person = new Person();
+		PropertyModel<String> model = new PropertyModel<>(person, "concreteAddress.street");
+		model.setObject("foo");
+		assertNotNull(person.concreteAddress, "concreteAddress");
+		assertThat(person.concreteAddress).isInstanceOf(ConcreteAddress.class);
+		assertEquals("foo", person.concreteAddress.street);
+	}
+
+	/**
+	 * Tests setting a value on a null, final property using a {@link PropertyModel}. This test
+	 * should pass when run using JDK 1.5 or newer.
+	 */
+	@Test
+	void setWithNullPathFinalJdk15()
+	{
+		Person person = new Person();
+		PropertyModel<String> model = new PropertyModel<>(person, "finalAddress.street");
+
+		model.setObject("foo");
+		assertThat(person.finalAddress).isInstanceOf(ConcreteAddress.class);
+		assertEquals("foo", person.finalAddress.street);
+	}
+
 	/**
 	 * Interface for testing the property assignment with an <code>null</code> interface property.
 	 */
@@ -44,7 +115,7 @@ public class PropertyModelTest extends WicketTestCase
 	 * Abstract class for testing the property assignment with an <code>null</code> abstract class
 	 * property.
 	 */
-	public static abstract class AbstractAddress implements IAddress
+	public abstract static class AbstractAddress implements IAddress
 	{
 		/** street field for assignment in property expressions. */
 		String street;
@@ -71,73 +142,5 @@ public class PropertyModelTest extends WicketTestCase
 		ConcreteAddress concreteAddress;
 		/** tests a <code>null</code> final concrete class property. */
 		final ConcreteAddress finalAddress = null;
-	}
-
-	/**
-	 * Tests setting a value on a {@link PropertyModel} when a property is <code>null</code> and an
-	 * interface type. This should end in an exception because Wicket can't decide what to
-	 * instantiate on behalf of the program.
-	 */
-	@Test
-	void setWithNullPathInterface()
-	{
-		Person person = new Person();
-		PropertyModel<String> model = new PropertyModel<String>(person, "interfaceAddress.street");
-		try
-		{
-			model.setObject("foo");
-			fail("Expected exception");
-		}
-		catch (WicketRuntimeException wre)
-		{
-			// ok
-		}
-	}
-
-	/**
-	 * Tests setting a value on a {@link PropertyModel} when a property is <code>null</code> and an
-	 * abstract class type. This should end in an exception because Wicket can't decide what to
-	 * instantiate on behalf of the program.
-	 */
-	@Test
-	void setWithNullPathAbstract()
-	{
-		Person person = new Person();
-		PropertyModel<String> model = new PropertyModel<String>(person, "abstractAddress.street");
-		assertThrows(WicketRuntimeException.class, ()->{
-			model.setObject("foo");
-		});
-
-	}
-
-	/**
-	 * Tests setting a value on a {@link PropertyModel} when a property is <code>null</code> and a
-	 * concrete type. This should work because Wicket can decide what to instantiate on behalf of
-	 * the program: the concrete class.
-	 */
-	@Test
-	void setWithNullPathConcrete()
-	{
-		Person person = new Person();
-		PropertyModel<String> model = new PropertyModel<String>(person, "concreteAddress.street");
-		model.setObject("foo");
-		assertNotNull(person.concreteAddress, "concreteAddress");
-		assertThat(person.concreteAddress).isInstanceOf(ConcreteAddress.class);
-		assertEquals("foo", person.concreteAddress.street);
-	}
-
-	/**
-	 * Tests setting a value on a null, final property using a {@link PropertyModel}. This test
-	 * should pass when run using JDK 1.5 or newer.
-	 */
-	@Test
-	void setWithNullPathFinalJdk15()
-	{
-		Person person = new Person();
-		PropertyModel<String> model = new PropertyModel<String>(person, "finalAddress.street");
-
-		model.setObject("foo");
-		assertThat(person.finalAddress).isInstanceOf(ConcreteAddress.class);
-		assertEquals("foo", person.finalAddress.street);
 	}
 }

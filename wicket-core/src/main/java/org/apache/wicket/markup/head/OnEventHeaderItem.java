@@ -38,24 +38,6 @@ import org.apache.wicket.util.value.AttributeMap;
 public class OnEventHeaderItem extends AbstractCspHeaderItem
 {
 	private static final long serialVersionUID = 1L;
-
-	/**
-	 * Creates a {@link OnEventHeaderItem} for the given parameters.
-	 *
-	 * @param target
-	 *            The target of the event handler, for example 'window' or 'document'.
-	 * @param event
-	 *            The event itself, for example 'click'.
-	 * @param javaScript
-	 *            The script to execute on the event.
-	 *
-	 * @return A newly created {@link OnEventHeaderItem}.
-	 */
-	public static OnEventHeaderItem forScript(String target, String event, CharSequence javaScript)
-	{
-		return new OnEventHeaderItem(target, event, javaScript);
-	}
-
 	private final String target;
 	private final String event;
 	private final CharSequence javaScript;
@@ -91,6 +73,23 @@ public class OnEventHeaderItem extends AbstractCspHeaderItem
 	}
 
 	/**
+	 * Creates a {@link OnEventHeaderItem} for the given parameters.
+	 *
+	 * @param target
+	 *            The target of the event handler, for example 'window' or 'document'.
+	 * @param event
+	 *            The event itself, for example 'click'.
+	 * @param javaScript
+	 *            The script to execute on the event.
+	 *
+	 * @return A newly created {@link OnEventHeaderItem}.
+	 */
+	public static OnEventHeaderItem forScript(String target, String event, CharSequence javaScript)
+	{
+		return new OnEventHeaderItem(target, event, javaScript);
+	}
+
+	/**
 	 * @return The target of the event handler, for example 'window' or 'document'.
 	 */
 	public String getTarget()
@@ -117,13 +116,13 @@ public class OnEventHeaderItem extends AbstractCspHeaderItem
 	@Override
 	public void render(Response response)
 	{
-		if (Strings.isEmpty(getJavaScript()) == false)
-		{
-			AttributeMap attributes = new AttributeMap();
-			attributes.putAttribute(JavaScriptUtils.ATTR_TYPE, "text/javascript");
-			attributes.putAttribute(JavaScriptUtils.ATTR_CSP_NONCE, getNonce());
-			JavaScriptUtils.writeInlineScript(response, getCompleteJavaScript(), attributes);
+		if (Strings.isEmpty(getJavaScript()) != false) {
+			return;
 		}
+		AttributeMap attributes = new AttributeMap();
+		attributes.putAttribute(JavaScriptUtils.ATTR_TYPE, "text/javascript");
+		attributes.putAttribute(JavaScriptUtils.ATTR_CSP_NONCE, getNonce());
+		JavaScriptUtils.writeInlineScript(response, getCompleteJavaScript(), attributes);
 	}
 
 	/**
@@ -145,14 +144,15 @@ public class OnEventHeaderItem extends AbstractCspHeaderItem
 	@Override
 	public Iterable<?> getRenderTokens()
 	{
-		return Collections.singletonList("javascript-event-" + getTarget() + "-" + getEvent() +
-			"-" + getJavaScript());
+		return Collections.singletonList(new StringBuilder().append("javascript-event-").append(getTarget()).append("-").append(getEvent()).append("-").append(getJavaScript())
+				.toString());
 	}
 
 	@Override
 	public String toString()
 	{
-		return "OnEventHeaderItem(" + getTarget() + ", '" + getEvent() + "', '" + getJavaScript() + "')";
+		return new StringBuilder().append("OnEventHeaderItem(").append(getTarget()).append(", '").append(getEvent()).append("', '").append(getJavaScript())
+				.append("')").toString();
 	}
 
 	@Override
@@ -164,8 +164,12 @@ public class OnEventHeaderItem extends AbstractCspHeaderItem
 	@Override
 	public boolean equals(Object o)
 	{
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
 		OnEventHeaderItem that = (OnEventHeaderItem) o;
 		return Objects.equals(target, that.target) &&
 				Objects.equals(event, that.event) &&

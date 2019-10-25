@@ -26,7 +26,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -40,6 +39,7 @@ import org.apache.wicket.util.io.IOUtils;
 import org.apache.wicket.util.tester.FormTester;
 import org.apache.wicket.util.tester.WicketTestCase;
 import org.junit.jupiter.api.Test;
+import java.util.Collections;
 
 /**
  * Test of FileUpload with simulated Servlet 3.0 multipart config
@@ -91,7 +91,7 @@ class FileUploadServletPartTest extends WicketTestCase
 
 		private Servlet3Part(String fieldName) {
 			this.fieldName = fieldName;
-			headers.put(AbstractResource.CONTENT_DISPOSITION_HEADER_NAME, Arrays.asList("attachment;filename=" + Servlet3Part.class.getSimpleName()));
+			headers.put(AbstractResource.CONTENT_DISPOSITION_HEADER_NAME, Collections.singletonList("attachment;filename=" + Servlet3Part.class.getSimpleName()));
 		}
 
 		@Override

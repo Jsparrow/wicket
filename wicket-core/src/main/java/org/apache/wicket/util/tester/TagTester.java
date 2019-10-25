@@ -173,12 +173,9 @@ public class TagTester
 		{
 			String value = getAttribute(attribute);
 
-			if (value != null)
-			{
-				if (value.contains(partialValue))
-				{
-					contains = true;
-				}
+			boolean condition = value != null && value.contains(partialValue);
+			if (condition) {
+				contains = true;
 			}
 		}
 
@@ -225,12 +222,9 @@ public class TagTester
 		{
 			String val = getAttribute(attribute);
 
-			if (val != null)
-			{
-				if (val.endsWith(expected))
-				{
-					endsWith = true;
-				}
+			boolean condition = val != null && val.endsWith(expected);
+			if (condition) {
+				endsWith = true;
 			}
 		}
 

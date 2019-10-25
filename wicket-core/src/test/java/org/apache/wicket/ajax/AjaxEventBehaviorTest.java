@@ -60,34 +60,25 @@ class AjaxEventBehaviorTest extends WicketTestCase
 	@Test
 	void nullName()
 	{
-		assertThrows(IllegalArgumentException.class, () -> {
-			new EventNamesBehavior(null);
-
-		});
+		assertThrows(IllegalArgumentException.class, () -> new EventNamesBehavior(null));
 	}
 
 	@Test
 	void emptyName()
 	{
-		assertThrows(IllegalArgumentException.class, () -> {
-			new EventNamesBehavior("");
-		});
+		assertThrows(IllegalArgumentException.class, () -> new EventNamesBehavior(""));
 	}
 
 	@Test
 	void spacesName()
 	{
-		assertThrows(IllegalArgumentException.class, () -> {
-			new EventNamesBehavior("  ");
-		});
+		assertThrows(IllegalArgumentException.class, () -> new EventNamesBehavior("  "));
 	}
 
 	@Test
 	void tabName()
 	{
-		assertThrows(IllegalArgumentException.class, () -> {
-			new EventNamesBehavior("\t");
-		});
+		assertThrows(IllegalArgumentException.class, () -> new EventNamesBehavior("\t"));
 	}
 
 	private static class EventNamesBehavior extends AjaxEventBehavior

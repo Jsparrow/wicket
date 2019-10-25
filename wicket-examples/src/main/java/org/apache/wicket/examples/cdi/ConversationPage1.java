@@ -47,6 +47,7 @@ public class ConversationPage1 extends CdiExamplePage
 		});
 
 		add(new Link<Void>("next") {
+			@Override
 			public void onClick() {
 				setResponsePage(new ConversationPage2());
 			}

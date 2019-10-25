@@ -28,6 +28,7 @@ import org.apache.wicket.request.Request;
 import org.apache.wicket.request.Url;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import java.util.stream.Collectors;
 
 
 /**
@@ -41,60 +42,6 @@ import org.slf4j.LoggerFactory;
 public class CompoundRequestMapper implements ICompoundRequestMapper
 {
 	private static final Logger LOG = LoggerFactory.getLogger(CompoundRequestMapper.class);
-
-	static class MapperWithScore implements Comparable<MapperWithScore>
-	{
-		private final IRequestMapper mapper;
-		private final int compatibilityScore;
-
-		public MapperWithScore(final IRequestMapper mapper, final int compatibilityScore)
-		{
-			this.mapper = mapper;
-			this.compatibilityScore = compatibilityScore;
-		}
-
-		@Override
-		public int compareTo(final MapperWithScore o)
-		{
-			return (compatibilityScore < o.compatibilityScore ? 1
-				: (compatibilityScore > o.compatibilityScore ? -1 : 0));
-		}
-
-		public IRequestMapper getMapper()
-		{
-			return mapper;
-		}
-
-		@Override
-		public boolean equals(Object o)
-		{
-			if (this == o)
-				return true;
-			if (!(o instanceof MapperWithScore))
-				return false;
-
-			MapperWithScore that = (MapperWithScore)o;
-
-			if (compatibilityScore != that.compatibilityScore)
-				return false;
-			return mapper.equals(that.mapper);
-		}
-
-		@Override
-		public int hashCode()
-		{
-			int result = mapper.hashCode();
-			result = 31 * result + compatibilityScore;
-			return result;
-		}
-
-		@Override
-		public String toString()
-		{
-			return "Mapper: " + mapper.getClass().getName() + "; Score: " + compatibilityScore;
-		}
-	}
-
 	private final List<IRequestMapper> mappers = new CopyOnWriteArrayList<>();
 
 	@Override
@@ -165,13 +112,7 @@ public class CompoundRequestMapper implements ICompoundRequestMapper
 	private void logMappers(final List<MapperWithScore> mappersWithScores, final String url)
 	{
 		final List<MapperWithScore> compatibleMappers = new ArrayList<>();
-		for (MapperWithScore mapperWithScore : mappersWithScores)
-		{
-			if (mapperWithScore.compatibilityScore > 0)
-			{
-				compatibleMappers.add(mapperWithScore);
-			}
-		}
+		compatibleMappers.addAll(mappersWithScores.stream().filter(mapperWithScore -> mapperWithScore.compatibilityScore > 0).collect(Collectors.toList()));
 		if (compatibleMappers.size() == 0)
 		{
 			LOG.debug("No compatible mapper found for URL '{}'", url);
@@ -183,10 +124,7 @@ public class CompoundRequestMapper implements ICompoundRequestMapper
 		else
 		{
 			LOG.debug("Multiple compatible mappers found for URL '{}'", url);
-			for (MapperWithScore compatibleMapper : compatibleMappers)
-			{
-		        LOG.debug(" * {}", compatibleMapper);
-			}
+			compatibleMappers.forEach(compatibleMapper -> LOG.debug(" * {}", compatibleMapper));
 		}
 	}
 
@@ -236,5 +174,61 @@ public class CompoundRequestMapper implements ICompoundRequestMapper
 	public Iterator<IRequestMapper> iterator()
 	{
 		return mappers.iterator();
+	}
+
+	static class MapperWithScore implements Comparable<MapperWithScore>
+	{
+		private final IRequestMapper mapper;
+		private final int compatibilityScore;
+
+		public MapperWithScore(final IRequestMapper mapper, final int compatibilityScore)
+		{
+			this.mapper = mapper;
+			this.compatibilityScore = compatibilityScore;
+		}
+
+		@Override
+		public int compareTo(final MapperWithScore o)
+		{
+			return (compatibilityScore < o.compatibilityScore ? 1
+				: (compatibilityScore > o.compatibilityScore ? -1 : 0));
+		}
+
+		public IRequestMapper getMapper()
+		{
+			return mapper;
+		}
+
+		@Override
+		public boolean equals(Object o)
+		{
+			if (this == o) {
+				return true;
+			}
+			if (!(o instanceof MapperWithScore)) {
+				return false;
+			}
+
+			MapperWithScore that = (MapperWithScore)o;
+
+			if (compatibilityScore != that.compatibilityScore) {
+				return false;
+			}
+			return mapper.equals(that.mapper);
+		}
+
+		@Override
+		public int hashCode()
+		{
+			int result = mapper.hashCode();
+			result = 31 * result + compatibilityScore;
+			return result;
+		}
+
+		@Override
+		public String toString()
+		{
+			return new StringBuilder().append("Mapper: ").append(mapper.getClass().getName()).append("; Score: ").append(compatibilityScore).toString();
+		}
 	}
 }

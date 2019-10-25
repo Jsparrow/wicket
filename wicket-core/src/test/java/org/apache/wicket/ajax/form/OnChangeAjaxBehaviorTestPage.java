@@ -34,10 +34,10 @@ public class OnChangeAjaxBehaviorTestPage extends WebPage
 	 */
 	public OnChangeAjaxBehaviorTestPage()
 	{
-		Form<Void> form = new Form<Void>("form");
+		Form<Void> form = new Form<>("form");
 		add(form);
 
-		TextField<String> field = new TextField<String>("field");
+		TextField<String> field = new TextField<>("field");
 		field.add(new OnChangeAjaxBehavior()
 		{
 			private static final long serialVersionUID = 1L;

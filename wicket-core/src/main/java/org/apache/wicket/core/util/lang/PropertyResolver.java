@@ -80,15 +80,22 @@ public final class PropertyResolver
 	/** Log. */
 	private static final Logger log = LoggerFactory.getLogger(PropertyResolver.class);
 
-	private final static int RETURN_NULL = 0;
-	private final static int CREATE_NEW_VALUE = 1;
-	private final static int RESOLVE_CLASS = 2;
+	private static final int RETURN_NULL = 0;
+	private static final int CREATE_NEW_VALUE = 1;
+	private static final int RESOLVE_CLASS = 2;
 
-	private final static ConcurrentHashMap<Object, IPropertyLocator> applicationToLocators = Generics.newConcurrentHashMap(2);
+	private static final ConcurrentHashMap<Object, IPropertyLocator> applicationToLocators = Generics.newConcurrentHashMap(2);
 
 	private static final String GET = "get";
 	private static final String IS = "is";
 	private static final String SET = "set";
+
+	/**
+	 * Utility class: instantiation not allowed.
+	 */
+	private PropertyResolver()
+	{
+	}
 
 	/**
 	 * Looks up the value from the object with the given expression. If the expression, the object
@@ -102,7 +109,7 @@ public final class PropertyResolver
 	 */
 	public static Object getValue(final String expression, final Object object)
 	{
-		if (expression == null || expression.equals("") || object == null)
+		if (expression == null || "".equals(expression) || object == null)
 		{
 			return object;
 		}
@@ -138,21 +145,19 @@ public final class PropertyResolver
 	{
 		if (Strings.isEmpty(expression))
 		{
-			throw new WicketRuntimeException("Empty expression setting value: " + value +
-				" on object: " + object);
+			throw new WicketRuntimeException(new StringBuilder().append("Empty expression setting value: ").append(value).append(" on object: ").append(object).toString());
 		}
 		if (object == null)
 		{
 			throw new WicketRuntimeException(
-				"Attempted to set property value on a null object. Property expression: " +
-					expression + " Value: " + value);
+				new StringBuilder().append("Attempted to set property value on a null object. Property expression: ").append(expression).append(" Value: ").append(value).toString());
 		}
 
 		ObjectWithGetAndSet objectWithGetAndSet = getObjectWithGetAndSet(expression, object, CREATE_NEW_VALUE);
 		if (objectWithGetAndSet == null)
 		{
-			throw new WicketRuntimeException("Null object returned for expression: " + expression +
-				" for setting value: " + value + " on: " + object);
+			throw new WicketRuntimeException(new StringBuilder().append("Null object returned for expression: ").append(expression).append(" for setting value: ").append(value).append(" on: ").append(object)
+					.toString());
 		}
 		objectWithGetAndSet.setValue(value, converter == null ? new PropertyResolverConverter(Application.get()
 			.getConverterLocator(), Session.get().getLocale()) : converter);
@@ -169,8 +174,7 @@ public final class PropertyResolver
 		ObjectWithGetAndSet objectWithGetAndSet = getObjectWithGetAndSet(expression, object, RESOLVE_CLASS);
 		if (objectWithGetAndSet == null)
 		{
-			throw new WicketRuntimeException("Null object returned for expression: " + expression +
-				" for getting the target class of: " + object);
+			throw new WicketRuntimeException(new StringBuilder().append("Null object returned for expression: ").append(expression).append(" for getting the target class of: ").append(object).toString());
 		}
 		return objectWithGetAndSet.getTargetClass();
 	}
@@ -188,8 +192,7 @@ public final class PropertyResolver
 		ObjectWithGetAndSet objectWithGetAndSet = getObjectWithGetAndSet(expression, null, RESOLVE_CLASS, clz);
 		if (objectWithGetAndSet == null)
 		{
-			throw new WicketRuntimeException("No Class returned for expression: " + expression +
-				" for getting the target class of: " + clz);
+			throw new WicketRuntimeException(new StringBuilder().append("No Class returned for expression: ").append(expression).append(" for getting the target class of: ").append(clz).toString());
 		}
 		return (Class<T>)objectWithGetAndSet.getTargetClass();
 	}
@@ -205,8 +208,7 @@ public final class PropertyResolver
 		ObjectWithGetAndSet objectWithGetAndSet = getObjectWithGetAndSet(expression, object, RESOLVE_CLASS);
 		if (objectWithGetAndSet == null)
 		{
-			throw new WicketRuntimeException("Null object returned for expression: " + expression +
-				" for getting the target class of: " + object);
+			throw new WicketRuntimeException(new StringBuilder().append("Null object returned for expression: ").append(expression).append(" for getting the target class of: ").append(object).toString());
 		}
 		return objectWithGetAndSet.getField();
 	}
@@ -222,8 +224,7 @@ public final class PropertyResolver
 		ObjectWithGetAndSet objectWithGetAndSet = getObjectWithGetAndSet(expression, object, RESOLVE_CLASS);
 		if (objectWithGetAndSet == null)
 		{
-			throw new WicketRuntimeException("Null object returned for expression: " + expression +
-				" for getting the target class of: " + object);
+			throw new WicketRuntimeException(new StringBuilder().append("Null object returned for expression: ").append(expression).append(" for getting the target class of: ").append(object).toString());
 		}
 		return objectWithGetAndSet.getGetter();
 	}
@@ -239,8 +240,7 @@ public final class PropertyResolver
 		ObjectWithGetAndSet objectWithGetAndSet = getObjectWithGetAndSet(expression, object, RESOLVE_CLASS);
 		if (objectWithGetAndSet == null)
 		{
-			throw new WicketRuntimeException("Null object returned for expression: " + expression +
-				" for getting the target class of: " + object);
+			throw new WicketRuntimeException(new StringBuilder().append("Null object returned for expression: ").append(expression).append(" for getting the target class of: ").append(object).toString());
 		}
 		return objectWithGetAndSet.getSetter();
 	}
@@ -287,7 +287,7 @@ public final class PropertyResolver
 		while (index != -1)
 		{
 			exp = expressionBracketsSeperated.substring(lastIndex, index);
-			if (exp.length() == 0)
+			if (exp.isEmpty())
 			{
 				exp = expressionBracketsSeperated.substring(index + 1);
 				break;
@@ -300,6 +300,7 @@ public final class PropertyResolver
 			}
 			catch (WicketRuntimeException ex)
 			{
+				log.error(ex.getMessage(), ex);
 				// expression by itself can't be found. try combined with the following
 				// expression (e.g. for a indexed property);
 				int temp = getNextDotIndex(expressionBracketsSeperated, index + 1);
@@ -390,24 +391,74 @@ public final class PropertyResolver
 		IGetAndSet getAndSet = locator.get(clz, exp);
 		if (getAndSet == null) {
 			throw new WicketRuntimeException(
-					"Property could not be resolved for class: " + clz + " expression: " + exp);
+					new StringBuilder().append("Property could not be resolved for class: ").append(clz).append(" expression: ").append(exp).toString());
 		}
 		
 		return getAndSet;
 	}
 
 	/**
-	 * Utility class: instantiation not allowed.
+	 * Clean up cache for this app.
+	 *
+	 * @param application
 	 */
-	private PropertyResolver()
+	public static void destroy(Application application)
 	{
+		applicationToLocators.remove(application);
+	}
+
+	/**
+	 * Get the current {@link IPropertyLocator}.
+	 * 
+	 * @return locator for the current {@link Application} or a general one if no current application is present
+	 * @see Application#get()
+	 */
+	public static IPropertyLocator getLocator()
+	{
+		Object key;
+		if (Application.exists())
+		{
+			key = Application.get();
+		}
+		else
+		{
+			key = PropertyResolver.class;
+		}
+		IPropertyLocator result = applicationToLocators.get(key);
+		if (result == null)
+		{
+			IPropertyLocator tmpResult = applicationToLocators.putIfAbsent(key, result = new CachingPropertyLocator(new DefaultPropertyLocator()));
+			if (tmpResult != null)
+			{
+				result = tmpResult;
+			}
+		}
+		return result;
+	}
+
+	/**
+	 * Set a locator for the given application.
+	 * 
+	 * @param application application, may be {@code null}
+	 * @param locator locator
+	 */
+	public static void setLocator(final Application application, final IPropertyLocator locator)
+	{
+		if (application == null)
+		{
+			applicationToLocators.put(PropertyResolver.class, locator);
+		}
+		else
+		{
+			applicationToLocators.put(application, locator);
+		}
 	}
 
 	/**
 	 * @author jcompagner
 	 *
 	 */
-	private final static class ObjectWithGetAndSet
+	private static final class ObjectWithGetAndSet
 	{
 		private final IGetAndSet getAndSet;
 		private final Object value;
@@ -524,7 +575,7 @@ public final class PropertyResolver
 		Method getSetter();
 	}
 
-	public static abstract class AbstractGetAndSet implements IGetAndSet
+	public abstract static class AbstractGetAndSet implements IGetAndSet
 	{
 		/**
 		 * {@inheritDoc}
@@ -606,7 +657,7 @@ public final class PropertyResolver
 
 	private static final class ListGetAndSet extends AbstractGetAndSet
 	{
-		final private int index;
+		private final int index;
 
 		ListGetAndSet(int index)
 		{
@@ -714,8 +765,8 @@ public final class PropertyResolver
 			}
 			catch (Exception e)
 			{
-				log.warn("Cannot set new value " + value + " at index " + index +
-					" for array holding elements of class " + clzComponentType, e);
+				log.warn(new StringBuilder().append("Cannot set new value ").append(value).append(" at index ").append(index).append(" for array holding elements of class ").append(clzComponentType)
+						.toString(), e);
 			}
 			return value;
 		}
@@ -777,8 +828,8 @@ public final class PropertyResolver
 
 	private static final class IndexedPropertyGetAndSet extends AbstractGetAndSet
 	{
-		final private Integer index;
-		final private Method getMethod;
+		private final Integer index;
+		private final Method getMethod;
 		private Method setMethod;
 
 		IndexedPropertyGetAndSet(final Method method, final int index)
@@ -816,13 +867,11 @@ public final class PropertyResolver
 			}
 			catch (InvocationTargetException ex)
 			{
-				throw new WicketRuntimeException("Error calling index property method: " +
-					getMethod + " on object: " + object, ex.getCause());
+				throw new WicketRuntimeException(new StringBuilder().append("Error calling index property method: ").append(getMethod).append(" on object: ").append(object).toString(), ex.getCause());
 			}
 			catch (Exception ex)
 			{
-				throw new WicketRuntimeException("Error calling index property method: " +
-					getMethod + " on object: " + object, ex);
+				throw new WicketRuntimeException(new StringBuilder().append("Error calling index property method: ").append(getMethod).append(" on object: ").append(object).toString(), ex);
 			}
 			return ret;
 		}
@@ -844,8 +893,8 @@ public final class PropertyResolver
 				Object converted = converter.convert(value, getMethod.getReturnType());
 				if (converted == null && value != null)
 				{
-					throw new ConversionException("Can't convert value: " + value + " to class: " +
-						getMethod.getReturnType() + " for setting it on " + object);
+					throw new ConversionException(new StringBuilder().append("Can't convert value: ").append(value).append(" to class: ").append(getMethod.getReturnType()).append(" for setting it on ")
+							.append(object).toString());
 				}
 				try
 				{
@@ -853,19 +902,16 @@ public final class PropertyResolver
 				}
 				catch (InvocationTargetException ex)
 				{
-					throw new WicketRuntimeException("Error index property calling method: " +
-						setMethod + " on object: " + object, ex.getCause());
+					throw new WicketRuntimeException(new StringBuilder().append("Error index property calling method: ").append(setMethod).append(" on object: ").append(object).toString(), ex.getCause());
 				}
 				catch (Exception ex)
 				{
-					throw new WicketRuntimeException("Error index property calling method: " +
-						setMethod + " on object: " + object, ex);
+					throw new WicketRuntimeException(new StringBuilder().append("Error index property calling method: ").append(setMethod).append(" on object: ").append(object).toString(), ex);
 				}
 			}
 			else
 			{
-				throw new WicketRuntimeException("No set method defined for value: " + value +
-					" on object: " + object);
+				throw new WicketRuntimeException(new StringBuilder().append("No set method defined for value: ").append(value).append(" on object: ").append(object).toString());
 			}
 		}
 
@@ -904,7 +950,7 @@ public final class PropertyResolver
 			}
 			catch (Exception e)
 			{
-				log.warn("Cannot set new value " + value + " at index " + index, e);
+				log.warn(new StringBuilder().append("Cannot set new value ").append(value).append(" at index ").append(index).toString(), e);
 			}
 			return value;
 		}
@@ -937,13 +983,11 @@ public final class PropertyResolver
 			}
 			catch (InvocationTargetException ex)
 			{
-				throw new WicketRuntimeException("Error calling method: " + getMethod +
-					" on object: " + object, ex.getCause());
+				throw new WicketRuntimeException(new StringBuilder().append("Error calling method: ").append(getMethod).append(" on object: ").append(object).toString(), ex.getCause());
 			}
 			catch (Exception ex)
 			{
-				throw new WicketRuntimeException("Error calling method: " + getMethod +
-					" on object: " + object, ex);
+				throw new WicketRuntimeException(new StringBuilder().append("Error calling method: ").append(getMethod).append(" on object: ").append(object).toString(), ex);
 			}
 			return ret;
 		}
@@ -975,15 +1019,13 @@ public final class PropertyResolver
 				{
 					if (value != null)
 					{
-						throw new ConversionException("Method [" + getMethod +
-							"]. Can't convert value: " + value + " to class: " +
-							type + " for setting it on " + object);
+						throw new ConversionException(new StringBuilder().append("Method [").append(getMethod).append("]. Can't convert value: ").append(value).append(" to class: ")
+								.append(type).append(" for setting it on ").append(object).toString());
 					}
 					else if (setMethod != null && type.isPrimitive())
 					{
-						throw new ConversionException("Method [" + setMethod +
-							"]. Can't convert null value to a primitive class: " +
-							type + " for setting it on " + object);
+						throw new ConversionException(new StringBuilder().append("Method [").append(setMethod).append("]. Can't convert null value to a primitive class: ").append(type).append(" for setting it on ")
+								.append(object).toString());
 					}
 				}
 			}
@@ -996,13 +1038,11 @@ public final class PropertyResolver
 				}
 				catch (InvocationTargetException ex)
 				{
-					throw new WicketRuntimeException("Error calling method: " + setMethod +
-						" on object: " + object, ex.getCause());
+					throw new WicketRuntimeException(new StringBuilder().append("Error calling method: ").append(setMethod).append(" on object: ").append(object).toString(), ex.getCause());
 				}
 				catch (Exception ex)
 				{
-					throw new WicketRuntimeException("Error calling method: " + setMethod +
-						" on object: " + object, ex);
+					throw new WicketRuntimeException(new StringBuilder().append("Error calling method: ").append(setMethod).append(" on object: ").append(object).toString(), ex);
 				}
 			}
 			else if (field != null)
@@ -1013,15 +1053,13 @@ public final class PropertyResolver
 				}
 				catch (Exception ex)
 				{
-					throw new WicketRuntimeException("Error setting field: " + field +
-						" on object: " + object, ex);
+					throw new WicketRuntimeException(new StringBuilder().append("Error setting field: ").append(field).append(" on object: ").append(object).toString(), ex);
 				}
 			}
 			else
 			{
-				throw new WicketRuntimeException("no set method defined for value: " + value +
-					" on object: " + object + " while respective getMethod being " +
-					getMethod.getName());
+				throw new WicketRuntimeException(new StringBuilder().append("no set method defined for value: ").append(value).append(" on object: ").append(object).append(" while respective getMethod being ").append(getMethod.getName())
+						.toString());
 			}
 		}
 
@@ -1053,12 +1091,9 @@ public final class PropertyResolver
 					if (method.getName().equals(name))
 					{
 						Class<?>[] parameterTypes = method.getParameterTypes();
-						if (parameterTypes.length == 1)
-						{
-							if (parameterTypes[0].isAssignableFrom(getMethod.getReturnType()))
-							{
-								return method;
-							}
+						boolean condition = parameterTypes.length == 1 && parameterTypes[0].isAssignableFrom(getMethod.getReturnType());
+						if (condition) {
+							return method;
 						}
 					}
 				}
@@ -1148,7 +1183,6 @@ public final class PropertyResolver
 		 */
 		public FieldGetAndSet(final Field field)
 		{
-			super();
 			this.field = field;
 			this.field.setAccessible(true);
 		}
@@ -1165,8 +1199,7 @@ public final class PropertyResolver
 			}
 			catch (Exception ex)
 			{
-				throw new WicketRuntimeException("Error getting field value of field " + field +
-					" from object " + object, ex);
+				throw new WicketRuntimeException(new StringBuilder().append("Error getting field value of field ").append(field).append(" from object ").append(object).toString(), ex);
 			}
 		}
 
@@ -1185,7 +1218,7 @@ public final class PropertyResolver
 			}
 			catch (Exception e)
 			{
-				log.warn("Cannot set field " + field + " to " + value, e);
+				log.warn(new StringBuilder().append("Cannot set field ").append(field).append(" to ").append(value).toString(), e);
 			}
 			return value;
 		}
@@ -1204,8 +1237,8 @@ public final class PropertyResolver
 			}
 			catch (Exception ex)
 			{
-				throw new WicketRuntimeException("Error setting field value of field " + field +
-					" on object " + object + ", value " + value, ex);
+				throw new WicketRuntimeException(new StringBuilder().append("Error setting field value of field ").append(field).append(" on object ").append(object).append(", value ").append(value)
+						.toString(), ex);
 			}
 		}
 
@@ -1225,63 +1258,6 @@ public final class PropertyResolver
 		public Field getField()
 		{
 			return field;
-		}
-	}
-
-	/**
-	 * Clean up cache for this app.
-	 *
-	 * @param application
-	 */
-	public static void destroy(Application application)
-	{
-		applicationToLocators.remove(application);
-	}
-
-	/**
-	 * Get the current {@link IPropertyLocator}.
-	 * 
-	 * @return locator for the current {@link Application} or a general one if no current application is present
-	 * @see Application#get()
-	 */
-	public static IPropertyLocator getLocator()
-	{
-		Object key;
-		if (Application.exists())
-		{
-			key = Application.get();
-		}
-		else
-		{
-			key = PropertyResolver.class;
-		}
-		IPropertyLocator result = applicationToLocators.get(key);
-		if (result == null)
-		{
-			IPropertyLocator tmpResult = applicationToLocators.putIfAbsent(key, result = new CachingPropertyLocator(new DefaultPropertyLocator()));
-			if (tmpResult != null)
-			{
-				result = tmpResult;
-			}
-		}
-		return result;
-	}
-
-	/**
-	 * Set a locator for the given application.
-	 * 
-	 * @param application application, may be {@code null}
-	 * @param locator locator
-	 */
-	public static void setLocator(final Application application, final IPropertyLocator locator)
-	{
-		if (application == null)
-		{
-			applicationToLocators.put(PropertyResolver.class, locator);
-		}
-		else
-		{
-			applicationToLocators.put(application, locator);
 		}
 	}
 
@@ -1337,7 +1313,7 @@ public final class PropertyResolver
 
 		@Override
 		public IGetAndSet get(Class<?> clz, String exp) {
-			String key = clz.getName() + "#" + exp;
+			String key = new StringBuilder().append(clz.getName()).append("#").append(exp).toString();
 			
 			IGetAndSet located = map.get(key);
 			if (located == null) {
@@ -1361,6 +1337,8 @@ public final class PropertyResolver
 	 */
 	public static class DefaultPropertyLocator implements IPropertyLocator
 	{
+		private final Logger logger = LoggerFactory.getLogger(DefaultPropertyLocator.class);
+
 		@Override
 		public IGetAndSet get(Class<?> clz, String exp) {
 			IGetAndSet getAndSet = null;
@@ -1394,6 +1372,7 @@ public final class PropertyResolver
 					}
 					catch (NumberFormatException ex)
 					{
+						logger.error(ex.getMessage(), ex);
 						// can't parse the exp as an index, maybe the exp was a
 						// method.
 						method = findMethod(clz, exp);
@@ -1412,10 +1391,7 @@ public final class PropertyResolver
 							else
 							{
 								throw new WicketRuntimeException(
-									"The expression '" +
-										exp +
-										"' is neither an index nor is it a method or field for the list " +
-										clz);
+									new StringBuilder().append("The expression '").append(exp).append("' is neither an index nor is it a method or field for the list ").append(clz).toString());
 							}
 						}
 					}
@@ -1433,14 +1409,14 @@ public final class PropertyResolver
 					}
 					catch (NumberFormatException ex)
 					{
-						if (exp.equals("length") || exp.equals("size"))
+						logger.error(ex.getMessage(), ex);
+						if ("length".equals(exp) || "size".equals(exp))
 						{
 							getAndSet = new ArrayLengthGetAndSet();
 						}
 						else
 						{
-							throw new WicketRuntimeException("Can't parse the expression '" + exp +
-								"' as an index for an array lookup");
+							throw new WicketRuntimeException(new StringBuilder().append("Can't parse the expression '").append(exp).append("' as an index for an array lookup").toString());
 						}
 					}
 				}
@@ -1469,9 +1445,10 @@ public final class PropertyResolver
 								}
 								catch (Exception e)
 								{
+									logger.error(e.getMessage(), e);
 									throw new WicketRuntimeException(
-										"No get method defined for class: " + clz +
-											" expression: " + propertyName);
+										new StringBuilder().append("No get method defined for class: ").append(clz).append(" expression: ").append(propertyName)
+												.toString());
 								}
 							}
 						}
@@ -1511,6 +1488,7 @@ public final class PropertyResolver
 			}
 			catch (Exception e)
 			{
+				logger.error(e.getMessage(), e);
 				Class<?> tmp = clz;
 				while (tmp != null && tmp != Object.class)
 				{
@@ -1525,7 +1503,7 @@ public final class PropertyResolver
 					}
 					tmp = tmp.getSuperclass();
 				}
-				log.debug("Cannot find field " + clz + "." + expression);
+				log.debug(new StringBuilder().append("Cannot find field ").append(clz).append(".").append(expression).toString());
 			}
 			return field;
 		}
@@ -1545,6 +1523,7 @@ public final class PropertyResolver
 			}
 			catch (Exception ignored)
 			{
+				logger.error(ignored.getMessage(), ignored);
 			}
 			if (method == null)
 			{
@@ -1554,7 +1533,8 @@ public final class PropertyResolver
 				}
 				catch (Exception e)
 				{
-					log.debug("Cannot find getter " + clz + "." + expression);
+					logger.error(e.getMessage(), e);
+					log.debug(new StringBuilder().append("Cannot find getter ").append(clz).append(".").append(expression).toString());
 				}
 			}
 			return method;
@@ -1573,7 +1553,8 @@ public final class PropertyResolver
 			}
 			catch (Exception e)
 			{
-				log.debug("Cannot find method " + clz + "." + expression);
+				logger.error(e.getMessage(), e);
+				log.debug(new StringBuilder().append("Cannot find method ").append(clz).append(".").append(expression).toString());
 			}
 			return method;
 		}

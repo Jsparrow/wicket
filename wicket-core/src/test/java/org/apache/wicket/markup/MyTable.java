@@ -58,7 +58,7 @@ public class MyTable extends ListView<String>
 	 */
 	public void setRowsPerPage(final int rows)
 	{
-		List<String> list = new ArrayList<String>();
+		List<String> list = new ArrayList<>();
 
 		for (int i = 0; i < rows; i++)
 		{

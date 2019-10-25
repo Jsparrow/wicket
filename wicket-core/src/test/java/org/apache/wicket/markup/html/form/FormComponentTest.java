@@ -117,8 +117,8 @@ class FormComponentTest extends WicketTestCase
 		{
 			Form<Void> form = new Form<>("form");
 			add(form);
-			form.add(field1 = new TextField<String>("field1", Model.of("")));
-			form.add(field2 = new TextField<String>("field2", Model.of("")));
+			form.add(field1 = new TextField<>("field1", Model.of("")));
+			form.add(field2 = new TextField<>("field2", Model.of("")));
 		}
         
 		@Override

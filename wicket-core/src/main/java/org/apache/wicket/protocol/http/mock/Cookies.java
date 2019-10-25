@@ -117,12 +117,15 @@ public final class Cookies
 		@Override
 		public boolean equals(Object obj)
 		{
-			if (this == obj)
+			if (this == obj) {
 				return true;
-			if (obj == null)
+			}
+			if (obj == null) {
 				return false;
-			if (getClass() != obj.getClass())
+			}
+			if (getClass() != obj.getClass()) {
 				return false;
+			}
 			Key other = (Key)obj;
 			
 			return Objects.equals(domain, other.domain)
@@ -133,7 +136,7 @@ public final class Cookies
 		@Override
 		public String toString()
 		{
-			return name + ";" + domain + "/" + path;
+			return new StringBuilder().append(name).append(";").append(domain).append("/").append(path).toString();
 		}
 
 	}

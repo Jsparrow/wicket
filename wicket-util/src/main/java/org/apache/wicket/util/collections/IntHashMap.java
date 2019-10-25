@@ -26,6 +26,8 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This is an integer hashmap that has the exact same features and interface as a normal Map except
@@ -38,9 +40,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class IntHashMap<V> implements Cloneable, Serializable
 {
-	transient volatile Set<Integer> keySet = null;
-
-	transient volatile Collection<V> values = null;
+	private static final Logger logger = LoggerFactory.getLogger(IntHashMap.class);
 
 	/**
 	 * The default initial capacity - MUST be a power of two.
@@ -57,6 +57,12 @@ public class IntHashMap<V> implements Cloneable, Serializable
 	 * The load factor used when none specified in constructor.
 	 */
 	static final float DEFAULT_LOAD_FACTOR = 0.75f;
+
+	private static final long serialVersionUID = 362498820763181265L;
+
+	transient volatile Set<Integer> keySet = null;
+
+	transient volatile Collection<V> values = null;
 
 	/**
 	 * The table, resized as necessary. Length MUST Always be a power of two.
@@ -89,6 +95,10 @@ public class IntHashMap<V> implements Cloneable, Serializable
 	 * HashMap fail-fast. (See ConcurrentModificationException).
 	 */
 	transient AtomicInteger modCount = new AtomicInteger(0);
+
+	// Views
+
+	private transient Set<Entry<V>> entrySet = null;
 
 	/**
 	 * Constructs an empty <tt>HashMap</tt> with the specified initial capacity and load factor.
@@ -335,10 +345,7 @@ public class IntHashMap<V> implements Cloneable, Serializable
 
 	void putAllForCreate(final IntHashMap<V> m)
 	{
-		for (Entry<V> entry : m.entrySet())
-		{
-			putForCreate(entry.getKey(), entry.getValue());
-		}
+		m.entrySet().forEach(entry -> putForCreate(entry.getKey(), entry.getValue()));
 	}
 
 	/**
@@ -439,10 +446,7 @@ public class IntHashMap<V> implements Cloneable, Serializable
 			}
 		}
 
-		for (Entry<V> entry : m.entrySet())
-		{
-			put(entry.getKey(), entry.getValue());
-		}
+		m.entrySet().forEach(entry -> put(entry.getKey(), entry.getValue()));
 	}
 
 	/**
@@ -626,9 +630,189 @@ public class IntHashMap<V> implements Cloneable, Serializable
 		}
 		catch (CloneNotSupportedException e)
 		{
+			logger.error(e.getMessage(), e);
 			// assert false;
 		}
 		return result;
+	}
+
+	/**
+	 * Add a new entry with the specified key, value and hash code to the specified bucket. It is
+	 * the responsibility of this method to resize the table if appropriate.
+	 * 
+	 * Subclass overrides this to alter the behavior of put method.
+	 * 
+	 * @param key
+	 * @param value
+	 * @param bucketIndex
+	 */
+	void addEntry(final int key, final V value, final int bucketIndex)
+	{
+		table[bucketIndex] = new Entry<>(key, value, table[bucketIndex]);
+		if (size++ >= threshold)
+		{
+			resize(2 * table.length);
+		}
+	}
+
+	/**
+	 * Like addEntry except that this version is used when creating entries as part of Map
+	 * construction or "pseudo-construction" (cloning, deserialization). This version needn't worry
+	 * about resizing the table.
+	 * 
+	 * Subclass overrides this to alter the behavior of HashMap(Map), clone, and readObject.
+	 * 
+	 * @param key
+	 * @param value
+	 * @param bucketIndex
+	 */
+	void createEntry(final int key, final V value, final int bucketIndex)
+	{
+		table[bucketIndex] = new Entry<>(key, value, table[bucketIndex]);
+		size++;
+	}
+
+	// Subclass overrides these to alter behavior of views' iterator() method
+	Iterator<Integer> newKeyIterator()
+	{
+		return new KeyIterator();
+	}
+
+	Iterator<V> newValueIterator()
+	{
+		return new ValueIterator();
+	}
+
+	Iterator<Entry<V>> newEntryIterator()
+	{
+		return new EntryIterator();
+	}
+
+	/**
+	 * Returns a set view of the keys contained in this map. The set is backed by the map, so
+	 * changes to the map are reflected in the set, and vice-versa. The set supports element
+	 * removal, which removes the corresponding mapping from this map, via the
+	 * <tt>Iterator.remove</tt>, <tt>Set.remove</tt>, <tt>removeAll</tt>, <tt>retainAll</tt>, and
+	 * <tt>clear</tt> operations. It does not support the <tt>add</tt> or <tt>addAll</tt>
+	 * operations.
+	 * 
+	 * @return a set view of the keys contained in this map.
+	 */
+	public Set<Integer> keySet()
+	{
+		Set<Integer> ks = keySet;
+		return (ks != null ? ks : (keySet = new KeySet()));
+	}
+
+	/**
+	 * Returns a collection view of the values contained in this map. The collection is backed by
+	 * the map, so changes to the map are reflected in the collection, and vice-versa. The
+	 * collection supports element removal, which removes the corresponding mapping from this map,
+	 * via the <tt>Iterator.remove</tt>, <tt>Collection.remove</tt>, <tt>removeAll</tt>,
+	 * <tt>retainAll</tt>, and <tt>clear</tt> operations. It does not support the <tt>add</tt> or
+	 * <tt>addAll</tt> operations.
+	 * 
+	 * @return a collection view of the values contained in this map.
+	 */
+	public Collection<V> values()
+	{
+		Collection<V> vs = values;
+		return (vs != null ? vs : (values = new Values()));
+	}
+
+	/**
+	 * Returns a collection view of the mappings contained in this map. Each element in the returned
+	 * collection is a <tt>Map.Entry</tt>. The collection is backed by the map, so changes to the
+	 * map are reflected in the collection, and vice-versa. The collection supports element removal,
+	 * which removes the corresponding mapping from the map, via the <tt>Iterator.remove</tt>,
+	 * <tt>Collection.remove</tt>, <tt>removeAll</tt>, <tt>retainAll</tt>, and <tt>clear</tt>
+	 * operations. It does not support the <tt>add</tt> or <tt>addAll</tt> operations.
+	 * 
+	 * @return a collection view of the mappings contained in this map.
+	 * @see java.util.Map.Entry
+	 */
+	public Set<Entry<V>> entrySet()
+	{
+		Set<Entry<V>> es = entrySet;
+		return (es != null ? es : (entrySet = new EntrySet()));
+	}
+
+	/**
+	 * Save the state of the <tt>HashMap</tt> instance to a stream (i.e., serialize it).
+	 * 
+	 * @param s
+	 *            The ObjectOutputStream
+	 * @throws IOException
+	 * 
+	 * @serialData The <i>capacity</i> of the HashMap (the length of the bucket array) is emitted
+	 *             (int), followed by the <i>size</i> of the HashMap (the number of key-value
+	 *             mappings), followed by the key (Object) and value (Object) for each key-value
+	 *             mapping represented by the HashMap The key-value mappings are emitted in the
+	 *             order that they are returned by <tt>entrySet().iterator()</tt>.
+	 * 
+	 */
+	private void writeObject(final java.io.ObjectOutputStream s) throws IOException
+	{
+		// Write out the threshold, loadfactor, and any hidden stuff
+		s.defaultWriteObject();
+
+		// Write out number of buckets
+		s.writeInt(table.length);
+
+		// Write out size (number of Mappings)
+		s.writeInt(size);
+
+		// Write out keys and values (alternating)
+		for (Entry<V> entry : entrySet())
+		{
+			s.writeInt(entry.getKey());
+			s.writeObject(entry.getValue());
+		}
+	}
+
+	/**
+	 * Reconstitute the <tt>HashMap</tt> instance from a stream (i.e., deserialize it).
+	 * 
+	 * @param s
+	 * @throws IOException
+	 * @throws ClassNotFoundException
+	 */
+	@SuppressWarnings("unchecked")
+	private void readObject(final java.io.ObjectInputStream s) throws IOException,
+		ClassNotFoundException
+	{
+		modCount = new AtomicInteger(0);
+
+		// Read in the threshold, loadfactor, and any hidden stuff
+		s.defaultReadObject();
+
+		// Read in number of buckets and allocate the bucket array;
+		int numBuckets = s.readInt();
+		table = new Entry[numBuckets];
+
+		init(); // Give subclass a chance to do its thing.
+
+		// Read in size (number of Mappings)
+		int size = s.readInt();
+
+		// Read the keys and values, and put the mappings in the HashMap
+		for (int i = 0; i < size; i++)
+		{
+			int key = s.readInt();
+			V value = (V)s.readObject();
+			putForCreate(key, value);
+		}
+	}
+
+	// These methods are used when serializing HashSets
+	int capacity()
+	{
+		return table.length;
+	}
+
+	float loadFactor()
+	{
+		return loadFactor;
 	}
 
 	/**
@@ -724,44 +908,8 @@ public class IntHashMap<V> implements Cloneable, Serializable
 		@Override
 		public String toString()
 		{
-			return getKey() + "=" + getValue(); //$NON-NLS-1$
+			return new StringBuilder().append(getKey()).append("=").append(getValue()).toString(); //$NON-NLS-1$
 		}
-	}
-
-	/**
-	 * Add a new entry with the specified key, value and hash code to the specified bucket. It is
-	 * the responsibility of this method to resize the table if appropriate.
-	 * 
-	 * Subclass overrides this to alter the behavior of put method.
-	 * 
-	 * @param key
-	 * @param value
-	 * @param bucketIndex
-	 */
-	void addEntry(final int key, final V value, final int bucketIndex)
-	{
-		table[bucketIndex] = new Entry<>(key, value, table[bucketIndex]);
-		if (size++ >= threshold)
-		{
-			resize(2 * table.length);
-		}
-	}
-
-	/**
-	 * Like addEntry except that this version is used when creating entries as part of Map
-	 * construction or "pseudo-construction" (cloning, deserialization). This version needn't worry
-	 * about resizing the table.
-	 * 
-	 * Subclass overrides this to alter the behavior of HashMap(Map), clone, and readObject.
-	 * 
-	 * @param key
-	 * @param value
-	 * @param bucketIndex
-	 */
-	void createEntry(final int key, final V value, final int bucketIndex)
-	{
-		table[bucketIndex] = new Entry<>(key, value, table[bucketIndex]);
-		size++;
 	}
 
 	private abstract class HashIterator<H> implements Iterator<H>
@@ -879,42 +1027,6 @@ public class IntHashMap<V> implements Cloneable, Serializable
 		}
 	}
 
-	// Subclass overrides these to alter behavior of views' iterator() method
-	Iterator<Integer> newKeyIterator()
-	{
-		return new KeyIterator();
-	}
-
-	Iterator<V> newValueIterator()
-	{
-		return new ValueIterator();
-	}
-
-	Iterator<Entry<V>> newEntryIterator()
-	{
-		return new EntryIterator();
-	}
-
-	// Views
-
-	private transient Set<Entry<V>> entrySet = null;
-
-	/**
-	 * Returns a set view of the keys contained in this map. The set is backed by the map, so
-	 * changes to the map are reflected in the set, and vice-versa. The set supports element
-	 * removal, which removes the corresponding mapping from this map, via the
-	 * <tt>Iterator.remove</tt>, <tt>Set.remove</tt>, <tt>removeAll</tt>, <tt>retainAll</tt>, and
-	 * <tt>clear</tt> operations. It does not support the <tt>add</tt> or <tt>addAll</tt>
-	 * operations.
-	 * 
-	 * @return a set view of the keys contained in this map.
-	 */
-	public Set<Integer> keySet()
-	{
-		Set<Integer> ks = keySet;
-		return (ks != null ? ks : (keySet = new KeySet()));
-	}
-
 	private class KeySet extends AbstractSet<Integer>
 	{
 		/**
@@ -971,22 +1083,6 @@ public class IntHashMap<V> implements Cloneable, Serializable
 		}
 	}
 
-	/**
-	 * Returns a collection view of the values contained in this map. The collection is backed by
-	 * the map, so changes to the map are reflected in the collection, and vice-versa. The
-	 * collection supports element removal, which removes the corresponding mapping from this map,
-	 * via the <tt>Iterator.remove</tt>, <tt>Collection.remove</tt>, <tt>removeAll</tt>,
-	 * <tt>retainAll</tt>, and <tt>clear</tt> operations. It does not support the <tt>add</tt> or
-	 * <tt>addAll</tt> operations.
-	 * 
-	 * @return a collection view of the values contained in this map.
-	 */
-	public Collection<V> values()
-	{
-		Collection<V> vs = values;
-		return (vs != null ? vs : (values = new Values()));
-	}
-
 	private class Values extends AbstractCollection<V>
 	{
 		/**
@@ -1024,23 +1120,6 @@ public class IntHashMap<V> implements Cloneable, Serializable
 		{
 			IntHashMap.this.clear();
 		}
-	}
-
-	/**
-	 * Returns a collection view of the mappings contained in this map. Each element in the returned
-	 * collection is a <tt>Map.Entry</tt>. The collection is backed by the map, so changes to the
-	 * map are reflected in the collection, and vice-versa. The collection supports element removal,
-	 * which removes the corresponding mapping from the map, via the <tt>Iterator.remove</tt>,
-	 * <tt>Collection.remove</tt>, <tt>removeAll</tt>, <tt>retainAll</tt>, and <tt>clear</tt>
-	 * operations. It does not support the <tt>add</tt> or <tt>addAll</tt> operations.
-	 * 
-	 * @return a collection view of the mappings contained in this map.
-	 * @see java.util.Map.Entry
-	 */
-	public Set<Entry<V>> entrySet()
-	{
-		Set<Entry<V>> es = entrySet;
-		return (es != null ? es : (entrySet = new EntrySet()));
 	}
 
 	private class EntrySet extends AbstractSet<Entry<V>>
@@ -1096,85 +1175,5 @@ public class IntHashMap<V> implements Cloneable, Serializable
 		{
 			IntHashMap.this.clear();
 		}
-	}
-
-	/**
-	 * Save the state of the <tt>HashMap</tt> instance to a stream (i.e., serialize it).
-	 * 
-	 * @param s
-	 *            The ObjectOutputStream
-	 * @throws IOException
-	 * 
-	 * @serialData The <i>capacity</i> of the HashMap (the length of the bucket array) is emitted
-	 *             (int), followed by the <i>size</i> of the HashMap (the number of key-value
-	 *             mappings), followed by the key (Object) and value (Object) for each key-value
-	 *             mapping represented by the HashMap The key-value mappings are emitted in the
-	 *             order that they are returned by <tt>entrySet().iterator()</tt>.
-	 * 
-	 */
-	private void writeObject(final java.io.ObjectOutputStream s) throws IOException
-	{
-		// Write out the threshold, loadfactor, and any hidden stuff
-		s.defaultWriteObject();
-
-		// Write out number of buckets
-		s.writeInt(table.length);
-
-		// Write out size (number of Mappings)
-		s.writeInt(size);
-
-		// Write out keys and values (alternating)
-		for (Entry<V> entry : entrySet())
-		{
-			s.writeInt(entry.getKey());
-			s.writeObject(entry.getValue());
-		}
-	}
-
-	private static final long serialVersionUID = 362498820763181265L;
-
-	/**
-	 * Reconstitute the <tt>HashMap</tt> instance from a stream (i.e., deserialize it).
-	 * 
-	 * @param s
-	 * @throws IOException
-	 * @throws ClassNotFoundException
-	 */
-	@SuppressWarnings("unchecked")
-	private void readObject(final java.io.ObjectInputStream s) throws IOException,
-		ClassNotFoundException
-	{
-		modCount = new AtomicInteger(0);
-
-		// Read in the threshold, loadfactor, and any hidden stuff
-		s.defaultReadObject();
-
-		// Read in number of buckets and allocate the bucket array;
-		int numBuckets = s.readInt();
-		table = new Entry[numBuckets];
-
-		init(); // Give subclass a chance to do its thing.
-
-		// Read in size (number of Mappings)
-		int size = s.readInt();
-
-		// Read the keys and values, and put the mappings in the HashMap
-		for (int i = 0; i < size; i++)
-		{
-			int key = s.readInt();
-			V value = (V)s.readObject();
-			putForCreate(key, value);
-		}
-	}
-
-	// These methods are used when serializing HashSets
-	int capacity()
-	{
-		return table.length;
-	}
-
-	float loadFactor()
-	{
-		return loadFactor;
 	}
 }

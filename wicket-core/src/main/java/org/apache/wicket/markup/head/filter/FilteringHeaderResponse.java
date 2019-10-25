@@ -59,36 +59,6 @@ public class FilteringHeaderResponse extends DecoratingHeaderResponse
 	public static final String DEFAULT_HEADER_FILTER_NAME = "wicket-default-header-filter";
 
 	/**
-	 * A filter used to bucket your resources, inline scripts, etc, into different responses. The
-	 * bucketed resources are then rendered by a {@link HeaderResponseContainer}, using the name of
-	 * the filter to get the correct bucket.
-	 * 
-	 * @author Jeremy Thomerson
-	 */
-	public interface IHeaderResponseFilter extends Predicate<HeaderItem>
-	{
-		/**
-		 * @return name of the filter (used by the container that renders these resources)
-		 */
-		String getName();
-
-		/**
-		 * Determines whether a given HeaderItem should be rendered in the bucket represented by
-		 * this filter.
-		 * 
-		 * @param item
-		 *            the item to be rendered
-		 * @return true if it should be bucketed with other things in this filter
-		 */
-		boolean accepts(HeaderItem item);
-
-		@Override
-		default boolean test(HeaderItem item) {
-			return accepts(item);
-		}
-	}
-
-	/**
 	 * we store this FilteringHeaderResponse in the RequestCycle so that the containers can access
 	 * it to render their bucket of stuff
 	 */
@@ -97,8 +67,10 @@ public class FilteringHeaderResponse extends DecoratingHeaderResponse
 		private static final long serialVersionUID = 1L;
 	};
 
-	private final Map<String, List<HeaderItem>> responseFilterMap = new HashMap<String, List<HeaderItem>>();
+	private final Map<String, List<HeaderItem>> responseFilterMap = new HashMap<>();
+
 	private Iterable<? extends IHeaderResponseFilter> filters;
+
 	private final String headerFilterName;
 
 	/**
@@ -149,7 +121,7 @@ public class FilteringHeaderResponse extends DecoratingHeaderResponse
 		}
 		for (IHeaderResponseFilter filter : filters)
 		{
-			responseFilterMap.put(filter.getName(), new ArrayList<HeaderItem>());
+			responseFilterMap.put(filter.getName(), new ArrayList<>());
 		}
 	}
 
@@ -182,7 +154,7 @@ public class FilteringHeaderResponse extends DecoratingHeaderResponse
 
 			if (responseFilterMap.containsKey(filterName) == false)
 			{
-				responseFilterMap.put(filterName, new ArrayList<HeaderItem>());
+				responseFilterMap.put(filterName, new ArrayList<>());
 			}
 
 			render(item, filterName);
@@ -204,7 +176,7 @@ public class FilteringHeaderResponse extends DecoratingHeaderResponse
 			// none of the configured filters accepted it so put it in the header
 			if (responseFilterMap.containsKey(headerFilterName) == false)
 			{
-				responseFilterMap.put(headerFilterName, new ArrayList<HeaderItem>());
+				responseFilterMap.put(headerFilterName, new ArrayList<>());
 			}
 			render(item, headerFilterName);
 			log.debug("A HeaderItem '{}' was rendered to the filtering header response, but did not match any filters, so it put in the <head>.",
@@ -291,8 +263,7 @@ public class FilteringHeaderResponse extends DecoratingHeaderResponse
 	{
 		if (responseFilterMap.containsKey(filterName) == false)
 		{
-			throw new IllegalArgumentException("No filter named '" + filterName +
-				"', known filter names are: " + responseFilterMap.keySet());
+			throw new IllegalArgumentException(new StringBuilder().append("No filter named '").append(filterName).append("', known filter names are: ").append(responseFilterMap.keySet()).toString());
 		}
 		render(item, responseFilterMap.get(filterName));
 	}
@@ -306,5 +277,35 @@ public class FilteringHeaderResponse extends DecoratingHeaderResponse
 			return;
 		}
 		filteredItems.add(item);
+	}
+
+	/**
+	 * A filter used to bucket your resources, inline scripts, etc, into different responses. The
+	 * bucketed resources are then rendered by a {@link HeaderResponseContainer}, using the name of
+	 * the filter to get the correct bucket.
+	 * 
+	 * @author Jeremy Thomerson
+	 */
+	public interface IHeaderResponseFilter extends Predicate<HeaderItem>
+	{
+		/**
+		 * @return name of the filter (used by the container that renders these resources)
+		 */
+		String getName();
+
+		/**
+		 * Determines whether a given HeaderItem should be rendered in the bucket represented by
+		 * this filter.
+		 * 
+		 * @param item
+		 *            the item to be rendered
+		 * @return true if it should be bucketed with other things in this filter
+		 */
+		boolean accepts(HeaderItem item);
+
+		@Override
+		default boolean test(HeaderItem item) {
+			return accepts(item);
+		}
 	}
 }

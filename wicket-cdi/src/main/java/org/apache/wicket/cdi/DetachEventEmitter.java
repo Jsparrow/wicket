@@ -63,13 +63,11 @@ public class DetachEventEmitter implements IRequestCycleListener
 	@Override
 	public void onDetach(RequestCycle cycle)
 	{
-		if (Boolean.TRUE.equals(cycle.getMetaData(DETACH_SCHEDULED_KEY)))
-		{
-			logger.debug("Firing Detach event {}", cycle.getRequest().getUrl());
-
-			detachEvent.fire(new DetachEvent());
-
-			cycle.setMetaData(DETACH_SCHEDULED_KEY, null);
+		if (!Boolean.TRUE.equals(cycle.getMetaData(DETACH_SCHEDULED_KEY))) {
+			return;
 		}
+		logger.debug("Firing Detach event {}", cycle.getRequest().getUrl());
+		detachEvent.fire(new DetachEvent());
+		cycle.setMetaData(DETACH_SCHEDULED_KEY, null);
 	}
 }

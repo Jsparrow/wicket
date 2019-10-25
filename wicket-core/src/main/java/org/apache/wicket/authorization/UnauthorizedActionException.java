@@ -44,7 +44,7 @@ public class UnauthorizedActionException extends AuthorizationException
 	 */
 	public UnauthorizedActionException(Component component, Action action)
 	{
-		super("Component " + component + " does not permit action " + action);
+		super(new StringBuilder().append("Component ").append(component).append(" does not permit action ").append(action).toString());
 		this.component = component;
 		this.action = action;
 	}

@@ -497,7 +497,7 @@ public class ComponentEventsTest
 
 	private void assertPath(Testable... testables)
 	{
-		List<Testable> remaining = new ArrayList<Testable>(Arrays.asList(all));
+		List<Testable> remaining = new ArrayList<>(Arrays.asList(all));
 
 		for (int i = 0; i < testables.length; i++)
 		{
@@ -505,8 +505,7 @@ public class ComponentEventsTest
 			remaining.remove(testables[i]);
 		}
 
-		for (Testable testable : remaining)
-		{
+		remaining.forEach(testable -> {
 			String name = testable.getClass().getSimpleName();
 			if (testable instanceof Component && !(testable instanceof Page))
 			{
@@ -514,7 +513,7 @@ public class ComponentEventsTest
 			}
 			assertEquals(-1, testable.getSequence(),
 				name + " should not have been visited, but was.");
-		}
+		});
 	}
 
 	private static interface Testable

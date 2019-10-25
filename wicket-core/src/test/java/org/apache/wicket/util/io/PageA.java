@@ -54,16 +54,13 @@ public class PageA extends WebPage
 	@Override
 	public boolean equals(Object obj)
 	{
-		if (obj instanceof PageA)
-		{
-			if (getPageId() == ((PageA)obj).getPageId())
+		boolean condition = obj instanceof PageA && getPageId() == ((PageA)obj).getPageId();
+		if (condition) {
+			if (page != null)
 			{
-				if (page != null)
-				{
-					return page.equals(((PageA)obj).page);
-				}
-				return ((PageA)obj).page == null;
+				return page.equals(((PageA)obj).page);
 			}
+			return ((PageA)obj).page == null;
 		}
 		return false;
 	}

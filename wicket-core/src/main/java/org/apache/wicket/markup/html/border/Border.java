@@ -165,7 +165,7 @@ public abstract class Border extends WebMarkupContainer implements IComponentRes
 	{
 		super(id, model);
 
-		body = new BorderBodyContainer(id + "_" + BODY);
+		body = new BorderBodyContainer(new StringBuilder().append(id).append("_").append(BODY).toString());
 		queueToBorder(body);
 	}
 	
@@ -371,15 +371,12 @@ public abstract class Border extends WebMarkupContainer implements IComponentRes
 	public Component resolve(final MarkupContainer container, final MarkupStream markupStream,
 		final ComponentTag tag)
 	{
+		boolean condition = body.rendering == false && TagUtils.isWicketBodyTag(tag);
+		// We are only interested in border body tags. The tag ID actually is irrelevant since
+		// always preset with the same default
 		// make sure nested borders are resolved properly
-		if (body.rendering == false)
-		{
-			// We are only interested in border body tags. The tag ID actually is irrelevant since
-			// always preset with the same default
-			if (TagUtils.isWicketBodyTag(tag))
-			{
-				return body;
-			}
+		if (condition) {
+			return body;
 		}
 
 		return null;
@@ -450,6 +447,64 @@ public abstract class Border extends WebMarkupContainer implements IComponentRes
 
 		return ((BorderMarkupSourcingStrategy)getMarkupSourcingStrategy()).findMarkupInAssociatedFileHeader(
 			this, child);
+	}
+
+	@Override
+	protected DequeueTagAction canDequeueTag(ComponentTag tag)
+	{
+		if (canDequeueBody(tag))
+		{
+			return DequeueTagAction.DEQUEUE;
+		}
+
+		return super.canDequeueTag(tag);
+	}
+
+	@Override
+	public Component findComponentToDequeue(ComponentTag tag)
+	{
+		if (canDequeueBody(tag))
+		{
+			//synch the tag id with the one of the body component
+			tag.setId(body.getId());
+		}
+		
+		return super.findComponentToDequeue(tag);
+	}
+
+	private boolean canDequeueBody(ComponentTag tag)
+	{
+		boolean isBodyTag = (tag instanceof WicketTag) && ((WicketTag)tag).isBodyTag();
+		
+		return isBodyTag;
+	}
+
+	@Override
+	protected void addDequeuedComponent(Component component, ComponentTag tag)
+	{
+		// components queued in border get dequeued into the border not into the body container
+		super.add(component);
+	}
+
+	/**
+	 * Returns the markup inside &lt;wicket:border&gt; tag.
+	 * If such tag is not found, all the markup is returned.
+	 * 
+	 * @see IQueueRegion#getRegionMarkup() 
+	 */
+	@Override
+	public IMarkupFragment getRegionMarkup()
+	{
+		IMarkupFragment markup = super.getRegionMarkup();
+		
+		if (markup == null)
+		{
+			return markup;
+		}
+		
+		IMarkupFragment borderMarkup = MarkupUtil.findStartTag(markup, BORDER);
+		
+		return borderMarkup != null ? borderMarkup : markup;
 	}
 
 	/**
@@ -559,12 +614,9 @@ public abstract class Border extends WebMarkupContainer implements IComponentRes
 			while (stream.skipUntil(ComponentTag.class))
 			{
 				ComponentTag tag = stream.getTag();
-				if (tag.isOpen() || tag.isOpenClose())
-				{
-					if (TagUtils.isWicketBodyTag(tag))
-					{
-						return stream.getMarkupFragment();
-					}
+				boolean condition = (tag.isOpen() || tag.isOpenClose()) && TagUtils.isWicketBodyTag(tag);
+				if (condition) {
+					return stream.getMarkupFragment();
 				}
 
 				stream.next();
@@ -640,64 +692,6 @@ public abstract class Border extends WebMarkupContainer implements IComponentRes
 			}
 			return null;
 		}
-	}
-
-	@Override
-	protected DequeueTagAction canDequeueTag(ComponentTag tag)
-	{
-		if (canDequeueBody(tag))
-		{
-			return DequeueTagAction.DEQUEUE;
-		}
-
-		return super.canDequeueTag(tag);
-	}
-
-	@Override
-	public Component findComponentToDequeue(ComponentTag tag)
-	{
-		if (canDequeueBody(tag))
-		{
-			//synch the tag id with the one of the body component
-			tag.setId(body.getId());
-		}
-		
-		return super.findComponentToDequeue(tag);
-	}
-
-	private boolean canDequeueBody(ComponentTag tag)
-	{
-		boolean isBodyTag = (tag instanceof WicketTag) && ((WicketTag)tag).isBodyTag();
-		
-		return isBodyTag;
-	}
-
-	@Override
-	protected void addDequeuedComponent(Component component, ComponentTag tag)
-	{
-		// components queued in border get dequeued into the border not into the body container
-		super.add(component);
-	}
-	
-	/**
-	 * Returns the markup inside &lt;wicket:border&gt; tag.
-	 * If such tag is not found, all the markup is returned.
-	 * 
-	 * @see IQueueRegion#getRegionMarkup() 
-	 */
-	@Override
-	public IMarkupFragment getRegionMarkup()
-	{
-		IMarkupFragment markup = super.getRegionMarkup();
-		
-		if (markup == null)
-		{
-			return markup;
-		}
-		
-		IMarkupFragment borderMarkup = MarkupUtil.findStartTag(markup, BORDER);
-		
-		return borderMarkup != null ? borderMarkup : markup;
 	}
 	
 }

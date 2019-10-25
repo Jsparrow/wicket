@@ -106,7 +106,7 @@ public class PropertyModel<T> extends AbstractPropertyModel<T>
 	@Override
 	public String toString()
 	{
-		return super.toString() + ":expression=[" + expression + ']';
+		return new StringBuilder().append(super.toString()).append(":expression=[").append(expression).append(']').toString();
 	}
 
 	@Override

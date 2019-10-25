@@ -25,6 +25,8 @@ import org.apache.wicket.response.filter.IResponseFilter;
 import org.apache.wicket.util.lang.Args;
 import org.apache.wicket.util.string.AppendingStringBuffer;
 import org.apache.wicket.util.string.Strings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -36,6 +38,7 @@ import org.apache.wicket.util.string.Strings;
  */
 public class ServerHostNameAndTimeFilter implements IResponseFilter
 {
+	private static final Logger logger = LoggerFactory.getLogger(ServerHostNameAndTimeFilter.class);
 	private String host;
 
 	/**
@@ -51,6 +54,7 @@ public class ServerHostNameAndTimeFilter implements IResponseFilter
 		}
 		catch (SecurityException ignored)
 		{
+			logger.error(ignored.getMessage(), ignored);
 		}
 		if (Strings.isEmpty(hostId))
 		{
@@ -109,11 +113,11 @@ public class ServerHostNameAndTimeFilter implements IResponseFilter
 			InetAddress localMachine = InetAddress.getLocalHost();
 			String hostName = localMachine.getHostName();
 			String address = localMachine.getHostAddress();
-			host = ((!Strings.isEmpty(hostName)) ? hostName + "/" + address : address) + "/" +
-				hostId;
+			host = new StringBuilder().append((!Strings.isEmpty(hostName)) ? hostName + "/" + address : address).append("/").append(hostId).toString();
 		}
 		catch (UnknownHostException ignored)
 		{
+			logger.error(ignored.getMessage(), ignored);
 		}
 
 		if (Strings.isEmpty(host))

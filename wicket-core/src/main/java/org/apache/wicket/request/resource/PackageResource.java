@@ -81,27 +81,6 @@ public class PackageResource extends AbstractResource implements IStaticCacheabl
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * Exception thrown when the creation of a package resource is not allowed.
-	 */
-	public static final class PackageResourceBlockedException extends WicketRuntimeException
-		implements
-			IWicketInternalException
-	{
-		private static final long serialVersionUID = 1L;
-
-		/**
-		 * Construct.
-		 * 
-		 * @param message
-		 *            error message
-		 */
-		public PackageResourceBlockedException(String message)
-		{
-			super(message);
-		}
-	}
-
-	/**
 	 * The path to the resource
 	 */
 	private final String absolutePath;
@@ -582,8 +561,7 @@ public class PackageResource extends AbstractResource implements IStaticCacheabl
 		if (accept(realPath) == false)
 		{
 			throw new PackageResourceBlockedException(
-				"Access denied to (static) package resource " + absolutePath +
-					". See IPackageResourceGuard");
+				new StringBuilder().append("Access denied to (static) package resource ").append(absolutePath).append(". See IPackageResourceGuard").toString());
 		}
 
 		if (resourceStream != null)
@@ -591,63 +569,6 @@ public class PackageResource extends AbstractResource implements IStaticCacheabl
 			resourceStream = new ProcessingResourceStream(resourceStream);
 		}
 		return resourceStream;
-	}
-
-	/**
-	 * An IResourceStream that processes the input stream of the original IResourceStream
-	 */
-	private class ProcessingResourceStream extends ResourceStreamWrapper
-	{
-		private static final long serialVersionUID = 1L;
-
-		private ProcessingResourceStream(IResourceStream delegate)
-		{
-			super(delegate);
-		}
-
-		@Override
-		public InputStream getInputStream() throws ResourceStreamNotFoundException
-		{
-			byte[] bytes = null;
-			InputStream inputStream = super.getInputStream();
-
-			if (readBuffered)
-			{
-				try
-				{
-					bytes = IOUtils.toByteArray(inputStream);
-				}
-				catch (IOException iox)
-				{
-					throw new WicketRuntimeException(iox);
-				}
-				finally
-				{
-					IOUtils.closeQuietly(this);
-				}
-			}
-
-			RequestCycle cycle = RequestCycle.get();
-			Attributes attributes;
-			if (cycle != null)
-			{
-				attributes = new Attributes(cycle.getRequest(), cycle.getResponse());
-			}
-			else
-			{
-				// use empty request and response in case of non-http thread. WICKET-5532
-				attributes = new Attributes(new MockWebRequest(Url.parse("")), new StringResponse());
-			}
-			if (bytes != null)
-			{
-				byte[] processedBytes = processResponse(attributes, bytes);
-				return new ByteArrayInputStream(processedBytes);
-			}
-			else
-			{
-				return inputStream;
-			}
-		}
 	}
 
 	/**
@@ -747,12 +668,15 @@ public class PackageResource extends AbstractResource implements IStaticCacheabl
 	@Override
 	public boolean equals(Object obj)
 	{
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 
 		PackageResource other = (PackageResource)obj;
 
@@ -778,6 +702,103 @@ public class PackageResource extends AbstractResource implements IStaticCacheabl
 		return parentFolderPlaceholder;
 	}
 
+	/**
+	 * If the package resource should be read buffered.<br>
+	 * <br>
+	 * WARNING - if the stream is not read buffered compressors will not work, because they require
+	 * the whole content to be read into memory.<br>
+	 * ({@link org.apache.wicket.javascript.IJavaScriptCompressor}, <br>
+	 * {@link org.apache.wicket.css.ICssCompressor}, <br>
+	 * {@link org.apache.wicket.resource.IScopeAwareTextResourceProcessor})
+	 * 
+	 * @param readBuffered
+	 *            if the package resource should be read buffered
+	 * @return the current package resource
+	 */
+	public PackageResource readBuffered(boolean readBuffered)
+	{
+		this.readBuffered = readBuffered;
+		return this;
+	}
+
+	/**
+	 * Exception thrown when the creation of a package resource is not allowed.
+	 */
+	public static final class PackageResourceBlockedException extends WicketRuntimeException
+		implements
+			IWicketInternalException
+	{
+		private static final long serialVersionUID = 1L;
+
+		/**
+		 * Construct.
+		 * 
+		 * @param message
+		 *            error message
+		 */
+		public PackageResourceBlockedException(String message)
+		{
+			super(message);
+		}
+	}
+
+	/**
+	 * An IResourceStream that processes the input stream of the original IResourceStream
+	 */
+	private class ProcessingResourceStream extends ResourceStreamWrapper
+	{
+		private static final long serialVersionUID = 1L;
+
+		private ProcessingResourceStream(IResourceStream delegate)
+		{
+			super(delegate);
+		}
+
+		@Override
+		public InputStream getInputStream() throws ResourceStreamNotFoundException
+		{
+			byte[] bytes = null;
+			InputStream inputStream = super.getInputStream();
+
+			if (readBuffered)
+			{
+				try
+				{
+					bytes = IOUtils.toByteArray(inputStream);
+				}
+				catch (IOException iox)
+				{
+					throw new WicketRuntimeException(iox);
+				}
+				finally
+				{
+					IOUtils.closeQuietly(this);
+				}
+			}
+
+			RequestCycle cycle = RequestCycle.get();
+			Attributes attributes;
+			if (cycle != null)
+			{
+				attributes = new Attributes(cycle.getRequest(), cycle.getResponse());
+			}
+			else
+			{
+				// use empty request and response in case of non-http thread. WICKET-5532
+				attributes = new Attributes(new MockWebRequest(Url.parse("")), new StringResponse());
+			}
+			if (bytes != null)
+			{
+				byte[] processedBytes = processResponse(attributes, bytes);
+				return new ByteArrayInputStream(processedBytes);
+			}
+			else
+			{
+				return inputStream;
+			}
+		}
+	}
+
 	private static class CacheKey implements Serializable
 	{
 		private final String scopeName;
@@ -798,10 +819,12 @@ public class PackageResource extends AbstractResource implements IStaticCacheabl
 		@Override
 		public boolean equals(Object o)
 		{
-			if (this == o)
+			if (this == o) {
 				return true;
-			if (!(o instanceof CacheKey))
+			}
+			if (!(o instanceof CacheKey)) {
 				return false;
+			}
 
 			CacheKey cacheKey = (CacheKey)o;
 
@@ -835,24 +858,5 @@ public class PackageResource extends AbstractResource implements IStaticCacheabl
 			sb.append('}');
 			return sb.toString();
 		}
-	}
-
-	/**
-	 * If the package resource should be read buffered.<br>
-	 * <br>
-	 * WARNING - if the stream is not read buffered compressors will not work, because they require
-	 * the whole content to be read into memory.<br>
-	 * ({@link org.apache.wicket.javascript.IJavaScriptCompressor}, <br>
-	 * {@link org.apache.wicket.css.ICssCompressor}, <br>
-	 * {@link org.apache.wicket.resource.IScopeAwareTextResourceProcessor})
-	 * 
-	 * @param readBuffered
-	 *            if the package resource should be read buffered
-	 * @return the current package resource
-	 */
-	public PackageResource readBuffered(boolean readBuffered)
-	{
-		this.readBuffered = readBuffered;
-		return this;
 	}
 }

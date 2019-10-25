@@ -82,26 +82,6 @@ public class RequestCycle implements IRequestCycle, IEventSink, IMetadataContext
 	 */
 	private static final Logger logExtra = LoggerFactory.getLogger("RequestCycleExtra");
 
-	/**
-	 * Returns request cycle associated with current thread.
-	 * 
-	 * @return request cycle instance or <code>null</code> if no request cycle is associated with
-	 *         current thread.
-	 */
-	public static RequestCycle get()
-	{
-		return ThreadContext.getRequestCycle();
-	}
-
-	/**
-	 * 
-	 * @param requestCycle
-	 */
-	private static void set(RequestCycle requestCycle)
-	{
-		ThreadContext.setRequestCycle(requestCycle);
-	}
-
 	private Request request;
 
 	private final Response originalResponse;
@@ -145,6 +125,26 @@ public class RequestCycle implements IRequestCycle, IEventSink, IMetadataContext
 		originalResponse = context.getResponse();
 		requestMapper = context.getRequestMapper();
 		exceptionMapper = context.getExceptionMapper();
+	}
+
+	/**
+	 * Returns request cycle associated with current thread.
+	 * 
+	 * @return request cycle instance or <code>null</code> if no request cycle is associated with
+	 *         current thread.
+	 */
+	public static RequestCycle get()
+	{
+		return ThreadContext.getRequestCycle();
+	}
+
+	/**
+	 * 
+	 * @param requestCycle
+	 */
+	private static void set(RequestCycle requestCycle)
+	{
+		ThreadContext.setRequestCycle(requestCycle);
 	}
 
 	/**
@@ -565,42 +565,37 @@ public class RequestCycle implements IRequestCycle, IEventSink, IMetadataContext
 
 	private String renderUrl(Url url, IRequestHandler handler)
 	{
-		if (url != null)
+		if (url == null) {
+			return null;
+		}
+		boolean shouldEncodeStaticResource = Application.exists() &&
+			Application.get().getResourceSettings().isEncodeJSessionId();
+		String renderedUrl = getUrlRenderer().renderUrl(url);
+		if (handler instanceof ResourceReferenceRequestHandler)
 		{
-			boolean shouldEncodeStaticResource = Application.exists() &&
-				Application.get().getResourceSettings().isEncodeJSessionId();
-
-			String renderedUrl = getUrlRenderer().renderUrl(url);
-			if (handler instanceof ResourceReferenceRequestHandler)
-			{
-				ResourceReferenceRequestHandler rrrh = (ResourceReferenceRequestHandler)handler;
-				IResource resource = rrrh.getResource();
-				if (resource != null && !(resource instanceof IStaticCacheableResource) ||
-					shouldEncodeStaticResource)
-				{
-					renderedUrl = getOriginalResponse().encodeURL(renderedUrl);
-				}
-			}
-			else if (handler instanceof ResourceRequestHandler)
-			{
-				ResourceRequestHandler rrh = (ResourceRequestHandler)handler;
-				IResource resource = rrh.getResource();
-				if (resource != null && !(resource instanceof IStaticCacheableResource) ||
-					shouldEncodeStaticResource)
-				{
-					renderedUrl = getOriginalResponse().encodeURL(renderedUrl);
-				}
-			}
-			else
+			ResourceReferenceRequestHandler rrrh = (ResourceReferenceRequestHandler)handler;
+			IResource resource = rrrh.getResource();
+			if (resource != null && !(resource instanceof IStaticCacheableResource) ||
+				shouldEncodeStaticResource)
 			{
 				renderedUrl = getOriginalResponse().encodeURL(renderedUrl);
 			}
-			return renderedUrl;
+		}
+		else if (handler instanceof ResourceRequestHandler)
+		{
+			ResourceRequestHandler rrh = (ResourceRequestHandler)handler;
+			IResource resource = rrh.getResource();
+			if (resource != null && !(resource instanceof IStaticCacheableResource) ||
+				shouldEncodeStaticResource)
+			{
+				renderedUrl = getOriginalResponse().encodeURL(renderedUrl);
+			}
 		}
 		else
 		{
-			return null;
+			renderedUrl = getOriginalResponse().encodeURL(renderedUrl);
 		}
+		return renderedUrl;
 	}
 
 	/**
@@ -633,11 +628,12 @@ public class RequestCycle implements IRequestCycle, IEventSink, IMetadataContext
 			Session.get().internalDetach();
 		}
 
-		if (Application.exists())
-		{
-			IRequestLogger requestLogger = Application.get().getRequestLogger();
-			if (requestLogger != null)
-				requestLogger.performLogging();
+		if (!Application.exists()) {
+			return;
+		}
+		IRequestLogger requestLogger = Application.get().getRequestLogger();
+		if (requestLogger != null) {
+			requestLogger.performLogging();
 		}
 	}
 
@@ -840,8 +836,9 @@ public class RequestCycle implements IRequestCycle, IEventSink, IMetadataContext
 		requestHandlerExecutor.schedule(handler);
 
 		// only forward calls to the listeners when handler is null
-		if (handler != null)
+		if (handler != null) {
 			listeners.onRequestHandlerScheduled(this, handler);
+		}
 	}
 
 	/**

@@ -116,15 +116,9 @@ public abstract class Injector
 					}
 				}
 			}
-			catch (IllegalArgumentException e)
+			catch (IllegalAccessException | IllegalArgumentException e)
 			{
-				throw new RuntimeException("error while injecting object [" + object.toString() +
-					"] of type [" + object.getClass().getName() + "]", e);
-			}
-			catch (IllegalAccessException e)
-			{
-				throw new RuntimeException("error while injecting object [" + object.toString() +
-					"] of type [" + object.getClass().getName() + "]", e);
+				throw new RuntimeException(new StringBuilder().append("error while injecting object [").append(object.toString()).append("] of type [").append(object.getClass().getName()).append("]").toString(), e);
 			}
 		}
 	}

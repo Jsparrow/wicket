@@ -18,7 +18,6 @@ package org.apache.wicket.protocol.http.servlet;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
@@ -29,6 +28,8 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * See <a href="http://code.google.com/p/xebia-france/wiki/XForwardedFilter">XForwardedFilter</a>
@@ -37,6 +38,8 @@ import javax.servlet.http.HttpServletRequestWrapper;
  */
 public class XForwardedRequestWrapper extends HttpServletRequestWrapper
 {
+	private static final Logger logger = LoggerFactory.getLogger(XForwardedRequestWrapper.class);
+
 	private SimpleDateFormat[] dateFormats = new SimpleDateFormat[] {
 			new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US),
 			new SimpleDateFormat("EEEEEE, dd-MMM-yy HH:mm:ss zzz", Locale.US),
@@ -70,7 +73,7 @@ public class XForwardedRequestWrapper extends HttpServletRequestWrapper
 		secure = request.isSecure();
 		serverPort = request.getServerPort();
 
-		headers = new HashMap<String, List<String>>();
+		headers = new HashMap<>();
 		Enumeration<?> headerNames = request.getHeaderNames();
 		while (headerNames.hasMoreElements())
 		{
@@ -101,7 +104,8 @@ public class XForwardedRequestWrapper extends HttpServletRequestWrapper
 			}
 			catch (Exception ignored)
 			{
-				; // noop
+				logger.error(ignored.getMessage(), ignored);
+				// noop
 			}
 		}
 
@@ -139,14 +143,7 @@ public class XForwardedRequestWrapper extends HttpServletRequestWrapper
 	 */
 	private Map.Entry<String, List<String>> getHeaderEntry(final String name)
 	{
-		for (Map.Entry<String, List<String>> entry : headers.entrySet())
-		{
-			if (entry.getKey().equalsIgnoreCase(name))
-			{
-				return entry;
-			}
-		}
-		return null;
+		return headers.entrySet().stream().filter(entry -> entry.getKey().equalsIgnoreCase(name)).findFirst().orElse(null);
 	}
 
 	/**
@@ -256,7 +253,7 @@ public class XForwardedRequestWrapper extends HttpServletRequestWrapper
 	 */
 	public void setHeader(final String name, final String value)
 	{
-		List<String> values = Arrays.asList(value);
+		List<String> values = Collections.singletonList(value);
 		Map.Entry<String, List<String>> header = getHeaderEntry(name);
 		if (header == null)
 		{

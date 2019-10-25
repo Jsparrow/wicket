@@ -42,7 +42,7 @@ public class MetaInfStaticResourceReference extends PackageResourceReference
 {
 	private static final long serialVersionUID = -1858339228780709471L;
 
-	private static Boolean META_INF_RESOURCES_SUPPORTED = null;
+	private static Boolean metaInfResourcesSupported = null;
 
 	/**
 	 * Construct.
@@ -95,13 +95,13 @@ public class MetaInfStaticResourceReference extends PackageResourceReference
 
 	protected boolean isMetaInfResourcesSupported()
 	{
-		if (META_INF_RESOURCES_SUPPORTED == null)
+		if (metaInfResourcesSupported == null)
 		{
 			int majorVersion = WebApplication.get().getServletContext().getMajorVersion();
-			META_INF_RESOURCES_SUPPORTED = majorVersion >= 3;
+			metaInfResourcesSupported = majorVersion >= 3;
 		}
 
-		return META_INF_RESOURCES_SUPPORTED;
+		return metaInfResourcesSupported;
 	}
 
 }

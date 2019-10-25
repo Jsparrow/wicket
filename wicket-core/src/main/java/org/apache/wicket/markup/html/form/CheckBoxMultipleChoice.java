@@ -366,14 +366,8 @@ public class CheckBoxMultipleChoice<T> extends ListMultipleChoice<T>
 		StringBuilder extraLabelAttributes = new StringBuilder();
 		if (labelAttrs != null)
 		{
-			for (Map.Entry<String, Object> attr : labelAttrs.entrySet())
-			{
-				extraLabelAttributes.append(' ')
-						.append(Strings.escapeMarkup(attr.getKey()))
-						.append("=\"")
-						.append(Strings.escapeMarkup(attr.getValue().toString()))
-						.append('"');
-			}
+			labelAttrs.entrySet().forEach(attr -> extraLabelAttributes.append(' ').append(Strings.escapeMarkup(attr.getKey())).append("=\"")
+					.append(Strings.escapeMarkup(attr.getValue().toString())).append('"'));
 		}
 
 		labelPosition.before(buffer, idAttr, extraLabelAttributes, renderValue);
@@ -402,14 +396,8 @@ public class CheckBoxMultipleChoice<T> extends ListMultipleChoice<T>
 			IValueMap attrs = getAdditionalAttributes(index, choice);
 			if (attrs != null)
 			{
-				for (Map.Entry<String, Object> attr : attrs.entrySet())
-				{
-					buffer.append(' ')
-						.append(Strings.escapeMarkup(attr.getKey()))
-						.append("=\"")
-						.append(Strings.escapeMarkup(attr.getValue().toString()))
-						.append('"');
-				}
+				attrs.entrySet().forEach(attr -> buffer.append(' ').append(Strings.escapeMarkup(attr.getKey())).append("=\"")
+						.append(Strings.escapeMarkup(attr.getValue().toString())).append('"'));
 			}
 		}
 
@@ -477,6 +465,6 @@ public class CheckBoxMultipleChoice<T> extends ListMultipleChoice<T>
 	 */
 	protected String getCheckBoxMarkupId(String id)
 	{
-		return getMarkupId() + '-' + getInputName() + '_' + id;
+		return new StringBuilder().append(getMarkupId()).append('-').append(getInputName()).append('_').append(id).toString();
 	}
 }

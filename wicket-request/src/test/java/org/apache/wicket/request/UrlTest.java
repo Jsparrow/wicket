@@ -448,7 +448,7 @@ class UrlTest
 	void concat6()
 	{
 		Url url = Url.parse("abc/efg/");
-		url.concatSegments(Arrays.asList(".."));
+		url.concatSegments(Collections.singletonList(".."));
 		assertEquals(Url.parse("abc/"), url);
 	}
 
@@ -464,7 +464,7 @@ class UrlTest
 	void concat8()
 	{
 		Url url = Url.parse("fff/abc/efg/xxx");
-		url.concatSegments(Arrays.asList(".."));
+		url.concatSegments(Collections.singletonList(".."));
 		assertEquals(Url.parse("fff/abc/"), url);
 	}
 
@@ -839,7 +839,7 @@ class UrlTest
 	{
 		Url url = Url.parse("a");
 
-		url.prependLeadingSegments(Arrays.asList("x"));
+		url.prependLeadingSegments(Collections.singletonList("x"));
 
 		assertEquals("x/a", url.toString());
 	}
@@ -859,7 +859,7 @@ class UrlTest
 	{
 		Url url = new Url();
 
-		url.prependLeadingSegments(Arrays.asList("x"));
+		url.prependLeadingSegments(Collections.singletonList("x"));
 
 		assertEquals("x", url.toString());
 	}

@@ -42,8 +42,8 @@ import org.apache.wicket.request.http.WebRequest;
 public class MockWebRequest extends WebRequest
 {
 	private Url url;
-	private List<Cookie> cookies = new ArrayList<Cookie>();
-	private Map<String, List<Object>> headers = new HashMap<String, List<Object>>();
+	private List<Cookie> cookies = new ArrayList<>();
+	private Map<String, List<Object>> headers = new HashMap<>();
 	private MockRequestParameters postRequestParameters = new MockRequestParameters();
 	private Locale locale = Locale.getDefault();
 	private String contextPath;
@@ -109,7 +109,7 @@ public class MockWebRequest extends WebRequest
 	@Override
 	public String toString()
 	{
-		return "MockWebRequest [url=" + url + "]";
+		return new StringBuilder().append("MockWebRequest [url=").append(url).append("]").toString();
 	}
 
 	/**
@@ -151,8 +151,7 @@ public class MockWebRequest extends WebRequest
 
 		if (date instanceof Instant == false)
 		{
-			throw new WicketRuntimeException("Date header with name '" + name +
-				"' is not a valid Instant.");
+			throw new WicketRuntimeException(new StringBuilder().append("Date header with name '").append(name).append("' is not a valid Instant.").toString());
 		}
 		return (Instant)date;
 	}
@@ -162,7 +161,7 @@ public class MockWebRequest extends WebRequest
 		List<Object> values = headers.get(name);
 		if (values == null)
 		{
-			values = new ArrayList<Object>();
+			values = new ArrayList<>();
 			headers.put(name, values);
 		}
 		values.add(value);
@@ -241,17 +240,11 @@ public class MockWebRequest extends WebRequest
 	@Override
 	public List<String> getHeaders(String name)
 	{
-		List<String> res = new ArrayList<String>();
+		List<String> res = new ArrayList<>();
 		List<Object> values = headers.get(name);
 		if (values != null)
 		{
-			for (Object value : values)
-			{
-				if (value != null)
-				{
-					res.add(value.toString());
-				}
-			}
+			values.stream().filter(value -> value != null).forEach(value -> res.add(value.toString()));
 		}
 		return res;
 	}

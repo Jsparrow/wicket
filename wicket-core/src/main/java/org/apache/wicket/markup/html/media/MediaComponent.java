@@ -36,80 +36,6 @@ public abstract class MediaComponent extends WebMarkupContainer
 {
 	private static final long serialVersionUID = 1L;
 
-	/**
-	 * To be used for the <em>crossorigin</em> attribute
-	 *
-	 * @see {@link #setCrossOrigin(Cors)}
-	 */
-	public enum Cors {
-		/**
-		 * no authentication required
-		 */
-		ANONYMOUS("anonymous"),
-		/**
-		 * user credentials required
-		 */
-		USER_CREDENTIALS("user-credentials"),
-		/**
-		 * no cross origin
-		 */
-		NO_CORS("");
-
-		private final String realName;
-
-		private Cors(String realName)
-		{
-			this.realName = realName;
-		}
-
-		/**
-		 * Gets the real name for the cors option
-		 * 
-		 * @return the real name
-		 */
-		public String getRealName()
-		{
-			return realName;
-		}
-	}
-
-	/**
-	 * To be used for the <em>preload</em> attribute
-	 *
-	 * @see {@link #setPreload(Preload)}
-	 */
-	public enum Preload {
-		/**
-		 * preloads nothing
-		 */
-		NONE("none"),
-		/**
-		 * preloads only meta data like first picture, etc.
-		 */
-		METADATA("metadata"),
-		/**
-		 * auto detection what is going to be preload
-		 */
-		AUTO("auto");
-
-		private final String realName;
-
-		private Preload(String realname)
-		{
-			realName = realname;
-		}
-
-		/**
-		 * Gets the real name for the preload option
-		 * 
-		 * @return the real name
-		 */
-		public String getRealName()
-		{
-			return realName;
-		}
-	}
-
 	private boolean autoplay;
 
 	private boolean loop;
@@ -286,7 +212,7 @@ public abstract class MediaComponent extends WebMarkupContainer
 		String timeManagement = "";
 		if (startTime != null)
 		{
-			timeManagement += "#t=" + startTime + (endTime != null ? "," + endTime : "");
+			timeManagement += new StringBuilder().append("#t=").append(startTime).append(endTime != null ? "," + endTime : "").toString();
 		}
 
 		if (resourceReference != null)
@@ -299,7 +225,7 @@ public abstract class MediaComponent extends WebMarkupContainer
 		{
 			Url encoded = new PageParametersEncoder().encodePageParameters(pageParameters);
 			String queryString = encoded.getQueryString();
-			tag.put("src", url + (queryString != null ? "?" + queryString : "") + timeManagement);
+			tag.put("src", new StringBuilder().append(url).append(queryString != null ? "?" + queryString : "").append(timeManagement).toString());
 		}
 
 		String mg = getMediaGroup();
@@ -676,5 +602,79 @@ public abstract class MediaComponent extends WebMarkupContainer
 	public void setType(String type)
 	{
 		this.type = type;
+	}
+
+	/**
+	 * To be used for the <em>crossorigin</em> attribute
+	 *
+	 * @see {@link #setCrossOrigin(Cors)}
+	 */
+	public enum Cors {
+		/**
+		 * no authentication required
+		 */
+		ANONYMOUS("anonymous"),
+		/**
+		 * user credentials required
+		 */
+		USER_CREDENTIALS("user-credentials"),
+		/**
+		 * no cross origin
+		 */
+		NO_CORS("");
+
+		private final String realName;
+
+		private Cors(String realName)
+		{
+			this.realName = realName;
+		}
+
+		/**
+		 * Gets the real name for the cors option
+		 * 
+		 * @return the real name
+		 */
+		public String getRealName()
+		{
+			return realName;
+		}
+	}
+
+	/**
+	 * To be used for the <em>preload</em> attribute
+	 *
+	 * @see {@link #setPreload(Preload)}
+	 */
+	public enum Preload {
+		/**
+		 * preloads nothing
+		 */
+		NONE("none"),
+		/**
+		 * preloads only meta data like first picture, etc.
+		 */
+		METADATA("metadata"),
+		/**
+		 * auto detection what is going to be preload
+		 */
+		AUTO("auto");
+
+		private final String realName;
+
+		private Preload(String realname)
+		{
+			realName = realname;
+		}
+
+		/**
+		 * Gets the real name for the preload option
+		 * 
+		 * @return the real name
+		 */
+		public String getRealName()
+		{
+			return realName;
+		}
 	}
 }

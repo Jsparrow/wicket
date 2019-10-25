@@ -42,9 +42,7 @@ class HtmlHeaderSectionHandlerTest extends WicketTestCase
 	{
 		CustomMarkupPage customMarkupPage = new CustomMarkupPage();
 
-		assertThrows(MarkupException.class, () -> {
-			tester.startPage(customMarkupPage);
-		});
+		assertThrows(MarkupException.class, () -> tester.startPage(customMarkupPage));
 
 
 	}

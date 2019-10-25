@@ -278,27 +278,22 @@ public abstract class Link<T> extends AbstractLink implements IRequestListener, 
 
 					if (id != null)
 					{
-						url = url + "#" + anchor.getMarkupId();
+						url = new StringBuilder().append(url).append("#").append(anchor.getMarkupId()).toString();
 					}
 					else
 					{
-						throw new WicketRuntimeException("an achor component was set on " + this +
-							" but it neither has outputMarkupId set to true " +
-							"nor has a id set explicitly");
+						throw new WicketRuntimeException(new StringBuilder().append("an achor component was set on ").append(this).append(" but it neither has outputMarkupId set to true ").append("nor has a id set explicitly").toString());
 					}
 				}
 			}
 			else
 			{
-				if (tag.getName().equalsIgnoreCase("a"))
-				{
-					if (url.toString().indexOf('#') == -1)
+				boolean condition = "a".equalsIgnoreCase(tag.getName()) && url.toString().indexOf('#') == -1;
+				if (condition) {
+					String href = tag.getAttributes().getString("href");
+					if (href != null && href.length() > 1 && href.charAt(0) == '#')
 					{
-						String href = tag.getAttributes().getString("href");
-						if (href != null && href.length() > 1 && href.charAt(0) == '#')
-						{
-							url = url + href;
-						}
+						url = url + href;
 					}
 				}
 			}
@@ -361,8 +356,8 @@ public abstract class Link<T> extends AbstractLink implements IRequestListener, 
 			url = appendAnchor(tag, url);
 
 			// if the tag is an anchor proper
-			if (tag.getName().equalsIgnoreCase("a") || tag.getName().equalsIgnoreCase("link") ||
-				tag.getName().equalsIgnoreCase("area"))
+			if ("a".equalsIgnoreCase(tag.getName()) || "link".equalsIgnoreCase(tag.getName()) ||
+				"area".equalsIgnoreCase(tag.getName()))
 			{
 				// generate the href attribute
 				tag.put("href", url);
@@ -375,8 +370,8 @@ public abstract class Link<T> extends AbstractLink implements IRequestListener, 
 					tag.put("onclick", popupSettings.getPopupJavaScript());
 				}
 			}
-			else if (tag.getName().equalsIgnoreCase("script") ||
-				tag.getName().equalsIgnoreCase("style"))
+			else if ("script".equalsIgnoreCase(tag.getName()) ||
+				"style".equalsIgnoreCase(tag.getName()))
 			{
 				tag.put("src", url);
 			}
@@ -385,7 +380,7 @@ public abstract class Link<T> extends AbstractLink implements IRequestListener, 
 				// generate a popup script by asking popup settings for one
 				if (popupSettings != null)
 				{
-					popupSettings.setTarget("'" + url + "'");
+					popupSettings.setTarget(new StringBuilder().append("'").append(url).append("'").toString());
 					String popupScript = popupSettings.getPopupJavaScript();
 					tag.put("onclick", popupScript);
 				}
@@ -396,10 +391,7 @@ public abstract class Link<T> extends AbstractLink implements IRequestListener, 
 					// generated during page load. This check ensures that the click is ignored
 					tag.put(
 						"onclick",
-						"var win = this.ownerDocument.defaultView || this.ownerDocument.parentWindow; " +
-							"if (win == window) { window.location.href='" +
-							url +
-							"'; } ;return false");
+						new StringBuilder().append("var win = this.ownerDocument.defaultView || this.ownerDocument.parentWindow; ").append("if (win == window) { window.location.href='").append(url).append("'; } ;return false").toString());
 				}
 			}
 

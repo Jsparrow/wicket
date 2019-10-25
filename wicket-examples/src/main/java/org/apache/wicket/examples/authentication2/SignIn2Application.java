@@ -53,6 +53,7 @@ public final class SignIn2Application extends WicketExampleApplication
 		// Register the authorization strategy
 		getSecuritySettings().setAuthorizationStrategy(new IAuthorizationStrategy.AllowAllAuthorizationStrategy()
 		{
+			@Override
 			public <T extends IRequestableComponent> boolean isInstantiationAuthorized(
 				Class<T> componentClass)
 			{

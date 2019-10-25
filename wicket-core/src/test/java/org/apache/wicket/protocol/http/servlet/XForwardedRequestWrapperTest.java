@@ -168,25 +168,6 @@ class XForwardedRequestWrapperTest extends WicketTestCase
 		assertEquals("proxy1", resp.getHeader("x-forwarded-by"));
 	}
 
-	private class MyApplication extends MockApplication
-	{
-		XForwardedRequestWrapperFactory factory;
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		protected void init()
-		{
-			super.init();
-
-			factory = new XForwardedRequestWrapperFactory();
-			factory.init(getWicketFilter().getFilterConfig());
-
-			getFilterFactoryManager().add(factory);
-		}
-	}
-
 	/**
 	 * @throws Exception
 	 * 
@@ -214,5 +195,24 @@ class XForwardedRequestWrapperTest extends WicketTestCase
 		// @TODO should there be any header in the response ????
 		// assertEquals("140.211.11.130", resp.getHeader("x-forwarded-for"));
 		// assertEquals("proxy1", resp.getHeader("x-forwarded-by"));
+	}
+
+	private class MyApplication extends MockApplication
+	{
+		XForwardedRequestWrapperFactory factory;
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected void init()
+		{
+			super.init();
+
+			factory = new XForwardedRequestWrapperFactory();
+			factory.init(getWicketFilter().getFilterConfig());
+
+			getFilterFactoryManager().add(factory);
+		}
 	}
 }

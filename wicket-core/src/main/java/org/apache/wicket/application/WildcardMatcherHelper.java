@@ -115,7 +115,7 @@ public class WildcardMatcherHelper
 		private final int lstr;
 
 		/** The <code>Map</code> to be filled */
-		private final Map<String, String> map = new HashMap<String, String>();
+		private final Map<String, String> map = new HashMap<>();
 
 		/** Whether string matched to pattern */
 		private final boolean matched;
@@ -244,7 +244,7 @@ public class WildcardMatcherHelper
 				// skip to first non star character in the pattern
 				while (++ipat < lpat && apat[ipat] == STAR)
 				{
-					; // noop
+					// noop
 				}
 
 				// if we are at the end of the pattern we've matched and are finish scanning
@@ -420,29 +420,26 @@ public class WildcardMatcherHelper
 			// we do not match
 			final int l = lpat - sipat; // calculate length of comparison
 			final int ostr = lstr - l; // calculate offset into string
-			if (ostr >= 0 && strncmp(apat, sipat, astr, ostr, l))
+			if (!(ostr >= 0 && strncmp(apat, sipat, astr, ostr, l))) {
+				// otherwise we do not match
+				return false;
+			}
+			if (isSingleStart)
 			{
-				if (isSingleStart)
+				// if the ends matches make sure there isn't a PATHSEP in the candidate string
+				// part
+				int i = ostr - istr;
+				while (i > istr)
 				{
-					// if the ends matches make sure there isn't a PATHSEP in the candidate string
-					// part
-					int i = ostr - istr;
-					while (i > istr)
+					if (astr[--i] == PATHSEP)
 					{
-						if (astr[--i] == PATHSEP)
-						{
-							return false; // we cannot match because of a PATHSEP in the matched
-							// part
-						}
+						return false; // we cannot match because of a PATHSEP in the matched
+						// part
 					}
 				}
-				add(new String(astr, istr, ostr - istr));
-
-				return true;
 			}
-
-			// otherwise we do not match
-			return false;
+			add(new String(astr, istr, ostr - istr));
+			return true;
 		}
 	}
 }

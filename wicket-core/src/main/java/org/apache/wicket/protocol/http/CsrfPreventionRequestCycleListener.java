@@ -117,40 +117,6 @@ public class CsrfPreventionRequestCycleListener implements IRequestCycleListener
 		.getLogger(CsrfPreventionRequestCycleListener.class);
 
 	/**
-	 * The action to perform when a missing or conflicting source URI is detected.
-	 */
-	public enum CsrfAction {
-		/** Aborts the request and throws an exception when a CSRF request is detected. */
-		ABORT {
-			@Override
-			public String toString()
-			{
-				return "aborted";
-			}
-		},
-
-		/**
-		 * Ignores the action of a CSRF request, and just renders the page it was targeted against.
-		 */
-		SUPPRESS {
-			@Override
-			public String toString()
-			{
-				return "suppressed";
-			}
-		},
-
-		/** Detects a CSRF request, logs it and allows the request to continue. */
-		ALLOW {
-			@Override
-			public String toString()
-			{
-				return "allowed";
-			}
-		},
-	}
-
-	/**
 	 * Action to perform when no Origin header is present in the request.
 	 */
 	private CsrfAction noOriginAction = CsrfAction.ABORT;
@@ -265,12 +231,12 @@ public class CsrfPreventionRequestCycleListener implements IRequestCycleListener
 	@Override
 	public void onBeginRequest(RequestCycle cycle)
 	{
-		if (log.isDebugEnabled())
-		{
-			HttpServletRequest containerRequest = (HttpServletRequest)cycle.getRequest()
-				.getContainerRequest();
-			log.debug("Request Source URI: {}", getSourceUri(containerRequest));
+		if (!log.isDebugEnabled()) {
+			return;
 		}
+		HttpServletRequest containerRequest = (HttpServletRequest)cycle.getRequest()
+			.getContainerRequest();
+		log.debug("Request Source URI: {}", getSourceUri(containerRequest));
 	}
 
 	/**
@@ -322,8 +288,9 @@ public class CsrfPreventionRequestCycleListener implements IRequestCycleListener
 	 */
 	protected IRequestHandler unwrap(IRequestHandler handler)
 	{
-		while (handler instanceof IRequestHandlerDelegate)
+		while (handler instanceof IRequestHandlerDelegate) {
 			handler = ((IRequestHandlerDelegate)handler).getDelegateHandler();
+		}
 		return handler;
 	}
 
@@ -365,10 +332,11 @@ public class CsrfPreventionRequestCycleListener implements IRequestCycleListener
 		}
 		else
 		{
-			if (log.isTraceEnabled())
+			if (log.isTraceEnabled()) {
 				log.trace(
 					"Resolved handler {} doesn't target an action on a page, no CSRF check performed",
 					handler.getClass().getName());
+			}
 		}
 	}
 
@@ -464,8 +432,9 @@ public class CsrfPreventionRequestCycleListener implements IRequestCycleListener
 		try
 		{
 			final String sourceHost = new URI(sourceUri).getHost();
-			if (Strings.isEmpty(sourceHost))
+			if (Strings.isEmpty(sourceHost)) {
 				return false;
+			}
 			for (String whitelistedOrigin : acceptedOrigins)
 			{
 				if (sourceHost.equalsIgnoreCase(whitelistedOrigin) ||
@@ -479,6 +448,7 @@ public class CsrfPreventionRequestCycleListener implements IRequestCycleListener
 		}
 		catch (URISyntaxException e)
 		{
+			log.error(e.getMessage(), e);
 			log.debug("Origin: {} not parseable as an URI. Whitelisted-origin check skipped.",
 				sourceUri);
 		}
@@ -500,12 +470,14 @@ public class CsrfPreventionRequestCycleListener implements IRequestCycleListener
 	{
 		// Make comparable strings from Origin and Location
 		String origin = normalizeUri(originHeader);
-		if (origin == null)
+		if (origin == null) {
 			return false;
+		}
 
 		String request = getTargetUriFromRequest(containerRequest);
-		if (request == null)
+		if (request == null) {
 			return false;
+		}
 
 		return origin.equalsIgnoreCase(request);
 	}
@@ -524,8 +496,9 @@ public class CsrfPreventionRequestCycleListener implements IRequestCycleListener
 		// alternative action is required, an implementor can override any of the onAborted,
 		// onSuppressed or onAllowed and implement such needed action.
 
-		if (Strings.isEmpty(uri) || "null".equals(uri))
+		if (Strings.isEmpty(uri) || "null".equals(uri)) {
 			return null;
+		}
 
 		StringBuilder target = new StringBuilder();
 
@@ -566,6 +539,7 @@ public class CsrfPreventionRequestCycleListener implements IRequestCycleListener
 		}
 		catch (URISyntaxException e)
 		{
+			log.error(e.getMessage(), e);
 			log.debug("Invalid URI provided: {}, marked conflicting", uri);
 			return null;
 		}
@@ -796,5 +770,39 @@ public class CsrfPreventionRequestCycleListener implements IRequestCycleListener
 	 */
 	protected void onAborted(HttpServletRequest request, String origin, IRequestablePage page)
 	{
+	}
+
+	/**
+	 * The action to perform when a missing or conflicting source URI is detected.
+	 */
+	public enum CsrfAction {
+		/** Aborts the request and throws an exception when a CSRF request is detected. */
+		ABORT {
+			@Override
+			public String toString()
+			{
+				return "aborted";
+			}
+		},
+
+		/**
+		 * Ignores the action of a CSRF request, and just renders the page it was targeted against.
+		 */
+		SUPPRESS {
+			@Override
+			public String toString()
+			{
+				return "suppressed";
+			}
+		},
+
+		/** Detects a CSRF request, logs it and allows the request to continue. */
+		ALLOW {
+			@Override
+			public String toString()
+			{
+				return "allowed";
+			}
+		},
 	}
 }

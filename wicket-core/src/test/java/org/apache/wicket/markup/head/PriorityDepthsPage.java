@@ -59,7 +59,7 @@ public class PriorityDepthsPage extends WebPage
 			super.renderHead(response);
 			
 			response.render(new PriorityHeaderItem(
-				StringHeaderItem.forString(String.format("<title>%s</title>\n", title))));
+				StringHeaderItem.forString(String.format("<title>%s</title>%n", title))));
 		}
 	}
 }

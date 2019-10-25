@@ -34,6 +34,31 @@ import org.apache.wicket.model.CompoundPropertyModel;
 public class MockFormPage extends WebPage
 {
 	private static final long serialVersionUID = 1L;
+	private final MockDomainObject domainObject;
+
+	/**
+	 * Construct.
+	 */
+	public MockFormPage()
+	{
+		domainObject = new MockDomainObject();
+		Form<MockDomainObject> form = new Form<>("form",
+			new CompoundPropertyModel<MockDomainObject>(domainObject));
+		add(form);
+
+		form.add(new TextField<String>("text"));
+		form.add(new CheckBox("checkbox"));
+		form.add(new TextArea<String>("textarea"));
+		form.add(new Button("submit"));
+	}
+
+	/**
+	 * @return domainObject
+	 */
+	public MockDomainObject getDomainObject()
+	{
+		return domainObject;
+	}
 
 	/**
 	 * Domain object
@@ -93,31 +118,5 @@ public class MockFormPage extends WebPage
 		{
 			this.textarea = textarea;
 		}
-	}
-
-	private final MockDomainObject domainObject;
-
-	/**
-	 * Construct.
-	 */
-	public MockFormPage()
-	{
-		domainObject = new MockDomainObject();
-		Form<MockDomainObject> form = new Form<MockDomainObject>("form",
-			new CompoundPropertyModel<MockDomainObject>(domainObject));
-		add(form);
-
-		form.add(new TextField<String>("text"));
-		form.add(new CheckBox("checkbox"));
-		form.add(new TextArea<String>("textarea"));
-		form.add(new Button("submit"));
-	}
-
-	/**
-	 * @return domainObject
-	 */
-	public MockDomainObject getDomainObject()
-	{
-		return domainObject;
 	}
 }

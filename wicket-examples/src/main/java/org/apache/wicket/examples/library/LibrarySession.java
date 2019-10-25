@@ -59,32 +59,25 @@ public final class LibrarySession extends AuthenticatedWebSession
 	@Override
 	public final boolean authenticate(final String username, final String password)
 	{
-		if (USERNAME_PASSWORD.equalsIgnoreCase(username) && USERNAME_PASSWORD.equalsIgnoreCase(password))
-		{
-			// Create User object
-			final User user = new User();
-
-			user.setName(username);
-
-			final List<Book> books = user.getBooks();
-
-			books.add(new Book("Effective Java", "Joshua Bloch", Book.NON_FICTION));
-			books.add(new Book("The Illiad", "Homer Simpson", Book.FICTION));
-			books.add(new Book("Why Stock Markets Crash", "Didier Sornette", Book.NON_FICTION));
-			books.add(new Book("The Netherlands", "Mike Jones", Book.NON_FICTION));
-			books.add(new Book("Windows, Windows, Windows!", "Steve Ballmer", Book.FICTION));
-			books.add(new Book("This is a test", "Vincent Rumsfield", Book.FICTION));
-			books.add(new Book("Movies", "Mark Marksfield", Book.NON_FICTION));
-			books.add(new Book("DOS Capitol", "Billy G", Book.FICTION));
-			books.add(new Book("Whatever", "Jonny Zoom", Book.FICTION));
-			books.add(new Book("Tooty Fruity", "Rudy O", Book.FICTION));
-
-			setUser(user);
-
-			return true;
+		if (!(USERNAME_PASSWORD.equalsIgnoreCase(username) && USERNAME_PASSWORD.equalsIgnoreCase(password))) {
+			return false;
 		}
-
-		return false;
+		// Create User object
+		final User user = new User();
+		user.setName(username);
+		final List<Book> books = user.getBooks();
+		books.add(new Book("Effective Java", "Joshua Bloch", Book.NON_FICTION));
+		books.add(new Book("The Illiad", "Homer Simpson", Book.FICTION));
+		books.add(new Book("Why Stock Markets Crash", "Didier Sornette", Book.NON_FICTION));
+		books.add(new Book("The Netherlands", "Mike Jones", Book.NON_FICTION));
+		books.add(new Book("Windows, Windows, Windows!", "Steve Ballmer", Book.FICTION));
+		books.add(new Book("This is a test", "Vincent Rumsfield", Book.FICTION));
+		books.add(new Book("Movies", "Mark Marksfield", Book.NON_FICTION));
+		books.add(new Book("DOS Capitol", "Billy G", Book.FICTION));
+		books.add(new Book("Whatever", "Jonny Zoom", Book.FICTION));
+		books.add(new Book("Tooty Fruity", "Rudy O", Book.FICTION));
+		setUser(user);
+		return true;
 	}
 
 	/**

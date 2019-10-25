@@ -61,7 +61,7 @@ public interface IConverter<C> extends IClusterable
 	 * @throws ConversionException
 	 *             if value could not be converted
 	 */
-	C convertToObject(String value, Locale locale) throws ConversionException;
+	C convertToObject(String value, Locale locale);
 
 	/**
 	 * Converts the given value to a string.

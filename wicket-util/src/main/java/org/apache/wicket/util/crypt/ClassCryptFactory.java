@@ -53,7 +53,7 @@ public class ClassCryptFactory implements ICryptFactory
 			throw new IllegalArgumentException("cryptClass must implement ICrypt interface");
 		}
 
-		this.cryptClass = new WeakReference<Class<?>>(cryptClass);
+		this.cryptClass = new WeakReference<>(cryptClass);
 		this.encryptionKey = encryptionKey;
 	}
 
@@ -73,7 +73,7 @@ public class ClassCryptFactory implements ICryptFactory
 			log.warn("As the instantiation of encryption/decryption class:");
 			log.warn("\t" + cryptClass);
 			log.warn("failed, Wicket will fallback on a dummy implementation");
-			log.warn("\t(" + NoCrypt.class.getName() + ")");
+			log.warn(new StringBuilder().append("\t(").append(NoCrypt.class.getName()).append(")").toString());
 			log.warn("This is NOT recommended for production systems.");
 			log.warn("Please override method org.apache.wicket.util.crypt.ICryptFactory.newCrypt()");
 			log.warn("to provide a custom encryption/decryption implementation.");

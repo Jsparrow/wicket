@@ -48,23 +48,6 @@ public abstract class AbstractTextComponent<T> extends FormComponent<T>
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * Text components that implement this interface are know to be able to provide a pattern for
-	 * formatting output and parsing input. This can be used by for instance date picker components
-	 * which are based on JavaScript and need some knowledge as to how to communicate properly via
-	 * request parameters.
-	 */
-	public interface ITextFormatProvider
-	{
-		/**
-		 * Gets the pattern for printing output and parsing input.
-		 * 
-		 * @return The text pattern
-		 * @see SimpleDateFormat
-		 */
-		String getTextFormat();
-	}
-
-	/**
 	 * @see org.apache.wicket.Component#Component(String)
 	 */
 	public AbstractTextComponent(String id)
@@ -147,12 +130,12 @@ public abstract class AbstractTextComponent<T> extends FormComponent<T>
 	 */
 	private void resolveType()
 	{
-		if (!getFlag(TYPE_RESOLVED) && getType() == null)
-		{
-			Class<?> type = getModelType(getDefaultModel());
-			setType(type);
-			setFlag(TYPE_RESOLVED, true);
+		if (!(!getFlag(TYPE_RESOLVED) && getType() == null)) {
+			return;
 		}
+		Class<?> type = getModelType(getDefaultModel());
+		setType(type);
+		setFlag(TYPE_RESOLVED, true);
 	}
 
 	/**
@@ -184,5 +167,22 @@ public abstract class AbstractTextComponent<T> extends FormComponent<T>
 	{
 		setFlag(FLAG_CONVERT_EMPTY_INPUT_STRING_TO_NULL, flag);
 		return this;
+	}
+
+	/**
+	 * Text components that implement this interface are know to be able to provide a pattern for
+	 * formatting output and parsing input. This can be used by for instance date picker components
+	 * which are based on JavaScript and need some knowledge as to how to communicate properly via
+	 * request parameters.
+	 */
+	public interface ITextFormatProvider
+	{
+		/**
+		 * Gets the pattern for printing output and parsing input.
+		 * 
+		 * @return The text pattern
+		 * @see SimpleDateFormat
+		 */
+		String getTextFormat();
 	};
 }

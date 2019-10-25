@@ -38,6 +38,7 @@ public class ShouldRenderPageAndWriteResponseVariations extends AbstractVariatio
 		return last;
 	}
 
+	@Override
 	public boolean getResult()
 	{
 		TestPageRenderer renderer = new TestPageRenderer(null);

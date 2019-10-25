@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.wicket.util.io.IClusterable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -33,54 +35,7 @@ import org.apache.wicket.util.io.IClusterable;
  */
 public final class FormInputModel implements IClusterable
 {
-	/**
-	 * Represents a line of text. Hack to get around the fact that strings are immutable.
-	 */
-	public final class Line implements IClusterable
-	{
-		private String text;
-
-		/**
-		 * Construct.
-		 * 
-		 * @param text
-		 */
-		public Line(String text)
-		{
-			this.text = text;
-		}
-
-		/**
-		 * Gets text.
-		 * 
-		 * @return text
-		 */
-		public String getText()
-		{
-			return text;
-		}
-
-		/**
-		 * Sets text.
-		 * 
-		 * @param text
-		 *            text
-		 */
-		public void setText(String text)
-		{
-			this.text = text;
-		}
-
-		/**
-		 * @see java.lang.Object#toString()
-		 */
-		@Override
-		public String toString()
-		{
-			return text == null ? "null" : "'" + text + "'";
-		}
-	}
-
+	private static final Logger logger = LoggerFactory.getLogger(FormInputModel.class);
 	private Boolean booleanProperty;
 	private Double doubleProperty = 20.5;
 	private Integer integerInRangeProperty = 50;
@@ -107,7 +62,7 @@ public final class FormInputModel implements IClusterable
 		}
 		catch (MalformedURLException e)
 		{
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 		}
 		lines.add(new Line("line one"));
 		lines.add(new Line("line two"));
@@ -369,7 +324,7 @@ public final class FormInputModel implements IClusterable
 	{
 	 StringBuilder b = new StringBuilder();
 		b.append("[TestInputObject stringProperty = ")
-			.append(stringProperty == null ? "null" : "'" + stringProperty + "'")
+			.append(stringProperty == null ? "null" : new StringBuilder().append("'").append(stringProperty).append("'").toString())
 			.append(", integerProperty = ")
 			.append(integerProperty)
 			.append(", doubleProperty = ")
@@ -410,5 +365,53 @@ public final class FormInputModel implements IClusterable
 		b.append(']');
 		b.append(']');
 		return b.toString();
+	}
+
+	/**
+	 * Represents a line of text. Hack to get around the fact that strings are immutable.
+	 */
+	public final class Line implements IClusterable
+	{
+		private String text;
+
+		/**
+		 * Construct.
+		 * 
+		 * @param text
+		 */
+		public Line(String text)
+		{
+			this.text = text;
+		}
+
+		/**
+		 * Gets text.
+		 * 
+		 * @return text
+		 */
+		public String getText()
+		{
+			return text;
+		}
+
+		/**
+		 * Sets text.
+		 * 
+		 * @param text
+		 *            text
+		 */
+		public void setText(String text)
+		{
+			this.text = text;
+		}
+
+		/**
+		 * @see java.lang.Object#toString()
+		 */
+		@Override
+		public String toString()
+		{
+			return text == null ? "null" : new StringBuilder().append("'").append(text).append("'").toString();
+		}
 	}
 }

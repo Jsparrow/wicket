@@ -94,11 +94,7 @@ public abstract class AbstractStringResourceStream extends AbstractResourceStrea
 			}
 			return Streams.readString(reader);
 		}
-		catch (IOException e)
-		{
-			throw new RuntimeException("Unable to read resource as String", e);
-		}
-		catch (ResourceStreamNotFoundException e)
+		catch (ResourceStreamNotFoundException | IOException e)
 		{
 			throw new RuntimeException("Unable to read resource as String", e);
 		}

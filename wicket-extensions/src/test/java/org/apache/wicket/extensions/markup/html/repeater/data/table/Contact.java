@@ -45,13 +45,25 @@ public class Contact implements IClusterable
 	}
 
 	/**
+	 * Constructor
+	 * 
+	 * @param firstName
+	 * @param lastName
+	 */
+	public Contact(final String firstName, final String lastName)
+	{
+		this.firstName = firstName;
+		this.lastName = lastName;
+	}
+
+	/**
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString()
 	{
-		return "[Contact id=" + id + " firstName=" + firstName + " lastName=" + lastName +
-			" homePhone=" + homePhone + " cellPhone=" + cellPhone + "]";
+		return new StringBuilder().append("[Contact id=").append(id).append(" firstName=").append(firstName).append(" lastName=").append(lastName).append(" homePhone=")
+				.append(homePhone).append(" cellPhone=").append(cellPhone).append("]").toString();
 	}
 
 	/**
@@ -97,18 +109,6 @@ public class Contact implements IClusterable
 	public long getId()
 	{
 		return id;
-	}
-
-	/**
-	 * Constructor
-	 * 
-	 * @param firstName
-	 * @param lastName
-	 */
-	public Contact(final String firstName, final String lastName)
-	{
-		this.firstName = firstName;
-		this.lastName = lastName;
 	}
 
 	/**

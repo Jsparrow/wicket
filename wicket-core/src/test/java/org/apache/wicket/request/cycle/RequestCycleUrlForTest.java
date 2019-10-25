@@ -71,13 +71,13 @@ class RequestCycleUrlForTest
 		IRequestMapper mapper = mock(IRequestMapper.class);
 
 		Url bookmarkablePageUrl = Url.parse(BOOKMARKABLE_PAGE_URL);
-		when(mapper.mapHandler(argThat(new ExactClassMatcher<BookmarkablePageRequestHandler>(BookmarkablePageRequestHandler.class)))).thenReturn(bookmarkablePageUrl);
+		when(mapper.mapHandler(argThat(new ExactClassMatcher<>(BookmarkablePageRequestHandler.class)))).thenReturn(bookmarkablePageUrl);
 
 		Url resourceUrl = Url.parse(RESOURCE_URL);
-		when(mapper.mapHandler(argThat(new ExactClassMatcher<ResourceRequestHandler>(ResourceRequestHandler.class)))).thenReturn(resourceUrl);
+		when(mapper.mapHandler(argThat(new ExactClassMatcher<>(ResourceRequestHandler.class)))).thenReturn(resourceUrl);
 
 		Url resourceReferenceUrl = Url.parse(RES_REF_URL);
-		when(mapper.mapHandler(argThat(new ExactClassMatcher<ResourceReferenceRequestHandler>(ResourceReferenceRequestHandler.class)))).thenReturn(resourceReferenceUrl);
+		when(mapper.mapHandler(argThat(new ExactClassMatcher<>(ResourceReferenceRequestHandler.class)))).thenReturn(resourceReferenceUrl);
 
 		IExceptionMapper exceptionMapper = mock(IExceptionMapper.class);
 		RequestCycleContext context = new RequestCycleContext(request, response, mapper, exceptionMapper);
@@ -139,7 +139,7 @@ class RequestCycleUrlForTest
 		};
 		ResourceReferenceRequestHandler handler = new ResourceReferenceRequestHandler(reference);
 		CharSequence url = requestCycle.urlFor(handler);
-		assertEquals("./"+RES_REF_URL+JSESSIONID, url);
+		assertEquals(new StringBuilder().append("./").append(RES_REF_URL).append(JSESSIONID).toString(), url);
 	}
 
 	/**
@@ -167,7 +167,7 @@ class RequestCycleUrlForTest
 		ByteArrayResource resource = new ByteArrayResource(null, new byte[] {1, 2}, "test.bin");
 		ResourceRequestHandler handler = new ResourceRequestHandler(resource, new PageParameters());
 		CharSequence url = requestCycle.urlFor(handler);
-		assertEquals("./"+RESOURCE_URL + JSESSIONID, url);
+		assertEquals(new StringBuilder().append("./").append(RESOURCE_URL).append(JSESSIONID).toString(), url);
 	}
 
 	/**

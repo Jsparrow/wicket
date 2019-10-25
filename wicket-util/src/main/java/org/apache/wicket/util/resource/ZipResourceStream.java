@@ -144,7 +144,7 @@ public class ZipResourceStream extends AbstractResourceStream
 				{
 					if (recursive)
 					{
-						zipDir(f, out, path + f.getName() + "/", recursive);
+						zipDir(f, out, new StringBuilder().append(path).append(f.getName()).append("/").toString(), recursive);
 					}
 				} else
 				{

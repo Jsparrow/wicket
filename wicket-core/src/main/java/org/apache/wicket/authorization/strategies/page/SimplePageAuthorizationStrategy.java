@@ -78,28 +78,23 @@ public abstract class SimplePageAuthorizationStrategy extends AbstractPageAuthor
 			throw new IllegalArgumentException("Secure page super type must not be null");
 		}
 
-		securePageSuperTypeRef = new WeakReference<Class<?>>(securePageSuperType);
+		securePageSuperTypeRef = new WeakReference<>(securePageSuperType);
 
 		// Handle unauthorized access to pages
 		Application.get().getSecuritySettings().setUnauthorizedComponentInstantiationListener(
-			new IUnauthorizedComponentInstantiationListener()
-			{
-				@Override
-				public void onUnauthorizedInstantiation(final Component component)
+			(final Component component) -> {
+				// If there is a sign in page class declared, and the
+				// unauthorized component is a page, but it's not the
+				// sign in page
+				if (component instanceof Page)
 				{
-					// If there is a sign in page class declared, and the
-					// unauthorized component is a page, but it's not the
-					// sign in page
-					if (component instanceof Page)
-					{
-						// Redirect to page to let the user sign in
-						throw new RestartResponseAtInterceptPageException(signInPageClass);
-					}
-					else
-					{
-						// The component was not a page, so throw exception
-						throw new UnauthorizedInstantiationException(component.getClass());
-					}
+					// Redirect to page to let the user sign in
+					throw new RestartResponseAtInterceptPageException(signInPageClass);
+				}
+				else
+				{
+					// The component was not a page, so throw exception
+					throw new UnauthorizedInstantiationException(component.getClass());
 				}
 			});
 	}

@@ -42,28 +42,6 @@ import org.apache.wicket.velocity.markup.html.VelocityPanel;
  */
 public class TemplatePage extends WicketExamplePage
 {
-	/**
-	 * Form for changing the template contents.
-	 */
-	private final class TemplateForm extends Form<Void>
-	{
-		private TextArea<IStringResourceStream> templateTextArea;
-
-		/**
-		 * Construct.
-		 * 
-		 * @param name
-		 *            component name
-		 */
-		public TemplateForm(String name)
-		{
-			super(name);
-			add(templateTextArea = new TextArea<>("templateInput",
-				new PropertyModel<>(
-					new Model<>(TemplatePage.this), "template")));
-		}
-	}
-
 	/** the current template contents. */
 	private IResourceStream template = new PackageResourceStream(DynamicPage.class, "persons.vm");
 
@@ -113,5 +91,27 @@ public class TemplatePage extends WicketExamplePage
 	public final void setTemplate(String template)
 	{
 		this.template = new StringResourceStream(template);
+	}
+
+	/**
+	 * Form for changing the template contents.
+	 */
+	private final class TemplateForm extends Form<Void>
+	{
+		private TextArea<IStringResourceStream> templateTextArea;
+
+		/**
+		 * Construct.
+		 * 
+		 * @param name
+		 *            component name
+		 */
+		public TemplateForm(String name)
+		{
+			super(name);
+			add(templateTextArea = new TextArea<>("templateInput",
+				new PropertyModel<>(
+					new Model<>(TemplatePage.this), "template")));
+		}
 	}
 }

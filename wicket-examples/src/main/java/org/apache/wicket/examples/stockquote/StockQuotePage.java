@@ -33,6 +33,12 @@ import org.apache.wicket.util.io.IClusterable;
 public class StockQuotePage extends WicketExamplePage
 {
 	/**
+	 * Quote instance used for communicating between the form input field and the display labels for
+	 * showing the stock quote.
+	 */
+	private final Quote quote = new Quote();
+
+	/**
 	 * Constructor
 	 */
 	public StockQuotePage()
@@ -62,12 +68,6 @@ public class StockQuotePage extends WicketExamplePage
 		// and its quote
 		add(new StockQuoteLabel("quote", model));
 	}
-
-	/**
-	 * Quote instance used for communicating between the form input field and the display labels for
-	 * showing the stock quote.
-	 */
-	private final Quote quote = new Quote();
 
 	/**
 	 * POJO to hold the symbol for the quote query.

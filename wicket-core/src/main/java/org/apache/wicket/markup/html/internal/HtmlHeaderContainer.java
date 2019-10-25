@@ -87,40 +87,6 @@ public class HtmlHeaderContainer extends TransparentWebMarkupContainer
 	private transient IHeaderResponse headerResponse = null;
 
 	/**
-	 * Combines the {@link MarkupStream} with the open tag, together representing the header section
-	 * in the markup.
-	 *
-	 * @author papegaaij
-	 */
-	public static class HeaderStreamState
-	{
-		private final MarkupStream markupStream;
-		private final ComponentTag openTag;
-
-		private HeaderStreamState(MarkupStream markupStream, ComponentTag openTag)
-		{
-			this.markupStream = markupStream;
-			this.openTag = openTag;
-		}
-
-		/**
-		 * @return the {@link MarkupStream}
-		 */
-		public MarkupStream getMarkupStream()
-		{
-			return markupStream;
-		}
-
-		/**
-		 * @return the {@link ComponentTag} that represents the open tag
-		 */
-		public ComponentTag getOpenTag()
-		{
-			return openTag;
-		}
-	}
-
-	/**
 	 * Construct
 	 *
 	 * @see Component#Component(String)
@@ -173,7 +139,7 @@ public class HtmlHeaderContainer extends TransparentWebMarkupContainer
 
 				// Header response will be auto-closed before rendering the header container itself
 				// See https://issues.apache.org/jira/browse/WICKET-3728
-			};
+			}
 
 			// Cleanup extraneous CR and LF from the response
 			CharSequence output = getCleanResponse(response);
@@ -210,8 +176,9 @@ public class HtmlHeaderContainer extends TransparentWebMarkupContainer
 	 */
 	public void renderHeaderTagBody(HeaderStreamState headerStreamState)
 	{
-		if (headerStreamState == null)
+		if (headerStreamState == null) {
 			return;
+		}
 
 		final Response oldResponse = getRequestCycle().getResponse();
 		try
@@ -385,7 +352,7 @@ public class HtmlHeaderContainer extends TransparentWebMarkupContainer
 						break;
 					}
 				}
-				else if (tag.getName().equalsIgnoreCase("head") && tag.isAutoComponentTag())
+				else if ("head".equalsIgnoreCase(tag.getName()) && tag.isAutoComponentTag())
 				{
 					headerMarkup = stream.getMarkupFragment();
 					break;
@@ -397,5 +364,39 @@ public class HtmlHeaderContainer extends TransparentWebMarkupContainer
 
 		setMarkup(headerMarkup);
 		return headerMarkup;
+	}
+
+	/**
+	 * Combines the {@link MarkupStream} with the open tag, together representing the header section
+	 * in the markup.
+	 *
+	 * @author papegaaij
+	 */
+	public static class HeaderStreamState
+	{
+		private final MarkupStream markupStream;
+		private final ComponentTag openTag;
+
+		private HeaderStreamState(MarkupStream markupStream, ComponentTag openTag)
+		{
+			this.markupStream = markupStream;
+			this.openTag = openTag;
+		}
+
+		/**
+		 * @return the {@link MarkupStream}
+		 */
+		public MarkupStream getMarkupStream()
+		{
+			return markupStream;
+		}
+
+		/**
+		 * @return the {@link ComponentTag} that represents the open tag
+		 */
+		public ComponentTag getOpenTag()
+		{
+			return openTag;
+		}
 	}
 }

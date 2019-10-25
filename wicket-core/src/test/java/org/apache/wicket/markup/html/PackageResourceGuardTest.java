@@ -61,23 +61,22 @@ class PackageResourceGuardTest extends WicketTestCase
 		assertTrue(guard.accept("/test/.java"));
 		assertFalse(guard.accept("/test.js"));
 
-		if ("\\".equals(File.separator))
-		{
-			assertTrue(guard.accept("c:\\test\\org\\apache\\.java"));
-			assertTrue(guard.accept("\\test\\org\\apache\\.java"));
-			assertTrue(guard.accept("c:\\test\\org\\apache\\test.js"));
-			assertTrue(guard.accept("\\test\\org\\apache\\test.js"));
-			assertFalse(guard.accept("c:\\test.js"));
-			assertFalse(guard.accept("\\test.js"));
-
-			// java also generates file paths with '/' on windows
-			assertTrue(guard.accept("c:/test/org/apache/.java"));
-			assertTrue(guard.accept("/test/org/apache/.java"));
-			assertTrue(guard.accept("c:/test/org/apache/test.js"));
-			assertTrue(guard.accept("/test/org/apache/test.js"));
-			assertFalse(guard.accept("c:/test.js"));
-			assertFalse(guard.accept("/test.js"));
+		if (!"\\".equals(File.separator)) {
+			return;
 		}
+		assertTrue(guard.accept("c:\\test\\org\\apache\\.java"));
+		assertTrue(guard.accept("\\test\\org\\apache\\.java"));
+		assertTrue(guard.accept("c:\\test\\org\\apache\\test.js"));
+		assertTrue(guard.accept("\\test\\org\\apache\\test.js"));
+		assertFalse(guard.accept("c:\\test.js"));
+		assertFalse(guard.accept("\\test.js"));
+		// java also generates file paths with '/' on windows
+		assertTrue(guard.accept("c:/test/org/apache/.java"));
+		assertTrue(guard.accept("/test/org/apache/.java"));
+		assertTrue(guard.accept("c:/test/org/apache/test.js"));
+		assertTrue(guard.accept("/test/org/apache/test.js"));
+		assertFalse(guard.accept("c:/test.js"));
+		assertFalse(guard.accept("/test.js"));
 	}
 
 	/**

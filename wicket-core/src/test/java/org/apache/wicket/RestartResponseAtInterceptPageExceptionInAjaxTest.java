@@ -50,6 +50,26 @@ class RestartResponseAtInterceptPageExceptionInAjaxTest extends WicketTestCase
 		};
 	}
 
+	/**
+	 * https://issues.apache.org/jira/browse/WICKET-4251
+	 *
+	 * Asserts that the special WebRequest#PARAM_AJAX parameter is no preserved neither in the intercept url nor
+	 * in its post parameters
+	 */
+	@Test
+	void requestAPageInAjaxButReceiveItInNonAjaxResponse()
+	{
+		// issue ajax request
+		tester.executeAjaxUrl(Url.parse(new StringBuilder().append("?").append(WebRequest.PARAM_AJAX).append("=true&").append(WebRequest.PARAM_AJAX_BASE_URL).append("=/").toString()));
+
+		// verify that ajax request parameters are not saved
+		RestartResponseAtInterceptPageException.InterceptData data = RestartResponseAtInterceptPageException.InterceptData.get();
+		assertNull(data.getOriginalUrl().getQueryParameter(WebRequest.PARAM_AJAX));
+		assertNull(data.getOriginalUrl().getQueryParameter(WebRequest.PARAM_AJAX_BASE_URL));
+		assertNull(data.getPostParameters().get(WebRequest.PARAM_AJAX));
+		assertNull(data.getPostParameters().get(WebRequest.PARAM_AJAX_BASE_URL));
+	}
+
 	public static class HomePage extends WebPage implements IMarkupResourceStreamProvider
 	{
 		public HomePage()
@@ -63,26 +83,6 @@ class RestartResponseAtInterceptPageExceptionInAjaxTest extends WicketTestCase
 		{
 			return new StringResourceStream("<html><body></body></html>");
 		}
-	}
-
-	/**
-	 * https://issues.apache.org/jira/browse/WICKET-4251
-	 *
-	 * Asserts that the special WebRequest#PARAM_AJAX parameter is no preserved neither in the intercept url nor
-	 * in its post parameters
-	 */
-	@Test
-	void requestAPageInAjaxButReceiveItInNonAjaxResponse()
-	{
-		// issue ajax request
-		tester.executeAjaxUrl(Url.parse("?"+WebRequest.PARAM_AJAX+"=true&"+WebRequest.PARAM_AJAX_BASE_URL+"=/"));
-
-		// verify that ajax request parameters are not saved
-		RestartResponseAtInterceptPageException.InterceptData data = RestartResponseAtInterceptPageException.InterceptData.get();
-		assertNull(data.getOriginalUrl().getQueryParameter(WebRequest.PARAM_AJAX));
-		assertNull(data.getOriginalUrl().getQueryParameter(WebRequest.PARAM_AJAX_BASE_URL));
-		assertNull(data.getPostParameters().get(WebRequest.PARAM_AJAX));
-		assertNull(data.getPostParameters().get(WebRequest.PARAM_AJAX_BASE_URL));
 	}
 
 }

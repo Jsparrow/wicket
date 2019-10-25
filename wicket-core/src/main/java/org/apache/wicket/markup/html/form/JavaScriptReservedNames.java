@@ -32,7 +32,7 @@ class JavaScriptReservedNames
 	/**
 	 * Set of names reserved by JavaScript DOM API.
 	 */
-	private static final Set<String> RESERVED_NAMES = new HashSet<String>(100);
+	private static final Set<String> RESERVED_NAMES = new HashSet<>(100);
 
 	static
 	{

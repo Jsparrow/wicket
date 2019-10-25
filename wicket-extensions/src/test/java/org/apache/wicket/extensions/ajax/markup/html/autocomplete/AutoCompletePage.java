@@ -16,7 +16,6 @@
  */
 package org.apache.wicket.extensions.ajax.markup.html.autocomplete;
 
-import java.util.Arrays;
 import java.util.Iterator;
 
 import org.apache.wicket.ajax.AjaxEventBehavior;
@@ -24,6 +23,7 @@ import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.model.Model;
+import java.util.Collections;
 
 /**
  * @author svenmeier
@@ -45,7 +45,7 @@ public class AutoCompletePage extends WebPage
 			@Override
 			protected Iterator<String> getChoices(String input)
 			{
-				return Arrays.<String> asList().iterator();
+				return Collections.<String> emptyList().iterator();
 			}
 		};
 		textField.add(new AjaxEventBehavior("change")

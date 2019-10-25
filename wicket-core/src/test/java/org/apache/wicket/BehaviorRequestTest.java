@@ -36,12 +36,15 @@ import org.apache.wicket.util.resource.StringResourceStream;
 import org.apache.wicket.util.tester.WicketTestCase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * See issue <a href="https://issues.apache.org/jira/browse/WICKET-3098">WICKET-3098</a>
  */
 class BehaviorRequestTest extends WicketTestCase
 {
+	private static final Logger logger = LoggerFactory.getLogger(BehaviorRequestTest.class);
 	private TestPage page;
 
 	/**
@@ -77,6 +80,7 @@ class BehaviorRequestTest extends WicketTestCase
 		}
 		catch (ListenerInvocationNotAllowedException expected)
 		{
+			logger.error(expected.getMessage(), expected);
 			assertFalse(page.disabledBehavior.wasCalled());
 		}
 	}

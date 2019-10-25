@@ -110,7 +110,7 @@ public class FeedbackMessagesModel implements IModel<List<FeedbackMessage>>
 			// Sort the list before returning it
 			if (sortingComparator != null)
 			{
-				Collections.sort(messages, sortingComparator);
+				messages.sort(sortingComparator);
 			}
 
 			// Let subclass do any extra processing it wants to on the messages.

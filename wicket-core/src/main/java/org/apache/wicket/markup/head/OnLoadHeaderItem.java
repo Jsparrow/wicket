@@ -36,20 +36,6 @@ import org.apache.wicket.util.value.AttributeMap;
 public class OnLoadHeaderItem extends AbstractCspHeaderItem
 {
 	private static final long serialVersionUID = 1L;
-
-	/**
-	 * Creates a {@link OnLoadHeaderItem} for the script.
-	 *
-	 * @param javaScript
-	 *            The script to execute on the load event.
-	 *
-	 * @return A newly created {@link OnLoadHeaderItem}.
-	 */
-	public static OnLoadHeaderItem forScript(CharSequence javaScript)
-	{
-		return new OnLoadHeaderItem(javaScript);
-	}
-
 	private final CharSequence javaScript;
 
 	/**
@@ -73,6 +59,19 @@ public class OnLoadHeaderItem extends AbstractCspHeaderItem
 	}
 
 	/**
+	 * Creates a {@link OnLoadHeaderItem} for the script.
+	 *
+	 * @param javaScript
+	 *            The script to execute on the load event.
+	 *
+	 * @return A newly created {@link OnLoadHeaderItem}.
+	 */
+	public static OnLoadHeaderItem forScript(CharSequence javaScript)
+	{
+		return new OnLoadHeaderItem(javaScript);
+	}
+
+	/**
 	 * @return the script that gets executed after the entire is loaded.
 	 */
 	public CharSequence getJavaScript()
@@ -80,19 +79,17 @@ public class OnLoadHeaderItem extends AbstractCspHeaderItem
 		return javaScript;
 	}
 
-
 	@Override
 	public void render(Response response)
 	{
 		CharSequence js = getJavaScript();
-		if (Strings.isEmpty(js) == false)
-		{
-			AttributeMap attributes = new AttributeMap();
-			attributes.putAttribute(JavaScriptUtils.ATTR_TYPE, "text/javascript");
-			attributes.putAttribute(JavaScriptUtils.ATTR_CSP_NONCE, getNonce());
-			JavaScriptUtils.writeInlineScript(response, "Wicket.Event.add(window, \"load\", " +
-					"function(event) { " + js + ";});", attributes);
+		if (Strings.isEmpty(js) != false) {
+			return;
 		}
+		AttributeMap attributes = new AttributeMap();
+		attributes.putAttribute(JavaScriptUtils.ATTR_TYPE, "text/javascript");
+		attributes.putAttribute(JavaScriptUtils.ATTR_CSP_NONCE, getNonce());
+		JavaScriptUtils.writeInlineScript(response, new StringBuilder().append("Wicket.Event.add(window, \"load\", ").append("function(event) { ").append(js).append(";});").toString(), attributes);
 	}
 
 	@Override
@@ -104,14 +101,18 @@ public class OnLoadHeaderItem extends AbstractCspHeaderItem
 	@Override
 	public String toString()
 	{
-		return "OnLoadHeaderItem('" + getJavaScript() + "')";
+		return new StringBuilder().append("OnLoadHeaderItem('").append(getJavaScript()).append("')").toString();
 	}
 
 	@Override
 	public boolean equals(Object o)
 	{
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
 		OnLoadHeaderItem that = (OnLoadHeaderItem) o;
 		return Objects.equals(javaScript, that.javaScript);
 	}

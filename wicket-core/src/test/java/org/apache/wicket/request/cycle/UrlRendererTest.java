@@ -27,12 +27,17 @@ import org.apache.wicket.mock.MockWebRequest;
 import org.apache.wicket.request.Url;
 import org.apache.wicket.request.UrlRenderer;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import java.util.Collections;
 
 /**
  * @author Matej Knopp
  */
 class UrlRendererTest
 {
+
+	private static final Logger logger = LoggerFactory.getLogger(UrlRendererTest.class);
 
 	/**
 	 * 
@@ -143,6 +148,7 @@ class UrlRendererTest
 		}
 		catch (IllegalArgumentException iax)
 		{
+			logger.error(iax.getMessage(), iax);
 			assertTrue(true);
 		}
 	}
@@ -573,7 +579,7 @@ class UrlRendererTest
 	@Test
 	void removeCommonPrefixesWicket5073()
 	{
-		Url baseUrl = new Url(Arrays.asList(""), Arrays.<Url.QueryParameter> asList());
+		Url baseUrl = new Url(Collections.singletonList(""), Collections.<Url.QueryParameter> emptyList());
 
 		MockWebRequest request = new MockWebRequest(baseUrl);
 		request.setContextPath("/qs");
@@ -592,7 +598,7 @@ class UrlRendererTest
 	void removeCommonPrefixesWithJSessionId()
 	{
 		Url baseUrl = new Url(Arrays.asList("", "SomePage;jsessionid=1234"),
-			Arrays.<Url.QueryParameter> asList());
+			Collections.<Url.QueryParameter> emptyList());
 
 		MockWebRequest request = new MockWebRequest(baseUrl);
 		request.setContextPath("/");

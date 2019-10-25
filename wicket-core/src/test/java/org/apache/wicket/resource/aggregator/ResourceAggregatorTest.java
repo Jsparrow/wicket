@@ -41,11 +41,15 @@ import org.junit.jupiter.api.Test;
  */
 class ResourceAggregatorTest extends WicketTestCase
 {
+	private TestHeaderResponse responseStub;
+	private ResourceAggregator aggregator;
+
 	private void assertItems(ResourceReference... references)
 	{
-		List<HeaderItem> items = new ArrayList<HeaderItem>();
-		for (ResourceReference curReference : references)
+		List<HeaderItem> items = new ArrayList<>();
+		for (ResourceReference curReference : references) {
 			items.add(forReference(curReference));
+		}
 		assertItems(items);
 	}
 
@@ -59,9 +63,6 @@ class ResourceAggregatorTest extends WicketTestCase
 		aggregator.close();
 		assertEquals(items, responseStub.getItems());
 	}
-
-	private TestHeaderResponse responseStub;
-	private ResourceAggregator aggregator;
 
 	/**
 	 * Setup the testcase, creating a new header response stub and wrapping it in a resource
@@ -177,7 +178,6 @@ class ResourceAggregatorTest extends WicketTestCase
 		assertItems(forReference(new ResourceReferenceA()), bundleCD);
 	}
 
-
 	/**
 	 * bundle {a, b->a} and {c->a, d->c->a}, render [d], should render [ab, cd]
 	 */
@@ -240,9 +240,7 @@ class ResourceAggregatorTest extends WicketTestCase
 	@Test
 	void testCircularDependency()
 	{
-		assertThrows(CircularDependencyException.class, () -> {
-			aggregator.render(forReference(new ResourceReferenceCirc1()));
-		});
+		assertThrows(CircularDependencyException.class, () -> aggregator.render(forReference(new ResourceReferenceCirc1())));
 	}
 
 	/**

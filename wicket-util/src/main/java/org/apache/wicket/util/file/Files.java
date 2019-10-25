@@ -134,6 +134,7 @@ public class Files
 				}
 				catch (InterruptedException ix)
 				{
+					logger.error(ix.getMessage(), ix);
 					Thread.currentThread().interrupt();
 				}
 			}
@@ -450,10 +451,13 @@ public class Files
 			try
 			{
 				Thread.sleep(100);
-				if (folder.exists()) return true;
+				if (folder.exists()) {
+					return true;
+				}
 			}
 			catch (InterruptedException ix)
 			{
+				logger.error(ix.getMessage(), ix);
 				Thread.currentThread().interrupt();
 			}
 		}

@@ -36,6 +36,41 @@ public class StaticWizardWithPanels extends Wizard
 {
 
 	/**
+	 * Construct.
+	 * 
+	 * @param id
+	 *            The component id
+	 */
+	public StaticWizardWithPanels(String id)
+	{
+		super(id);
+
+		// create a model with a couple of custom panels
+		// still not that spectacular, but at least it
+		// will give you a hint of how nice it is to
+		// be able to work with custom panels
+		WizardModel model = new WizardModel();
+		model.add(new Step1());
+		model.add(new Step2());
+		model.add(new Step3());
+
+		// initialize the wizard
+		init(model);
+	}
+
+	@Override
+	public void onCancel()
+	{
+		setResponsePage(Index.class);
+	}
+
+	@Override
+	public void onFinish()
+	{
+		setResponsePage(Index.class);
+	}
+
+	/**
 	 * The first step of this wizard.
 	 */
 	private static final class Step1 extends WizardStep
@@ -75,40 +110,5 @@ public class StaticWizardWithPanels extends Wizard
 		{
 			super("Three", "The third step");
 		}
-	}
-
-	/**
-	 * Construct.
-	 * 
-	 * @param id
-	 *            The component id
-	 */
-	public StaticWizardWithPanels(String id)
-	{
-		super(id);
-
-		// create a model with a couple of custom panels
-		// still not that spectacular, but at least it
-		// will give you a hint of how nice it is to
-		// be able to work with custom panels
-		WizardModel model = new WizardModel();
-		model.add(new Step1());
-		model.add(new Step2());
-		model.add(new Step3());
-
-		// initialize the wizard
-		init(model);
-	}
-
-	@Override
-	public void onCancel()
-	{
-		setResponsePage(Index.class);
-	}
-
-	@Override
-	public void onFinish()
-	{
-		setResponsePage(Index.class);
 	}
 }

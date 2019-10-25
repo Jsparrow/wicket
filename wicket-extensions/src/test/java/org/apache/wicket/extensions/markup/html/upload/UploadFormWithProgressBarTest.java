@@ -90,9 +90,7 @@ public class UploadFormWithProgressBarTest extends WicketTestCase
 			final Class<?> containerClass)
 		{
 			return new StringResourceStream(
-				"<html><body><a wicket:id=\"re-create\"></a>"
-					+ "<form wicket:id=\"uploadForm\"><input wicket:id=\"fileInput\" type=\"file\" /> <span wicket:id=\"progress\"> </span></form>"
-					+ "</body></html>");
+				new StringBuilder().append("<html><body><a wicket:id=\"re-create\"></a>").append("<form wicket:id=\"uploadForm\"><input wicket:id=\"fileInput\" type=\"file\" /> <span wicket:id=\"progress\"> </span></form>").append("</body></html>").toString());
 		}
 
 	}
@@ -101,8 +99,8 @@ public class UploadFormWithProgressBarTest extends WicketTestCase
 	public static class TraceableForm extends Form<Void>
 	{
 		private static final long serialVersionUID = 1L;
-		private final int formInstance;
 		private static int nextInstanceId;
+		private final int formInstance;
 
 		/**
 		 * Construct.

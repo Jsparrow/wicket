@@ -24,12 +24,15 @@ import org.junit.jupiter.api.Test;
 import java.util.Locale;
 
 import static org.junit.jupiter.api.Assertions.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Tests the <code>Bytes</code> class.
  */
 public class BytesTest
 {
+	private static final Logger logger = LoggerFactory.getLogger(BytesTest.class);
 	/**
 	 * Backup of the default locale.
 	 */
@@ -101,7 +104,7 @@ public class BytesTest
 	 * @throws StringValueConversionException
 	 */
 	@Test
-	public void valueOf() throws StringValueConversionException
+	public void valueOf()
 	{
 		assertEquals(Bytes.valueOf("1024GB"), Bytes.valueOf("1TB"));
 		assertEquals(Bytes.valueOf("1024MB"), Bytes.valueOf("1GB"));
@@ -130,6 +133,7 @@ public class BytesTest
 		}
 		catch (StringValueConversionException e)
 		{
+			logger.error(e.getMessage(), e);
 			assertTrue(true);
 		}
 		try
@@ -139,6 +143,7 @@ public class BytesTest
 		}
 		catch (StringValueConversionException e)
 		{
+			logger.error(e.getMessage(), e);
 			assertTrue(true);
 		}
 	}

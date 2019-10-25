@@ -37,19 +37,18 @@ import org.apache.wicket.session.ISessionStore;
  */
 public class MockSessionStore implements ISessionStore
 {
+	private String sessionId;
+	private final Map<String, Serializable> attributes = new HashMap<>();
+	private final Set<UnboundListener> unboundListeners = new CopyOnWriteArraySet<>();
+	private final Set<BindListener> bindListeners = new CopyOnWriteArraySet<>();
+	private Session session;
+
 	/**
 	 * Construct.
 	 */
 	public MockSessionStore()
 	{
 	}
-
-	private String sessionId;
-	private final Map<String, Serializable> attributes = new HashMap<>();
-	private final Set<UnboundListener> unboundListeners = new CopyOnWriteArraySet<>();
-	private final Set<BindListener> bindListeners = new CopyOnWriteArraySet<>();
-
-	private Session session;
 
 	@Override
 	public void bind(Request request, Session newSession)
@@ -101,10 +100,7 @@ public class MockSessionStore implements ISessionStore
 			session.onInvalidate();
 		}
 		cleanup();
-		for (UnboundListener l : unboundListeners)
-		{
-			l.sessionUnbound(sessId);
-		}
+		unboundListeners.forEach(l -> l.sessionUnbound(sessId));
 
 	}
 

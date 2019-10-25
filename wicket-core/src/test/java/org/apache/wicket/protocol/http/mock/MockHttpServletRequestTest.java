@@ -101,7 +101,7 @@ class MockHttpServletRequestTest extends WicketTestCase
 		assertEquals("http", url.getProtocol());
 		assertEquals("localhost", url.getHost());
 		assertEquals(Integer.valueOf(80), url.getPort());
-		assertEquals(request.getContextPath() + request.getServletPath() + "/foo/bar/baz.html", url.getPath());
+		assertEquals(new StringBuilder().append(request.getContextPath()).append(request.getServletPath()).append("/foo/bar/baz.html").toString(), url.getPath());
 		assertEquals("a=123&b=456", url.getQueryString());
 
 		String pathInfo = request.getPathInfo();

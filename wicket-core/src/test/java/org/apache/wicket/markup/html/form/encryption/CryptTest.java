@@ -24,12 +24,16 @@ import org.apache.wicket.util.crypt.NoCrypt;
 import org.apache.wicket.util.crypt.SunJceCrypt;
 import org.apache.wicket.util.tester.WicketTestCase;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Juergen Donnerstag
  */
 class CryptTest extends WicketTestCase
 {
+	private static final Logger logger = LoggerFactory.getLogger(CryptTest.class);
+
 	@Test
 	void crypt()
 	{
@@ -51,6 +55,7 @@ class CryptTest extends WicketTestCase
 		}
 		catch (Exception ex)
 		{
+			logger.error(ex.getMessage(), ex);
 			// fails on JVMs without security provider (e.g. seems to be on
 			// MAC in US)
 		}
