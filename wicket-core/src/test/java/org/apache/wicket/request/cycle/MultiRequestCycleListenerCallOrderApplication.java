@@ -24,6 +24,8 @@ import org.apache.wicket.request.Url;
 
 class MultiRequestCycleListenerCallOrderApplication extends WebApplication
 {
+	public final ArrayList<String> callSequence = new ArrayList<>();
+
 	@Override
 	public Class<MultiRequestCycleListenerCallOrderPage> getHomePage()
 	{
@@ -38,8 +40,6 @@ class MultiRequestCycleListenerCallOrderApplication extends WebApplication
 		getRequestCycleListeners().add(new CallRecordingListener("first"));
 		getRequestCycleListeners().add(new CallRecordingListener("second"));
 	}
-
-	public final ArrayList<String> callSequence = new ArrayList<String>();
 
 	/**
 	 * Records calls to each method in the {@code callSequence}.
@@ -62,8 +62,9 @@ class MultiRequestCycleListenerCallOrderApplication extends WebApplication
 		@Override
 		public void onRequestHandlerScheduled(final RequestCycle cycle, IRequestHandler handler)
 		{
-			if (handler != null)
+			if (handler != null) {
 				callSequence.add(name + ".onRequestHandlerScheduled");
+			}
 		}
 
 		@Override

@@ -30,6 +30,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.wicket.util.lang.Args;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A variety of static String utility methods.
@@ -54,6 +56,8 @@ import org.apache.wicket.util.lang.Args;
  */
 public final class Strings
 {
+	private static final Logger logger = LoggerFactory.getLogger(Strings.class);
+
 	/**
 	 * The line separator for the current platform.
 	 */
@@ -92,7 +96,7 @@ public final class Strings
 	 * Constructs something like <em>;jsessionid=</em>. This is what {@linkplain Strings#stripJSessionId(String)}
 	 * actually uses.
 	 */
-	private static final String SESSION_ID_PARAM = ';' + SESSION_ID_PARAM_NAME + '=';
+	private static final String SESSION_ID_PARAM = new StringBuilder().append(';').append(SESSION_ID_PARAM_NAME).append('=').toString();
 
 	static
 	{
@@ -565,7 +569,7 @@ public final class Strings
 	public static boolean isEmpty(final CharSequence string)
 	{
 		return (string == null) || (string.length() == 0) ||
-			(string.toString().trim().length() == 0);
+			(string.toString().trim().isEmpty());
 	}
 
 	/**
@@ -609,28 +613,28 @@ public final class Strings
 	 * @throws StringValueConversionException
 	 *             when the value of <code>s</code> is not recognized.
 	 */
-	public static boolean isTrue(final String s) throws StringValueConversionException
+	public static boolean isTrue(final String s)
 	{
 		if (s != null)
 		{
-			if (s.equalsIgnoreCase("true"))
+			if ("true".equalsIgnoreCase(s))
 			{
 				return true;
 			}
 
-			if (s.equalsIgnoreCase("false"))
+			if ("false".equalsIgnoreCase(s))
 			{
 				return false;
 			}
 
-			if (s.equalsIgnoreCase("on") || s.equalsIgnoreCase("yes") || s.equalsIgnoreCase("y") ||
-				s.equalsIgnoreCase("1"))
+			if ("on".equalsIgnoreCase(s) || "yes".equalsIgnoreCase(s) || "y".equalsIgnoreCase(s) ||
+				"1".equalsIgnoreCase(s))
 			{
 				return true;
 			}
 
-			if (s.equalsIgnoreCase("off") || s.equalsIgnoreCase("no") || s.equalsIgnoreCase("n") ||
-				s.equalsIgnoreCase("0"))
+			if ("off".equalsIgnoreCase(s) || "no".equalsIgnoreCase(s) || "n".equalsIgnoreCase(s) ||
+				"0".equalsIgnoreCase(s))
 			{
 				return false;
 			}
@@ -640,7 +644,7 @@ public final class Strings
 				return false;
 			}
 
-			throw new StringValueConversionException("Boolean value \"" + s + "\" not recognized");
+			throw new StringValueConversionException(new StringBuilder().append("Boolean value \"").append(s).append("\" not recognized").toString());
 		}
 
 		return false;
@@ -846,7 +850,7 @@ public final class Strings
 			int end = matcher.end();
 			int number = Integer.parseInt(str.substring(pos + 2, end - 1));
 			char ch = (char)number;
-			str = str.substring(0, pos) + ch + str.substring(end);
+			str = new StringBuilder().append(str.substring(0, pos)).append(ch).append(str.substring(end)).toString();
 			matcher = HTML_NUMBER_REGEX.matcher(str);
 		}
 
@@ -864,7 +868,7 @@ public final class Strings
 	 */
 	public static String[] split(final String s, final char c)
 	{
-		if (s == null || s.length() == 0)
+		if (s == null || s.isEmpty())
 		{
 			return NO_STRINGS;
 		}
@@ -979,7 +983,7 @@ public final class Strings
 	 *             when s is not a valid value
 	 * @see #isTrue(String)
 	 */
-	public static Boolean toBoolean(final String s) throws StringValueConversionException
+	public static Boolean toBoolean(final String s)
 	{
 		return isTrue(s);
 	}
@@ -993,7 +997,7 @@ public final class Strings
 	 * @throws StringValueConversionException
 	 *             when the string is longer or shorter than 1 character, or <code>null</code>.
 	 */
-	public static char toChar(final String s) throws StringValueConversionException
+	public static char toChar(final String s)
 	{
 		if (s != null)
 		{
@@ -1003,8 +1007,7 @@ public final class Strings
 			}
 			else
 			{
-				throw new StringValueConversionException("Expected single character, not \"" + s +
-					"\"");
+				throw new StringValueConversionException(new StringBuilder().append("Expected single character, not \"").append(s).append("\"").toString());
 			}
 		}
 
@@ -1020,7 +1023,7 @@ public final class Strings
 	 */
 	public static String toEscapedUnicode(final String unicodeString)
 	{
-		if ((unicodeString == null) || (unicodeString.length() == 0))
+		if ((unicodeString == null) || (unicodeString.isEmpty()))
 		{
 			return unicodeString;
 		}
@@ -1202,45 +1205,39 @@ public final class Strings
 	 */
 	public static String toString(final Throwable throwable)
 	{
-		if (throwable != null)
-		{
-			List<Throwable> al = new ArrayList<>();
-			Throwable cause = throwable;
-			al.add(cause);
-			while ((cause.getCause() != null) && (cause != cause.getCause()))
-			{
-				cause = cause.getCause();
-				al.add(cause);
-			}
-
-			AppendingStringBuffer sb = new AppendingStringBuffer(256);
-			// first print the last cause
-			int length = al.size() - 1;
-			cause = al.get(length);
-			if (throwable instanceof RuntimeException)
-			{
-				sb.append("Message: ");
-				sb.append(throwable.getMessage());
-				sb.append("\n\n");
-			}
-			sb.append("Root cause:\n\n");
-			outputThrowable(cause, sb, false);
-
-			if (length > 0)
-			{
-				sb.append("\n\nComplete stack:\n\n");
-				for (int i = 0; i < length; i++)
-				{
-					outputThrowable(al.get(i), sb, true);
-					sb.append('\n');
-				}
-			}
-			return sb.toString();
-		}
-		else
-		{
+		if (throwable == null) {
 			return "<Null Throwable>";
 		}
+		List<Throwable> al = new ArrayList<>();
+		Throwable cause = throwable;
+		al.add(cause);
+		while ((cause.getCause() != null) && (cause != cause.getCause()))
+		{
+			cause = cause.getCause();
+			al.add(cause);
+		}
+		AppendingStringBuffer sb = new AppendingStringBuffer(256);
+		// first print the last cause
+		int length = al.size() - 1;
+		cause = al.get(length);
+		if (throwable instanceof RuntimeException)
+		{
+			sb.append("Message: ");
+			sb.append(throwable.getMessage());
+			sb.append("\n\n");
+		}
+		sb.append("Root cause:\n\n");
+		outputThrowable(cause, sb, false);
+		if (length > 0)
+		{
+			sb.append("\n\nComplete stack:\n\n");
+			for (int i = 0; i < length; i++)
+			{
+				outputThrowable(al.get(i), sb, true);
+				sb.append('\n');
+			}
+		}
+		return sb.toString();
 	}
 
 	private static void append(final AppendingStringBuffer buffer, final CharSequence s,
@@ -1344,6 +1341,7 @@ public final class Strings
 			}
 			catch (UnsupportedEncodingException e)
 			{
+				logger.error(e.getMessage(), e);
 				throw new RuntimeException(
 					"StringResourceStream created with unsupported charset: " + charset.name());
 			}

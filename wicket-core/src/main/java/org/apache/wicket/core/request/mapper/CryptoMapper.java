@@ -373,25 +373,22 @@ public class CryptoMapper implements IRequestMapperDelegate
 	{
 		Url url = decryptEntireUrl(request, encryptedUrl);
 
-		if (url == null)
-		{
-			if (encryptedUrl.getSegments().size() > 0
-				&& encryptedUrl.getSegments().get(0).equals(getContext().getNamespace()))
+		boolean condition = url == null && encryptedUrl.getSegments().size() > 0
+			&& encryptedUrl.getSegments().get(0).equals(getContext().getNamespace());
+		if (condition) {
+			/*
+			 * This URL should have been encrypted, but was not. We should refuse to handle this, except when
+			 * there is more than one CryptoMapper installed, and the request was decrypted by some other
+			 * CryptoMapper.
+			 */
+			if (request.getOriginalUrl().getSegments().size() > 0
+				&& request.getOriginalUrl().getSegments().get(0).equals(getContext().getNamespace()))
 			{
-				/*
-				 * This URL should have been encrypted, but was not. We should refuse to handle this, except when
-				 * there is more than one CryptoMapper installed, and the request was decrypted by some other
-				 * CryptoMapper.
-				 */
-				if (request.getOriginalUrl().getSegments().size() > 0
-					&& request.getOriginalUrl().getSegments().get(0).equals(getContext().getNamespace()))
-				{
-					return null;
-				}
-				else
-				{
-					return encryptedUrl;
-				}
+				return null;
+			}
+			else
+			{
+				return encryptedUrl;
 			}
 		}
 
@@ -643,7 +640,7 @@ public class CryptoMapper implements IRequestMapperDelegate
 			hash++;
 			char c = characters[Math.abs(hash % characters.length)];
 
-			String segment = "" + a + b + c;
+			String segment = new StringBuilder().append("").append(a).append(b).append(c).toString();
 			hash = hashString(segment);
 
 			segment += String.format("%02x", Math.abs(hash % 256));

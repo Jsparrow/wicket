@@ -37,20 +37,6 @@ import org.apache.wicket.util.value.AttributeMap;
 public class OnDomReadyHeaderItem extends AbstractCspHeaderItem
 {
 	private static final long serialVersionUID = 1L;
-
-	/**
-	 * Creates a {@link OnDomReadyHeaderItem} for the script.
-	 *
-	 * @param javaScript
-	 *            The script to execute on the DOM ready event.
-	 *
-	 * @return A newly created {@link OnDomReadyHeaderItem}.
-	 */
-	public static OnDomReadyHeaderItem forScript(CharSequence javaScript)
-	{
-		return new OnDomReadyHeaderItem(javaScript);
-	}
-
 	private final CharSequence javaScript;
 
 	/**
@@ -74,6 +60,19 @@ public class OnDomReadyHeaderItem extends AbstractCspHeaderItem
 	}
 
 	/**
+	 * Creates a {@link OnDomReadyHeaderItem} for the script.
+	 *
+	 * @param javaScript
+	 *            The script to execute on the DOM ready event.
+	 *
+	 * @return A newly created {@link OnDomReadyHeaderItem}.
+	 */
+	public static OnDomReadyHeaderItem forScript(CharSequence javaScript)
+	{
+		return new OnDomReadyHeaderItem(javaScript);
+	}
+
+	/**
 	 * @return the script that gets executed on the DOM ready event.
 	 */
 	public CharSequence getJavaScript()
@@ -85,14 +84,13 @@ public class OnDomReadyHeaderItem extends AbstractCspHeaderItem
 	public void render(Response response)
 	{
 		CharSequence js = getJavaScript();
-		if (Strings.isEmpty(js) == false)
-		{
-			AttributeMap attributes = new AttributeMap();
-			attributes.putAttribute(JavaScriptUtils.ATTR_TYPE, "text/javascript");
-			attributes.putAttribute(JavaScriptUtils.ATTR_CSP_NONCE, getNonce());
-			JavaScriptUtils.writeInlineScript(response, "Wicket.Event.add(window, \"domready\", " +
-					"function(event) { " + js + ";});", attributes);
+		if (Strings.isEmpty(js) != false) {
+			return;
 		}
+		AttributeMap attributes = new AttributeMap();
+		attributes.putAttribute(JavaScriptUtils.ATTR_TYPE, "text/javascript");
+		attributes.putAttribute(JavaScriptUtils.ATTR_CSP_NONCE, getNonce());
+		JavaScriptUtils.writeInlineScript(response, new StringBuilder().append("Wicket.Event.add(window, \"domready\", ").append("function(event) { ").append(js).append(";});").toString(), attributes);
 	}
 
 	@Override
@@ -104,7 +102,7 @@ public class OnDomReadyHeaderItem extends AbstractCspHeaderItem
 	@Override
 	public String toString()
 	{
-		return "OnDomReadyHeaderItem('" + getJavaScript() + "')";
+		return new StringBuilder().append("OnDomReadyHeaderItem('").append(getJavaScript()).append("')").toString();
 	}
 
 	@Override
@@ -116,8 +114,12 @@ public class OnDomReadyHeaderItem extends AbstractCspHeaderItem
 	@Override
 	public boolean equals(Object o)
 	{
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
 		OnDomReadyHeaderItem that = (OnDomReadyHeaderItem) o;
 		return Objects.equals(javaScript, that.javaScript);
 	}

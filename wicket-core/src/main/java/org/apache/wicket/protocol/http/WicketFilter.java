@@ -92,7 +92,7 @@ public class WicketFilter implements Filter
 	private int filterPathLength = -1;
 
 	/** set of paths that should be ignored by the wicket filter */
-	private final Set<String> ignorePaths = new HashSet<String>();
+	private final Set<String> ignorePaths = new HashSet<>();
 
 	/**
 	 * A flag indicating whether WicketFilter is used directly or through WicketServlet
@@ -336,8 +336,8 @@ public class WicketFilter implements Filter
 			}
 			catch (ClassCastException e)
 			{
-				throw new WicketRuntimeException("Application factory class " +
-					appFactoryClassName + " must implement IWebApplicationFactory");
+				log.error(e.getMessage(), e);
+				throw new WicketRuntimeException(new StringBuilder().append("Application factory class ").append(appFactoryClassName).append(" must implement IWebApplicationFactory").toString());
 			}
 			catch (ClassNotFoundException | InstantiationException | IllegalAccessException | SecurityException
 					| NoSuchMethodException | InvocationTargetException e)
@@ -423,9 +423,7 @@ public class WicketFilter implements Filter
 
 			if (getFilterPath() == null)
 			{
-				log.warn("Unable to determine filter path from filter init-param, web.xml, "
-					+ "or servlet 3.0 annotations. Assuming user will set filter path "
-					+ "manually by calling setFilterPath(String)");
+				log.warn(new StringBuilder().append("Unable to determine filter path from filter init-param, web.xml, ").append("or servlet 3.0 annotations. Assuming user will set filter path ").append("manually by calling setFilterPath(String)").toString());
 			}
 
 			ThreadContext.setApplication(application);
@@ -509,28 +507,25 @@ public class WicketFilter implements Filter
 			}
 		}
 
-		if (patterns != null && patterns.length > 0)
-		{
-			String pattern = patterns[0];
-			if (patterns.length > 1)
-			{
-				log.warn(
-						"Multiple url patterns defined for Wicket filter/servlet, using the first: {}",
-						pattern);
-			}
-
-			if ("/*".equals(pattern))
-			{
-				pattern = "";
-			}
-
-			if (pattern.endsWith("*"))
-			{
-				pattern = pattern.substring(0, pattern.length() - 1);
-			}
-			return pattern;
+		if (!(patterns != null && patterns.length > 0)) {
+			return null;
 		}
-		return null;
+		String pattern = patterns[0];
+		if (patterns.length > 1)
+		{
+			log.warn(
+					"Multiple url patterns defined for Wicket filter/servlet, using the first: {}",
+					pattern);
+		}
+		if ("/*".equals(pattern))
+		{
+			pattern = "";
+		}
+		if (pattern.endsWith("*"))
+		{
+			pattern = pattern.substring(0, pattern.length() - 1);
+		}
+		return pattern;
 	}
 
 	/**
@@ -585,14 +580,13 @@ public class WicketFilter implements Filter
 		String result = filterConfig.getInitParameter(FILTER_MAPPING_PARAM);
 		if (result != null)
 		{
-			if (result.equals("/*"))
+			if ("/*".equals(result))
 			{
 				result = "";
 			}
 			else if (!result.startsWith("/") || !result.endsWith("/*"))
 			{
-				throw new WicketRuntimeException("Your " + FILTER_MAPPING_PARAM +
-					" must start with \"/\" and end with \"/*\". It is: " + result);
+				throw new WicketRuntimeException(new StringBuilder().append("Your ").append(FILTER_MAPPING_PARAM).append(" must start with \"/\" and end with \"/*\". It is: ").append(result).toString());
 			}
 			else
 			{
@@ -677,21 +671,19 @@ public class WicketFilter implements Filter
 		String uri = Strings.stripJSessionId(requestURI);
 
 		// home page without trailing slash URI
-		String homePageUri = contextPath + '/' + getFilterPath();
+		String homePageUri = new StringBuilder().append(contextPath).append('/').append(getFilterPath()).toString();
 		if (homePageUri.endsWith("/"))
 		{
 			homePageUri = homePageUri.substring(0, homePageUri.length() - 1);
 		}
 
 		// If both are equal => redirect
-		if (uri.equals(homePageUri))
-		{
-			uri += "/";
-			return uri;
+		if (!uri.equals(homePageUri)) {
+			// no match => standard request processing; no redirect
+			return null;
 		}
-
-		// no match => standard request processing; no redirect
-		return null;
+		uri += "/";
+		return uri;
 	}
 
 	/**
@@ -708,8 +700,7 @@ public class WicketFilter implements Filter
 		if (this.filterPath != null)
 		{
 			throw new IllegalStateException(
-				"Filter path is write-once. You can not change it. Current value='" + filterPath +
-					'\'');
+				new StringBuilder().append("Filter path is write-once. You can not change it. Current value='").append(filterPath).append('\'').toString());
 		}
 		if (filterPath != null)
 		{
@@ -756,12 +747,9 @@ public class WicketFilter implements Filter
 		// for the special case of someone landing on the
 		// home page without a trailing slash.
 		String filterPath = getFilterPath();
-		if (!path.startsWith(filterPath))
-		{
-			if (filterPath.equals(path + "/"))
-			{
-				path += "/";
-			}
+		boolean condition = !path.startsWith(filterPath) && filterPath.equals(path + "/");
+		if (condition) {
+			path += "/";
 		}
 		if (path.startsWith(filterPath))
 		{
@@ -814,18 +802,18 @@ public class WicketFilter implements Filter
 	private void initIgnorePaths(final FilterConfig filterConfig)
 	{
 		String paths = filterConfig.getInitParameter(IGNORE_PATHS_PARAM);
-		if (Strings.isEmpty(paths) == false)
+		if (Strings.isEmpty(paths) != false) {
+			return;
+		}
+		String[] parts = Strings.split(paths, ',');
+		for (String path : parts)
 		{
-			String[] parts = Strings.split(paths, ',');
-			for (String path : parts)
+			path = path.trim();
+			if (path.startsWith("/"))
 			{
-				path = path.trim();
-				if (path.startsWith("/"))
-				{
-					path = path.substring(1);
-				}
-				ignorePaths.add(path);
+				path = path.substring(1);
 			}
+			ignorePaths.add(path);
 		}
 	}
 
@@ -877,7 +865,7 @@ public class WicketFilter implements Filter
 			filterPath = filterPath.substring(beginIndex) + '/';
 		}
 
-		if (filterPath.equals("/"))
+		if ("/".equals(filterPath))
 		{
 			return "";
 		}

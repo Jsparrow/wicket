@@ -31,6 +31,8 @@ import org.apache.wicket.util.resource.IResourceStream;
 import org.apache.wicket.util.resource.StringResourceStream;
 import org.apache.wicket.util.tester.WicketTestCase;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Tests {@link Component#onInitialize()} contract
@@ -39,6 +41,8 @@ import org.junit.jupiter.api.Test;
  */
 class ComponentInitializationTest extends WicketTestCase
 {
+	private static final Logger logger = LoggerFactory.getLogger(ComponentInitializationTest.class);
+
 	/**
 	 * testPropagation()
 	 */
@@ -134,6 +138,7 @@ class ComponentInitializationTest extends WicketTestCase
 		}
 		catch (IllegalStateException e)
 		{
+			logger.error(e.getMessage(), e);
 			illegalState = true;
 		}
 		assertTrue(illegalState);
@@ -275,12 +280,13 @@ class ComponentInitializationTest extends WicketTestCase
 
 	private static class TestInitListener implements IComponentInitializationListener
 	{
-		private List<Component> components = new ArrayList<Component>();
+		private final Logger logger1 = LoggerFactory.getLogger(TestInitListener.class);
+		private List<Component> components = new ArrayList<>();
 
 		@Override
 		public void onInitialize(Component component)
 		{
-			System.out.println(component);
+			logger1.info(String.valueOf(component));
 			components.add(component);
 		}
 

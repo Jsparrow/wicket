@@ -70,25 +70,21 @@ public class ListParser extends MetaPatternParser
 	public final boolean matches()
 	{
 		// Are there any more elements
-		if (advance(entryGroup))
-		{
-			// Add the first element
-			final String value = entryGroup.get(matcher());
-			values.add(value);
-
-			// All remaining elements must be preceded by the separator pattern
-			while (advance(separatorPattern) && advance(entryGroup))
-			{
-				// Add the value not including the separator
-				values.add(entryGroup.get(matcher()));
-			}
-
-			// Yes, we found at least on element
-			return true;
+		if (!advance(entryGroup)) {
+			// Nothing found, not even one element without separator
+			return false;
 		}
-
-		// Nothing found, not even one element without separator
-		return false;
+		// Add the first element
+		final String value = entryGroup.get(matcher());
+		values.add(value);
+		// All remaining elements must be preceded by the separator pattern
+		while (advance(separatorPattern) && advance(entryGroup))
+		{
+			// Add the value not including the separator
+			values.add(entryGroup.get(matcher()));
+		}
+		// Yes, we found at least on element
+		return true;
 	}
 
 	/**

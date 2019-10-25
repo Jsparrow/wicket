@@ -62,9 +62,7 @@ public class HomePage extends WicketExamplePage
 			@Override
 			public void renderHead(Component component, IHeaderResponse response)
 			{
-				response.render(OnDomReadyHeaderItem.forScript("jQuery('#" +
-					jsPlaceholder.getMarkupId() +
-					"').html('the ondomready script ran').css('border-color', 'green');"));
+				response.render(OnDomReadyHeaderItem.forScript(new StringBuilder().append("jQuery('#").append(jsPlaceholder.getMarkupId()).append("').html('the ondomready script ran').css('border-color', 'green');").toString()));
 			}
 		});
 		add(jsPlaceholder);
@@ -130,14 +128,14 @@ public class HomePage extends WicketExamplePage
 		@Override
 		public void renderHead(IHeaderResponse response)
 		{
-			if (getRequestCycle().find(AjaxRequestTarget.class).isPresent())
-			{
-				response.render(CssHeaderItem.forReference(new PackageResourceReference(
-					HomePage.class, "ajax.css")));
-				response.render(JavaScriptHeaderItem.forReference(new PackageResourceReference(
-					HomePage.class, "ajax.js")));
-				response.render(OnDomReadyHeaderItem.forScript("updatePending();"));
+			if (!getRequestCycle().find(AjaxRequestTarget.class).isPresent()) {
+				return;
 			}
+			response.render(CssHeaderItem.forReference(new PackageResourceReference(
+				HomePage.class, "ajax.css")));
+			response.render(JavaScriptHeaderItem.forReference(new PackageResourceReference(
+				HomePage.class, "ajax.js")));
+			response.render(OnDomReadyHeaderItem.forScript("updatePending();"));
 		}
 	}
 }

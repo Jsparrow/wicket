@@ -73,7 +73,7 @@ class MultiFileUploadFieldTest extends WicketTestCase
 						assertEquals("Test"+id, IOUtils.toString(fileUpload.getInputStream()));
 					} catch (IOException e)
 					{
-						fail("Reading file upload '"+id+"' failed: " + e.getMessage());
+						fail(new StringBuilder().append("Reading file upload '").append(id).append("' failed: ").append(e.getMessage()).toString());
 					}
 				}
 				submitted.set(true);
@@ -133,12 +133,7 @@ class MultiFileUploadFieldTest extends WicketTestCase
 		@Override
 		public IResourceStream getMarkupResourceStream(MarkupContainer container, Class<?> containerClass)
 		{
-			return new StringResourceStream("<html><body>\n" +
-					"\t\t<form wicket:id=\"f\">\n" +
-					"\t\t\t<input type=\"file\" wicket:id=\"muf\" />\n" +
-					"\t\t\t<input type=\"submit\" value=\"Submit!\" />\t\n" +
-					"\t\t</form>\n" +
-					"\t</body></html>");
+			return new StringResourceStream(new StringBuilder().append("<html><body>\n").append("\t\t<form wicket:id=\"f\">\n").append("\t\t\t<input type=\"file\" wicket:id=\"muf\" />\n").append("\t\t\t<input type=\"submit\" value=\"Submit!\" />\t\n").append("\t\t</form>\n").append("\t</body></html>").toString());
 		}
 	}
 }

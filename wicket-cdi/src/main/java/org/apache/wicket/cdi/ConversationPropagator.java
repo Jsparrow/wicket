@@ -103,11 +103,11 @@ public class ConversationPropagator implements IRequestCycleListener
 	@Override
 	public void onRequestHandlerResolved(RequestCycle cycle, IRequestHandler handler)
 	{
-		if (activateForHandler(handler))
-		{
-			logger.debug("Activating conversation {}", conversation.getId());
-			fireOnAfterConversationStarted(cycle);
+		if (!activateForHandler(handler)) {
+			return;
 		}
+		logger.debug("Activating conversation {}", conversation.getId());
+		fireOnAfterConversationStarted(cycle);
 	}
 
 	private void fireOnAfterConversationStarted(RequestCycle cycle)
@@ -139,18 +139,17 @@ public class ConversationPropagator implements IRequestCycleListener
 			return;
 		}
 
-		if (propagation.propagatesVia(handler, getPage(handler)))
+		if (!propagation.propagatesVia(handler, getPage(handler))) {
+			return;
+		}
+		logger.debug(
+				"Propagating non-transient conversation {} via page parameters of handler {}",
+				conversation.getId(), handler);
+		PageParameters parameters = getPageParameters(handler);
+		if (parameters != null)
 		{
-			logger.debug(
-					"Propagating non-transient conversation {} via page parameters of handler {}",
-					conversation.getId(), handler);
-
-			PageParameters parameters = getPageParameters(handler);
-			if (parameters != null)
-			{
-				parameters.set(CID, conversation.getId());
-				markPageWithConversationId(handler, conversation.getId());
-			}
+			parameters.set(CID, conversation.getId());
+			markPageWithConversationId(handler, conversation.getId());
 		}
 	}
 
@@ -160,12 +159,8 @@ public class ConversationPropagator implements IRequestCycleListener
 	{
 		// no need to propagate the conversation to packaged resources, they
 		// should never change
-		if (handler instanceof ResourceReferenceRequestHandler)
-		{
-			if (((ResourceReferenceRequestHandler)handler).getResourceReference() instanceof PackageResourceReference)
-			{
-				return;
-			}
+		if (handler instanceof ResourceReferenceRequestHandler && ((ResourceReferenceRequestHandler)handler).getResourceReference() instanceof PackageResourceReference) {
+			return;
 		}
 
 		if (conversation.isTransient())
@@ -173,12 +168,12 @@ public class ConversationPropagator implements IRequestCycleListener
 			return;
 		}
 
-		if (propagation.propagatesVia(handler, getPage(handler)))
-		{
-			logger.debug("Propagating non-transient conversation {} via url", conversation.getId());
-			url.setQueryParameter(CID, conversation.getId());
-			markPageWithConversationId(handler, conversation.getId());
+		if (!propagation.propagatesVia(handler, getPage(handler))) {
+			return;
 		}
+		logger.debug("Propagating non-transient conversation {} via url", conversation.getId());
+		url.setQueryParameter(CID, conversation.getId());
+		markPageWithConversationId(handler, conversation.getId());
 	}
 
 	@Override
@@ -281,11 +276,10 @@ public class ConversationPropagator implements IRequestCycleListener
 	 */
 	protected PageParameters getPageParameters(IRequestHandler handler)
 	{
-		if (handler instanceof IPageClassRequestHandler)
-		{
-			IPageClassRequestHandler pageHandler = (IPageClassRequestHandler)handler;
-			return pageHandler.getPageParameters();
+		if (!(handler instanceof IPageClassRequestHandler)) {
+			return null;
 		}
-		return null;
+		IPageClassRequestHandler pageHandler = (IPageClassRequestHandler)handler;
+		return pageHandler.getPageParameters();
 	}
 }

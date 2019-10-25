@@ -131,7 +131,7 @@ class PackageMapperTest extends AbstractMapperTest
 	@Test
 	void decode1()
 	{
-		Url url = Url.parse(MOUNT_PATH + '/' + PAGE_CLASS_NAME);
+		Url url = Url.parse(new StringBuilder().append(MOUNT_PATH).append('/').append(PAGE_CLASS_NAME).toString());
 		IRequestHandler handler = encoder.mapRequest(getRequest(url));
 
 		assertThat(handler).isInstanceOf(RenderPageRequestHandler.class);
@@ -147,7 +147,7 @@ class PackageMapperTest extends AbstractMapperTest
 	@Test
 	void decode1CaseInsensitively()
 	{
-		Url url = Url.parse(MOUNT_PATH.replace('o', 'O').replace('p', 'P') + '/' + PAGE_CLASS_NAME);
+		Url url = Url.parse(new StringBuilder().append(MOUNT_PATH.replace('o', 'O').replace('p', 'P')).append('/').append(PAGE_CLASS_NAME).toString());
 		IRequestHandler handler = encoder.setCaseSensitiveMatch(false).mapRequest(getRequest(url));
 
 		assertThat(handler).isInstanceOf(RenderPageRequestHandler.class);
@@ -163,7 +163,7 @@ class PackageMapperTest extends AbstractMapperTest
 	@Test
 	void decodePageClassWithPathParameters()
 	{
-		Url url = Url.parse(MOUNT_PATH + '/' + PAGE_CLASS_NAME + ";something=else");
+		Url url = Url.parse(new StringBuilder().append(MOUNT_PATH).append('/').append(PAGE_CLASS_NAME).append(";something=else").toString());
 		IRequestHandler handler = encoder.mapRequest(getRequest(url));
 
 		assertTrue(handler instanceof RenderPageRequestHandler);
@@ -179,7 +179,7 @@ class PackageMapperTest extends AbstractMapperTest
 	@Test
 	void decode2()
 	{
-		Url url = Url.parse(MOUNT_PATH + '/' + PAGE_CLASS_NAME + "/indexed1?a=b&b=c");
+		Url url = Url.parse(new StringBuilder().append(MOUNT_PATH).append('/').append(PAGE_CLASS_NAME).append("/indexed1?a=b&b=c").toString());
 		IRequestHandler handler = encoder.mapRequest(getRequest(url));
 
 		assertThat(handler).isInstanceOf(RenderPageRequestHandler.class);
@@ -205,7 +205,7 @@ class PackageMapperTest extends AbstractMapperTest
 	@Test
 	void decode3()
 	{
-		Url url = Url.parse(MOUNT_PATH + '/' + PAGE_CLASS_NAME + "?15");
+		Url url = Url.parse(new StringBuilder().append(MOUNT_PATH).append('/').append(PAGE_CLASS_NAME).append("?15").toString());
 		IRequestHandler handler = encoder.mapRequest(getRequest(url));
 
 		assertThat(handler).isInstanceOf(RenderPageRequestHandler.class);
@@ -226,7 +226,7 @@ class PackageMapperTest extends AbstractMapperTest
 	@Test
 	void decode4()
 	{
-		Url url = Url.parse(MOUNT_PATH + '/' + PAGE_CLASS_NAME + "/i1/i2?15&a=b&b=c");
+		Url url = Url.parse(new StringBuilder().append(MOUNT_PATH).append('/').append(PAGE_CLASS_NAME).append("/i1/i2?15&a=b&b=c").toString());
 		IRequestHandler handler = encoder.mapRequest(getRequest(url));
 
 		assertThat(handler).isInstanceOf(RenderPageRequestHandler.class);
@@ -247,7 +247,7 @@ class PackageMapperTest extends AbstractMapperTest
 	@Test
 	void decode5()
 	{
-		Url url = Url.parse(MOUNT_PATH + '/' + PAGE_CLASS_NAME + "?15--foo-bar");
+		Url url = Url.parse(new StringBuilder().append(MOUNT_PATH).append('/').append(PAGE_CLASS_NAME).append("?15--foo-bar").toString());
 		IRequestHandler handler = encoder.mapRequest(getRequest(url));
 
 		assertThat(handler).isInstanceOf(ListenerRequestHandler.class);
@@ -267,7 +267,7 @@ class PackageMapperTest extends AbstractMapperTest
 	@Test
 	void decode6()
 	{
-		Url url = Url.parse(MOUNT_PATH + '/' + PAGE_CLASS_NAME + "/i1/i2?15--foo-bar&a=b&b=c");
+		Url url = Url.parse(new StringBuilder().append(MOUNT_PATH).append('/').append(PAGE_CLASS_NAME).append("/i1/i2?15--foo-bar&a=b&b=c").toString());
 		IRequestHandler handler = encoder.mapRequest(getRequest(url));
 
 		assertThat(handler).isInstanceOf(ListenerRequestHandler.class);
@@ -290,7 +290,7 @@ class PackageMapperTest extends AbstractMapperTest
 	@Test
 	void decode7()
 	{
-		Url url = Url.parse(MOUNT_PATH + '/' + PAGE_CLASS_NAME + "?15-.4-foo-bar");
+		Url url = Url.parse(new StringBuilder().append(MOUNT_PATH).append('/').append(PAGE_CLASS_NAME).append("?15-.4-foo-bar").toString());
 		IRequestHandler handler = encoder.mapRequest(getRequest(url));
 
 		assertThat(handler).isInstanceOf(ListenerRequestHandler.class);
@@ -310,7 +310,7 @@ class PackageMapperTest extends AbstractMapperTest
 	@Test
 	void decode8()
 	{
-		Url url = Url.parse(MOUNT_PATH + '/' + PAGE_CLASS_NAME + "/i1/i2?15-5.-foo-bar&a=b&b=c");
+		Url url = Url.parse(new StringBuilder().append(MOUNT_PATH).append('/').append(PAGE_CLASS_NAME).append("/i1/i2?15-5.-foo-bar&a=b&b=c").toString());
 
 		context.setNextPageRenderCount(5);
 
@@ -330,7 +330,7 @@ class PackageMapperTest extends AbstractMapperTest
 	void decode9()
 	{
 		assertThrows(StalePageException.class, () -> {
-			Url url = Url.parse(MOUNT_PATH + '/' + PAGE_CLASS_NAME + "/i1/i2?15-5.-foo-bar&a=b&b=c");
+			Url url = Url.parse(new StringBuilder().append(MOUNT_PATH).append('/').append(PAGE_CLASS_NAME).append("/i1/i2?15-5.-foo-bar&a=b&b=c").toString());
 
 			context.setNextPageRenderCount(6);
 
@@ -346,7 +346,7 @@ class PackageMapperTest extends AbstractMapperTest
 	void decodeNamedParameters()
 	{
 		Url url = Url
-			.parse(MOUNT_PATH + "/fooValue/barValue/" + PAGE_CLASS_NAME + "/i1/i2?a=b&b=c");
+			.parse(new StringBuilder().append(MOUNT_PATH).append("/fooValue/barValue/").append(PAGE_CLASS_NAME).append("/i1/i2?a=b&b=c").toString());
 		IRequestHandler handler = namedParametersEncoder.mapRequest(getRequest(url));
 
 		assertTrue(handler instanceof RenderPageRequestHandler);
@@ -411,7 +411,7 @@ class PackageMapperTest extends AbstractMapperTest
 		provider.setPageSource(context);
 		IRequestHandler handler = new BookmarkablePageRequestHandler(provider);
 		Url url = encoder.mapHandler(handler);
-		assertEquals(MOUNT_PATH + '/' + PAGE_CLASS_NAME, url.toString());
+		assertEquals(new StringBuilder().append(MOUNT_PATH).append('/').append(PAGE_CLASS_NAME).toString(), url.toString());
 	}
 
 	/**
@@ -429,7 +429,7 @@ class PackageMapperTest extends AbstractMapperTest
 		provider.setPageSource(context);
 		IRequestHandler handler = new BookmarkablePageRequestHandler(provider);
 		Url url = encoder.mapHandler(handler);
-		assertEquals(MOUNT_PATH + '/' + PAGE_CLASS_NAME + "/i1/i2?a=b&b=c", url.toString());
+		assertEquals(new StringBuilder().append(MOUNT_PATH).append('/').append(PAGE_CLASS_NAME).append("/i1/i2?a=b&b=c").toString(), url.toString());
 	}
 
 	/**
@@ -449,7 +449,7 @@ class PackageMapperTest extends AbstractMapperTest
 		IRequestHandler handler = new BookmarkablePageRequestHandler(provider);
 		Url url = encoder.mapHandler(handler);
 
-		assertEquals(MOUNT_PATH + '/' + PAGE_CLASS_NAME + "/i1/i2?a=b&b=c", url.toString());
+		assertEquals(new StringBuilder().append(MOUNT_PATH).append('/').append(PAGE_CLASS_NAME).append("/i1/i2?a=b&b=c").toString(), url.toString());
 	}
 
 	/**
@@ -469,7 +469,7 @@ class PackageMapperTest extends AbstractMapperTest
 		IRequestHandler handler = new RenderPageRequestHandler(provider);
 		Url url = encoder.mapHandler(handler);
 
-		assertEquals(MOUNT_PATH + '/' + PAGE_CLASS_NAME + "/i1/i2?15&a=b&b=c", url.toString());
+		assertEquals(new StringBuilder().append(MOUNT_PATH).append('/').append(PAGE_CLASS_NAME).append("/i1/i2?15&a=b&b=c").toString(), url.toString());
 	}
 
 	/**
@@ -490,7 +490,7 @@ class PackageMapperTest extends AbstractMapperTest
 		IRequestHandler handler = new RenderPageRequestHandler(provider);
 		Url url = encoder.mapHandler(handler);
 
-		assertEquals(MOUNT_PATH + '/' + PAGE_CLASS_NAME + "/i1/i2?15&a=b&b=c", url.toString());
+		assertEquals(new StringBuilder().append(MOUNT_PATH).append('/').append(PAGE_CLASS_NAME).append("/i1/i2?15&a=b&b=c").toString(), url.toString());
 	}
 
 	/**
@@ -516,7 +516,7 @@ class PackageMapperTest extends AbstractMapperTest
 
 		Url url = encoder.mapHandler(handler);
 
-		assertEquals(MOUNT_PATH + '/' + PAGE_CLASS_NAME + "/i1/i2?15-0.-foo-bar&a=b&b=c",
+		assertEquals(new StringBuilder().append(MOUNT_PATH).append('/').append(PAGE_CLASS_NAME).append("/i1/i2?15-0.-foo-bar&a=b&b=c").toString(),
 			url.toString());
 	}
 
@@ -543,7 +543,7 @@ class PackageMapperTest extends AbstractMapperTest
 
 		Url url = encoder.mapHandler(handler);
 
-		assertEquals(MOUNT_PATH + '/' + PAGE_CLASS_NAME + "/i1/i2?15-0.4-foo-bar&a=b&b=c",
+		assertEquals(new StringBuilder().append(MOUNT_PATH).append('/').append(PAGE_CLASS_NAME).append("/i1/i2?15-0.4-foo-bar&a=b&b=c").toString(),
 			url.toString());
 	}
 
@@ -563,7 +563,7 @@ class PackageMapperTest extends AbstractMapperTest
 
 		Url url = encoder.mapHandler(handler);
 
-		assertEquals(MOUNT_PATH + '/' + PAGE_CLASS_NAME, url.toString());
+		assertEquals(new StringBuilder().append(MOUNT_PATH).append('/').append(PAGE_CLASS_NAME).toString(), url.toString());
 	}
 
 	/**
@@ -584,7 +584,7 @@ class PackageMapperTest extends AbstractMapperTest
 
 		Url url = namedParametersEncoder.mapHandler(handler);
 
-		assertEquals(MOUNT_PATH + "/fooValue/barValue/" + PAGE_CLASS_NAME, url.toString());
+		assertEquals(new StringBuilder().append(MOUNT_PATH).append("/fooValue/barValue/").append(PAGE_CLASS_NAME).toString(), url.toString());
 	}
 
 	/**
@@ -599,7 +599,7 @@ class PackageMapperTest extends AbstractMapperTest
 
 		Url url = innerClassEncoder.mapHandler(handler);
 
-		assertEquals(MOUNT_PATH + '/' + "PackageMapperTest$OuterPage$InnerPage", url.toString());
+		assertEquals(new StringBuilder().append(MOUNT_PATH).append('/').append("PackageMapperTest$OuterPage$InnerPage").toString(), url.toString());
 	}
 
 	/**
@@ -608,7 +608,7 @@ class PackageMapperTest extends AbstractMapperTest
 	@Test
 	void decodeInnerClass()
 	{
-		Url url = Url.parse(MOUNT_PATH + '/' + "PackageMapperTest$OuterPage$InnerPage");
+		Url url = Url.parse(new StringBuilder().append(MOUNT_PATH).append('/').append("PackageMapperTest$OuterPage$InnerPage").toString());
 		IRequestHandler handler = innerClassEncoder.mapRequest(getRequest(url));
 
 		assertThat(handler).isInstanceOf(RenderPageRequestHandler.class);
@@ -634,7 +634,7 @@ class PackageMapperTest extends AbstractMapperTest
 
 		Url url = aliasEncoder.mapHandler(handler);
 
-		assertEquals(MOUNT_PATH + '/' + ALIAS, url.toString());
+		assertEquals(new StringBuilder().append(MOUNT_PATH).append('/').append(ALIAS).toString(), url.toString());
 	}
 
 	/**
@@ -643,7 +643,7 @@ class PackageMapperTest extends AbstractMapperTest
 	@Test
 	void decodeAlias()
 	{
-		Url url = Url.parse(MOUNT_PATH + '/' + ALIAS + "?15");
+		Url url = Url.parse(new StringBuilder().append(MOUNT_PATH).append('/').append(ALIAS).append("?15").toString());
 		IRequestHandler handler = aliasEncoder.mapRequest(getRequest(url));
 
 		assertThat(handler).isInstanceOf(RenderPageRequestHandler.class);
@@ -658,13 +658,13 @@ class PackageMapperTest extends AbstractMapperTest
 	@Test
 	void testGetCompatibilityScore()
 	{
-		Url url = Url.parse(MOUNT_PATH + '/' + "MyPage");
+		Url url = Url.parse(new StringBuilder().append(MOUNT_PATH).append('/').append("MyPage").toString());
 		MockWebRequest request = new MockWebRequest(url);
 		int score = encoder.getCompatibilityScore(request);
 
 		assertEquals(4, score);
 
-		url = Url.parse(MOUNT_PATH + "/foo/bar/" + "MyPage");
+		url = Url.parse(new StringBuilder().append(MOUNT_PATH).append("/foo/bar/").append("MyPage").toString());
 		request = new MockWebRequest(url);
 		score = namedParametersEncoder.getCompatibilityScore(request);
 

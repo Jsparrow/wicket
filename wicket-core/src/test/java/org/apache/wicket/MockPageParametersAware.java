@@ -25,6 +25,8 @@ import org.apache.wicket.request.IRequestParameters;
 import org.apache.wicket.request.component.IRequestableComponent;
 import org.apache.wicket.util.resource.IResourceStream;
 import org.apache.wicket.util.resource.StringResourceStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -32,9 +34,10 @@ import org.apache.wicket.util.resource.StringResourceStream;
  */
 public class MockPageParametersAware extends WebPage
 	implements
-		IMarkupResourceStreamProvider,
-		IRequestableComponent
+		IMarkupResourceStreamProvider
 {
+	private static final Logger logger = LoggerFactory.getLogger(MockPageParametersAware.class);
+
 	private static final long serialVersionUID = 1L;
 
 	private IRequestParameters lastQueryParameters;
@@ -45,14 +48,14 @@ public class MockPageParametersAware extends WebPage
 	public MockPageParametersAware()
 	{
 		Form<Void> form = newForm("form");
-		textField = new TextField<String>("textfield", Model.of(""));
+		textField = new TextField<>("textfield", Model.of(""));
 		form.add(textField);
 		add(form);
 	}
 
 	protected Form<Void> newForm(String id)
 	{
-		return new Form<Void>(id);
+		return new Form<>(id);
 	}
 
 	@Override
@@ -85,14 +88,8 @@ public class MockPageParametersAware extends WebPage
 	 */
 	public void printParameters()
 	{
-		for (String n : lastPostParameters.getParameterNames())
-		{
-			System.out.println("post: " + n + " : " + lastPostParameters.getParameterValues(n));
-		}
-		for (String n : lastQueryParameters.getParameterNames())
-		{
-			System.out.println("query: " + n + " : " + lastQueryParameters.getParameterValues(n));
-		}
+		lastPostParameters.getParameterNames().forEach(n -> logger.info(new StringBuilder().append("post: ").append(n).append(" : ").append(lastPostParameters.getParameterValues(n)).toString()));
+		lastQueryParameters.getParameterNames().forEach(n -> logger.info(new StringBuilder().append("query: ").append(n).append(" : ").append(lastQueryParameters.getParameterValues(n)).toString()));
 	}
 
 

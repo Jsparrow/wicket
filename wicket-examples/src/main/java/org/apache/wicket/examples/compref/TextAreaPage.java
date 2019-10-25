@@ -58,19 +58,6 @@ public class TextAreaPage extends WicketExamplePage
 		form.add(new TextArea<>("text"));
 	}
 
-	/** Simple data class that acts as a model for the input fields. */
-	private static class Input implements IClusterable
-	{
-		/** some plain text. */
-		public String text = "line 1\nline 2\nline 3";
-
-		@Override
-		public String toString()
-		{
-			return "text = '" + text + "'";
-		}
-	}
-
 	/**
 	 * Override base method to provide an explanation
 	 */
@@ -81,6 +68,19 @@ public class TextAreaPage extends WicketExamplePage
 		String code = "&nbsp;&nbsp;&nbsp;&nbsp;// add a text area component that uses the model object's 'text' property.\n"
 			+ "&nbsp;&nbsp;&nbsp;&nbsp;form.add(new TextArea(\"text\"));";
 		add(new ExplainPanel(html, code));
+	}
+
+	/** Simple data class that acts as a model for the input fields. */
+	private static class Input implements IClusterable
+	{
+		/** some plain text. */
+		public String text = "line 1\nline 2\nline 3";
+
+		@Override
+		public String toString()
+		{
+			return new StringBuilder().append("text = '").append(text).append("'").toString();
+		}
 	}
 
 }

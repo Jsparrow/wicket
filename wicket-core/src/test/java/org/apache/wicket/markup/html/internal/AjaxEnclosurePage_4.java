@@ -54,7 +54,7 @@ public class AjaxEnclosurePage_4 extends WebPage
 		//nameLabel=new Label("nameLabel", "Name");
 		//queue(nameLabel);
 		
-		nameField=new TextField<String>("nameField", new PropertyModel<String>(this, "name"));
+		nameField=new TextField<>("nameField", new PropertyModel<String>(this, "name"));
 		nameField.setOutputMarkupId(true);
 		queue(nameField);
 

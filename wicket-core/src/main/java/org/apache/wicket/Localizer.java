@@ -67,19 +67,19 @@ public class Localizer
 	private final ClassMetaDatabase metaDatabase = new ClassMetaDatabase();
 
 	/**
-	 * @return Same as Application.get().getResourceSettings().getLocalizer()
-	 */
-	public static Localizer get()
-	{
-		return Application.get().getResourceSettings().getLocalizer();
-	}
-
-	/**
 	 * Create the utils instance class backed by the configuration information contained within the
 	 * supplied application object.
 	 */
 	public Localizer()
 	{
+	}
+
+	/**
+	 * @return Same as Application.get().getResourceSettings().getLocalizer()
+	 */
+	public static Localizer get()
+	{
+		return Application.get().getResourceSettings().getLocalizer();
 	}
 
 	/**
@@ -107,7 +107,6 @@ public class Localizer
 	 *             If resource not found and configuration dictates that exception should be thrown
 	 */
 	public String getString(final String key, final Component component)
-		throws MissingResourceException
 	{
 		return getString(key, component, null, null, null, (String)null);
 	}
@@ -126,7 +125,6 @@ public class Localizer
 	 *             If resource not found and configuration dictates that exception should be thrown
 	 */
 	public String getString(final String key, final Component component, final IModel<?> model)
-		throws MissingResourceException
 	{
 		return getString(key, component, model, null, null, (String)null);
 	}
@@ -145,7 +143,6 @@ public class Localizer
 	 *             If resource not found and configuration dictates that exception should be thrown
 	 */
 	public String getString(final String key, final Component component, final String defaultValue)
-		throws MissingResourceException
 	{
 		return getString(key, component, null, null, null, defaultValue);
 	}
@@ -166,7 +163,7 @@ public class Localizer
 	 *             If resource not found and configuration dictates that exception should be thrown
 	 */
 	public String getString(final String key, final Component component, final IModel<?> model,
-		final String defaultValue) throws MissingResourceException
+		final String defaultValue)
 	{
 		return getString(key, component, model, null, null, defaultValue);
 	}
@@ -195,7 +192,6 @@ public class Localizer
 	 */
 	public String getString(final String key, final Component component, final IModel<?> model,
 		final Locale locale, final String style, final String defaultValue)
-		throws MissingResourceException
 	{
 		IModel<String> defaultValueModel = defaultValue != null ? Model.of(defaultValue) : null;
 		return getString(key, component, model, locale, style, defaultValueModel);
@@ -225,7 +221,6 @@ public class Localizer
 	 */
 	public String getString(final String key, final Component component, final IModel<?> model,
 	                        final Locale locale, final String style, final IModel<String> defaultValue)
-			throws MissingResourceException
 	{
 		final ResourceSettings resourceSettings = Application.get().getResourceSettings();
 
@@ -269,7 +264,7 @@ public class Localizer
 				? component.getClass().getName() : ""), key);
 		}
 
-		return "[Warning: Property for '" + key + "' not found]";
+		return new StringBuilder().append("[Warning: Property for '").append(key).append("' not found]").toString();
 	}
 
 	/**
@@ -331,10 +326,7 @@ public class Localizer
 			if (!addedToPage && log.isWarnEnabled())
 			{
 				log.warn(
-					"Tried to retrieve a localized string for a component that has not yet been added to the page. "
-						+ "This can sometimes lead to an invalid or no localized resource returned. "
-						+ "Make sure you are not calling Component#getString() inside your Component's constructor. "
-						+ "Offending component: {}", component);
+					new StringBuilder().append("Tried to retrieve a localized string for a component that has not yet been added to the page. ").append("This can sometimes lead to an invalid or no localized resource returned. ").append("Make sure you are not calling Component#getString() inside your Component's constructor. ").append("Offending component: {}").toString(), component);
 			}
 		}
 
@@ -375,17 +367,16 @@ public class Localizer
 			value = getFromCache(cacheKey);
 			if (log.isDebugEnabled())
 			{
-				log.debug("Property found in cache: '" + key + "'; Component: '" +
-					(component != null ? component.toString(false) : null) + "'; value: '" + value +
-					'\'');
+				log.debug(new StringBuilder().append("Property found in cache: '").append(key).append("'; Component: '").append(component != null ? component.toString(false) : null).append("'; value: '")
+						.append(value).append('\'').toString());
 			}
 		}
 		else
 		{
 			if (log.isDebugEnabled())
 			{
-				log.debug("Locate property: key: '" + key + "'; Component: '" +
-					(component != null ? component.toString(false) : null) + '\'');
+				log.debug(new StringBuilder().append("Locate property: key: '").append(key).append("'; Component: '").append(component != null ? component.toString(false) : null)
+						.append('\'').toString());
 			}
 
 			// Iterate over all registered string resource loaders until the property has been found
@@ -405,8 +396,8 @@ public class Localizer
 
 			if ((value == null) && log.isDebugEnabled())
 			{
-				log.debug("Property not found; key: '" + key + "'; Component: '" +
-					(component != null ? component.toString(false) : null) + '\'');
+				log.debug(new StringBuilder().append("Property not found; key: '").append(key).append("'; Component: '").append(component != null ? component.toString(false) : null)
+						.append('\'').toString());
 			}
 		}
 
@@ -475,7 +466,7 @@ public class Localizer
 		final String value = cache.get(cacheKey);
 
 		// ConcurrentHashMap does not allow null values
-		if (NULL_VALUE == value)
+		if (NULL_VALUE.equals(value))
 		{
 			return null;
 		}
@@ -496,72 +487,66 @@ public class Localizer
 	protected String getCacheKey(final String key, final Component component, final Locale locale,
 		final String style, final String variation)
 	{
-		if (component != null)
+		// locale is guaranteed to be != null
+		if (component == null) {
+			// locale is guaranteed to be != null
+			return new StringBuilder().append(key).append('-').append(locale.toString()).append('-').append(style).toString();
+		}
+		StringBuilder buffer = new StringBuilder(200);
+		buffer.append(key);
+		Component cursor = component;
+		while (cursor != null)
 		{
-			StringBuilder buffer = new StringBuilder(200);
-			buffer.append(key);
+			buffer.append('-').append(metaDatabase.id(cursor.getClass()));
 
-			Component cursor = component;
-
-			while (cursor != null)
+			if (cursor instanceof Page)
 			{
-				buffer.append('-').append(metaDatabase.id(cursor.getClass()));
-
-				if (cursor instanceof Page)
-				{
-					break;
-				}
-
-				/*
-				 * only append component id if component is not a loop item because (a) these ids
-				 * are irrelevant when generating resource cache keys (b) they cause a lot of
-				 * redundant keys to be generated
-				 * 
-				 * also if the cursor component is an auto component we append a constant string
-				 * instead of component's id because auto components have a newly generated id on
-				 * every render.
-				 */
-				final Component parent = cursor.getParent();
-				final boolean skip = parent instanceof AbstractRepeater;
-
-				if (skip == false)
-				{
-					String cursorKey = cursor.isAuto() ? "wicket-auto" : cursor.getId();
-					buffer.append(':').append(cursorKey);
-				}
-
-				cursor = parent;
+				break;
 			}
 
-			buffer.append('-').append(locale);
-			buffer.append('-').append(style);
-			buffer.append('-').append(variation);
+			/*
+			 * only append component id if component is not a loop item because (a) these ids
+			 * are irrelevant when generating resource cache keys (b) they cause a lot of
+			 * redundant keys to be generated
+			 * 
+			 * also if the cursor component is an auto component we append a constant string
+			 * instead of component's id because auto components have a newly generated id on
+			 * every render.
+			 */
+			final Component parent = cursor.getParent();
+			final boolean skip = parent instanceof AbstractRepeater;
 
-			return buffer.toString();
+			if (skip == false)
+			{
+				String cursorKey = cursor.isAuto() ? "wicket-auto" : cursor.getId();
+				buffer.append(':').append(cursorKey);
+			}
+
+			cursor = parent;
 		}
-		else
-		{
-			// locale is guaranteed to be != null
-			return key + '-' + locale.toString() + '-' + style;
-		}
+		buffer.append('-').append(locale);
+		buffer.append('-').append(style);
+		buffer.append('-').append(variation);
+		return buffer.toString();
 	}
 
-/**
-	 * Helper method to handle property variable substitution in strings.
-	 * 
-	 * @param component
-	 *            The component requesting a model value or {@code null]
-	 * @param string
-	 *            The string to substitute into
-	 * @param model
-	 *            The model
-	 * @return The resulting string
-	 */
-	public String substitutePropertyExpressions(final Component component, final String string,
-		final IModel<?> model)
-	{
-		if ((string != null) && (model != null))
+	/**
+		 * Helper method to handle property variable substitution in strings.
+		 * 
+		 * @param component
+		 *            The component requesting a model value or {@code null]
+		 * @param string
+		 *            The string to substitute into
+		 * @param model
+		 *            The model
+		 * @return The resulting string
+		 */
+		public String substitutePropertyExpressions(final Component component, final String string,
+			final IModel<?> model)
 		{
+			if (!((string != null) && (model != null))) {
+				return string;
+			}
 			final IConverterLocator locator;
 			final Locale locale;
 			if (component == null)
@@ -582,12 +567,9 @@ public class Localizer
 				locator = component;
 				locale = component.getLocale();
 			}
-
 			return new ConvertingPropertyVariableInterpolator(string, model.getObject(), locator,
 				locale).toString();
 		}
-		return string;
-	}
 
 	/**
 	 * By default the cache is enabled. Disabling the cache will disable it and clear the cache.

@@ -91,7 +91,7 @@ public class CachingResourceVersion implements IResourceVersion
 
 		this.delegate = Args.notNull(delegate, "delegate");
 		this.cache = Collections.synchronizedMap(
-			new MostRecentlyUsedMap<Serializable, String>(maxEntries));
+			new MostRecentlyUsedMap<>(maxEntries));
 	}
 
 	@Override
@@ -125,7 +125,7 @@ public class CachingResourceVersion implements IResourceVersion
 		}
 
 		//noinspection StringEquality
-		if (version == NULL_VALUE)
+		if (version.equals(NULL_VALUE))
 		{
 			// replace holder with null value
 			return null;

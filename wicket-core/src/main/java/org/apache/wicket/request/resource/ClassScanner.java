@@ -28,13 +28,13 @@ abstract class ClassScanner
 {
 	private static final Logger log = LoggerFactory.getLogger(ClassScanner.class);
 
-	private final Set<String> scannedClasses = new ConcurrentHashSet<String>();
-
-	abstract boolean foundResourceReference(ResourceReference reference);
+	private final Set<String> scannedClasses = new ConcurrentHashSet<>();
 
 	ClassScanner()
 	{
 	}
+
+	abstract boolean foundResourceReference(ResourceReference reference);
 
 	public final void clearCache()
 	{
@@ -63,12 +63,9 @@ abstract class ClassScanner
 					try
 					{
 						Object value = f.get(null);
-						if (value instanceof ResourceReference)
-						{
-							if (foundResourceReference((ResourceReference)value) == true)
-							{
-								count += 1;
-							}
+						boolean condition = value instanceof ResourceReference && foundResourceReference((ResourceReference)value) == true;
+						if (condition) {
+							count += 1;
 						}
 					}
 					catch (Exception e)

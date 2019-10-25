@@ -60,14 +60,13 @@ public abstract class ClassAttributeModifier extends AttributeAppender
 
 		String separator = getSeparator();
 		StringBuilder result = new StringBuilder();
-		for (String cls : newClasses)
-		{
+		newClasses.forEach(cls -> {
 			if (result.length() > 0)
 			{
 				result.append(separator);
 			}
 			result.append(cls);
-		}
+		});
 		return result.length() > 0 ? result.toString() : VALUELESS_ATTRIBUTE_REMOVE;
 	}
 

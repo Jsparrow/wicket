@@ -90,7 +90,7 @@ public abstract class PartialPageUpdate
 	/**
 	 * The component instances that will be rendered/replaced.
 	 */
-	protected final Map<String, Component> markupIdToComponent = new LinkedHashMap<String, Component>();
+	protected final Map<String, Component> markupIdToComponent = new LinkedHashMap<>();
 
 	/**
 	 * A flag that indicates that components cannot be added anymore.
@@ -240,50 +240,40 @@ public abstract class PartialPageUpdate
 		
 		// delay preparation of feedbacks after all other components
 		try (FeedbackDelay delay = new FeedbackDelay(RequestCycle.get())) {
-			for (Component component : markupIdToComponent.values())
-			{
-				if (!containsAncestorFor(component))
-				{
-					if (prepareComponent(component)) {
-						toBeWritten.add(component);
-					}
+			markupIdToComponent.values().forEach(component -> {
+				boolean condition = !containsAncestorFor(component) && prepareComponent(component);
+				if (condition) {
+					toBeWritten.add(component);
 				}
-			}
+			});
 
 			// .. now prepare all postponed feedbacks
 			delay.beforeRender();
 		}
 
 		// write components
-		for (Component component : toBeWritten)
-		{
-			writeComponent(response, component.getAjaxRegionMarkupId(), component, encoding);
+		toBeWritten.forEach(component -> writeComponent(response, component.getAjaxRegionMarkupId(), component, encoding));
+
+		if (header == null) {
+			return;
 		}
-
-		if (header != null)
-		{
-			RequestCycle cycle = RequestCycle.get();
-			
-			// some header responses buffer all calls to render*** until close is called.
-			// when they are closed, they do something (i.e. aggregate all JS resource urls to a
-			// single url), and then "flush" (by writing to the real response) before closing.
-			// to support this, we need to allow header contributions to be written in the close
-			// tag, which we do here:
-			headerRendering = true;
-			// save old response, set new
-			Response oldResponse = cycle.setResponse(headerBuffer);
-			headerBuffer.reset();
-
-			// now, close the response (which may render things)
-			header.getHeaderResponse().close();
-
-			// revert to old response
-			cycle.setResponse(oldResponse);
-
-			// write the XML tags and we're done
-			writeHeaderContribution(response);
-			headerRendering = false;
-		}
+		RequestCycle cycle = RequestCycle.get();
+		// some header responses buffer all calls to render*** until close is called.
+		// when they are closed, they do something (i.e. aggregate all JS resource urls to a
+		// single url), and then "flush" (by writing to the real response) before closing.
+		// to support this, we need to allow header contributions to be written in the close
+		// tag, which we do here:
+		headerRendering = true;
+		// save old response, set new
+		Response oldResponse = cycle.setResponse(headerBuffer);
+		headerBuffer.reset();
+		// now, close the response (which may render things)
+		header.getHeaderResponse().close();
+		// revert to old response
+		cycle.setResponse(oldResponse);
+		// write the XML tags and we're done
+		writeHeaderContribution(response);
+		headerRendering = false;
 	}
 
 	/**
@@ -363,13 +353,21 @@ public abstract class PartialPageUpdate
 	@Override
 	public boolean equals(Object o)
 	{
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
 
 		PartialPageUpdate that = (PartialPageUpdate) o;
 
-		if (!appendJavaScripts.equals(that.appendJavaScripts)) return false;
-		if (!domReadyJavaScripts.equals(that.domReadyJavaScripts)) return false;
+		if (!appendJavaScripts.equals(that.appendJavaScripts)) {
+			return false;
+		}
+		if (!domReadyJavaScripts.equals(that.domReadyJavaScripts)) {
+			return false;
+		}
 		return prependJavaScripts.equals(that.prependJavaScripts);
 	}
 
@@ -421,7 +419,6 @@ public abstract class PartialPageUpdate
 	 *      thrown when components no more can be added for replacement.
 	 */
 	public final void add(final Component component, final String markupId)
-			throws IllegalArgumentException, IllegalStateException
 	{
 		Args.notEmpty(markupId, "markupId");
 		Args.notNull(component, "component");
@@ -446,22 +443,19 @@ public abstract class PartialPageUpdate
 			else if (pageOfComponent != page) 
 			{
 				// on another page
-				throw new IllegalArgumentException("Component " + component.toString() + " cannot be updated because it is on another page.");
+				throw new IllegalArgumentException(new StringBuilder().append("Component ").append(component.toString()).append(" cannot be updated because it is on another page.").toString());
 			}
 
 			if (component instanceof AbstractRepeater)
 			{
 				throw new IllegalArgumentException(
-						"Component " +
-								component.getClass().getName() +
-								" is a repeater and cannot be added to a partial page update directly. " +
-								"Instead add its parent or another markup container higher in the hierarchy.");
+						new StringBuilder().append("Component ").append(component.getClass().getName()).append(" is a repeater and cannot be added to a partial page update directly. ").append("Instead add its parent or another markup container higher in the hierarchy.").toString());
 			}
 		}
 
 		if (componentsFrozen)
 		{
-			throw new IllegalStateException("A partial update of the page is being rendered, component " + component.toString() + " can no longer be added");
+			throw new IllegalStateException(new StringBuilder().append("A partial update of the page is being rendered, component ").append(component.toString()).append(" can no longer be added").toString());
 		}
 
 		component.setMarkupId(markupId);

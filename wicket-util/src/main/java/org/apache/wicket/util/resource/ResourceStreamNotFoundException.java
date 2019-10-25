@@ -30,7 +30,6 @@ public final class ResourceStreamNotFoundException extends Exception
 	 */
 	public ResourceStreamNotFoundException()
 	{
-		super();
 	}
 
 	/**

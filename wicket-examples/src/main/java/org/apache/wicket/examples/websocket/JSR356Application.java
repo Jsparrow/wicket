@@ -53,14 +53,14 @@ public class JSR356Application extends WebApplication
 
 		getSharedResources().add(ChartWebSocketResource.NAME, new ChartWebSocketResource());
 
-		if (System.getenv("OPENSHIFT_APP_NAME") != null)
-		{
-			// OpenShift uses special proxy for WebSocket connections
-			// https://blog.openshift.com/paas-websockets/
-			final WebSocketSettings webSocketSettings = WebSocketSettings.Holder.get(this);
-			webSocketSettings.setPort(8000);
-			webSocketSettings.setSecurePort(8443);
+		if (System.getenv("OPENSHIFT_APP_NAME") == null) {
+			return;
 		}
+		// OpenShift uses special proxy for WebSocket connections
+		// https://blog.openshift.com/paas-websockets/
+		final WebSocketSettings webSocketSettings = WebSocketSettings.Holder.get(this);
+		webSocketSettings.setPort(8000);
+		webSocketSettings.setSecurePort(8443);
 	}
 
     @Override

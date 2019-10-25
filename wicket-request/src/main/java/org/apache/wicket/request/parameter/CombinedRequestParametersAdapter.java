@@ -88,10 +88,7 @@ public class CombinedRequestParametersAdapter implements IRequestParameters
 			List<StringValue> values = p.getParameterValues(name);
 			if (values != null)
 			{
-				for (StringValue v : values)
-				{
-					result.add(v);
-				}
+				values.forEach(result::add);
 			}
 		}
 

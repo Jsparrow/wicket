@@ -40,8 +40,7 @@ public class PagedTableNavigatorWithLabelProviderPage extends WebPage
 	 */
 	public PagedTableNavigatorWithLabelProviderPage()
 	{
-		super();
-		List<String> list = new ArrayList<String>();
+		List<String> list = new ArrayList<>();
 		list.add("one");
 		list.add("two");
 		list.add("three");
@@ -86,7 +85,7 @@ public class PagedTableNavigatorWithLabelProviderPage extends WebPage
 					end = size;
 				}
 				current++; // page start at 0.
-				return current + "-" + end;
+				return new StringBuilder().append(current).append("-").append(end).toString();
 			}
 		};
 

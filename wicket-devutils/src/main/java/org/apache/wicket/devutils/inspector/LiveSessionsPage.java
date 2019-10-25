@@ -174,8 +174,9 @@ public class LiveSessionsPage extends DevUtilsPage
 		WebApplication webApplication = (WebApplication)Application.get();
 		IRequestLogger requestLogger = webApplication.getRequestLogger();
 
-		if (requestLogger == null)
+		if (requestLogger == null) {
 			requestLogger = new RequestLogger();
+		}
 		return requestLogger;
 	}
 }

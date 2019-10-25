@@ -43,10 +43,15 @@ import org.apache.wicket.util.tester.WicketTestCase;
 import org.apache.wicket.util.tester.WicketTester;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Tag(WicketTestTag.SLOW)
 public class ComponentQueueingPerformanceTest extends WicketTestCase
 {
+	private static final Logger logger = LoggerFactory.getLogger(ComponentQueueingPerformanceTest.class);
+	private static Store store = new Store();
+
 	private void run(Class<? extends Page> pageClass)
 	{
 		WicketTester tester = new WicketTester(new MockApplication());
@@ -93,10 +98,9 @@ public class ComponentQueueingPerformanceTest extends WicketTestCase
 		long queueDuration = end - start;
 
 
-		System.out.println("add duration: " + addDuration + " queue duration: " + queueDuration);
+		logger.info(new StringBuilder().append("add duration: ").append(addDuration).append(" queue duration: ").append(queueDuration).toString());
 
 	}
-
 
 	@Test
 	void consistency()
@@ -136,13 +140,20 @@ public class ComponentQueueingPerformanceTest extends WicketTestCase
 
 	}
 
-	private static Store store = new Store();
-
 	private static class Store
 	{
-		Map<String, PhoneNumber> phones = new HashMap<String, PhoneNumber>();
-		Map<String, Address> addresses = new HashMap<String, Address>();
-		Map<String, Contact> contacts = new HashMap<String, Contact>();
+		Map<String, PhoneNumber> phones = new HashMap<>();
+		Map<String, Address> addresses = new HashMap<>();
+		Map<String, Contact> contacts = new HashMap<>();
+
+		Store()
+		{
+			for (int i = 0; i < 250; i++)
+			{
+				Contact contact = new Contact();
+				contacts.put(contact.id, contact);
+			}
+		}
 
 		public <T> T get(Class<T> clazz, String id)
 		{
@@ -159,15 +170,6 @@ public class ComponentQueueingPerformanceTest extends WicketTestCase
 				return (T)contacts.get(id);
 			}
 			throw new RuntimeException();
-		}
-
-		Store()
-		{
-			for (int i = 0; i < 250; i++)
-			{
-				Contact contact = new Contact();
-				contacts.put(contact.id, contact);
-			}
 		}
 
 	}
@@ -190,7 +192,7 @@ public class ComponentQueueingPerformanceTest extends WicketTestCase
 
 	}
 
-	private static abstract class AbstractPhonePanel extends TestPanel
+	private abstract static class AbstractPhonePanel extends TestPanel
 	{
 		AbstractPhonePanel(String id, IModel<PhoneNumber> phone)
 		{
@@ -220,7 +222,7 @@ public class ComponentQueueingPerformanceTest extends WicketTestCase
 		}
 	}
 
-	private static abstract class AbstractAddressPanel extends TestPanel
+	private abstract static class AbstractAddressPanel extends TestPanel
 	{
 		AbstractAddressPanel(String id, IModel<Address> addr)
 		{
@@ -258,13 +260,8 @@ public class ComponentQueueingPerformanceTest extends WicketTestCase
 		{
 			// @formatter:off
 			setPageMarkup(
-				"  <div wicket:id='contacts'>"
-				+ "  <span wicket:id='first'></span>"
-				+ "  <span wicket:id='last'></span>"
-				+ "  <div wicket:id='addr'></div>"
-				+ "  <div wicket:id='work'></div>"
-				+ "  <div wicket:id='cell'></div>"
-				+ "</div>");
+				new StringBuilder().append("  <div wicket:id='contacts'>").append("  <span wicket:id='first'></span>").append("  <span wicket:id='last'></span>").append("  <div wicket:id='addr'></div>").append("  <div wicket:id='work'></div>").append("  <div wicket:id='cell'></div>").append("</div>")
+						.toString());
 			// @formatter:on
 
 		}
@@ -342,13 +339,13 @@ public class ComponentQueueingPerformanceTest extends WicketTestCase
 	{
 		private String markup;
 
-		TestPage()
-		{
-		}
-
 		public TestPage(String markup)
 		{
 			this.markup = markup;
+		}
+
+		TestPage()
+		{
 		}
 
 		String getPageMarkup()

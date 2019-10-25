@@ -42,6 +42,7 @@ public class SetCookiePage extends DummyHomePage
 		this(cookie,null);
 	}
 	
+	@Override
 	protected void onInitialize() {
 		super.onInitialize();
 

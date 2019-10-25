@@ -254,7 +254,7 @@ public final class Book implements IClusterable
 	@Override
 	public final String toString()
 	{
-		return title + " (" + author + ")";
+		return new StringBuilder().append(title).append(" (").append(author).append(")").toString();
 	}
 
 	/**

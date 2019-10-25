@@ -34,7 +34,6 @@ public class NotDetachedModelChecker extends AbstractObjectChecker
 	 */
 	public NotDetachedModelChecker()
 	{
-		super();
 	}
 
 	/**

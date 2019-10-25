@@ -29,6 +29,8 @@ import java.util.List;
 import org.apache.wicket.extensions.markup.html.repeater.tree.ITreeProvider;
 import org.apache.wicket.model.IModel;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Test for {@link ProviderSubset}.
@@ -37,6 +39,8 @@ import org.junit.jupiter.api.Test;
  */
 public class ProviderSubsetTest
 {
+	private static final Logger logger = LoggerFactory.getLogger(ProviderSubsetTest.class);
+
 	private ITreeProvider<String> provider = new EmptyProvider();
 
 	/**
@@ -72,6 +76,7 @@ public class ProviderSubsetTest
 		}
 		catch (Exception expected)
 		{
+			logger.error(expected.getMessage(), expected);
 		}
 
 		assertTrue(subset.contains("A"));
@@ -80,10 +85,7 @@ public class ProviderSubsetTest
 
 		subset.createModel().detach();
 
-		for (StringModel model : models)
-		{
-			assertTrue(model.isDetached());
-		}
+		models.forEach(model -> assertTrue(model.isDetached()));
 
 		assertTrue(subset.contains("A"));
 		assertTrue(subset.contains("AA"));
@@ -133,7 +135,7 @@ public class ProviderSubsetTest
 		@Override
 		public boolean equals(Object obj)
 		{
-			return string == ((StringModel)obj).string;
+			return string.equals(((StringModel)obj).string);
 		}
 
 		@Override
@@ -148,12 +150,12 @@ public class ProviderSubsetTest
 
 		private static final long serialVersionUID = 1L;
 
-		private List<String> EMPTY = new ArrayList<>();
+		private List<String> empty = new ArrayList<>();
 
 		@Override
 		public Iterator<String> getRoots()
 		{
-			return EMPTY.iterator();
+			return empty.iterator();
 		}
 
 		@Override

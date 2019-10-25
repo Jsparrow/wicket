@@ -16,8 +16,8 @@
  */
 package org.apache.wicket.util.license;
 
-import java.util.Arrays;
 import java.util.List;
+import java.util.Collections;
 
 class HtmlLicenseHeaderHandler extends XmlLicenseHeaderHandler
 {
@@ -34,6 +34,6 @@ class HtmlLicenseHeaderHandler extends XmlLicenseHeaderHandler
 	@Override
 	public List<String> getSuffixes()
 	{
-		return Arrays.asList("html");
+		return Collections.singletonList("html");
 	}
 }

@@ -43,6 +43,14 @@ public class NonContextual<T>
 
 	final InjectionTarget<T> it;
 
+	@SuppressWarnings("unchecked")
+	private NonContextual(Class<? extends T> clazz)
+	{
+		BeanManager manager = BeanManagerLookup.lookup();
+		AnnotatedType<? extends T> type = manager.createAnnotatedType(clazz);
+		this.it = (InjectionTarget<T>)manager.createInjectionTarget(type);
+	}
+
 	/**
 	 * Undeploys the looked up bean manager from cache
 	 */
@@ -53,7 +61,7 @@ public class NonContextual<T>
 			synchronized (lock)
 			{
 				// copy-on-write the cache
-				Map<BeanManager, ClassMetaCache<NonContextual<?>>> newCache = new WeakHashMap<BeanManager, ClassMetaCache<NonContextual<?>>>(
+				Map<BeanManager, ClassMetaCache<NonContextual<?>>> newCache = new WeakHashMap<>(
 						cache);
 				newCache.remove(BeanManagerLookup.lookup());
 				cache = Collections.unmodifiableMap(newCache);
@@ -90,7 +98,7 @@ public class NonContextual<T>
 
 		if (nc == null)
 		{
-			nc = new NonContextual<T>(clazz);
+			nc = new NonContextual<>(clazz);
 			meta.put(clazz, nc);
 		}
 		return nc;
@@ -107,10 +115,10 @@ public class NonContextual<T>
 				meta = cache.get(manager);
 				if (meta == null)
 				{
-					meta = new ClassMetaCache<NonContextual<?>>();
+					meta = new ClassMetaCache<>();
 
 					// copy-on-write the cache
-					Map<BeanManager, ClassMetaCache<NonContextual<?>>> newCache = new WeakHashMap<BeanManager, ClassMetaCache<NonContextual<?>>>(
+					Map<BeanManager, ClassMetaCache<NonContextual<?>>> newCache = new WeakHashMap<>(
 							cache);
 					newCache.put(manager, meta);
 					cache = Collections.unmodifiableMap(newCache);
@@ -118,14 +126,6 @@ public class NonContextual<T>
 			}
 		}
 		return meta;
-	}
-
-	@SuppressWarnings("unchecked")
-	private NonContextual(Class<? extends T> clazz)
-	{
-		BeanManager manager = BeanManagerLookup.lookup();
-		AnnotatedType<? extends T> type = manager.createAnnotatedType(clazz);
-		this.it = (InjectionTarget<T>)manager.createInjectionTarget(type);
 	}
 
 	/**

@@ -201,23 +201,19 @@ public abstract class Page extends MarkupContainer
 	public final void componentRendered(final Component component)
 	{
 		// Inform the page that this component rendered
-		if (getApplication().getDebugSettings().getComponentUseCheck())
-		{
-			if (renderedComponents == null)
-			{
-				renderedComponents = new HashSet<Component>();
-			}
-			if (renderedComponents.add(component) == false)
-			{
-				throw new MarkupException(
-					"The component " +
-						component +
-						" was rendered already. You can render it only once during a render phase. Class relative path: " +
-						component.getClassRelativePath());
-			}
-			log.debug("Rendered {}", component);
-
+		if (!getApplication().getDebugSettings().getComponentUseCheck()) {
+			return;
 		}
+		if (renderedComponents == null)
+		{
+			renderedComponents = new HashSet<>();
+		}
+		if (renderedComponents.add(component) == false)
+		{
+			throw new MarkupException(
+				new StringBuilder().append("The component ").append(component).append(" was rendered already. You can render it only once during a render phase. Class relative path: ").append(component.getClassRelativePath()).toString());
+		}
+		log.debug("Rendered {}", component);
 	}
 
 	/**
@@ -275,20 +271,19 @@ public abstract class Page extends MarkupContainer
 		}
 
 		final IPageManager pageManager = getSession().getPageManager();
-		if (!getFlag(FLAG_IS_DIRTY) && (isVersioned() && pageManager.supportsVersioning() ||
+		if (!(!getFlag(FLAG_IS_DIRTY) && (isVersioned() && pageManager.supportsVersioning() ||
 
 		// we need to get pageId for new page instances even when the page doesn't need
 		// versioning, otherwise pages override each other in the page store and back button
 		// support is broken
-			isInitialization))
+			isInitialization))) {
+			return;
+		}
+		setFlag(FLAG_IS_DIRTY, true);
+		setNextAvailableId();
+		if (isInitialization == false)
 		{
-			setFlag(FLAG_IS_DIRTY, true);
-			setNextAvailableId();
-
-			if (isInitialization == false)
-			{
-				pageManager.touchPage(this);
-			}
+			pageManager.touchPage(this);
 		}
 	}
 	
@@ -377,21 +372,16 @@ public abstract class Page extends MarkupContainer
 	{
 		final StringBuilder buffer = new StringBuilder();
 		buffer.append("Page ").append(getId());
-		visitChildren(new IVisitor<Component, Void>()
-		{
-			@Override
-			public void component(final Component component, final IVisit<Void> visit)
+		visitChildren((final Component component, final IVisit<Void> visit) -> {
+			int levels = 0;
+			for (Component current = component; current != null; current = current.getParent())
 			{
-				int levels = 0;
-				for (Component current = component; current != null; current = current.getParent())
-				{
-					levels++;
-				}
-				buffer.append(StringValue.repeat(levels, "	"))
-					.append(component.getPageRelativePath())
-					.append(':')
-					.append(Classes.simpleName(component.getClass()));
+				levels++;
 			}
+			buffer.append(StringValue.repeat(levels, "	"))
+				.append(component.getPageRelativePath())
+				.append(':')
+				.append(Classes.simpleName(component.getClass()));
 		});
 		return buffer.toString();
 	}
@@ -446,8 +436,7 @@ public abstract class Page extends MarkupContainer
 			stateless = Boolean.FALSE;
 			if (getStatelessHint())
 			{
-				log.warn("Page '" + this + "' is not stateless because it is not bookmarkable, " +
-					"but the stateless hint is set to true!");
+				log.warn(new StringBuilder().append("Page '").append(this).append("' is not stateless because it is not bookmarkable, ").append("but the stateless hint is set to true!").toString());
 			}
 		}
 
@@ -469,15 +458,10 @@ public abstract class Page extends MarkupContainer
 		if (stateless == null)
 		{
 			Component statefulComponent = visitChildren(Component.class,
-				new IVisitor<Component, Component>()
-				{
-					@Override
-					public void component(final Component component, final IVisit<Component> visit)
+				(final Component component, final IVisit<Component> visit) -> {
+					if (!component.isStateless())
 					{
-						if (!component.isStateless())
-						{
-							visit.stop(component);
-						}
+						visit.stop(component);
 					}
 				});
 
@@ -548,8 +532,8 @@ public abstract class Page extends MarkupContainer
 	@Override
 	public String toString()
 	{
-		return "[Page class = " + getClass().getName() + ", id = " + getId() + ", render count = " +
-			getRenderCount() + "]";
+		return new StringBuilder().append("[Page class = ").append(getClass().getName()).append(", id = ").append(getId()).append(", render count = ").append(getRenderCount())
+				.append("]").toString();
 	}
 
 	/**
@@ -566,45 +550,40 @@ public abstract class Page extends MarkupContainer
 		final DebugSettings debugSettings = getApplication().getDebugSettings();
 		if (debugSettings.getComponentUseCheck())
 		{
-			final List<Component> unrenderedComponents = new ArrayList<Component>();
+			final List<Component> unrenderedComponents = new ArrayList<>();
 			final StringBuilder buffer = new StringBuilder();
-			renderedContainer.visitChildren(new IVisitor<Component, Void>()
-			{
-				@Override
-				public void component(final Component component, final IVisit<Void> visit)
+			renderedContainer.visitChildren((final Component component, final IVisit<Void> visit) -> {
+				// If component never rendered
+				if (renderedComponents == null || !renderedComponents.contains(component))
 				{
-					// If component never rendered
-					if (renderedComponents == null || !renderedComponents.contains(component))
+					// If not an auto component ...
+					if (!component.isAuto() && component.isVisibleInHierarchy())
 					{
-						// If not an auto component ...
-						if (!component.isAuto() && component.isVisibleInHierarchy())
-						{
-							// Increase number of unrendered components
-							unrenderedComponents.add(component);
+						// Increase number of unrendered components
+						unrenderedComponents.add(component);
 
-							// Add to explanatory string to buffer
-							buffer.append(Integer.toString(unrenderedComponents.size()))
-								.append(". ")
-								.append(component.toString(true))
-								.append('\n');
-							String metadata = component.getMetaData(Component.CONSTRUCTED_AT_KEY);
-							if (metadata != null)
-							{
-								buffer.append(metadata).append('\n');
-							}
-							metadata = component.getMetaData(Component.ADDED_AT_KEY);
-							if (metadata != null)
-							{
-								buffer.append(metadata).append('\n');
-							}
-						}
-						else
+						// Add to explanatory string to buffer
+						buffer.append(Integer.toString(unrenderedComponents.size()))
+							.append(". ")
+							.append(component.toString(true))
+							.append('\n');
+						String metadata = component.getMetaData(Component.CONSTRUCTED_AT_KEY);
+						if (metadata != null)
 						{
-							// if the component is not visible in hierarchy we
-							// should not visit its children since they are also
-							// not visible
-							visit.dontGoDeeper();
+							buffer.append(metadata).append('\n');
 						}
+						metadata = component.getMetaData(Component.ADDED_AT_KEY);
+						if (metadata != null)
+						{
+							buffer.append(metadata).append('\n');
+						}
+					}
+					else
+					{
+						// if the component is not visible in hierarchy we
+						// should not visit its children since they are also
+						// not visible
+						visit.dontGoDeeper();
 					}
 				}
 			});
@@ -747,16 +726,11 @@ public abstract class Page extends MarkupContainer
 	@Override
 	protected final void internalOnModelChanged()
 	{
-		visitChildren(new IVisitor<Component, Void>()
-		{
-			@Override
-			public void component(final Component component, final IVisit<Void> visit)
+		visitChildren((final Component component, final IVisit<Void> visit) -> {
+			// If form component is using form model
+			if (component.sameInnermostModel(Page.this))
 			{
-				// If form component is using form model
-				if (component.sameInnermostModel(Page.this))
-				{
-					component.modelChanged();
-				}
+				component.modelChanged();
 			}
 		});
 	}
@@ -767,14 +741,14 @@ public abstract class Page extends MarkupContainer
 		super.internalOnAfterConfigure();
 
 		// first try to check if the page can be rendered:
-		if (!isRenderAllowed())
-		{
-			if (log.isDebugEnabled())
-			{
-				log.debug("Page not allowed to render: " + this);
-			}
-			throw new UnauthorizedActionException(this, Component.RENDER);
+		if (isRenderAllowed()) {
+			return;
 		}
+		if (log.isDebugEnabled())
+		{
+			log.debug("Page not allowed to render: " + this);
+		}
+		throw new UnauthorizedActionException(this, Component.RENDER);
 	}
 
 	@Override
@@ -808,14 +782,9 @@ public abstract class Page extends MarkupContainer
 		// clean up debug meta data if component check is on
 		if (getApplication().getDebugSettings().getComponentUseCheck())
 		{
-			visitChildren(new IVisitor<Component, Void>()
-			{
-				@Override
-				public void component(final Component component, final IVisit<Void> visit)
-				{
-					component.setMetaData(Component.CONSTRUCTED_AT_KEY, null);
-					component.setMetaData(Component.ADDED_AT_KEY, null);
-				}
+			visitChildren((final Component component, final IVisit<Void> visit) -> {
+				component.setMetaData(Component.CONSTRUCTED_AT_KEY, null);
+				component.setMetaData(Component.ADDED_AT_KEY, null);
 			});
 		}
 
@@ -828,13 +797,13 @@ public abstract class Page extends MarkupContainer
 			getSession().getPageManager().touchPage(this);
 		}
 
-		if (getApplication().getDebugSettings().isOutputMarkupContainerClassName())
-		{
-			String className = Classes.name(getClass());
-			getResponse().write("<!-- Page Class ");
-			getResponse().write(className);
-			getResponse().write(" END -->\n");
+		if (!getApplication().getDebugSettings().isOutputMarkupContainerClassName()) {
+			return;
 		}
+		String className = Classes.name(getClass());
+		getResponse().write("<!-- Page Class ");
+		getResponse().write(className);
+		getResponse().write(" END -->\n");
 	}
 
 	@Override
@@ -842,7 +811,7 @@ public abstract class Page extends MarkupContainer
 	{
 		if (log.isDebugEnabled())
 		{
-			log.debug("ending request for page " + this + ", request " + getRequest());
+			log.debug(new StringBuilder().append("ending request for page ").append(this).append(", request ").append(getRequest()).toString());
 		}
 
 		setFlag(FLAG_IS_DIRTY, false);

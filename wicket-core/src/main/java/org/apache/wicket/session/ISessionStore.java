@@ -150,19 +150,6 @@ public interface ISessionStore
 	void destroy();
 
 	/**
-	 * Listener invoked when session is unbound.
-	 */
-	interface UnboundListener
-	{
-		/**
-		 * Informs the listener that session with specific id has been unbound.
-		 * 
-		 * @param sessionId
-		 */
-		void sessionUnbound(String sessionId);
-	}
-
-	/**
 	 * Registers listener invoked when session is unbound.
 	 * 
 	 * @param listener
@@ -182,23 +169,6 @@ public interface ISessionStore
 	Set<UnboundListener> getUnboundListener();
 
 	/**
-	 * Listener invoked when session is bound.
-	 */
-	interface BindListener
-	{
-		/**
-		 * Informs the listener that a session is about to be bound. Note that this method is also
-		 * called for {@link Session#isTemporary() temporary sessions}.
-		 * 
-		 * @param request
-		 *            The request the session is bound in
-		 * @param newSession
-		 *            The session that will be bound
-		 */
-		void bindingSession(Request request, Session newSession);
-	}
-
-	/**
 	 * Registers listener invoked when session is bound.
 	 * 
 	 * @param listener
@@ -216,4 +186,34 @@ public interface ISessionStore
 	 * @return The list of registered bind listeners
 	 */
 	Set<BindListener> getBindListeners();
+
+	/**
+	 * Listener invoked when session is unbound.
+	 */
+	interface UnboundListener
+	{
+		/**
+		 * Informs the listener that session with specific id has been unbound.
+		 * 
+		 * @param sessionId
+		 */
+		void sessionUnbound(String sessionId);
+	}
+
+	/**
+	 * Listener invoked when session is bound.
+	 */
+	interface BindListener
+	{
+		/**
+		 * Informs the listener that a session is about to be bound. Note that this method is also
+		 * called for {@link Session#isTemporary() temporary sessions}.
+		 * 
+		 * @param request
+		 *            The request the session is bound in
+		 * @param newSession
+		 *            The session that will be bound
+		 */
+		void bindingSession(Request request, Session newSession);
+	}
 }

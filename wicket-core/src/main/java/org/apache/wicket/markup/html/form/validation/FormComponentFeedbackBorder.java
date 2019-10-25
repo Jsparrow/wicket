@@ -43,35 +43,6 @@ public class FormComponentFeedbackBorder extends Border implements IFeedback
 	private boolean visible;
 
 	/**
-	 * Error indicator that will be shown whenever there is an error-level message for the
-	 * collecting component.
-	 */
-	private final class ErrorIndicator extends WebMarkupContainer
-	{
-		private static final long serialVersionUID = 1L;
-
-		/**
-		 * Construct.
-		 * 
-		 * @param id
-		 *            component id
-		 */
-		public ErrorIndicator(String id)
-		{
-			super(id);
-		}
-
-		/**
-		 * @see org.apache.wicket.Component#isVisible()
-		 */
-		@Override
-		public boolean isVisible()
-		{
-			return visible;
-		}
-	}
-
-	/**
 	 * Constructor.
 	 * 
 	 * @param id
@@ -100,5 +71,34 @@ public class FormComponentFeedbackBorder extends Border implements IFeedback
 	protected IFeedbackMessageFilter getMessagesFilter()
 	{
 		return new ContainerFeedbackMessageFilter(this);
+	}
+
+	/**
+	 * Error indicator that will be shown whenever there is an error-level message for the
+	 * collecting component.
+	 */
+	private final class ErrorIndicator extends WebMarkupContainer
+	{
+		private static final long serialVersionUID = 1L;
+
+		/**
+		 * Construct.
+		 * 
+		 * @param id
+		 *            component id
+		 */
+		public ErrorIndicator(String id)
+		{
+			super(id);
+		}
+
+		/**
+		 * @see org.apache.wicket.Component#isVisible()
+		 */
+		@Override
+		public boolean isVisible()
+		{
+			return visible;
+		}
 	}
 }

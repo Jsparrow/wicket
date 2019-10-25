@@ -54,7 +54,7 @@ public final class WicketMessageTagHandler extends AbstractMarkupFilter
 	/**
 	 * The id automatically assigned to tags with wicket:message attribute but without id
 	 */
-	public final static String WICKET_MESSAGE_CONTAINER_ID = "_message_attr_";
+	public static final String WICKET_MESSAGE_CONTAINER_ID = "_message_attr_";
 
 	/**
 	 * Constructor for the IComponentResolver role.
@@ -101,6 +101,37 @@ public final class WicketMessageTagHandler extends AbstractMarkupFilter
 		return tag;
 	}
 
+	@Override
+	public Component resolve(MarkupContainer container, MarkupStream markupStream, ComponentTag tag)
+	{
+		// localize any raw markup that has wicket:message attrs
+		if (!((tag != null) && (tag.getId().startsWith(getWicketMessageIdPrefix(markupStream))))) {
+			return null;
+		}
+		Component wc;
+		String id = tag.getId();
+		if (tag.isOpenClose())
+		{
+			wc = new WebComponent(id);
+		}
+		else
+		{
+			wc = new TransparentWebMarkupContainer(id);
+		}
+		return wc;
+	}
+
+	private String getWicketMessageAttrName()
+	{
+		String wicketNamespace = getWicketNamespace();
+		return new StringBuilder().append(wicketNamespace).append(':').append("message").toString();
+	}
+
+	private String getWicketMessageIdPrefix(final MarkupStream markupStream)
+	{
+		return getWicketNamespace(markupStream) + WICKET_MESSAGE_CONTAINER_ID;
+	}
+
 	/**
 	 * Attribute localizing behavior. See the javadoc of {@link WicketMessageTagHandler} for
 	 * details.
@@ -122,74 +153,37 @@ public final class WicketMessageTagHandler extends AbstractMarkupFilter
 		public void onComponentTag(final Component component, final ComponentTag tag)
 		{
 			String expr = tag.getAttributes().getString(wicketMessageAttrName);
-			if (!Strings.isEmpty(expr))
+			if (Strings.isEmpty(expr)) {
+				return;
+			}
+			expr = expr.trim();
+			String[] attrsAndKeys = Strings.split(expr, ',');
+			for (String attrAndKey : attrsAndKeys)
 			{
-				expr = expr.trim();
-
-				String[] attrsAndKeys = Strings.split(expr, ',');
-
-				for (String attrAndKey : attrsAndKeys)
+				int colon = attrAndKey.lastIndexOf(":");
+				// make sure the attribute-key pair is valid
+				if (attrAndKey.length() < 3 || colon < 1 || colon > attrAndKey.length() - 2)
 				{
-					int colon = attrAndKey.lastIndexOf(":");
-					// make sure the attribute-key pair is valid
-					if (attrAndKey.length() < 3 || colon < 1 || colon > attrAndKey.length() - 2)
-					{
-						throw new WicketRuntimeException(
-							"wicket:message attribute contains an invalid value [[" + expr +
-								"]], must be of form (attr:key)+");
-					}
-
-					String attr = attrAndKey.substring(0, colon);
-					String key = attrAndKey.substring(colon + 1);
-
-					// we need to call the proper getString() method based on
-					// whether or not we have a default value
-					final String value;
-					if (tag.getAttributes().containsKey(attr))
-					{
-						value = component.getString(key, null, tag.getAttributes().getString(attr));
-					}
-					else
-					{
-						value = component.getString(key);
-					}
-					tag.put(attr, value);
+					throw new WicketRuntimeException(
+						new StringBuilder().append("wicket:message attribute contains an invalid value [[").append(expr).append("]], must be of form (attr:key)+").toString());
 				}
+
+				String attr = attrAndKey.substring(0, colon);
+				String key = attrAndKey.substring(colon + 1);
+
+				// we need to call the proper getString() method based on
+				// whether or not we have a default value
+				final String value;
+				if (tag.getAttributes().containsKey(attr))
+				{
+					value = component.getString(key, null, tag.getAttributes().getString(attr));
+				}
+				else
+				{
+					value = component.getString(key);
+				}
+				tag.put(attr, value);
 			}
 		}
-	}
-
-	@Override
-	public Component resolve(MarkupContainer container, MarkupStream markupStream, ComponentTag tag)
-	{
-		// localize any raw markup that has wicket:message attrs
-		if ((tag != null) && (tag.getId().startsWith(getWicketMessageIdPrefix(markupStream))))
-		{
-			Component wc;
-			String id = tag.getId();
-
-			if (tag.isOpenClose())
-			{
-				wc = new WebComponent(id);
-			}
-			else
-			{
-				wc = new TransparentWebMarkupContainer(id);
-			}
-
-			return wc;
-		}
-		return null;
-	}
-	
-	private String getWicketMessageAttrName()
-	{
-		String wicketNamespace = getWicketNamespace();
-		return wicketNamespace + ':' + "message";
-	}
-
-	private String getWicketMessageIdPrefix(final MarkupStream markupStream)
-	{
-		return getWicketNamespace(markupStream) + WICKET_MESSAGE_CONTAINER_ID;
 	}
 }

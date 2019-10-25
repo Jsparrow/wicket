@@ -22,12 +22,16 @@ import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.util.tester.WicketTestCase;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jcompagner
  */
 class TesterTest extends WicketTestCase
 {
+	private static final Logger logger = LoggerFactory.getLogger(TesterTest.class);
+
 	/**
 	 * 
 	 */
@@ -43,9 +47,11 @@ class TesterTest extends WicketTestCase
 		}
 		catch (AssertionError e)
 		{
+			logger.error(e.getMessage(), e);
 		}
 		catch (NullPointerException e)
 		{
+			logger.error(e.getMessage(), e);
 			fail("NullPointerException shouldn't be thrown, instead it must fail.");
 		}
 	}

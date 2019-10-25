@@ -57,6 +57,23 @@ public final class TimeFrame implements ITimeFrameSource
 	private final Time start;
 
 	/**
+	 * Private constructor to force use of static factory methods.
+	 * 
+	 * @param start
+	 *            the start <code>Time</code>
+	 * @param end
+	 *            the end <code>Time</code>
+	 * @throws IllegalArgumentException
+	 *             thrown if start <code>Time</code> value is before end <code>Time</code> value
+	 */
+	private TimeFrame(final Time start, final Time end)
+	{
+		check(start, end);
+		this.start = start;
+		this.end = end;
+	}
+
+	/**
 	 * Creates an <code>ITimeFrameSource</code> source for start and end <code>TimeOfDay</code>s.
 	 * For example, called with 3pm and 5pm as parameters, the <code>TimeFrame</code> source
 	 * returned would produce <code>TimeFrame</code> objects representing 3pm-5pm on whatever day it
@@ -134,26 +151,8 @@ public final class TimeFrame implements ITimeFrameSource
 		// Throw illegal argument exception if end is less than start
 		if (end.lessThan(start))
 		{
-			throw new IllegalArgumentException("Start time of time frame " + start +
-				" was after end time " + end);
+			throw new IllegalArgumentException(new StringBuilder().append("Start time of time frame ").append(start).append(" was after end time ").append(end).toString());
 		}
-	}
-
-	/**
-	 * Private constructor to force use of static factory methods.
-	 * 
-	 * @param start
-	 *            the start <code>Time</code>
-	 * @param end
-	 *            the end <code>Time</code>
-	 * @throws IllegalArgumentException
-	 *             thrown if start <code>Time</code> value is before end <code>Time</code> value
-	 */
-	private TimeFrame(final Time start, final Time end)
-	{
-		check(start, end);
-		this.start = start;
-		this.end = end;
 	}
 
 	/**
@@ -256,6 +255,6 @@ public final class TimeFrame implements ITimeFrameSource
 	@Override
 	public String toString()
 	{
-		return "[start=" + start + ", end=" + end + "]";
+		return new StringBuilder().append("[start=").append(start).append(", end=").append(end).append("]").toString();
 	}
 }

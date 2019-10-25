@@ -33,11 +33,11 @@ import org.apache.wicket.extensions.markup.html.repeater.util.SortParam;
  */
 public class ContactsDatabase
 {
-	private final Map<Long, Contact> map = Collections.synchronizedMap(new HashMap<Long, Contact>());
-	private final List<Contact> fnameIdx = Collections.synchronizedList(new ArrayList<Contact>());
-	private final List<Contact> lnameIdx = Collections.synchronizedList(new ArrayList<Contact>());
-	private final List<Contact> fnameDescIdx = Collections.synchronizedList(new ArrayList<Contact>());
-	private final List<Contact> lnameDescIdx = Collections.synchronizedList(new ArrayList<Contact>());
+	private final Map<Long, Contact> map = Collections.synchronizedMap(new HashMap<>());
+	private final List<Contact> fnameIdx = Collections.synchronizedList(new ArrayList<>());
+	private final List<Contact> lnameIdx = Collections.synchronizedList(new ArrayList<>());
+	private final List<Contact> fnameDescIdx = Collections.synchronizedList(new ArrayList<>());
+	private final List<Contact> lnameDescIdx = Collections.synchronizedList(new ArrayList<>());
 
 	/**
 	 * Constructor
@@ -65,7 +65,7 @@ public class ContactsDatabase
 		Contact c = map.get(id);
 		if (c == null)
 		{
-			throw new RuntimeException("contact with id [" + id + "] not found in the database");
+			throw new RuntimeException(new StringBuilder().append("contact with id [").append(id).append("] not found in the database").toString());
 		}
 		return c;
 	}
@@ -100,16 +100,15 @@ public class ContactsDatabase
 		}
 		final String field = sort.getProperty();
 
-		if (field.equals("firstName"))
+		if ("firstName".equals(field))
 		{
 			return sort.isAscending() ? fnameIdx : fnameDescIdx;
 		}
-		else if (field.equals("lastName"))
+		else if ("lastName".equals(field))
 		{
 			return sort.isAscending() ? lnameIdx : lnameDescIdx;
 		}
-		throw new RuntimeException("unknown sort option [" + sort +
-			"]. valid fields: [firstName], [lastName]");
+		throw new RuntimeException(new StringBuilder().append("unknown sort option [").append(sort).append("]. valid fields: [firstName], [lastName]").toString());
 	}
 
 	/**
@@ -135,8 +134,7 @@ public class ContactsDatabase
 		}
 		else
 		{
-			throw new IllegalArgumentException("contact [" + contact.getFirstName() +
-				"] is already persistent");
+			throw new IllegalArgumentException(new StringBuilder().append("contact [").append(contact.getFirstName()).append("] is already persistent").toString());
 		}
 	}
 
@@ -159,7 +157,7 @@ public class ContactsDatabase
 
 	private void updateIndecies()
 	{
-		Collections.sort(fnameIdx, new Comparator<Contact>()
+		fnameIdx.sort(new Comparator<Contact>()
 		{
 			@Override
 			public int compare(final Contact arg0, final Contact arg1)
@@ -168,7 +166,7 @@ public class ContactsDatabase
 			}
 		});
 
-		Collections.sort(lnameIdx, new Comparator<Contact>()
+		lnameIdx.sort(new Comparator<Contact>()
 		{
 			@Override
 			public int compare(final Contact arg0, final Contact arg1)
@@ -177,7 +175,7 @@ public class ContactsDatabase
 			}
 		});
 
-		Collections.sort(fnameDescIdx, new Comparator<Contact>()
+		fnameDescIdx.sort(new Comparator<Contact>()
 		{
 			@Override
 			public int compare(final Contact arg0, final Contact arg1)
@@ -186,7 +184,7 @@ public class ContactsDatabase
 			}
 		});
 
-		Collections.sort(lnameDescIdx, new Comparator<Contact>()
+		lnameDescIdx.sort(new Comparator<Contact>()
 		{
 			@Override
 			public int compare(final Contact arg0, final Contact arg1)

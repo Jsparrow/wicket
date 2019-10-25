@@ -72,7 +72,7 @@ class NestedFormsTest extends WicketTestCase
 	{
 		/** */
 		private static final long serialVersionUID = 1L;
-		private List<Component> submitSequence = new ArrayList<Component>();
+		private List<Component> submitSequence = new ArrayList<>();
 		Form<Void> outerForm;
 		Button outerSubmit;
 		Form<Void> innerForm;
@@ -137,13 +137,12 @@ class NestedFormsTest extends WicketTestCase
 		public IResourceStream getMarkupResourceStream(MarkupContainer container,
 			Class<?> containerClass)
 		{
+			//
 			return new StringResourceStream(
-				"<html><body>"
-					+ "<form wicket:id=\"outerForm\">"//
-					+ "  <input type=\"submit\" wicket:id=\"outerSubmit\"/>"//
-					+ "  <form wicket:id=\"innerForm\"><input type=\"submit\" wicket:id=\"innerSubmit\"/></form>"//
-					+ "</form>" + //
-					"</body></html>");
+				new StringBuilder().append("<html><body>").append("<form wicket:id=\"outerForm\">"//
+).append("  <input type=\"submit\" wicket:id=\"outerSubmit\"/>"//
+).append("  <form wicket:id=\"innerForm\"><input type=\"submit\" wicket:id=\"innerSubmit\"/></form>"//
+).append("</form>").append("</body></html>").toString());
 		}
 	}
 }

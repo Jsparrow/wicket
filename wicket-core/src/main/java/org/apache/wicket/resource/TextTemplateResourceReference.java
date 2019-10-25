@@ -39,7 +39,7 @@ import org.apache.wicket.util.template.TextTemplate;
  * 
  * @author James Carman
  */
-public class TextTemplateResourceReference extends ResourceReference implements IClusterable
+public class TextTemplateResourceReference extends ResourceReference
 {
 
 	private static final long serialVersionUID = 1L;

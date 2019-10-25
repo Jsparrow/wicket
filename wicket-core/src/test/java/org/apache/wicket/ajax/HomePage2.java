@@ -30,7 +30,7 @@ public class HomePage2 extends WebPage
 
 	private static final long serialVersionUID = 1L;
 
-	private String _message = "clicked";
+	private String message = "clicked";
 
 	/**
 	 * Constructor that is invoked when page is invoked without a session.
@@ -50,7 +50,7 @@ public class HomePage2 extends WebPage
 			@Override
 			public void onClick(AjaxRequestTarget tgt)
 			{
-				_message = "ajax link clicked";
+				message = "ajax link clicked";
 
 				// Adding the entire page to the ajax request target
 				// should force the entire page to be re-requested by the
@@ -67,7 +67,7 @@ public class HomePage2 extends WebPage
 	@Override
 	protected void onBeforeRender()
 	{
-		_message = "onBeforeRender called";
+		message = "onBeforeRender called";
 		super.onBeforeRender();
 	}
 }

@@ -45,8 +45,7 @@ public class DefaultPropertyResolver implements IPropertyResolver
 			}
 			else
 			{
-				throw new WicketRuntimeException("Invalid name for a getter method: '"
-						+ methodName + "'. It must start either with 'get' or 'is'.");
+				throw new WicketRuntimeException(new StringBuilder().append("Invalid name for a getter method: '").append(methodName).append("'. It must start either with 'get' or 'is'.").toString());
 			}
 			return new Property(getter.getDeclaringClass(), name);
 		}

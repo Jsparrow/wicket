@@ -185,22 +185,28 @@ public class CachingResourceStreamLocator implements IResourceStreamLocator
 		@Override
 		public boolean equals(Object obj)
 		{
-			if (this == obj)
+			if (this == obj) {
 				return true;
-			if (!super.equals(obj))
+			}
+			if (!super.equals(obj)) {
 				return false;
-			if (getClass() != obj.getClass())
+			}
+			if (getClass() != obj.getClass()) {
 				return false;
+			}
 			CacheKey other = (CacheKey)obj;
 			if (extension == null)
 			{
-				if (other.extension != null)
+				if (other.extension != null) {
 					return false;
+				}
 			}
-			else if (!extension.equals(other.extension))
+			else if (!extension.equals(other.extension)) {
 				return false;
-			if (strict != other.strict)
+			}
+			if (strict != other.strict) {
 				return false;
+			}
 			return true;
 		}
 	}

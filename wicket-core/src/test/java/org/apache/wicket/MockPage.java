@@ -30,6 +30,16 @@ public class MockPage extends MockComponent implements IRequestablePage
 
 	private int pageId;
 
+	private final PageParameters pageParameters = new PageParameters();
+
+	private boolean bookmarkable;
+
+	private boolean stateless = false;
+
+	private boolean createBookmarkable;
+
+	private int renderCount;
+
 	/**
 	 * Construct.
 	 */
@@ -49,6 +59,7 @@ public class MockPage extends MockComponent implements IRequestablePage
 		setPageId(pageId);
 	}
 
+
 	/**
 	 * Sets the page id
 	 * 
@@ -61,11 +72,13 @@ public class MockPage extends MockComponent implements IRequestablePage
 		return this;
 	}
 
+
 	@Override
 	public IRequestablePage getPage()
 	{
 		return this;
 	}
+
 
 	@Override
 	public int getPageId()
@@ -73,7 +86,6 @@ public class MockPage extends MockComponent implements IRequestablePage
 		return pageId;
 	}
 
-	private final PageParameters pageParameters = new PageParameters();
 
 	@Override
 	public PageParameters getPageParameters()
@@ -81,13 +93,13 @@ public class MockPage extends MockComponent implements IRequestablePage
 		return pageParameters;
 	}
 
-	private boolean bookmarkable;
 
 	@Override
 	public boolean isBookmarkable()
 	{
 		return bookmarkable;
 	}
+
 
 	/**
 	 * Sets the bookmarkable flags
@@ -101,7 +113,6 @@ public class MockPage extends MockComponent implements IRequestablePage
 		return this;
 	}
 
-	private boolean stateless = false;
 
 	/**
 	 * Sets the stateless flag
@@ -115,24 +126,26 @@ public class MockPage extends MockComponent implements IRequestablePage
 		return this;
 	}
 
+
 	@Override
 	public boolean isPageStateless()
 	{
 		return stateless;
 	}
 
+
 	@Override
 	public void renderPage()
 	{
 	}
 
-	private boolean createBookmarkable;
 
 	@Override
 	public boolean wasCreatedBookmarkable()
 	{
 		return createBookmarkable;
 	}
+
 
 	/**
 	 * Sets the createdBookmarkable flag.
@@ -148,13 +161,13 @@ public class MockPage extends MockComponent implements IRequestablePage
 		return this;
 	}
 
-	private int renderCount;
 
 	@Override
 	public int getRenderCount()
 	{
 		return renderCount;
 	}
+
 
 	/**
 	 * Sets the render count

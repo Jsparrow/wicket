@@ -122,7 +122,7 @@ public final class WicketTagIdentifier extends AbstractMarkupFilter
 			if (Strings.isEmpty(wicketIdValue))
 			{
 				// Make it a Wicket component.
-				tag.setId(namespace + "_" + tag.getName() + getRequestUniqueId());
+				tag.setId(new StringBuilder().append(namespace).append("_").append(tag.getName()).append(getRequestUniqueId()).toString());
 				tag.setUserData(CONTAINER_INFO, getMarkupResourceStream().getContainerInfo());
 				tag.setUserData(MARKUP_CACHE_KEY, getMarkupResourceStream().getCacheKey());
 				tag.setModified(true);
@@ -141,15 +141,14 @@ public final class WicketTagIdentifier extends AbstractMarkupFilter
 			if (!isWellKnown(tag))
 			{
 				// give up
-				throw new WicketParseException("Unknown tag name with Wicket namespace: '" +
-					tag.getName() + "'. Might be you haven't installed the appropriate resolver?",
+				throw new WicketParseException(new StringBuilder().append("Unknown tag name with Wicket namespace: '").append(tag.getName()).append("'. Might be you haven't installed the appropriate resolver?").toString(),
 					tag);
 			}
 		}
 
 		if (wicketIdValue != null)
 		{
-			if (wicketIdValue.trim().length() == 0)
+			if (wicketIdValue.trim().isEmpty())
 			{
 				throw new WicketParseException(
 					"The wicket:id attribute value must not be empty. May be unmatched quotes?!?",

@@ -115,7 +115,7 @@ public class RequestPageStore extends DelegatingPageStore
 
 	private RequestData getRequestData(IPageContext context)
 	{
-		return context.getRequestData(KEY, () -> new RequestData());
+		return context.getRequestData(KEY, RequestData::new);
 	}
 	
 	/**
@@ -140,14 +140,7 @@ public class RequestPageStore extends DelegatingPageStore
 
 		public IManageablePage get(int id)
 		{
-			for (IManageablePage page : pages)
-			{
-				if (page.getPageId() == id)
-				{
-					return page;
-				}
-			}
-			return null;
+			return pages.stream().filter(page -> page.getPageId() == id).findFirst().orElse(null);
 		}
 
 		public void remove(IManageablePage page)

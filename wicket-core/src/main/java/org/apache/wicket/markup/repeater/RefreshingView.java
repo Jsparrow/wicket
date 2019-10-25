@@ -104,16 +104,11 @@ public abstract class RefreshingView<T> extends RepeatingView
 	 */
 	protected IItemFactory<T> newItemFactory()
 	{
-		return new IItemFactory<T>()
-		{
-			@Override
-			public Item<T> newItem(int index, IModel<T> model)
-			{
-				String id = RefreshingView.this.newChildId();
-				Item<T> item = RefreshingView.this.newItem(id, index, model);
-				RefreshingView.this.populateItem(item);
-				return item;
-			}
+		return (int index, IModel<T> model) -> {
+			String id = RefreshingView.this.newChildId();
+			Item<T> item = RefreshingView.this.newItem(id, index, model);
+			RefreshingView.this.populateItem(item);
+			return item;
 		};
 	}
 

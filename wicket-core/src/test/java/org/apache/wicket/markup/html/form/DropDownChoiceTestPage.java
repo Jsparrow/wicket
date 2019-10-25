@@ -42,10 +42,10 @@ public class DropDownChoiceTestPage extends WebPage
 	{
 		this.string = string;
 
-		Form<Void> form = new Form<Void>("form");
+		Form<Void> form = new Form<>("form");
 		add(form);
 
-		final DropDownChoice<String> ddc = new DropDownChoice<String>("dropdown",
+		final DropDownChoice<String> ddc = new DropDownChoice<>("dropdown",
 			new PropertyModel<String>(this, "string"), Arrays.asList("A", "B", "C"));
 		ddc.setNullValid(nullValid);
 		form.add(ddc);

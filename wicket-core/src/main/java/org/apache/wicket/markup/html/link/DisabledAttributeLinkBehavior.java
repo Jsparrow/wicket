@@ -34,20 +34,19 @@ public class DisabledAttributeLinkBehavior extends Behavior
 	@Override
 	public void onComponentTag(Component component, ComponentTag tag)
 	{
-		if (!component.isEnabledInHierarchy())
+		if (component.isEnabledInHierarchy()) {
+			return;
+		}
+		// if the tag is an anchor proper
+		String tagName = tag.getName();
+		if ("a".equalsIgnoreCase(tagName) || "link".equalsIgnoreCase(tagName) ||
+			"area".equalsIgnoreCase(tagName))
 		{
-			// if the tag is an anchor proper
-			String tagName = tag.getName();
-			
-			if (tagName.equalsIgnoreCase("a") || tagName.equalsIgnoreCase("link") ||
-				tagName.equalsIgnoreCase("area"))
-			{
-			    tag.put("disabled", "disabled");
-			}
-			else 
-			{
-				tag.remove("rel");
-			}
+		    tag.put("disabled", "disabled");
+		}
+		else 
+		{
+			tag.remove("rel");
 		}
 	}
 }

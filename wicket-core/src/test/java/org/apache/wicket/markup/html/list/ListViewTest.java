@@ -43,7 +43,7 @@ class ListViewTest extends WicketTestCase
 	 */
 	private ListView<Integer> createListView(final int modelListSize)
 	{
-		ArrayList<Integer> modelList = new ArrayList<Integer>();
+		ArrayList<Integer> modelList = new ArrayList<>();
 		for (int i = 0; i < modelListSize; i++)
 		{
 			modelList.add(i);
@@ -86,8 +86,6 @@ class ListViewTest extends WicketTestCase
 				add(new Label("label", item.getModel()));
 			}
 		}
-		;
-
 		IModel<List<Integer>> integers = new ListModel<>(new ArrayList<Integer>());
 
 		// pass list of integers to the number listView

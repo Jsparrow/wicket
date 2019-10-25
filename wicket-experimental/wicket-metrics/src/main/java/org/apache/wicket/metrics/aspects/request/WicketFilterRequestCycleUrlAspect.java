@@ -49,7 +49,7 @@ public class WicketFilterRequestCycleUrlAspect extends WicketMetrics
 		if (args.length >= 3)
 		{
 			Object requestAsObject = args[2];
-			if (requestAsObject != null && requestAsObject instanceof HttpServletRequest)
+			if (requestAsObject instanceof HttpServletRequest)
 			{
 				HttpServletRequest httpServletRequest = (HttpServletRequest)requestAsObject;
 				String requestUrl = httpServletRequest.getRequestURL().toString();

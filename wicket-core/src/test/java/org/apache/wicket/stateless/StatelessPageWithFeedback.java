@@ -36,7 +36,7 @@ public class StatelessPageWithFeedback extends WebPage {
 		error("error in onInitialize");
 
 		add(new FeedbackPanel("feedback"));
-		StatelessForm<Void> form = new StatelessForm<Void>("form");
+		StatelessForm<Void> form = new StatelessForm<>("form");
 		add(form);
 		form.add(new SubmitLink("submit") {
 			private static final long serialVersionUID = 1L;

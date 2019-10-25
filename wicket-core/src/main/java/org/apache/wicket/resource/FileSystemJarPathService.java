@@ -60,7 +60,7 @@ public class FileSystemJarPathService implements FileSystemPathService
 					.getMetaData(FILE_SYSTEM_META_DATA_KEY);
 				if (metaData == null)
 				{
-					metaData = new HashMap<String, FileSystem>();
+					metaData = new HashMap<>();
 					Application.get().setMetaData(FILE_SYSTEM_META_DATA_KEY, metaData);
 				}
 				fileSystem = metaData.get(jarFile);
@@ -89,6 +89,6 @@ public class FileSystemJarPathService implements FileSystemPathService
 	@Override
 	public boolean isResponsible(URI uri)
 	{
-		return uri.getScheme().equals("jar") && uri.toString().indexOf('!') != -1;
+		return "jar".equals(uri.getScheme()) && uri.toString().indexOf('!') != -1;
 	}
 }

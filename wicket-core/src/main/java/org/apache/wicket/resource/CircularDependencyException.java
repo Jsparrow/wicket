@@ -39,7 +39,6 @@ public final class CircularDependencyException extends WicketRuntimeException
 	 */
 	public CircularDependencyException(Set<HeaderItem> depsDone, HeaderItem newDependency)
 	{
-		super("Circular dependency detected in the dependency chain " + depsDone + ". " +
-			newDependency + " is already in the chain.");
+		super(new StringBuilder().append("Circular dependency detected in the dependency chain ").append(depsDone).append(". ").append(newDependency).append(" is already in the chain.").toString());
 	}
 }

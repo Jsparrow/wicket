@@ -71,11 +71,6 @@ import java.util.List;
 public class ChangeDelta extends Delta
 {
 
-	ChangeDelta()
-	{
-		super();
-	}
-
 	/**
 	 * Construct.
 	 * 
@@ -85,6 +80,10 @@ public class ChangeDelta extends Delta
 	public ChangeDelta(final Chunk orig, final Chunk rev)
 	{
 		init(orig, rev);
+	}
+
+	ChangeDelta()
+	{
 	}
 
 	/**

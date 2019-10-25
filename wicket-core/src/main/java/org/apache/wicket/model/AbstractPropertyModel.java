@@ -25,6 +25,8 @@ import org.apache.wicket.WicketRuntimeException;
 import org.apache.wicket.core.util.lang.PropertyResolver;
 import org.apache.wicket.core.util.lang.PropertyResolverConverter;
 import org.apache.wicket.util.string.Strings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Serves as a base class for different kinds of property models. By default, this class uses
@@ -48,6 +50,7 @@ public abstract class AbstractPropertyModel<T> extends ChainingModel<T>
 		IObjectClassAwareModel<T>,
 		IPropertyReflectionAwareModel<T>
 {
+	private static final Logger logger = LoggerFactory.getLogger(AbstractPropertyModel.class);
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -153,6 +156,7 @@ public abstract class AbstractPropertyModel<T> extends ChainingModel<T>
 			}
 			catch (Exception e)
 			{
+				logger.error(e.getMessage(), e);
 				// ignore.
 			}
 		}
@@ -168,6 +172,7 @@ public abstract class AbstractPropertyModel<T> extends ChainingModel<T>
 			}
 			catch (WicketRuntimeException e)
 			{
+				logger.error(e.getMessage(), e);
 				// it was just a try.
 			}
 
@@ -190,6 +195,7 @@ public abstract class AbstractPropertyModel<T> extends ChainingModel<T>
 				}
 				catch (Exception ignore)
 				{
+					logger.error(ignore.getMessage(), ignore);
 					// ignore.
 				}
 			}
@@ -212,6 +218,7 @@ public abstract class AbstractPropertyModel<T> extends ChainingModel<T>
 				}
 				catch (Exception ignore)
 				{
+					logger.error(ignore.getMessage(), ignore);
 				}
 			}
 		}
@@ -233,6 +240,7 @@ public abstract class AbstractPropertyModel<T> extends ChainingModel<T>
 				}
 				catch (Exception ignore)
 				{
+					logger.error(ignore.getMessage(), ignore);
 				}
 			}
 		}

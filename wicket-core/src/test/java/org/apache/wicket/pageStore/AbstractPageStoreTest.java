@@ -57,11 +57,11 @@ public abstract class AbstractPageStoreTest
 	@AfterEach
 	public void after()
 	{
-		if (pageStore != null)
-		{
-			pageStore.destroy();
-			pageStore = null;
+		if (pageStore == null) {
+			return;
 		}
+		pageStore.destroy();
+		pageStore = null;
 	}
 
 	/**

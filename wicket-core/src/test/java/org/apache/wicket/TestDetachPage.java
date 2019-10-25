@@ -47,34 +47,6 @@ public class TestDetachPage extends WebPage
 	private final AjaxEventBehavior ajaxEventBehavior;
 
 	/**
-	 * Model for testing detach logic.
-	 * 
-	 * @author dashorst
-	 */
-	private class DetachModel implements IModel<String>
-	{
-		/** for serialization. */
-		private static final long serialVersionUID = 1L;
-
-		@Override
-		public String getObject()
-		{
-			return "body";
-		}
-
-		@Override
-		public void setObject(String object)
-		{
-		}
-
-		@Override
-		public void detach()
-		{
-			nrModelDetachCalls++;
-		}
-	}
-
-	/**
 	 * Construct.
 	 */
 	public TestDetachPage()
@@ -219,5 +191,33 @@ public class TestDetachPage extends WebPage
 	public AjaxEventBehavior getAjaxBehavior()
 	{
 		return ajaxEventBehavior;
+	}
+
+	/**
+	 * Model for testing detach logic.
+	 * 
+	 * @author dashorst
+	 */
+	private class DetachModel implements IModel<String>
+	{
+		/** for serialization. */
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public String getObject()
+		{
+			return "body";
+		}
+
+		@Override
+		public void setObject(String object)
+		{
+		}
+
+		@Override
+		public void detach()
+		{
+			nrModelDetachCalls++;
+		}
 	}
 }

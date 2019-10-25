@@ -51,14 +51,7 @@ class MarkupIdGeneratorTest extends WicketTestCase
 	void customMarkupIdGenerator()
 	{
 		final String customMarkupId = "custom";
-		IMarkupIdGenerator generator = new IMarkupIdGenerator()
-		{
-			@Override
-			public String generateMarkupId(Component component, boolean create)
-			{
-				return customMarkupId;
-			}
-		};
+		IMarkupIdGenerator generator = (Component component, boolean create) -> customMarkupId;
 		tester.getApplication().getMarkupSettings().setMarkupIdGenerator(generator);
 		MockPageWithLink page = new MockPageWithLink();
 		Link link = new Link<Void>(MockPageWithLink.LINK_ID)

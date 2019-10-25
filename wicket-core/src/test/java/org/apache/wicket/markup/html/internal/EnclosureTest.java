@@ -443,9 +443,7 @@ class EnclosureTest extends WicketTestCase
 	void nestedEnclousers()
 	{
 		TestPageMarkup p = new TestPageMarkup();
-		p.setPageMarkup("<wicket:enclosure child='labelOuter'>tOuter Enclosure <span wicket:id='labelOuter'/>"
-				+ "<wicket:enclosure>Inner Enclosure <span wicket:id='labelInner' /></wicket:enclosure>"
-				+ "</wicket:enclosure>");
+		p.setPageMarkup(new StringBuilder().append("<wicket:enclosure child='labelOuter'>tOuter Enclosure <span wicket:id='labelOuter'/>").append("<wicket:enclosure>Inner Enclosure <span wicket:id='labelInner' /></wicket:enclosure>").append("</wicket:enclosure>").toString());
 		
 		p.add(new Label("labelOuter"), new Label("labelInner"));
 		tester.startPage(p);
@@ -465,13 +463,13 @@ class EnclosureTest extends WicketTestCase
 	{
 		private String markup;
 
-		TestPageMarkup()
-		{
-		}
-
 		public TestPageMarkup(String markup)
 		{
 			this.markup = markup;
+		}
+
+		TestPageMarkup()
+		{
 		}
 
 		String getPageMarkup()

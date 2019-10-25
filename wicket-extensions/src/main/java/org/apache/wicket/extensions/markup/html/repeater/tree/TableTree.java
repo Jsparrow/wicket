@@ -90,13 +90,7 @@ public abstract class TableTree<T, S> extends AbstractTree<T>
 		super(id, provider, state);
 
 		Args.notEmpty(columns, "columns");
-		for (IColumn<T, S> column : columns)
-		{
-			if (column instanceof ITreeColumn<?, ?>)
-			{
-				((ITreeColumn<T, S>)column).setTree(this);
-			}
-		}
+		columns.stream().filter(column -> column instanceof ITreeColumn<?, ?>).forEach(column -> ((ITreeColumn<T, S>) column).setTree(this));
 
 		this.table = newDataTable("table", columns, newDataProvider(provider), rowsPerPage);
 		add(table);
@@ -184,22 +178,17 @@ public abstract class TableTree<T, S> extends AbstractTree<T>
 	public void updateNode(T t, IPartialPageRequestHandler target)
 	{
 		final IModel<T> model = getProvider().model(t);
-		table.getBody().visitChildren(Item.class, new IVisitor<Item<T>, Void>()
-		{
-			@Override
-			public void component(Item<T> item, IVisit<Void> visit)
-			{
-				NodeModel<T> nodeModel = (NodeModel<T>)item.getModel();
+		table.getBody().visitChildren(Item.class, (Item<T> item, IVisit<Void> visit) -> {
+			NodeModel<T> nodeModel = (NodeModel<T>)item.getModel();
 
-				if (model.equals(nodeModel.getWrappedModel()))
-				{
-					// row items are configured to output their markupId
-					target.add(item);
-					visit.stop();
-					return;
-				}
-				visit.dontGoDeeper();
+			if (model.equals(nodeModel.getWrappedModel()))
+			{
+				// row items are configured to output their markupId
+				target.add(item);
+				visit.stop();
+				return;
 			}
+			visit.dontGoDeeper();
 		});
 		model.detach();
 	}

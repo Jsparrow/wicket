@@ -52,12 +52,12 @@ public abstract class AbstractPersistentPageStore implements IPageStore
 
 	protected AbstractPersistentPageStore(String applicationName)
 	{
-		this.storeKey = Args.notNull(applicationName, "applicationName") + ":" + getClass().getSimpleName();
+		this.storeKey = new StringBuilder().append(Args.notNull(applicationName, "applicationName")).append(":").append(getClass().getSimpleName()).toString();
 
 		if (STORES.containsKey(storeKey))
 		{
 			throw new IllegalStateException(
-				"Store with key '" + storeKey + "' already exists.");
+				new StringBuilder().append("Store with key '").append(storeKey).append("' already exists.").toString());
 		}
 		STORES.put(storeKey, this);
 	}
@@ -175,6 +175,11 @@ public abstract class AbstractPersistentPageStore implements IPageStore
 		return context.getSessionId(true);
 	}
 
+	public String getSessionIdentifier(IPageContext context)
+	{
+		return getSessionIdentifier(context, true);
+	}
+
 	/**
 	 * Attribute held in session.
 	 */
@@ -215,11 +220,6 @@ public abstract class AbstractPersistentPageStore implements IPageStore
 				store.removeAllPersistedPages(sessionIdentifier);
 			}
 		}
-	}
-
-	public String getSessionIdentifier(IPageContext context)
-	{
-		return getSessionIdentifier(context, true);
 	}
 
 	protected static class PersistedPage implements IPersistedPage

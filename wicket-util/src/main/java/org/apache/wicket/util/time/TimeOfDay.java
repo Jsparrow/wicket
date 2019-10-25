@@ -72,20 +72,20 @@ public final class TimeOfDay extends AbstractTime
 	/** Constant for noon. */
 	public static final TimeOfDay NOON = time(12, 0, PM);
 
-	/** Typesafe AM/PM enumeration. */
-	public static final class Meridian extends EnumeratedType
+	/**
+	 * Private utility constructor forces use of static factory methods.
+	 * 
+	 * @param time
+	 *            the time today in milliseconds
+	 */
+	private TimeOfDay(final long time)
 	{
-		private static final long serialVersionUID = 1L;
+		super(time);
 
-		/**
-		 * Constructor.
-		 * 
-		 * @param name
-		 *            the meridian name (value)
-		 */
-		Meridian(final String name)
+		// A time of day value must be less than 1 day of milliseconds
+		if (Duration.valueOf(time).greaterThan(Duration.ONE_DAY))
 		{
-			super(name);
+			throw new IllegalArgumentException(new StringBuilder().append("Time ").append(this).append(" is not a time of day value").toString());
 		}
 	}
 
@@ -104,17 +104,17 @@ public final class TimeOfDay extends AbstractTime
 	{
 		if ((hour > 23) || (hour < 0))
 		{
-			throw new IllegalArgumentException("Hour " + hour + " is not valid");
+			throw new IllegalArgumentException(new StringBuilder().append("Hour ").append(hour).append(" is not valid").toString());
 		}
 
 		if ((minute > 59) || (minute < 0))
 		{
-			throw new IllegalArgumentException("Minute " + minute + " is not valid");
+			throw new IllegalArgumentException(new StringBuilder().append("Minute ").append(minute).append(" is not valid").toString());
 		}
 
 		if ((second > 59) || (second < 0))
 		{
-			throw new IllegalArgumentException("Second " + second + " is not valid");
+			throw new IllegalArgumentException(new StringBuilder().append("Second ").append(second).append(" is not valid").toString());
 		}
 
 		return valueOf(Duration.hours(hour)
@@ -290,23 +290,6 @@ public final class TimeOfDay extends AbstractTime
 	}
 
 	/**
-	 * Private utility constructor forces use of static factory methods.
-	 * 
-	 * @param time
-	 *            the time today in milliseconds
-	 */
-	private TimeOfDay(final long time)
-	{
-		super(time);
-
-		// A time of day value must be less than 1 day of milliseconds
-		if (Duration.valueOf(time).greaterThan(Duration.ONE_DAY))
-		{
-			throw new IllegalArgumentException("Time " + this + " is not a time of day value");
-		}
-	}
-
-	/**
 	 * Retrieves the hour of the day.
 	 * 
 	 * @return the hour (0-23) of this <code>TimeOfDay</code>
@@ -379,7 +362,8 @@ public final class TimeOfDay extends AbstractTime
 	public String toString()
 	{
 		final int second = second();
-		return "" + hour() + ":" + minute() + (second != 0 ? ":" + second : "");
+		return new StringBuilder().append(Integer.toString(hour())).append(":").append(minute()).append(second != 0 ? ":" + second : "")
+				.toString();
 	}
 
 	/**
@@ -416,5 +400,22 @@ public final class TimeOfDay extends AbstractTime
 	private int toSeconds(final long milliseconds)
 	{
 		return (int)(milliseconds / 1000);
+	}
+
+	/** Typesafe AM/PM enumeration. */
+	public static final class Meridian extends EnumeratedType
+	{
+		private static final long serialVersionUID = 1L;
+
+		/**
+		 * Constructor.
+		 * 
+		 * @param name
+		 *            the meridian name (value)
+		 */
+		Meridian(final String name)
+		{
+			super(name);
+		}
 	}
 }

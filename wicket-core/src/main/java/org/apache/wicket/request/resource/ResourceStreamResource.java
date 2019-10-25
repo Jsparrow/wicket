@@ -162,6 +162,7 @@ public class ResourceStreamResource extends AbstractResource
 				}
 				catch (ResourceStreamNotFoundException e)
 				{
+					logger.error(e.getMessage(), e);
 					data.setError(HttpServletResponse.SC_NOT_FOUND);
 					close(resourceStream);
 				}

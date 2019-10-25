@@ -40,7 +40,7 @@ public class FormBorder extends Border
 	{
 		super(id);
 
-		form = new Form<Void>("myForm");
+		form = new Form<>("myForm");
 		addToBorder(form);
 
 		form.add(getBodyContainer());

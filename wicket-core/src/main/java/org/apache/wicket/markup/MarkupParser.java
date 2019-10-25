@@ -50,7 +50,7 @@ import org.apache.wicket.util.lang.Objects;
 public class MarkupParser extends AbstractMarkupParser
 {
 	/** "wicket" */
-	public final static String WICKET = "wicket";
+	public static final String WICKET = "wicket";
 
 	/**
 	 * Constructor.

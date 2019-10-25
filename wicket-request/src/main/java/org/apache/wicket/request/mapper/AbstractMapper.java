@@ -35,6 +35,13 @@ public abstract class AbstractMapper implements IRequestMapper
 {
 
 	/**
+	 * Construct.
+	 */
+	public AbstractMapper()
+	{
+	}
+
+	/**
 	 * If the string is in a placeholder format ${key} this method returns the key.
 	 * 
 	 * @param s
@@ -79,14 +86,6 @@ public abstract class AbstractMapper implements IRequestMapper
 	}
 
 	/**
-	 * Construct.
-	 */
-	public AbstractMapper()
-	{
-		super();
-	}
-
-	/**
 	 * Returns true if the given url starts with specified segments.
 	 * 
 	 * @param url
@@ -122,7 +121,7 @@ public abstract class AbstractMapper implements IRequestMapper
 			
 		return true;
 	}
-	
+
 	/**
 	 * Utility method to safely get an element from a list of String.
 	 * If the specified index is bigger than the size of the list
@@ -143,7 +142,7 @@ public abstract class AbstractMapper implements IRequestMapper
 		
 		return defaultValue;
 	}
-	
+
 	/**
 	 * Extracts {@link PageParameters} from the URL using the given {@link IPageParametersEncoder} .
 	 * 

@@ -43,6 +43,9 @@ import org.apache.wicket.util.string.AppendingStringBuffer;
 public class BufferedWebResponse extends WebResponse implements IMetaDataBufferingWebResponse
 {
 	private final WebResponse originalResponse;
+	private final List<Action> actions = new ArrayList<>();
+	private StringBuilder charSequenceBuilder;
+	private ByteArrayOutputStream dataStream;
 
 	/**
 	 * Construct.
@@ -69,13 +72,8 @@ public class BufferedWebResponse extends WebResponse implements IMetaDataBufferi
 	@Override
 	public void writeMetaData(WebResponse response)
 	{
-		for (Action action : actions)
-		{
-			if (action.getType() == ActionType.HEADER)
-				action.invoke(response);
-		}
+		actions.stream().filter(action -> action.getType() == ActionType.HEADER).forEach(action -> action.invoke(response));
 	}
-
 
 	@Override
 	public String encodeURL(CharSequence url)
@@ -102,55 +100,6 @@ public class BufferedWebResponse extends WebResponse implements IMetaDataBufferi
 			return url != null ? url.toString() : null;
 		}
 	}
-
-	private enum ActionType {
-		/**
-		 * Actions not related directly to the content of the response, eg setting cookies, headers.
-		 */
-		HEADER,
-		REDIRECT,
-		NORMAL,
-		/**
-		 * Actions directly related to the data of the response, eg writing output, etc.
-		 */
-		DATA;
-
-		protected final Action action(Consumer<WebResponse> action) {
-			return new Action(this, action);
-		}
-	}
-
-	private static final class Action implements Comparable<Action>
-	{
-		private final ActionType type;
-		private final Consumer<WebResponse> action;
-
-		private Action(ActionType type, Consumer<WebResponse> action)
-		{
-			this.type = type;
-			this.action = action;
-		}
-
-		protected final void invoke(WebResponse response)
-		{
-			action.accept(response);
-		}
-
-		protected final ActionType getType()
-		{
-			return type;
-		}
-
-		@Override
-		public int compareTo(Action o)
-		{
-			return getType().ordinal() - o.getType().ordinal();
-		}
-	}
-
-	private final List<Action> actions = new ArrayList<Action>();
-	private StringBuilder charSequenceBuilder;
-	private ByteArrayOutputStream dataStream;
 
 	@Override
 	public void reset()
@@ -336,23 +285,13 @@ public class BufferedWebResponse extends WebResponse implements IMetaDataBufferi
 
 		Collections.sort(actions);
 
-		for (Action action : actions)
-		{
-			action.invoke(response);
-		}
+		actions.forEach(action -> action.invoke(response));
 	}
 
 	@Override
 	public boolean isRedirect()
 	{
-		for (Action action : actions)
-		{
-			if (action.getType() == ActionType.REDIRECT)
-			{
-				return true;
-			}
-		}
-		return false;
+		return actions.stream().anyMatch(action -> action.getType() == ActionType.REDIRECT);
 	}
 
 	@Override
@@ -378,11 +317,11 @@ public class BufferedWebResponse extends WebResponse implements IMetaDataBufferi
 				@Override
 				public void write(byte[] b, int off, int len) throws IOException
 				{
-					if (off == 0 && len == b.length)
-					{
-						response.write(b);
-						copied[0] = true;
+					if (!(off == 0 && len == b.length)) {
+						return;
 					}
+					response.write(b);
+					copied[0] = true;
 				}
 			});
 		}
@@ -418,5 +357,50 @@ public class BufferedWebResponse extends WebResponse implements IMetaDataBufferi
 	public Object getContainerResponse()
 	{
 		return originalResponse.getContainerResponse();
+	}
+
+	private enum ActionType {
+		/**
+		 * Actions not related directly to the content of the response, eg setting cookies, headers.
+		 */
+		HEADER,
+		REDIRECT,
+		NORMAL,
+		/**
+		 * Actions directly related to the data of the response, eg writing output, etc.
+		 */
+		DATA;
+
+		protected final Action action(Consumer<WebResponse> action) {
+			return new Action(this, action);
+		}
+	}
+
+	private static final class Action implements Comparable<Action>
+	{
+		private final ActionType type;
+		private final Consumer<WebResponse> action;
+
+		private Action(ActionType type, Consumer<WebResponse> action)
+		{
+			this.type = type;
+			this.action = action;
+		}
+
+		protected final void invoke(WebResponse response)
+		{
+			action.accept(response);
+		}
+
+		protected final ActionType getType()
+		{
+			return type;
+		}
+
+		@Override
+		public int compareTo(Action o)
+		{
+			return getType().ordinal() - o.getType().ordinal();
+		}
 	}
 }

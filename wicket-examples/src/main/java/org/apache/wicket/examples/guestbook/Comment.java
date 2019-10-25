@@ -87,6 +87,6 @@ public class Comment implements IClusterable
 	@Override
 	public String toString()
 	{
-		return "[Comment date = " + date + ", text = " + text + "]";
+		return new StringBuilder().append("[Comment date = ").append(date).append(", text = ").append(text).append("]").toString();
 	}
 }

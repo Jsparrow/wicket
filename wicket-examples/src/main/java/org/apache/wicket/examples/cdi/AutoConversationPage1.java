@@ -45,6 +45,7 @@ public class AutoConversationPage1 extends CdiExamplePage implements Conversatio
 		});
 
 		add(new Link<Void>("next") {
+			@Override
 			public void onClick() {
 				setResponsePage(new AutoConversationPage2());
 			}

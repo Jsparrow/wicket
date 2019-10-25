@@ -54,6 +54,8 @@ import java.io.BufferedReader;
 import java.io.StringReader;
 import java.util.LinkedList;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class delegates handling of the to a StringBuilder based version.
@@ -63,6 +65,8 @@ import java.util.List;
  */
 public class ToString
 {
+	private static final Logger logger = LoggerFactory.getLogger(ToString.class);
+
 	/**
 	 * Construct.
 	 */
@@ -117,6 +121,7 @@ public class ToString
 		}
 		catch (java.io.IOException ignored)
 		{
+			logger.error(ignored.getMessage(), ignored);
 		}
 		return l.toArray(new String[l.size()]);
 	}

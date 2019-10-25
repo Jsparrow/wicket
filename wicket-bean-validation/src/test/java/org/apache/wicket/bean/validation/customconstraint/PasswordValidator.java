@@ -44,15 +44,12 @@ public class PasswordValidator implements ConstraintValidator<PasswordConstraint
 		Matcher matcher = MetaPattern.NON_WORD.matcher(value);
 		
 		// password must not contain non-word characters.
-		if (matcher.find())
-		{
-			context.disableDefaultConstraintViolation();
-			context.buildConstraintViolationWithTemplate("{" +
-				PasswordConstraintAnnotation.CUSTOM_BUNDLE_KEY + "}").addConstraintViolation();
-			return false;
+		if (!matcher.find()) {
+			return true;
 		}
-
-		return true;
+		context.disableDefaultConstraintViolation();
+		context.buildConstraintViolationWithTemplate(new StringBuilder().append("{").append(PasswordConstraintAnnotation.CUSTOM_BUNDLE_KEY).append("}").toString()).addConstraintViolation();
+		return false;
 	}
 
 }

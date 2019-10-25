@@ -34,17 +34,17 @@ public class WicketAjaxJQueryResourceReference extends JavaScriptResourceReferen
 
 	private static final WicketAjaxJQueryResourceReference INSTANCE = new WicketAjaxJQueryResourceReference();
 
+	private WicketAjaxJQueryResourceReference()
+	{
+		super(AbstractDefaultAjaxBehavior.class, "res/js/wicket-ajax-jquery.js");
+	}
+
 	/**
 	 * @return the singleton INSTANCE
 	 */
 	public static WicketAjaxJQueryResourceReference get()
 	{
 		return INSTANCE;
-	}
-
-	private WicketAjaxJQueryResourceReference()
-	{
-		super(AbstractDefaultAjaxBehavior.class, "res/js/wicket-ajax-jquery.js");
 	}
 
 	@Override

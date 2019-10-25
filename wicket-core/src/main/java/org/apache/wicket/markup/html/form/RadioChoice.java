@@ -347,7 +347,7 @@ public class RadioChoice<T> extends AbstractSingleSelectChoice<T>
 		buffer.append(getPrefix(index, choice));
 
 		String id = getChoiceRenderer().getIdValue(choice, index);
-		final String idAttr = getMarkupId() + "-" + id;
+		final String idAttr = new StringBuilder().append(getMarkupId()).append("-").append(id).toString();
 
 		boolean enabled = isEnabledInHierarchy() && !isDisabled(choice, index, selected);
 
@@ -358,14 +358,8 @@ public class RadioChoice<T> extends AbstractSingleSelectChoice<T>
 		StringBuilder extraLabelAttributes = new StringBuilder();
 		if (labelAttrs != null)
 		{
-			for (Map.Entry<String, Object> attr : labelAttrs.entrySet())
-			{
-				extraLabelAttributes.append(' ')
-						.append(Strings.escapeMarkup(attr.getKey()))
-						.append("=\"")
-						.append(Strings.escapeMarkup(attr.getValue().toString()))
-						.append('"');
-			}
+			labelAttrs.entrySet().forEach(attr -> extraLabelAttributes.append(' ').append(Strings.escapeMarkup(attr.getKey())).append("=\"")
+					.append(Strings.escapeMarkup(attr.getValue().toString())).append('"'));
 		}
 
 		labelPosition.before(buffer, idAttr, extraLabelAttributes, renderValue);
@@ -388,14 +382,8 @@ public class RadioChoice<T> extends AbstractSingleSelectChoice<T>
 			IValueMap attrs = getAdditionalAttributes(index, choice);
 			if (attrs != null)
 			{
-				for (Map.Entry<String, Object> attr : attrs.entrySet())
-				{
-					buffer.append(' ')
-						.append(Strings.escapeMarkup(attr.getKey()))
-						.append("=\"")
-						.append(Strings.escapeMarkup(attr.getValue().toString()))
-						.append('"');
-				}
+				attrs.entrySet().forEach(attr -> buffer.append(' ').append(Strings.escapeMarkup(attr.getKey())).append("=\"")
+						.append(Strings.escapeMarkup(attr.getValue().toString())).append('"'));
 			}
 		}
 

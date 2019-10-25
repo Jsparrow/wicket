@@ -118,14 +118,9 @@ class RequestCycleListenerTest extends RequestHandlerExecutorTest
 				throw new UnsupportedOperationException();
 			}
 		};
-		IExceptionMapper exceptionMapper = new IExceptionMapper()
-		{
-			@Override
-			public IRequestHandler map(Exception e)
-			{
-				exceptionsMapped++;
-				return null;
-			}
+		IExceptionMapper exceptionMapper = (Exception e) -> {
+			exceptionsMapped++;
+			return null;
 		};
 		RequestCycleContext context = new RequestCycleContext(request, originalResponse,
 			requestMapper, exceptionMapper);
@@ -382,8 +377,14 @@ class RequestCycleListenerTest extends RequestHandlerExecutorTest
 	private class IncrementingListener implements IRequestCycleListener
 	{
 
-		private int begins, ends, exceptions, detachesnotified, resolved, exceptionResolutions,
-			schedules, executed = 0;
+		private int begins;
+		private int ends;
+		private int exceptions;
+		private int detachesnotified;
+		private int resolved;
+		private int exceptionResolutions;
+		private int schedules;
+		private int executed = 0;
 
 		@Override
 		public IRequestHandler onException(final RequestCycle cycle, Exception ex)

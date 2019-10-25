@@ -40,20 +40,6 @@ public abstract class LabeledWebMarkupContainer extends WebMarkupContainer
 	 */
 	private IModel<String> labelModel = null;
 
-	@Override
-	protected void onDetach()
-	{
-		super.onDetach();
-		if (labelModel != null)
-		{
-			labelModel.detach();
-			if (labelModel instanceof IWrapModel)
-			{
-				((IWrapModel<?>)labelModel).getWrappedModel().detach();
-			}
-		}
-	}
-
 	/**
 	 * @see org.apache.wicket.Component#Component(String)
 	 */
@@ -68,6 +54,20 @@ public abstract class LabeledWebMarkupContainer extends WebMarkupContainer
 	public LabeledWebMarkupContainer(final String id, final IModel<?> model)
 	{
 		super(id, model);
+	}
+
+	@Override
+	protected void onDetach()
+	{
+		super.onDetach();
+		if (labelModel == null) {
+			return;
+		}
+		labelModel.detach();
+		if (labelModel instanceof IWrapModel)
+		{
+			((IWrapModel<?>)labelModel).getWrappedModel().detach();
+		}
 	}
 
 	/**

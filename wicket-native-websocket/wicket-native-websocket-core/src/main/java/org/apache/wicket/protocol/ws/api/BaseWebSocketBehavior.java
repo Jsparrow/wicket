@@ -45,17 +45,6 @@ public class BaseWebSocketBehavior extends Behavior
 	 * Constructor.
 	 *
 	 * Contributes WebSocket initialization code that will
-	 * work with {@link org.apache.wicket.protocol.ws.api.WebSocketBehavior}
-	 */
-	protected BaseWebSocketBehavior()
-	{
-		this.resourceName = null;
-	}
-
-	/**
-	 * Constructor.
-	 *
-	 * Contributes WebSocket initialization code that will
 	 * work with {@link org.apache.wicket.protocol.ws.api.WebSocketResource}
 	 *
 	 * To use WebSocketResource the application have to setup the
@@ -71,6 +60,17 @@ public class BaseWebSocketBehavior extends Behavior
 	public BaseWebSocketBehavior(String resourceName)
 	{
 		this.resourceName = Args.notEmpty(resourceName, "resourceName");
+	}
+
+	/**
+	 * Constructor.
+	 *
+	 * Contributes WebSocket initialization code that will
+	 * work with {@link org.apache.wicket.protocol.ws.api.WebSocketBehavior}
+	 */
+	protected BaseWebSocketBehavior()
+	{
+		this.resourceName = null;
 	}
 
 	@Override
@@ -163,7 +163,7 @@ public class BaseWebSocketBehavior extends Behavior
 		final WebApplication application = (WebApplication) component.getApplication();
 		final Set<SessionTrackingMode> effectiveSessionTrackingModes = application.getServletContext().getEffectiveSessionTrackingModes();
 		Object containerRequest = component.getRequest().getContainerRequest();
-		if (effectiveSessionTrackingModes.size() == 1 && SessionTrackingMode.URL.equals(effectiveSessionTrackingModes.iterator().next()))
+		if (effectiveSessionTrackingModes.size() == 1 && SessionTrackingMode.URL == effectiveSessionTrackingModes.iterator().next())
 		{
 			sessionId = component.getSession().getId();
 		}

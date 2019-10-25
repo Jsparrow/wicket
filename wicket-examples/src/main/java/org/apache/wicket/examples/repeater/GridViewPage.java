@@ -41,8 +41,7 @@ public class GridViewPage extends BasePage
 			protected void populateItem(Item<Contact> item)
 			{
 				final Contact contact = item.getModelObject();
-				item.add(new Label("firstName", contact.getFirstName() + " " +
-					contact.getLastName()));
+				item.add(new Label("firstName", new StringBuilder().append(contact.getFirstName()).append(" ").append(contact.getLastName()).toString()));
 			}
 
 			@Override

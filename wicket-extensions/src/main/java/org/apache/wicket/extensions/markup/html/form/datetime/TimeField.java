@@ -55,14 +55,6 @@ public class TimeField extends FormComponentPanel<LocalTime>
 
 	public static final String MINUTES_CSS_CLASS_KEY = CssUtils.key(TimeField.class, "minutes");
 
-	/**
-	 * Enumerated type for different ways of handling the render part of requests.
-	 */
-	public enum AM_PM
-	{
-		AM, PM;
-	}
-
 	private static final IConverter<Integer> MINUTES_CONVERTER = new IntegerConverter()
 	{
 		private static final long serialVersionUID = 1L;
@@ -303,6 +295,14 @@ public class TimeField extends FormComponentPanel<LocalTime>
 			FormatStyle.SHORT, IsoChronology.INSTANCE, getLocale());
 		return pattern.indexOf('a') != -1 || pattern.indexOf('h') != -1
 			|| pattern.indexOf('K') != -1;
+	}
+
+	/**
+	 * Enumerated type for different ways of handling the render part of requests.
+	 */
+	public enum AM_PM
+	{
+		AM, PM;
 	}
 
 	protected class HoursModel implements IModel<Integer>

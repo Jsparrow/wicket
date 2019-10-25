@@ -94,8 +94,7 @@ public class FileSystemResourceStream extends AbstractResourceStream
 			}
 			catch (IOException e)
 			{
-				throw new ResourceStreamNotFoundException("Input stream of path " + path +
-					" could not be acquired", e);
+				throw new ResourceStreamNotFoundException(new StringBuilder().append("Input stream of path ").append(path).append(" could not be acquired").toString(), e);
 			}
 		}
 		return inputStream;
@@ -104,11 +103,11 @@ public class FileSystemResourceStream extends AbstractResourceStream
 	@Override
 	public void close() throws IOException
 	{
-		if (inputStream != null)
-		{
-			inputStream.close();
-			inputStream = null;
+		if (inputStream == null) {
+			return;
 		}
+		inputStream.close();
+		inputStream = null;
 	}
 
 	@Override
@@ -126,7 +125,7 @@ public class FileSystemResourceStream extends AbstractResourceStream
 		}
 		catch (IOException e)
 		{
-			throw new RuntimeException("Content type of path " + path + " could not be acquired", e);
+			throw new RuntimeException(new StringBuilder().append("Content type of path ").append(path).append(" could not be acquired").toString(), e);
 		}
 	}
 
@@ -150,8 +149,7 @@ public class FileSystemResourceStream extends AbstractResourceStream
 		}
 		catch (IOException e)
 		{
-			throw new RuntimeException("Modification time of path " + path +
-				" could not be acquired", e);
+			throw new RuntimeException(new StringBuilder().append("Modification time of path ").append(path).append(" could not be acquired").toString(), e);
 		}
 	}
 
@@ -166,7 +164,7 @@ public class FileSystemResourceStream extends AbstractResourceStream
 		}
 		catch (IOException e)
 		{
-			throw new RuntimeException("Length of path " + path + " could not be acquired", e);
+			throw new RuntimeException(new StringBuilder().append("Length of path ").append(path).append(" could not be acquired").toString(), e);
 		}
 	}
 

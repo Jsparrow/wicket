@@ -264,14 +264,13 @@ public abstract class ListView<T> extends AbstractRepeater
 			public void onClick()
 			{
 				final int index = item.getIndex();
-				if (index != -1)
-				{
-					addStateChange();
-
-					// Swap list items and invalidate listView
-					Collections.swap(getList(), index, index + 1);
-					ListView.this.removeAll();
+				if (!(index != -1)) {
+					return;
 				}
+				addStateChange();
+				// Swap list items and invalidate listView
+				Collections.swap(getList(), index, index + 1);
+				ListView.this.removeAll();
 			}
 
 			@Override
@@ -304,15 +303,13 @@ public abstract class ListView<T> extends AbstractRepeater
 			public void onClick()
 			{
 				final int index = item.getIndex();
-				if (index != -1)
-				{
-
-					addStateChange();
-
-					// Swap items and invalidate listView
-					Collections.swap(getList(), index, index - 1);
-					ListView.this.removeAll();
+				if (!(index != -1)) {
+					return;
 				}
+				addStateChange();
+				// Swap items and invalidate listView
+				Collections.swap(getList(), index, index - 1);
+				ListView.this.removeAll();
 			}
 
 			@Override

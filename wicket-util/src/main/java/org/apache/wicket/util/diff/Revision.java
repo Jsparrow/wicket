@@ -187,10 +187,7 @@ public class Revision extends ToString
 	@Override
 	public synchronized void toString(final StringBuilder s)
 	{
-		for (Delta delta : deltas_)
-		{
-			delta.toString(s);
-		}
+		deltas_.forEach(delta -> delta.toString(s));
 	}
 
 	/**
@@ -204,10 +201,7 @@ public class Revision extends ToString
 	 */
 	public synchronized void toRCSString(final StringBuilder s, final String EOL)
 	{
-		for (Delta deltas : deltas_)
-		{
-			deltas.toRCSString(s, EOL);
-		}
+		deltas_.forEach(deltas -> deltas.toRCSString(s, EOL));
 	}
 
 	/**
@@ -256,10 +250,7 @@ public class Revision extends ToString
 	public void accept(final RevisionVisitor visitor)
 	{
 		visitor.visit(this);
-		for (Delta delta : deltas_)
-		{
-			delta.accept(visitor);
-		}
+		deltas_.forEach(delta -> delta.accept(visitor));
 	}
 
 }

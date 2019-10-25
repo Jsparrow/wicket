@@ -18,6 +18,8 @@ package org.apache.wicket.util.io;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -39,6 +41,9 @@ public abstract class ThresholdingOutputStream extends OutputStream
 {
 
 	// ----------------------------------------------------------- Data members
+
+
+	private static final Logger logger = LoggerFactory.getLogger(ThresholdingOutputStream.class);
 
 
 	/**
@@ -161,6 +166,7 @@ public abstract class ThresholdingOutputStream extends OutputStream
 		}
 		catch (IOException ignored)
 		{
+			logger.error(ignored.getMessage(), ignored);
 			// ignore
 		}
 		getStream().close();
@@ -218,11 +224,11 @@ public abstract class ThresholdingOutputStream extends OutputStream
 	 */
 	protected void checkThreshold(final int count) throws IOException
 	{
-		if (!thresholdExceeded && (written + count > threshold))
-		{
-			thresholdReached();
-			thresholdExceeded = true;
+		if (!(!thresholdExceeded && (written + count > threshold))) {
+			return;
 		}
+		thresholdReached();
+		thresholdExceeded = true;
 	}
 
 

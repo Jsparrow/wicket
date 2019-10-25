@@ -24,6 +24,8 @@ import org.apache.wicket.WicketRuntimeException;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.util.tester.WicketTestCase;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Test for RadioGroup and Radio components
@@ -33,6 +35,8 @@ import org.junit.jupiter.api.Test;
  */
 class RadioGroupTest extends WicketTestCase
 {
+	private static final Logger logger = LoggerFactory.getLogger(RadioGroupTest.class);
+
 	/**
 	 * test component form processing
 	 */
@@ -40,7 +44,7 @@ class RadioGroupTest extends WicketTestCase
 	void formProcessing()
 	{
 		// object used to test regular model
-		Model<String> model = new Model<String>();
+		Model<String> model = new Model<>();
 
 		RadioGroupProcessingTestPage page = new RadioGroupProcessingTestPage(model);
 
@@ -76,6 +80,7 @@ class RadioGroupTest extends WicketTestCase
 		}
 		catch (WicketRuntimeException e)
 		{
+			logger.error(e.getMessage(), e);
 
 		}
 	}

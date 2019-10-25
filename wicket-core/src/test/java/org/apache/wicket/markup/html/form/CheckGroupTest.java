@@ -25,6 +25,8 @@ import java.util.List;
 import org.apache.wicket.WicketRuntimeException;
 import org.apache.wicket.util.tester.WicketTestCase;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jcompagner
@@ -37,6 +39,8 @@ import org.junit.jupiter.api.Test;
  */
 class CheckGroupTest extends WicketTestCase
 {
+	private static final Logger logger = LoggerFactory.getLogger(CheckGroupTest.class);
+
 	/**
 	 * test component form processing
 	 */
@@ -45,7 +49,7 @@ class CheckGroupTest extends WicketTestCase
 	{
 
 		// test model constructors
-		List<String> list = new ArrayList<String>();
+		List<String> list = new ArrayList<>();
 		list.add("check2");
 
 		CheckGroupProcessingTestPage page = new CheckGroupProcessingTestPage(list);
@@ -91,6 +95,7 @@ class CheckGroupTest extends WicketTestCase
 		}
 		catch (WicketRuntimeException e)
 		{
+			logger.error(e.getMessage(), e);
 		}
 	}
 

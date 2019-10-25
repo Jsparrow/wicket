@@ -53,12 +53,13 @@ public class GroupingPageStoreTest
 		
 		IPageStore store = new MockPageStore() {
 			
+			@Override
 			public void addPage(IPageContext context, IManageablePage page) {
 
 				context.getSessionAttribute("attribute", () -> "value");
 				context.getSessionData(KEY, () -> VALUE);
 
-				assertEquals(sessionId + "_" + group(page), context.getSessionId(true));
+				assertEquals(new StringBuilder().append(sessionId).append("_").append(group(page)).toString(), context.getSessionId(true));
 				
 				super.addPage(context, page);
 			}

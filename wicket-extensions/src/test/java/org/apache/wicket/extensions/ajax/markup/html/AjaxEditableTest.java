@@ -19,8 +19,6 @@ package org.apache.wicket.extensions.ajax.markup.html;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.Arrays;
-
 import org.apache.wicket.Page;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.behavior.AbstractAjaxBehavior;
@@ -35,6 +33,7 @@ import org.apache.wicket.util.string.StringValue;
 import org.apache.wicket.util.tester.WicketTestCase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import java.util.Collections;
 
 /**
  * Tests for {@link AjaxEditableLabel}
@@ -166,14 +165,14 @@ public class AjaxEditableTest extends WicketTestCase
 			}
 		}
 		IModel<Integer> integerModel = new IntegerModel();
-		AjaxEditableLabel<Integer> editableLabel = new AjaxEditableLabel<Integer>("test",
+		AjaxEditableLabel<Integer> editableLabel = new AjaxEditableLabel<>("test",
 			integerModel);
 		editableLabel.getEditor().setVisible(true);
 
 		IWritableRequestParameters postParameters = (IWritableRequestParameters)tester
 			.getRequestCycle().getRequest().getPostParameters();
 		postParameters.setParameterValues(editableLabel.getEditor().getInputName(),
-			Arrays.asList(StringValue.valueOf("5")));
+			Collections.singletonList(StringValue.valueOf("5")));
 		editableLabel.getEditor().processInput();
 
 		assertTrue(integerModel.getObject() instanceof Integer);

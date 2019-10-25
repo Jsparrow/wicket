@@ -34,7 +34,7 @@ class JsonUtilsTest
 	@Test
     void asArray() throws Exception
 	{
-		Map<String, Object> map = new HashMap<String, Object>();
+		Map<String, Object> map = new HashMap<>();
 
 		map.put("string", "stringValue");
 		assertEquals("[{\"name\":\"string\",\"value\":\"stringValue\"}]", JsonUtils.asArray(map).toString());
@@ -48,7 +48,7 @@ class JsonUtilsTest
 		assertEquals("[{\"name\":\"boolean\",\"value\":true}]", JsonUtils.asArray(map).toString());
 
 		map.clear();
-		List<Object> listValues = new ArrayList<Object>();
+		List<Object> listValues = new ArrayList<>();
 		listValues.addAll(Arrays.asList("listValue", 2, false, null));
 		map.put("list", listValues);
 		assertEquals("[{\"name\":\"list\",\"value\":\"listValue\"},{\"name\":\"list\",\"value\":2},{\"name\":\"list\",\"value\":false}]", JsonUtils.asArray(map).toString());

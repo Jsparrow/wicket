@@ -45,21 +45,6 @@ import org.apache.wicket.util.io.IClusterable;
 public class WizardModel extends AbstractWizardModel
 {
 	/**
-	 * Interface for conditional displaying of wizard steps.
-	 */
-	@FunctionalInterface
-	public interface ICondition extends IClusterable
-	{
-		/**
-		 * Evaluates the current state and returns whether the step that is coupled to this
-		 * condition is available.
-		 * 
-		 * @return True if the step this condition is coupled to is available, false otherwise
-		 */
-		public boolean evaluate();
-	}
-
-	/**
 	 * Condition that always evaluates true.
 	 */
 	public static final ICondition TRUE = (() -> true);
@@ -215,10 +200,7 @@ public class WizardModel extends AbstractWizardModel
 		history.clear();
 		activeStep = null;
 		
-		for (IWizardStep step : steps)
-		{
-			step.init(this);
-		}
+		steps.forEach(step -> step.init(this));
 
 		setActiveStep(findNextVisibleStep());
 	}
@@ -267,15 +249,7 @@ public class WizardModel extends AbstractWizardModel
 	 */
 	protected final boolean allStepsComplete()
 	{
-		for (IWizardStep step : steps)
-		{
-			if (!step.isComplete())
-			{
-				return false;
-			}
-		}
-
-		return true;
+		return steps.stream().allMatch(IWizardStep::isComplete);
 	}
 
 	/**
@@ -326,6 +300,21 @@ public class WizardModel extends AbstractWizardModel
 	public List<ICondition> getConditions()
 	{
 		return Collections.unmodifiableList(conditions);
+	}
+
+	/**
+	 * Interface for conditional displaying of wizard steps.
+	 */
+	@FunctionalInterface
+	public interface ICondition extends IClusterable
+	{
+		/**
+		 * Evaluates the current state and returns whether the step that is coupled to this
+		 * condition is available.
+		 * 
+		 * @return True if the step this condition is coupled to is available, false otherwise
+		 */
+		boolean evaluate();
 	}
 
 }

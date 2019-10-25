@@ -39,6 +39,8 @@ import org.apache.wicket.page.IManageablePage;
 import org.apache.wicket.util.WicketTestTag;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -49,66 +51,15 @@ import org.junit.jupiter.api.Test;
 @Tag(WicketTestTag.SLOW)
 public class AsynchronousPageStoreTest
 {
-	@SuppressWarnings("serial")
-	private static class DummyPage implements IManageablePage, Cloneable
+	private static final Logger logger = LoggerFactory.getLogger(AsynchronousPageStoreTest.class);
+
+	private MetaDataKey<Serializable> key1 = new MetaDataKey<Serializable>()
 	{
+	};
 
-		private int pageId;
-		private long writeMillis;
-		private long readMillis;
-		private String sessionId;
-
-		private DummyPage(int pageId, long writeMillis, long readMillis, String sessionId)
-		{
-			this.pageId = pageId;
-			this.writeMillis = writeMillis;
-			this.readMillis = readMillis;
-			this.sessionId = sessionId;
-		}
-
-		@Override
-		public boolean isPageStateless()
-		{
-			return false;
-		}
-
-		@Override
-		public int getPageId()
-		{
-			return pageId;
-		}
-
-		@Override
-		public void detach()
-		{
-		}
-
-		@Override
-		public boolean setFreezePageId(boolean freeze)
-		{
-			return false;
-		}
-
-		@Override
-		protected DummyPage clone()
-		{
-			try
-			{
-				return (DummyPage) super.clone();
-			}
-			catch (CloneNotSupportedException e)
-			{
-				throw new Error(e);
-			}
-		}
-		
-		public String toString()
-		{
-			return "DummyPage[pageId = " + pageId + ", writeMillis = " + writeMillis +
-					", readMillis = " + readMillis + ", sessionId = " + sessionId + ", hashCode = " +
-					hashCode() + "]";
-		}
-	}
+	private MetaDataKey<Serializable> key2 = new MetaDataKey<Serializable>()
+	{
+	};
 
 	/**
 	 * Store returns the same page instance from queue when there is a close request for it back
@@ -133,6 +84,7 @@ public class AsynchronousPageStoreTest
 				}
 				catch (InterruptedException e)
 				{
+					logger.error(e.getMessage(), e);
 				}
 				
 				super.addPage(context, page);
@@ -213,6 +165,7 @@ public class AsynchronousPageStoreTest
 		}
 		catch (InterruptedException e)
 		{
+			logger.error(e.getMessage(), e);
 		}
 
 		IManageablePage pageBack = asyncPageStore.getPage(context, pageId);
@@ -242,15 +195,13 @@ public class AsynchronousPageStoreTest
 		List<Metrics> results = runTest(sessions, pages, writeMillis, readMillis,
 				asyncPageStoreCapacity);
 
-		for (Metrics metrics : results)
-			System.out.println(metrics);
+		results.forEach(metrics -> logger.info(String.valueOf(metrics)));
 
-		for (Metrics metrics : results)
-		{
+		results.forEach(metrics -> {
 			assertEquals(metrics.storedPage, metrics.restoredPage);
 			assertTrue(metrics.storingMillis < writeMillis);
 			assertTrue(metrics.restoringMillis < readMillis);
-		}
+		});
 	}
 
 	/**
@@ -272,15 +223,11 @@ public class AsynchronousPageStoreTest
 		List<Metrics> results = runTest(sessions, pages, writeMillis, readMillis,
 				asyncPageStoreCapacity);
 
-		for (Metrics metrics : results)
-			System.out.println(metrics);
+		results.forEach(metrics -> logger.info(String.valueOf(metrics)));
 
 		int sync = 0;
 
-		for (int i = 0; i < results.size(); i++)
-		{
-			Metrics metrics = results.get(i);
-
+		for (Metrics metrics : results) {
 			assertEquals(metrics.storedPage.sessionId, metrics.restoredPage.sessionId);
 			assertEquals(metrics.storedPage.getPageId(), metrics.restoredPage.getPageId());
 
@@ -294,14 +241,6 @@ public class AsynchronousPageStoreTest
 		assertTrue(sync > 0);
 	}
 
-	private MetaDataKey<Serializable> KEY1 = new MetaDataKey<Serializable>()
-	{
-	};
-	
-	private MetaDataKey<Serializable> KEY2 = new MetaDataKey<Serializable>()
-	{
-	};
-	
 	/**
 	 * Store does not allow modifications when pages are added asynchronously.
 	 */
@@ -319,10 +258,10 @@ public class AsynchronousPageStoreTest
 				context.getSessionId(true);
 				
 				// can access request data
-				assertEquals("value1", context.getRequestData(KEY1, () -> "value1"));
+				assertEquals("value1", context.getRequestData(key1, () -> "value1"));
 
 				// can access session data
-				assertEquals("value1", context.getSessionData(KEY1, () -> "value1"));
+				assertEquals("value1", context.getSessionData(key1, () -> "value1"));
 
 				// can access session
 				context.getSessionAttribute("key1", () -> "value1");
@@ -338,24 +277,27 @@ public class AsynchronousPageStoreTest
 				
 				// cannot access request
 				try {
-					context.getRequestData(KEY1, () -> null);
+					context.getRequestData(key1, () -> null);
 					asyncFail.set(new Exception().fillInStackTrace());
 				} catch (WicketRuntimeException expected) {
+					logger.error(expected.getMessage(), expected);
 				}
 				try {
-					context.getRequestData(KEY2, () -> null);
+					context.getRequestData(key2, () -> null);
 					asyncFail.set(new Exception().fillInStackTrace());
 				} catch (WicketRuntimeException expected) {
+					logger.error(expected.getMessage(), expected);
 				}
 
 				// can read session data 
-				assertEquals("value1", context.getSessionData(KEY1, () -> "value2"));
-				assertEquals(null, context.getSessionData(KEY2, () -> null));
+				assertEquals("value1", context.getSessionData(key1, () -> "value2"));
+				assertEquals(null, context.getSessionData(key2, () -> null));
 				// .. but cannot set
 				try {
-					context.getSessionData(KEY2, () -> "value2");
+					context.getSessionData(key2, () -> "value2");
 					asyncFail.set(new Exception().fillInStackTrace());
 				} catch (WicketRuntimeException expected) {
+					logger.error(expected.getMessage(), expected);
 				}
 				
 				// can read session attribute already read
@@ -365,6 +307,7 @@ public class AsynchronousPageStoreTest
 					context.getSessionAttribute("key2", () -> null);
 					asyncFail.set(new Exception().fillInStackTrace());
 				} catch (WicketRuntimeException expected) {
+					logger.error(expected.getMessage(), expected);
 				}
 			}
 		};
@@ -381,22 +324,6 @@ public class AsynchronousPageStoreTest
 		
 		if (asyncFail.get() != null) {
 			throw asyncFail.get();
-		}
-	}
-	
-	// test run
-
-	private class Metrics
-	{
-		private DummyPage storedPage;
-		private long storingMillis;
-		private DummyPage restoredPage;
-		private long restoringMillis;
-
-		public String toString()
-		{
-			return "Metrics[storedPage = " + storedPage + ", storingMillis = " + storingMillis +
-					", restoredPage = " + restoredPage + ", restoringMillis = " + restoringMillis + "]";
 		}
 	}
 
@@ -481,5 +408,83 @@ public class AsynchronousPageStoreTest
 	private long around(long target)
 	{
 		return RandomUtils.nextLong((long)(target * .9), (long)(target * 1.1));
+	}
+
+	@SuppressWarnings("serial")
+	private static class DummyPage implements IManageablePage, Cloneable
+	{
+
+		private int pageId;
+		private long writeMillis;
+		private long readMillis;
+		private String sessionId;
+
+		private DummyPage(int pageId, long writeMillis, long readMillis, String sessionId)
+		{
+			this.pageId = pageId;
+			this.writeMillis = writeMillis;
+			this.readMillis = readMillis;
+			this.sessionId = sessionId;
+		}
+
+		@Override
+		public boolean isPageStateless()
+		{
+			return false;
+		}
+
+		@Override
+		public int getPageId()
+		{
+			return pageId;
+		}
+
+		@Override
+		public void detach()
+		{
+		}
+
+		@Override
+		public boolean setFreezePageId(boolean freeze)
+		{
+			return false;
+		}
+
+		@Override
+		protected DummyPage clone()
+		{
+			try
+			{
+				return (DummyPage) super.clone();
+			}
+			catch (CloneNotSupportedException e)
+			{
+				throw new Error(e);
+			}
+		}
+		
+		@Override
+		public String toString()
+		{
+			return new StringBuilder().append("DummyPage[pageId = ").append(pageId).append(", writeMillis = ").append(writeMillis).append(", readMillis = ").append(readMillis)
+					.append(", sessionId = ").append(sessionId).append(", hashCode = ").append(hashCode()).append("]").toString();
+		}
+	}
+
+	// test run
+
+	private class Metrics
+	{
+		private DummyPage storedPage;
+		private long storingMillis;
+		private DummyPage restoredPage;
+		private long restoringMillis;
+
+		@Override
+		public String toString()
+		{
+			return new StringBuilder().append("Metrics[storedPage = ").append(storedPage).append(", storingMillis = ").append(storingMillis).append(", restoredPage = ").append(restoredPage)
+					.append(", restoringMillis = ").append(restoringMillis).append("]").toString();
+		}
 	}
 }

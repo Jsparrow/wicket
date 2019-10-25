@@ -85,82 +85,27 @@ public class AjaxEditableLabel<T> extends Panel implements IGenericComponent<T, 
 	/** label component. */
 	private Component label;
 
-	protected class EditorAjaxBehavior extends AbstractDefaultAjaxBehavior
+	/**
+	 * Constructor
+	 * 
+	 * @param id
+	 */
+	public AjaxEditableLabel(final String id)
 	{
-		private static final long serialVersionUID = 1L;
-
-		@Override
-		protected void updateAjaxAttributes(AjaxRequestAttributes attributes)
-		{
-			super.updateAjaxAttributes(attributes);
-
-			AjaxEditableLabel.this.updateEditorAjaxAttributes(attributes);
-		}
-
-		@Override
-		public void renderHead(final Component component, final IHeaderResponse response)
-		{
-			super.renderHead(component, response);
-
-			getRequestCycle().find(IPartialPageRequestHandler.class).ifPresent(target -> target.appendJavaScript(getCallbackScript(component)));
-		}
-
-		@Override
-		protected void respond(final AjaxRequestTarget target)
-		{
-			RequestCycle requestCycle = RequestCycle.get();
-			boolean save = requestCycle.getRequest()
-				.getRequestParameters()
-				.getParameterValue("save")
-				.toBoolean(false);
-
-			if (save)
-			{
-				editor.processInput();
-
-				if (editor.isValid())
-				{
-					onSubmit(target);
-				}
-				else
-				{
-					onError(target);
-				}
-			}
-			else
-			{
-				onCancel(target);
-			}
-		}
+		super(id);
+		setOutputMarkupId(true);
 	}
 
-	protected class LabelAjaxBehavior extends AjaxEventBehavior
+	/**
+	 * Constructor
+	 * 
+	 * @param id
+	 * @param model
+	 */
+	public AjaxEditableLabel(final String id, final IModel<T> model)
 	{
-		private static final long serialVersionUID = 1L;
-
-		/**
-		 * Construct.
-		 * 
-		 * @param event
-		 */
-		public LabelAjaxBehavior(final String event)
-		{
-			super(event);
-		}
-
-		@Override
-		protected void onEvent(final AjaxRequestTarget target)
-		{
-			onEdit(target);
-		}
-
-		@Override
-		protected void updateAjaxAttributes(AjaxRequestAttributes attributes)
-		{
-			super.updateAjaxAttributes(attributes);
-
-			AjaxEditableLabel.this.updateLabelAjaxAttributes(attributes);
-		}
+		super(id, model);
+		setOutputMarkupId(true);
 	}
 
 	/**
@@ -183,29 +128,6 @@ public class AjaxEditableLabel<T> extends Panel implements IGenericComponent<T, 
 	 */
 	protected void updateEditorAjaxAttributes(AjaxRequestAttributes attributes)
 	{
-	}
-
-	/**
-	 * Constructor
-	 * 
-	 * @param id
-	 */
-	public AjaxEditableLabel(final String id)
-	{
-		super(id);
-		setOutputMarkupId(true);
-	}
-
-	/**
-	 * Constructor
-	 * 
-	 * @param id
-	 * @param model
-	 */
-	public AjaxEditableLabel(final String id, final IModel<T> model)
-	{
-		super(id, model);
-		setOutputMarkupId(true);
 	}
 
 	/**
@@ -332,19 +254,11 @@ public class AjaxEditableLabel<T> extends Panel implements IGenericComponent<T, 
 				attributes.setPreventDefault(false);
 
 				// Note: escape can be detected on keyup, enter can be detected on keyup
-				CharSequence precondition = "var kc=Wicket.Event.keyCode(attrs.event),"
-					+ "evtType=attrs.event.type,"
-					+ "ret=false;"
-					+ "if (evtType==='blur' || (evtType==='keyup' && kc===27) || (evtType==='keydown' && kc===13)) {attrs.event.preventDefault(); ret = true;}"
-					+ "return ret;";
+				CharSequence precondition = new StringBuilder().append("var kc=Wicket.Event.keyCode(attrs.event),").append("evtType=attrs.event.type,").append("ret=false;").append("if (evtType==='blur' || (evtType==='keyup' && kc===27) || (evtType==='keydown' && kc===13)) {attrs.event.preventDefault(); ret = true;}").append("return ret;").toString();
 				AjaxCallListener ajaxCallListener = new AjaxCallListener();
 				ajaxCallListener.onPrecondition(precondition);
 
-				CharSequence dynamicExtraParameters = "var result,"
-					+ "evtType=attrs.event.type;"
-					+ "if (evtType === 'keyup') { result = { 'save': false }; }"
-					+ "else { result = { 'save': true }; }"
-					+ "return result;";
+				CharSequence dynamicExtraParameters = new StringBuilder().append("var result,").append("evtType=attrs.event.type;").append("if (evtType === 'keyup') { result = { 'save': false }; }").append("else { result = { 'save': true }; }").append("return result;").toString();
 				attributes.getDynamicExtraParameters().add(dynamicExtraParameters);
 
 				attributes.getAjaxCallListeners().add(ajaxCallListener);
@@ -425,7 +339,6 @@ public class AjaxEditableLabel<T> extends Panel implements IGenericComponent<T, 
 	{
 		return "click";
 	}
-
 
 	/**
 	 * Gets the editor component.
@@ -512,8 +425,7 @@ public class AjaxEditableLabel<T> extends Panel implements IGenericComponent<T, 
 		if (editor.hasErrorMessage())
 		{
 			Serializable errorMessage = editor.getFeedbackMessages().first(FeedbackMessage.ERROR);
-			target.appendJavaScript("window.status='" +
-				JavaScriptUtils.escapeQuotes(errorMessage.toString()) + "';");
+			target.appendJavaScript(new StringBuilder().append("window.status='").append(JavaScriptUtils.escapeQuotes(errorMessage.toString())).append("';").toString());
 		}
 		String selectAndFocusScript = String.format(
 			"(function(){var el=Wicket.$('%s'); if (el.select) el.select(); el.focus();})()",
@@ -553,6 +465,139 @@ public class AjaxEditableLabel<T> extends Panel implements IGenericComponent<T, 
 	}
 
 	/**
+	 * @return Gets the parent model in case no explicit model was specified.
+	 */
+	private IModel<T> getParentModel()
+	{
+		// the #getModel() call below will resolve and assign any inheritable
+		// model this component can use. Set that directly to the label and
+		// editor so that those components work like this enclosing panel
+		// does not exist (must have that e.g. with CompoundPropertyModels)
+		IModel<T> m = getModel();
+
+		// check that a model was found
+		if (m == null)
+		{
+			Component parent = getParent();
+			String msg = "No model found for this component, either pass one explicitly or "
+				+ "make sure an inheritable model is available.";
+			if (parent == null)
+			{
+				msg += new StringBuilder().append(" This component is not added to a parent yet, so if this component ").append("is supposed to use the model of the parent (e.g. when it uses a ").append("compound property model), add it first before further configuring ").append("the component calling methods like e.g. setType and addValidator.").toString();
+			}
+			throw new IllegalStateException(msg);
+		}
+		return m;
+	}
+
+	/**
+	 * Override this to display a different value when the model object is null. Default is
+	 * <code>...</code>
+	 * 
+	 * @return The string which should be displayed when the model object is null.
+	 */
+	protected String defaultNullLabel()
+	{
+		return "...";
+	}
+
+	/**
+	 * Dummy override to fix WICKET-1239
+	 */
+	@Override
+	protected void onModelChanged()
+	{
+		super.onModelChanged();
+	}
+
+	/**
+	 * Dummy override to fix WICKET-1239
+	 */
+	@Override
+	protected void onModelChanging()
+	{
+		super.onModelChanging();
+	}
+
+	protected class EditorAjaxBehavior extends AbstractDefaultAjaxBehavior
+	{
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		protected void updateAjaxAttributes(AjaxRequestAttributes attributes)
+		{
+			super.updateAjaxAttributes(attributes);
+
+			AjaxEditableLabel.this.updateEditorAjaxAttributes(attributes);
+		}
+
+		@Override
+		public void renderHead(final Component component, final IHeaderResponse response)
+		{
+			super.renderHead(component, response);
+
+			getRequestCycle().find(IPartialPageRequestHandler.class).ifPresent(target -> target.appendJavaScript(getCallbackScript(component)));
+		}
+
+		@Override
+		protected void respond(final AjaxRequestTarget target)
+		{
+			RequestCycle requestCycle = RequestCycle.get();
+			boolean save = requestCycle.getRequest()
+				.getRequestParameters()
+				.getParameterValue("save")
+				.toBoolean(false);
+
+			if (save)
+			{
+				editor.processInput();
+
+				if (editor.isValid())
+				{
+					onSubmit(target);
+				}
+				else
+				{
+					onError(target);
+				}
+			}
+			else
+			{
+				onCancel(target);
+			}
+		}
+	}
+
+	protected class LabelAjaxBehavior extends AjaxEventBehavior
+	{
+		private static final long serialVersionUID = 1L;
+
+		/**
+		 * Construct.
+		 * 
+		 * @param event
+		 */
+		public LabelAjaxBehavior(final String event)
+		{
+			super(event);
+		}
+
+		@Override
+		protected void onEvent(final AjaxRequestTarget target)
+		{
+			onEdit(target);
+		}
+
+		@Override
+		protected void updateAjaxAttributes(AjaxRequestAttributes attributes)
+		{
+			super.updateAjaxAttributes(attributes);
+
+			AjaxEditableLabel.this.updateLabelAjaxAttributes(attributes);
+		}
+	}
+
+	/**
 	 * Model that accesses the parent model lazily. this is required since we eventually request the
 	 * parents model before the component is added to the parent.
 	 */
@@ -588,63 +633,5 @@ public class AjaxEditableLabel<T> extends Panel implements IGenericComponent<T, 
 				return null;
 			}
 		}
-	}
-
-	/**
-	 * @return Gets the parent model in case no explicit model was specified.
-	 */
-	private IModel<T> getParentModel()
-	{
-		// the #getModel() call below will resolve and assign any inheritable
-		// model this component can use. Set that directly to the label and
-		// editor so that those components work like this enclosing panel
-		// does not exist (must have that e.g. with CompoundPropertyModels)
-		IModel<T> m = getModel();
-
-		// check that a model was found
-		if (m == null)
-		{
-			Component parent = getParent();
-			String msg = "No model found for this component, either pass one explicitly or "
-				+ "make sure an inheritable model is available.";
-			if (parent == null)
-			{
-				msg += " This component is not added to a parent yet, so if this component "
-					+ "is supposed to use the model of the parent (e.g. when it uses a "
-					+ "compound property model), add it first before further configuring "
-					+ "the component calling methods like e.g. setType and addValidator.";
-			}
-			throw new IllegalStateException(msg);
-		}
-		return m;
-	}
-
-	/**
-	 * Override this to display a different value when the model object is null. Default is
-	 * <code>...</code>
-	 * 
-	 * @return The string which should be displayed when the model object is null.
-	 */
-	protected String defaultNullLabel()
-	{
-		return "...";
-	}
-
-	/**
-	 * Dummy override to fix WICKET-1239
-	 */
-	@Override
-	protected void onModelChanged()
-	{
-		super.onModelChanged();
-	}
-
-	/**
-	 * Dummy override to fix WICKET-1239
-	 */
-	@Override
-	protected void onModelChanging()
-	{
-		super.onModelChanging();
 	}
 }

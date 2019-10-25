@@ -99,14 +99,7 @@ public final class RelativePathPrefixHandler extends AbstractMarkupFilter
 		}
 	};
 	
-	private static final IAutoComponentFactory FACTORY = new IAutoComponentFactory()
-	{
-		@Override
-		public Component newComponent(MarkupContainer container, ComponentTag tag)
-		{
-			return new TransparentWebMarkupContainer(tag.getId());
-		}
-	};
+	private static final IAutoComponentFactory FACTORY = (MarkupContainer container, ComponentTag tag) -> new TransparentWebMarkupContainer(tag.getId());
 
 	/**
 	 * Constructor for the IComponentResolver role.
@@ -135,7 +128,7 @@ public final class RelativePathPrefixHandler extends AbstractMarkupFilter
 			return tag;
 		}
 
-		String wicketIdAttr = getWicketNamespace() + ":" + "id";
+		String wicketIdAttr = new StringBuilder().append(getWicketNamespace()).append(":").append("id").toString();
 
 		// Don't touch any wicket:id component and any auto-components
 		if ((tag instanceof WicketTag) || (tag.isAutolinkEnabled() == true)
@@ -186,16 +179,7 @@ public final class RelativePathPrefixHandler extends AbstractMarkupFilter
 	@Override
 	public void postProcess(Markup markup)
 	{
-		/**
-		 * https://issues.apache.org/jira/browse/WICKET-5724
-		 * 
-		 * Transparent component inside page body must allow queued children components.
-		 */
-		Iterator<MarkupElement> markupIterator = markup.iterator();
-		while (markupIterator.hasNext())
-		{
-			MarkupElement next = markupIterator.next();
-
+		for (MarkupElement next : markup) {
 			if (next instanceof ComponentTag)
 			{
 				ComponentTag componentTag = (ComponentTag)next;

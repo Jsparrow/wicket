@@ -59,9 +59,9 @@ class PersistentPageManagerTest
 		ThreadContext.detach();
 
 		// create IPageManager (with IPageStore) and store a page instance
-		final AtomicReference<Object> sessionData = new AtomicReference<Object>(null);
+		final AtomicReference<Object> sessionData = new AtomicReference<>(null);
 		
-		IPageManager pageManager = createPageManager(APP_NAME, sessionData);
+		IPageManager pageManager = createPageManager(sessionData);
 
 		// add a page
 		TestPage toSerializePage = new TestPage();
@@ -91,7 +91,7 @@ class PersistentPageManagerTest
 
 		// provide new IPageStore which will read IManageablePage's or SerializedPage's
 		// from the SessionEntry's
-		IPageManager newPageManager = createPageManager(APP_NAME, sessionData);
+		IPageManager newPageManager = createPageManager(sessionData);
 
 		TestPage deserializedPage = (TestPage)newPageManager.getPage(toSerializePage.getPageId());
 		assertNotNull(deserializedPage);
@@ -103,7 +103,7 @@ class PersistentPageManagerTest
 	/**
 	 * Create a manager that stores session data in the given atomic reference.
 	 */
-	private IPageManager createPageManager(String appName, AtomicReference<Object> sessionData)
+	private IPageManager createPageManager(AtomicReference<Object> sessionData)
 	{
 		IPageStore store = new InSessionPageStore(new NoopPageStore(), Integer.MAX_VALUE, new JavaSerializer(APP_NAME));
 		

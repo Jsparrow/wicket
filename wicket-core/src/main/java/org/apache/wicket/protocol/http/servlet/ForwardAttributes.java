@@ -148,8 +148,7 @@ public class ForwardAttributes
 	@Override
 	public String toString()
 	{
-		return "ForwardAttributes [requestUri=" + requestUri + ", servletPath=" + servletPath +
-			", contextPath=" + contextPath + ", queryString=" + queryString +
-			   ", pathInfo=" + pathInfo + "]";
+		return new StringBuilder().append("ForwardAttributes [requestUri=").append(requestUri).append(", servletPath=").append(servletPath).append(", contextPath=").append(contextPath).append(", queryString=")
+				.append(queryString).append(", pathInfo=").append(pathInfo).append("]").toString();
 	}
 }

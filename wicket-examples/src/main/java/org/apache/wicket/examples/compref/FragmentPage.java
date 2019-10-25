@@ -30,6 +30,23 @@ import org.apache.wicket.markup.html.panel.Fragment;
 public class FragmentPage extends WicketExamplePage
 {
 	/**
+	 * Constructor
+	 */
+	public FragmentPage()
+	{
+		add(new MyFragment("fragment", "fragmentid", this));
+	}
+
+	@Override
+	protected void explain()
+	{
+		String html = "<wicket:fragment wicket:id=\"fragmentid\">...</wicket:fragment>";
+		String code = "private class MyFragment extends Fragment {\n ...\n"
+			+ "add(new MyFragment(\"fragment\", \"fragmentid\"));";
+		add(new ExplainPanel(html, code));
+	}
+
+	/**
 	 * A fragment,
 	 */
 	private class MyFragment extends Fragment
@@ -50,22 +67,5 @@ public class FragmentPage extends WicketExamplePage
 			add(new Label("label", "yep, this is from a component proper"));
 			add(new AnotherPanel("otherPanel"));
 		}
-	}
-
-	/**
-	 * Constructor
-	 */
-	public FragmentPage()
-	{
-		add(new MyFragment("fragment", "fragmentid", this));
-	}
-
-	@Override
-	protected void explain()
-	{
-		String html = "<wicket:fragment wicket:id=\"fragmentid\">...</wicket:fragment>";
-		String code = "private class MyFragment extends Fragment {\n ...\n"
-			+ "add(new MyFragment(\"fragment\", \"fragmentid\"));";
-		add(new ExplainPanel(html, code));
 	}
 }

@@ -87,9 +87,7 @@ public class FullyBufferedReaderTest
 		String testTag = "<a href='blabla>";
 		FullyBufferedReader fullyBufferedReader = new FullyBufferedReader(testTag);
 
-		final ParseException e = assertThrows(ParseException.class, () -> {
-			fullyBufferedReader.findOutOfQuotes('>', 0);
-		});
+		final ParseException e = assertThrows(ParseException.class, () -> fullyBufferedReader.findOutOfQuotes('>', 0));
 
 		assertEquals("Opening/closing quote not found for quote at (line 1, column 9)", e.getMessage());
 	}
@@ -109,9 +107,7 @@ public class FullyBufferedReaderTest
 		String testTag = "<a href=blabla'>";
 		FullyBufferedReader fullyBufferedReader = new FullyBufferedReader(testTag);
 
-		final ParseException e = assertThrows(ParseException.class, () -> {
-			fullyBufferedReader.findOutOfQuotes('>', 0);
-		});
+		final ParseException e = assertThrows(ParseException.class, () -> fullyBufferedReader.findOutOfQuotes('>', 0));
 
 		assertEquals("Opening/closing quote not found for quote at (line 1, column 15)", e.getMessage());
 	}
@@ -130,9 +126,7 @@ public class FullyBufferedReaderTest
 		String testTag = "<a href=\"blabla>";
 		FullyBufferedReader fullyBufferedReader = new FullyBufferedReader(testTag);
 
-		final ParseException e = assertThrows(ParseException.class, () -> {
-			fullyBufferedReader.findOutOfQuotes('>', 0);
-		});
+		final ParseException e = assertThrows(ParseException.class, () -> fullyBufferedReader.findOutOfQuotes('>', 0));
 
 		assertEquals("Opening/closing quote not found for quote at (line 1, column 9)", e.getMessage());
 	}
@@ -152,9 +146,7 @@ public class FullyBufferedReaderTest
 		String testTag = "<a href=blabla\">";
 		FullyBufferedReader fullyBufferedReader = new FullyBufferedReader(testTag);
 
-		final ParseException e = assertThrows(ParseException.class, () -> {
-			fullyBufferedReader.findOutOfQuotes('>', 0);
-		});
+		final ParseException e = assertThrows(ParseException.class, () -> fullyBufferedReader.findOutOfQuotes('>', 0));
 
 		assertEquals("Opening/closing quote not found for quote at (line 1, column 15)", e.getMessage());
 	}

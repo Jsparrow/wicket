@@ -69,85 +69,71 @@ public class StatelessChecker implements IComponentOnBeforeRenderListener
 	@Override
 	public void onBeforeRender(final Component component)
 	{
-		if (mustCheck(component))
+		if (!mustCheck(component)) {
+			return;
+		}
+		final IVisitor<Component, Component> visitor = (final Component comp, final IVisit<Component> visit) -> {
+			if ((component instanceof Page) && mustCheck(comp))
+			{
+				// Do not go deeper, because this component will be
+				// checked by checker
+				// itself.
+				// Actually we could go deeper but that would mean we
+				// traverse it twice
+				// (for current component and for inspected one).
+				// We go deeper for Page because full tree will be
+				// inspected during
+				// isPageStateless call.
+				visit.dontGoDeeper();
+			}
+			else if (!comp.isStateless())
+			{
+				visit.stop(comp);
+			}
+			else
+			{
+				// continue
+			}
+		};
+		if (component.isStateless() == false)
 		{
-			final IVisitor<Component, Component> visitor = new IVisitor<Component, Component>()
+			StringList statefulBehaviors = new StringList();
+			component.getBehaviors().stream().filter(b -> b.getStatelessHint(component) == false).forEach(b -> statefulBehaviors.add(Classes.name(b.getClass())));
+			String reason;
+			if (statefulBehaviors.size() == 0)
 			{
-				@Override
-				public void component(final Component comp, final IVisit<Component> visit)
-				{
-					if ((component instanceof Page) && mustCheck(comp))
-					{
-						// Do not go deeper, because this component will be
-						// checked by checker
-						// itself.
-						// Actually we could go deeper but that would mean we
-						// traverse it twice
-						// (for current component and for inspected one).
-						// We go deeper for Page because full tree will be
-						// inspected during
-						// isPageStateless call.
-						visit.dontGoDeeper();
-					}
-					else if (!comp.isStateless())
-					{
-						visit.stop(comp);
-					}
-					else
-					{
-						// continue
-					}
-				}
-			};
-
-			if (component.isStateless() == false)
+			    reason = " Possible reason: no stateless hint";
+			}
+			else
 			{
-				StringList statefulBehaviors = new StringList();
-				for (Behavior b : component.getBehaviors())
-				{
-					if (b.getStatelessHint(component) == false)
-					{
-						statefulBehaviors.add(Classes.name(b.getClass()));
-					}
-				}
-				String reason;
-				if (statefulBehaviors.size() == 0)
-				{
-				    reason = " Possible reason: no stateless hint";
-				}
-				else
-				{
-				    reason = " Stateful behaviors: " + statefulBehaviors.join();
-				}
-				fail(new StatelessCheckFailureException(component, reason));
+			    reason = " Stateful behaviors: " + statefulBehaviors.join();
+			}
+			fail(new StatelessCheckFailureException(component, reason));
+			return;
+		}
+		if (component instanceof MarkupContainer)
+		{
+			MarkupContainer container = ((MarkupContainer)component);
+			// Traverse children
+			final Object o = container.visitChildren(visitor);
+			if (o != null)
+			{
+				fail(new StatelessCheckFailureException(container, " Offending component: " + o));
 				return;
 			}
-
-			if (component instanceof MarkupContainer)
+		}
+		if (component instanceof Page)
+		{
+			final Page p = (Page)component;
+			if (!p.isBookmarkable())
 			{
-				MarkupContainer container = ((MarkupContainer)component);
-				// Traverse children
-				final Object o = container.visitChildren(visitor);
-				if (o != null)
-				{
-					fail(new StatelessCheckFailureException(container, " Offending component: " + o));
-					return;
-				}
+				fail(new StatelessCheckFailureException(p, " Only bookmarkable pages can be stateless"));
+				return;
 			}
-
-			if (component instanceof Page)
+			if (!p.isPageStateless())
 			{
-				final Page p = (Page)component;
-				if (!p.isBookmarkable())
-				{
-					fail(new StatelessCheckFailureException(p, " Only bookmarkable pages can be stateless"));
-					return;
-				}
-				if (!p.isPageStateless())
-				{
-					fail(new StatelessCheckFailureException(p, " for unknown reason"));
-					return;
-				}
+				fail(new StatelessCheckFailureException(p, " for unknown reason"));
+				return;
 			}
 		}
 	}

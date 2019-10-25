@@ -35,15 +35,15 @@ import org.apache.wicket.extensions.markup.html.repeater.util.SortParam;
  */
 public class ContactDaoImpl implements ContactDao
 {
-	private final Map<Long, Contact> map = Collections.synchronizedMap(new HashMap<Long, Contact>());
+	private final Map<Long, Contact> map = Collections.synchronizedMap(new HashMap<>());
 
-	private final List<Contact> fnameIdx = Collections.synchronizedList(new ArrayList<Contact>());
+	private final List<Contact> fnameIdx = Collections.synchronizedList(new ArrayList<>());
 
-	private final List<Contact> lnameIdx = Collections.synchronizedList(new ArrayList<Contact>());
+	private final List<Contact> lnameIdx = Collections.synchronizedList(new ArrayList<>());
 
-	private final List<Contact> fnameDescIdx = Collections.synchronizedList(new ArrayList<Contact>());
+	private final List<Contact> fnameDescIdx = Collections.synchronizedList(new ArrayList<>());
 
-	private final List<Contact> lnameDescIdx = Collections.synchronizedList(new ArrayList<Contact>());
+	private final List<Contact> lnameDescIdx = Collections.synchronizedList(new ArrayList<>());
 
 	/**
 	 * Construct.
@@ -67,8 +67,9 @@ public class ContactDaoImpl implements ContactDao
 	public Contact get(long id)
 	{
 		Contact c = map.get(id);
-		if (c == null)
-			throw new RuntimeException("contact with id [" + id + "] not found in the database");
+		if (c == null) {
+			throw new RuntimeException(new StringBuilder().append("contact with id [").append(id).append("] not found in the database").toString());
+		}
 		return c;
 	}
 
@@ -99,8 +100,9 @@ public class ContactDaoImpl implements ContactDao
 
 	protected List<Contact> getIndex(SortParam sort)
 	{
-		if (sort == null)
+		if (sort == null) {
 			return fnameIdx;
+		}
 
 		if (sort.getProperty().equals("firstName"))
 		{
@@ -110,8 +112,7 @@ public class ContactDaoImpl implements ContactDao
 		{
 			return sort.isAscending() ? lnameIdx : lnameDescIdx;
 		}
-		throw new RuntimeException("unknown sort option [" + sort +
-			"]. valid fields: [firstName], [lastName]");
+		throw new RuntimeException(new StringBuilder().append("unknown sort option [").append(sort).append("]. valid fields: [firstName], [lastName]").toString());
 	}
 
 	/**
@@ -138,8 +139,7 @@ public class ContactDaoImpl implements ContactDao
 		}
 		else
 		{
-			throw new IllegalArgumentException("contact [" + contact.getFirstName() +
-				"] is already persistent");
+			throw new IllegalArgumentException(new StringBuilder().append("contact [").append(contact.getFirstName()).append("] is already persistent").toString());
 		}
 	}
 
@@ -162,13 +162,13 @@ public class ContactDaoImpl implements ContactDao
 
 	private void updateIndecies()
 	{
-		Collections.sort(fnameIdx, (arg0, arg1) -> (arg0).getFirstName().compareTo((arg1).getFirstName()));
+		fnameIdx.sort((arg0, arg1) -> (arg0).getFirstName().compareTo((arg1).getFirstName()));
 
-		Collections.sort(lnameIdx, (arg0, arg1) -> (arg0).getLastName().compareTo((arg1).getLastName()));
+		lnameIdx.sort((arg0, arg1) -> (arg0).getLastName().compareTo((arg1).getLastName()));
 
-		Collections.sort(fnameDescIdx, (arg0, arg1) -> (arg1).getFirstName().compareTo((arg0).getFirstName()));
+		fnameDescIdx.sort((arg0, arg1) -> (arg1).getFirstName().compareTo((arg0).getFirstName()));
 
-		Collections.sort(lnameDescIdx, (arg0, arg1) -> (arg1).getLastName().compareTo((arg0).getLastName()));
+		lnameDescIdx.sort((arg0, arg1) -> (arg1).getLastName().compareTo((arg0).getLastName()));
 
 	}
 

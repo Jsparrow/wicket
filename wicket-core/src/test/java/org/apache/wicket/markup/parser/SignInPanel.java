@@ -44,7 +44,7 @@ public class SignInPanel extends Panel
 	public SignInPanel(String id)
 	{
 		super(id);
-		Form<ValueMap> form = new Form<ValueMap>("signInForm", new CompoundPropertyModel<ValueMap>(
+		Form<ValueMap> form = new Form<>("signInForm", new CompoundPropertyModel<ValueMap>(
 			new ValueMap()));
 		form.add(new TextField<String>("username"));
 		form.add(new PasswordTextField("password"));

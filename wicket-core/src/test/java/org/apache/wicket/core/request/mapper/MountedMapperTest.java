@@ -589,9 +589,7 @@ class MountedMapperTest extends AbstractMapperTest
 	@Test
 	void construct1()
 	{
-		assertThrows(IllegalArgumentException.class, () -> {
-			new MountedMapper("", MockPage.class);
-		});
+		assertThrows(IllegalArgumentException.class, () -> new MountedMapper("", MockPage.class));
 	}
 
 	/**
@@ -910,8 +908,7 @@ class MountedMapperTest extends AbstractMapperTest
 		final int exactCompatScore = exactMount.getCompatibilityScore(request);
 		final int optCompatScore = optionalParameter.getCompatibilityScore(request);
 		assertTrue(exactCompatScore > optCompatScore,
-			"exactCompatScore should have greater compatibility score than optional one" +
-				" got exact = " + exactCompatScore + " and optional = " + optCompatScore);
+			new StringBuilder().append("exactCompatScore should have greater compatibility score than optional one").append(" got exact = ").append(exactCompatScore).append(" and optional = ").append(optCompatScore).toString());
 	}
 
 	@Test
@@ -924,8 +921,7 @@ class MountedMapperTest extends AbstractMapperTest
 		final int exactCompatScore = exactMount.getCompatibilityScore(request);
 		final int requiredParamScore = requiredParam.getCompatibilityScore(request);
 		assertTrue(exactCompatScore > requiredParamScore,
-			"exactCompatScore should have greater compatibility score than required one" +
-				" got exact = " + exactCompatScore + " and required= " + requiredParamScore);
+			new StringBuilder().append("exactCompatScore should have greater compatibility score than required one").append(" got exact = ").append(exactCompatScore).append(" and required= ").append(requiredParamScore).toString());
 	}
 
 	@Test
@@ -955,16 +951,12 @@ class MountedMapperTest extends AbstractMapperTest
 			"requiredOptionalParam mapper must be eligible to handle the request");
 
 		assertTrue(exactCompatScore > requiredParamScore,
-			"exactCompatScore should have greater compatibility score than required one" +
-				" got exact = " + exactCompatScore + " and required= " + requiredParamScore);
+			new StringBuilder().append("exactCompatScore should have greater compatibility score than required one").append(" got exact = ").append(exactCompatScore).append(" and required= ").append(requiredParamScore).toString());
 
 		assertTrue(exactCompatScore > requiredOptCompatScore,
-			"exactCompatScore should have greater compatibility score than required+optional one" +
-				" got exact = " + exactCompatScore + " and requiredOptional= " +
-				requiredOptCompatScore);
+			new StringBuilder().append("exactCompatScore should have greater compatibility score than required+optional one").append(" got exact = ").append(exactCompatScore).append(" and requiredOptional= ").append(requiredOptCompatScore).toString());
 
 		assertTrue(requiredParamScore > optCompatScore,
-			"exactCompatScore should have greater compatibility score than optional one" +
-				" got exact = " + exactCompatScore + " and optional = " + optCompatScore);
+			new StringBuilder().append("exactCompatScore should have greater compatibility score than optional one").append(" got exact = ").append(exactCompatScore).append(" and optional = ").append(optCompatScore).toString());
 	}
 }

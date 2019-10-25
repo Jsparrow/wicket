@@ -84,13 +84,13 @@ public class PageRequestHandlerTracker implements IRequestCycleListener
 	 */
 	private void registerFirstHandler(RequestCycle cycle, IRequestHandler handler)
 	{
-		if (getFirstHandler(cycle) == null)
+		if (getFirstHandler(cycle) != null) {
+			return;
+		}
+		final IPageRequestHandler pageRequestHandler = findPageRequestHandler(handler);
+		if (pageRequestHandler != null)
 		{
-			final IPageRequestHandler pageRequestHandler = findPageRequestHandler(handler);
-			if (pageRequestHandler != null)
-			{
-				cycle.setMetaData(FIRST_HANDLER_KEY, pageRequestHandler);
-			}
+			cycle.setMetaData(FIRST_HANDLER_KEY, pageRequestHandler);
 		}
 	}
 

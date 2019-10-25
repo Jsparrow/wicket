@@ -120,42 +120,37 @@ public class ThumbnailImageResource extends DynamicImageResource
 		int originalWidth = originalImage.getWidth();
 		int originalHeight = originalImage.getHeight();
 
-		if ((originalWidth > maxSize) || (originalHeight > maxSize))
-		{
-			final int newWidth;
-			final int newHeight;
-
-			if (originalWidth > originalHeight)
-			{
-				newWidth = maxSize;
-				newHeight = (maxSize * originalHeight) / originalWidth;
-			}
-			else
-			{
-				newWidth = (maxSize * originalWidth) / originalHeight;
-				newHeight = maxSize;
-			}
-
-			// http://today.java.net/pub/a/today/2007/04/03/perils-of-image-getscaledinstance.html
-			BufferedImage dimg = new BufferedImage(newWidth, newHeight, originalImage.getType());
-			Graphics2D g = dimg.createGraphics();
-			try
-			{
-				g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-					RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-				g.drawImage(originalImage, 0, 0, newWidth, newHeight, 0, 0, originalWidth,
-					originalHeight, null);
-			}
-			finally
-			{
-				g.dispose();
-			}
-
-			return dimg;
+		if (!((originalWidth > maxSize) || (originalHeight > maxSize))) {
+			// no need for resizing
+			return originalImage;
 		}
-
-		// no need for resizing
-		return originalImage;
+		final int newWidth;
+		final int newHeight;
+		if (originalWidth > originalHeight)
+		{
+			newWidth = maxSize;
+			newHeight = (maxSize * originalHeight) / originalWidth;
+		}
+		else
+		{
+			newWidth = (maxSize * originalWidth) / originalHeight;
+			newHeight = maxSize;
+		}
+		// http://today.java.net/pub/a/today/2007/04/03/perils-of-image-getscaledinstance.html
+		BufferedImage dimg = new BufferedImage(newWidth, newHeight, originalImage.getType());
+		Graphics2D g = dimg.createGraphics();
+		try
+		{
+			g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+				RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+			g.drawImage(originalImage, 0, 0, newWidth, newHeight, 0, 0, originalWidth,
+				originalHeight, null);
+		}
+		finally
+		{
+			g.dispose();
+		}
+		return dimg;
 	}
 
 }

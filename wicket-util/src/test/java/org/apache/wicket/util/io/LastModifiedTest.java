@@ -57,7 +57,7 @@ public class LastModifiedTest
 		File file = Files.getLocalFileFromUrl("file:" + FILE);
 		assertEquals(file.getAbsolutePath(), new File(FILE).getAbsolutePath());
 
-		file = Files.getLocalFileFromUrl("jar:file:" + FILE + "!/internal/resource/bla/foo/bar/baz");
+		file = Files.getLocalFileFromUrl(new StringBuilder().append("jar:file:").append(FILE).append("!/internal/resource/bla/foo/bar/baz").toString());
 		assertEquals(file.getAbsolutePath(), new File(FILE).getAbsolutePath());
 
 		file = Files.getLocalFileFromUrl("http://bla.de");

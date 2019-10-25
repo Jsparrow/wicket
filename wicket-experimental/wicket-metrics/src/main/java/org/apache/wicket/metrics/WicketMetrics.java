@@ -96,7 +96,7 @@ public class WicketMetrics
 		{
 			Context context = registry
 				.timer(
-					settings.getPrefix() + name + (renderClass ? renderClassName(joinPoint) : ""))
+					new StringBuilder().append(settings.getPrefix()).append(name).append(renderClass ? renderClassName(joinPoint) : "").toString())
 				.time();
 			try
 			{
@@ -128,22 +128,6 @@ public class WicketMetrics
 	}
 
 	/**
-	 * 
-	 * @author Tobias Soloschenko
-	 *
-	 */
-	public enum CounterOperation {
-		/**
-		 * Increments
-		 */
-		INC,
-		/**
-		 * Decrements
-		 */
-		DEC
-	}
-
-	/**
 	 * Creates a count of the given arguments
 	 * 
 	 * @param name
@@ -166,7 +150,7 @@ public class WicketMetrics
 		if (settings.isEnabled())
 		{
 			Counter counter = registry
-				.counter(settings.getPrefix() + name + renderClassName(joinPoint));
+				.counter(new StringBuilder().append(settings.getPrefix()).append(name).append(renderClassName(joinPoint)).toString());
 			if (counterOperation == CounterOperation.INC)
 			{
 				counter.inc(value);
@@ -178,7 +162,6 @@ public class WicketMetrics
 		}
 		return proceedSilent(joinPoint);
 	}
-
 
 	/**
 	 * Marks the meter with the given name
@@ -197,7 +180,7 @@ public class WicketMetrics
 
 		if (settings.isEnabled())
 		{
-			registry.meter(settings.getPrefix() + name + renderClassName(joinPoint)).mark();
+			registry.meter(new StringBuilder().append(settings.getPrefix()).append(name).append(renderClassName(joinPoint)).toString()).mark();
 		}
 		return proceedSilent(joinPoint);
 	}
@@ -291,5 +274,21 @@ public class WicketMetrics
 	public static void setFilterName(String filterName)
 	{
 		WicketMetrics.filterName = filterName;
+	}
+
+	/**
+	 * 
+	 * @author Tobias Soloschenko
+	 *
+	 */
+	public enum CounterOperation {
+		/**
+		 * Increments
+		 */
+		INC,
+		/**
+		 * Decrements
+		 */
+		DEC
 	}
 }

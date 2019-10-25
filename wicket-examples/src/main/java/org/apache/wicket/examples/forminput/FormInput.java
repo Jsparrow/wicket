@@ -50,6 +50,8 @@ import org.apache.wicket.util.convert.ConversionException;
 import org.apache.wicket.util.convert.IConverter;
 import org.apache.wicket.util.convert.MaskConverter;
 import org.apache.wicket.validation.validator.RangeValidator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -60,6 +62,38 @@ import org.apache.wicket.validation.validator.RangeValidator;
  */
 public class FormInput extends WicketExamplePage
 {
+	/** available sites for the multiple select. */
+	private static final List<String> SITES = Arrays.asList("The Server Side", "Java Lobby",
+		"Java.Net");
+
+	/** available numbers for the radio selection. */
+	static final List<String> NUMBERS = Arrays.asList("1", "2", "3");
+
+	/**
+	 * Constructor
+	 */
+	public FormInput()
+	{
+		// Construct form and feedback panel and hook them up
+		final FeedbackPanel feedback = new FeedbackPanel("feedback");
+		add(feedback);
+		add(new InputForm("inputForm"));
+	}
+
+	/**
+	 * Sets locale for the user's session (getLocale() is inherited from Component)
+	 * 
+	 * @param locale
+	 *            The new locale
+	 */
+	public void setLocale(Locale locale)
+	{
+		if (locale != null)
+		{
+			getSession().setLocale(locale);
+		}
+	}
+
 	/**
 	 * Form for collecting input.
 	 */
@@ -81,6 +115,7 @@ public class FormInput extends WicketExamplePage
 
 			// Link to return to default locale
 			add(new Link<Void>("defaultLocaleLink") {
+				@Override
 				public void onClick() {
 					WebRequest request = (WebRequest)getRequest();
 					setLocale(request.getLocale());
@@ -267,41 +302,10 @@ public class FormInput extends WicketExamplePage
 		}
 	}
 
-	/** available sites for the multiple select. */
-	private static final List<String> SITES = Arrays.asList("The Server Side", "Java Lobby",
-		"Java.Net");
-
-	/** available numbers for the radio selection. */
-	static final List<String> NUMBERS = Arrays.asList("1", "2", "3");
-
-	/**
-	 * Constructor
-	 */
-	public FormInput()
-	{
-		// Construct form and feedback panel and hook them up
-		final FeedbackPanel feedback = new FeedbackPanel("feedback");
-		add(feedback);
-		add(new InputForm("inputForm"));
-	}
-
-	/**
-	 * Sets locale for the user's session (getLocale() is inherited from Component)
-	 * 
-	 * @param locale
-	 *            The new locale
-	 */
-	public void setLocale(Locale locale)
-	{
-		if (locale != null)
-		{
-			getSession().setLocale(locale);
-		}
-	}
-
 	private static class URLConverter implements IConverter<URL>
 	{
 		public static final URLConverter INSTANCE = new URLConverter();
+		private final Logger logger = LoggerFactory.getLogger(URLConverter.class);
 
 		@Override
 		public URL convertToObject(String value, Locale locale)
@@ -312,7 +316,8 @@ public class FormInput extends WicketExamplePage
 			}
 			catch (MalformedURLException e)
 			{
-				throw new ConversionException("'" + value + "' is not a valid URL");
+				logger.error(e.getMessage(), e);
+				throw new ConversionException(new StringBuilder().append("'").append(value).append("' is not a valid URL").toString());
 			}
 		}
 

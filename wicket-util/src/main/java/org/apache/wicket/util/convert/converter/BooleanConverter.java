@@ -21,6 +21,8 @@ import java.util.Locale;
 import org.apache.wicket.util.convert.IConverter;
 import org.apache.wicket.util.string.StringValueConversionException;
 import org.apache.wicket.util.string.Strings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -31,6 +33,8 @@ import org.apache.wicket.util.string.Strings;
  */
 public class BooleanConverter extends AbstractConverter<Boolean>
 {
+	private static final Logger logger = LoggerFactory.getLogger(BooleanConverter.class);
+
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -50,7 +54,8 @@ public class BooleanConverter extends AbstractConverter<Boolean>
 		}
 		catch (StringValueConversionException e)
 		{
-			throw newConversionException("Cannot convert '" + value + "' to Boolean", value, locale);
+			logger.error(e.getMessage(), e);
+			throw newConversionException(new StringBuilder().append("Cannot convert '").append(value).append("' to Boolean").toString(), value, locale);
 		}
 	}
 

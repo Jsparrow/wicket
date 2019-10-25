@@ -41,17 +41,9 @@ class FilteringHeaderResponseTest extends WicketTestCase
 	@Test
 	void footerDependsOnHeadItem() throws Exception
 	{
-		tester.getApplication().setHeaderResponseDecorator(new IHeaderResponseDecorator()
-		{
-			@Override
-			public IHeaderResponse decorate(IHeaderResponse response)
-			{
-				// use this header resource decorator to load all JavaScript resources in the page
-				// footer (after </body>)
-				return new ResourceAggregator(
-					new JavaScriptFilteredIntoFooterHeaderResponse(response, "footerJS"));
-			}
-		});
+		// use this header resource decorator to load all JavaScript resources in the page
+		// footer (after </body>)
+		tester.getApplication().setHeaderResponseDecorator((IHeaderResponse response) -> new ResourceAggregator(new JavaScriptFilteredIntoFooterHeaderResponse(response, "footerJS")));
 		executeTest(FilteredHeaderPage.class, "FilteredHeaderPageExpected.html");
 	}
 

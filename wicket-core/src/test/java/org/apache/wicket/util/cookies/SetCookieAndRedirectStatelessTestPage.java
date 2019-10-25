@@ -43,7 +43,7 @@ public class SetCookieAndRedirectStatelessTestPage extends WebPage
 	 */
 	public SetCookieAndRedirectStatelessTestPage()
 	{
-		inputModel = new Model<String>();
+		inputModel = new Model<>();
 		Form<Void> form = new StatelessForm<Void>("form")
 		{
 			private static final long serialVersionUID = 1L;

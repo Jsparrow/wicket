@@ -78,10 +78,7 @@ public class ResourceSettings implements ResourceSettingsMBean
 	public String getResourceFinders()
 	{
 		StringBuilder builder = new StringBuilder();
-		for (IResourceFinder rf : application.getResourceSettings().getResourceFinders())
-		{
-			builder.append(Stringz.className(rf));
-		}
+		application.getResourceSettings().getResourceFinders().forEach(rf -> builder.append(Stringz.className(rf)));
 		return builder.toString();
 	}
 
@@ -112,16 +109,12 @@ public class ResourceSettings implements ResourceSettingsMBean
 	{
 		List<IStringResourceLoader> loaders = application.getResourceSettings()
 			.getStringResourceLoaders();
-		if (loaders != null)
-		{
-			List<String> list = Generics.newArrayList();
-			for (Object loader : loaders)
-			{
-				list.add(loader.toString());
-			}
-			return list.toArray(new String[0]);
+		if (loaders == null) {
+			return null;
 		}
-		return null;
+		List<String> list = Generics.newArrayList();
+		loaders.forEach(loader -> list.add(loader.toString()));
+		return list.toArray(new String[0]);
 	}
 
 	/**

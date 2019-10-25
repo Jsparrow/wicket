@@ -325,7 +325,7 @@ public abstract class AbstractSingleSelectChoice<T> extends AbstractChoice<T, T>
 			{
 				// Force the user to pick a non-null value
 				String option = getNullKeyDisplayValue();
-				return "\n<option selected=\"selected\" value=\"\">" + option + "</option>";
+				return new StringBuilder().append("\n<option selected=\"selected\" value=\"\">").append(option).append("</option>").toString();
 			}
 		}
 		return "";

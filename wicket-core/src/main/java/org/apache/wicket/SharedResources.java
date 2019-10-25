@@ -49,29 +49,6 @@ public class SharedResources
 	}
 
 	/**
-	 * A {@link ResourceReference} that is used to register a reference to a known {@link IResource}
-	 */
-	private static final class AutoResourceReference extends ResourceReference
-	{
-		private static final long serialVersionUID = 1L;
-
-		private final IResource resource;
-
-		private AutoResourceReference(Class<?> scope, String name, Locale locale, String style,
-			String variation, IResource resource)
-		{
-			super(scope, name, locale, style, variation);
-			this.resource = resource;
-		}
-
-		@Override
-		public IResource getResource()
-		{
-			return resource;
-		}
-	}
-
-	/**
 	 * Adds a resource.
 	 * 
 	 * @param scope
@@ -172,5 +149,28 @@ public class SharedResources
 	public final ResourceReference remove(final Key key)
 	{
 		return registry.unregisterResourceReference(key);
+	}
+
+	/**
+	 * A {@link ResourceReference} that is used to register a reference to a known {@link IResource}
+	 */
+	private static final class AutoResourceReference extends ResourceReference
+	{
+		private static final long serialVersionUID = 1L;
+
+		private final IResource resource;
+
+		private AutoResourceReference(Class<?> scope, String name, Locale locale, String style,
+			String variation, IResource resource)
+		{
+			super(scope, name, locale, style, variation);
+			this.resource = resource;
+		}
+
+		@Override
+		public IResource getResource()
+		{
+			return resource;
+		}
 	}
 }

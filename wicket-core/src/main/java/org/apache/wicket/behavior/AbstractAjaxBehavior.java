@@ -60,9 +60,7 @@ public abstract class AbstractAjaxBehavior extends Behavior implements IRequestL
 
 		if (component != null)
 		{
-			throw new IllegalStateException("this kind of handler cannot be attached to " +
-				"multiple components; it is already attached to component " + component +
-				", but component " + hostComponent + " wants to be attached too");
+			throw new IllegalStateException(new StringBuilder().append("this kind of handler cannot be attached to ").append("multiple components; it is already attached to component ").append(component).append(", but component ").append(hostComponent).append(" wants to be attached too").toString());
 		}
 
 		component = hostComponent;
@@ -88,9 +86,7 @@ public abstract class AbstractAjaxBehavior extends Behavior implements IRequestL
 		PageParameters parameters = new PageParameters();
 		PageParameters pageParameters = component.getPage().getPageParameters();
 		List<INamedParameters.NamedPair> allNamedInPath = pageParameters.getAllNamedByType(INamedParameters.Type.PATH);
-		for (INamedParameters.NamedPair namedPair : allNamedInPath) {
-			parameters.add(namedPair.getKey(), namedPair.getValue(), INamedParameters.Type.PATH);
-		}
+		allNamedInPath.forEach(namedPair -> parameters.add(namedPair.getKey(), namedPair.getValue(), INamedParameters.Type.PATH));
 		return getComponent().urlForListener(this, parameters);
 	}
 

@@ -186,7 +186,7 @@ public class StringUtils
 	private static IllegalStateException newIllegalStateException(final String charsetName,
 		final UnsupportedEncodingException e)
 	{
-		return new IllegalStateException(charsetName + ": " + e);
+		return new IllegalStateException(new StringBuilder().append(charsetName).append(": ").append(e).toString());
 	}
 
 	/**

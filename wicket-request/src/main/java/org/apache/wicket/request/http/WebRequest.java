@@ -26,6 +26,8 @@ import org.apache.wicket.request.Request;
 import org.apache.wicket.request.Url;
 import org.apache.wicket.util.string.StringValueConversionException;
 import org.apache.wicket.util.string.Strings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Base class for request that provides additional web-related information.
@@ -35,6 +37,7 @@ import org.apache.wicket.util.string.Strings;
  */
 public abstract class WebRequest extends Request
 {
+	private static final Logger logger = LoggerFactory.getLogger(WebRequest.class);
 	/** marker for Ajax requests */
 	public static final String PARAM_AJAX = "wicket-ajax";
 	/** marker for Ajax requests */
@@ -63,14 +66,7 @@ public abstract class WebRequest extends Request
 	 */
 	public Cookie getCookie(final String cookieName)
 	{
-		for (Cookie cookie : getCookies())
-		{
-			if (cookie.getName().equals(cookieName))
-			{
-				return cookie;
-			}
-		}
-		return null;
+		return getCookies().stream().filter(cookie -> cookie.getName().equals(cookieName)).findFirst().orElse(null);
 	}
 
 	/**
@@ -125,6 +121,7 @@ public abstract class WebRequest extends Request
 				isAjax = Strings.isTrue(getHeader(HEADER_AJAX)) ||
 						Strings.isTrue(getQueryParameters().getParameterValue(PARAM_AJAX).toString());
 			} catch (StringValueConversionException invalidValue) {
+				logger.error(invalidValue.getMessage(), invalidValue);
 				isAjax = false;
 			}
 		}

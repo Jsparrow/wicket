@@ -36,43 +36,6 @@ public class OIRPage extends BasePage
 {
 	private static final long serialVersionUID = 1L;
 
-	private static class HighlitableDataItem<T> extends Item<T>
-	{
-		private static final long serialVersionUID = 1L;
-
-		private boolean highlite = false;
-
-		/**
-		 * toggles highlite
-		 */
-		public void toggleHighlite()
-		{
-			highlite = !highlite;
-		}
-
-		/**
-		 * Constructor
-		 * 
-		 * @param id
-		 * @param index
-		 * @param model
-		 */
-		public HighlitableDataItem(String id, int index, IModel<T> model)
-		{
-			super(id, index, model);
-			add(new AttributeModifier("style", "background-color:#80b6ed;")
-			{
-				private static final long serialVersionUID = 1L;
-
-				@Override
-				public boolean isEnabled(Component component)
-				{
-					return HighlitableDataItem.this.highlite;
-				}
-			});
-		}
-	}
-
 	/**
 	 * Constructor
 	 */
@@ -142,5 +105,42 @@ public class OIRPage extends BasePage
 
 		add(dataView);
 		add(new PagingNavigator("navigator", dataView));
+	}
+
+	private static class HighlitableDataItem<T> extends Item<T>
+	{
+		private static final long serialVersionUID = 1L;
+
+		private boolean highlite = false;
+
+		/**
+		 * Constructor
+		 * 
+		 * @param id
+		 * @param index
+		 * @param model
+		 */
+		public HighlitableDataItem(String id, int index, IModel<T> model)
+		{
+			super(id, index, model);
+			add(new AttributeModifier("style", "background-color:#80b6ed;")
+			{
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				public boolean isEnabled(Component component)
+				{
+					return HighlitableDataItem.this.highlite;
+				}
+			});
+		}
+
+		/**
+		 * toggles highlite
+		 */
+		public void toggleHighlite()
+		{
+			highlite = !highlite;
+		}
 	}
 }

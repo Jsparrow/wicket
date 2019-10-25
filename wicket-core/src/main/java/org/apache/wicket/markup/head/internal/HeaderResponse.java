@@ -33,7 +33,7 @@ import org.apache.wicket.response.NullResponse;
  */
 public abstract class HeaderResponse implements IHeaderResponse
 {
-	private final Set<Object> rendered = new HashSet<Object>();
+	private final Set<Object> rendered = new HashSet<>();
 
 	private boolean closed;
 
@@ -49,19 +49,20 @@ public abstract class HeaderResponse implements IHeaderResponse
 	@Override
 	public void render(HeaderItem item)
 	{
-		if (!closed && !wasItemRendered(item))
-		{
-			item.render(getResponse());
-			markItemRendered(item);
+		if (!(!closed && !wasItemRendered(item))) {
+			return;
 		}
+		item.render(getResponse());
+		markItemRendered(item);
 	}
 
 	protected boolean wasItemRendered(HeaderItem item)
 	{
 		for (Object curToken : item.getRenderTokens())
 		{
-			if (wasRendered(curToken))
+			if (wasRendered(curToken)) {
 				return true;
+			}
 		}
 		return false;
 	}

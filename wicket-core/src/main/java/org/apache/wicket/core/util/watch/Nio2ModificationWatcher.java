@@ -97,13 +97,9 @@ public class Nio2ModificationWatcher extends ModificationWatcher
 		// Construct task with the given polling frequency
 		task = new Task("Wicket-ModificationWatcher-NIO2");
 
-		task.run(pollFrequency, new ICode() {
-			@Override
-			public void run(final Logger log)
-			{
-				checkCreated(log);
-				checkModified();
-			}
+		task.run(pollFrequency, (final Logger log) -> {
+			checkCreated(log);
+			checkModified();
 		});
 	}
 
@@ -118,30 +114,29 @@ public class Nio2ModificationWatcher extends ModificationWatcher
 	protected void checkCreated(Logger log)
 	{
 		WatchKey watchKey = watchService.poll();
-		if (watchKey != null)
-		{
-			List<WatchEvent<?>> events = watchKey.pollEvents();
-			for (WatchEvent<?> event : events)
-			{
-				WatchEvent.Kind<?> eventKind = event.kind();
-				Path eventPath = (Path) event.context();
-
-				if (eventKind == ENTRY_CREATE)
-				{
-					entryCreated(eventPath, log);
-				}
-				else if (eventKind == ENTRY_DELETE)
-				{
-					entryDeleted(eventPath, log);
-				}
-				else if (eventKind == ENTRY_MODIFY)
-				{
-					entryModified(eventPath, log);
-				}
-			}
-
-			watchKey.reset();
+		if (watchKey == null) {
+			return;
 		}
+		List<WatchEvent<?>> events = watchKey.pollEvents();
+		for (WatchEvent<?> event : events)
+		{
+			WatchEvent.Kind<?> eventKind = event.kind();
+			Path eventPath = (Path) event.context();
+
+			if (eventKind == ENTRY_CREATE)
+			{
+				entryCreated(eventPath, log);
+			}
+			else if (eventKind == ENTRY_DELETE)
+			{
+				entryDeleted(eventPath, log);
+			}
+			else if (eventKind == ENTRY_MODIFY)
+			{
+				entryModified(eventPath, log);
+			}
+		}
+		watchKey.reset();
 	}
 
 	/**
@@ -186,7 +181,7 @@ public class Nio2ModificationWatcher extends ModificationWatcher
 				register(path, watchService);
 			} catch (IOException iox)
 			{
-				log.warn("Cannot register folder '" + path + "' to be watched.", iox);
+				log.warn(new StringBuilder().append("Cannot register folder '").append(path).append("' to be watched.").toString(), iox);
 			}
 		}
 		else

@@ -60,6 +60,6 @@ public final class BooleanGroup extends Group
 	public boolean getBoolean(final Matcher matcher, final boolean defaultValue)
 	{
 		final String value = get(matcher);
-		return value == null ? defaultValue : value.equals("true");
+		return value == null ? defaultValue : "true".equals(value);
 	}
 }

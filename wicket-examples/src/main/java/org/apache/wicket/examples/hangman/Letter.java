@@ -32,6 +32,20 @@ import org.apache.wicket.util.lang.Primitives;
  */
 public class Letter implements IClusterable
 {
+	static String PARAMETER_GUESSED = "guessed";
+
+	static String PARAMETER_LETTER = "letter";
+
+	static ResourceReference LETTER_RESOURCE_REFERENCE = new ResourceReference(Letter.class,
+		"letter")
+	{
+		@Override
+		public IResource getResource()
+		{
+			return new ButtonResource();
+		}
+	};
+
 	/** True if the letter has been guessed */
 	private boolean guessed;
 
@@ -60,55 +74,11 @@ public class Letter implements IClusterable
 	@Override
 	public boolean equals(final Object object)
 	{
-		if (object instanceof Letter)
-		{
-			final Letter that = (Letter)object;
-			return that.letter == letter && that.guessed == guessed;
+		if (!(object instanceof Letter)) {
+			return false;
 		}
-		return false;
-	}
-
-	static String PARAMETER_GUESSED = "guessed";
-	static String PARAMETER_LETTER = "letter";
-
-	static ResourceReference LETTER_RESOURCE_REFERENCE = new ResourceReference(Letter.class,
-		"letter")
-	{
-		@Override
-		public IResource getResource()
-		{
-			return new ButtonResource();
-		}
-	};
-
-	/**
-	 * Simple resource implementation that checks for "guessed" parameter and delegates to
-	 * {@link DefaultButtonImageResource}.
-	 * 
-	 * @author Matej Knopp
-	 */
-	private static class ButtonResource implements IResource
-	{
-		public void respond(Attributes attributes)
-		{
-			// request parameter for the resource
-			boolean guessed = attributes.getParameters()
-				.get(PARAMETER_GUESSED)
-				.toBoolean(false);
-			String letter = attributes.getParameters()
-				.get(PARAMETER_LETTER)
-				.toString();
-
-			// delegate to another resource
-			DefaultButtonImageResource buttonResource = new DefaultButtonImageResource(30, 30,
-				letter);
-
-			if (guessed)
-			{
-				buttonResource.setColor(Color.GRAY);
-			}
-			buttonResource.respond(attributes);
-		}
+		final Letter that = (Letter)object;
+		return that.letter == letter && that.guessed == guessed;
 	}
 
 	/**
@@ -144,6 +114,37 @@ public class Letter implements IClusterable
 	@Override
 	public String toString()
 	{
-		return "[Letter letter = " + letter + ", guessed = " + guessed + "]";
+		return new StringBuilder().append("[Letter letter = ").append(letter).append(", guessed = ").append(guessed).append("]").toString();
+	}
+
+	/**
+	 * Simple resource implementation that checks for "guessed" parameter and delegates to
+	 * {@link DefaultButtonImageResource}.
+	 * 
+	 * @author Matej Knopp
+	 */
+	private static class ButtonResource implements IResource
+	{
+		@Override
+		public void respond(Attributes attributes)
+		{
+			// request parameter for the resource
+			boolean guessed = attributes.getParameters()
+				.get(PARAMETER_GUESSED)
+				.toBoolean(false);
+			String letter = attributes.getParameters()
+				.get(PARAMETER_LETTER)
+				.toString();
+
+			// delegate to another resource
+			DefaultButtonImageResource buttonResource = new DefaultButtonImageResource(30, 30,
+				letter);
+
+			if (guessed)
+			{
+				buttonResource.setColor(Color.GRAY);
+			}
+			buttonResource.respond(attributes);
+		}
 	}
 }

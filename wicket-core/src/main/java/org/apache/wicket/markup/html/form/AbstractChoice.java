@@ -50,94 +50,6 @@ public abstract class AbstractChoice<T, E> extends FormComponent<T>
 {
 	private static final long serialVersionUID = 1L;
 
-	/**
-	 * An enumeration of possible positions of the label for a choice
-	 */
-	public enum LabelPosition
-	{
-		/**
-		 * will render the label before the choice
-		 */
-		BEFORE {
-			@Override
-			void before(AppendingStringBuffer buffer, String idAttr, StringBuilder extraLabelAttributes, CharSequence renderValue)
-			{
-				buffer.append("<label for=\"")
-				.append(Strings.escapeMarkup(idAttr))
-				.append('"')
-				.append(extraLabelAttributes)
-				.append('>')
-				.append(renderValue)
-				.append("</label>");
-			}
-		},
-
-		/**
-		 * will render the label after the choice
-		 */
-		AFTER {
-			@Override
-			void after(AppendingStringBuffer buffer, String idAttr, StringBuilder extraLabelAttributes, CharSequence renderValue)
-			{
-				buffer.append("<label for=\"")
-				.append(Strings.escapeMarkup(idAttr))
-				.append('"')
-				.append(extraLabelAttributes)
-				.append('>')
-				.append(renderValue)
-				.append("</label>");
-			}
-		},
-
-		/**
-		 * render the label around and the text will be before the the choice
-		 */
-		WRAP_BEFORE {
-			@Override
-			void before(AppendingStringBuffer buffer, String idAttr, StringBuilder extraLabelAttributes, CharSequence renderValue)
-			{
-				buffer.append("<label")
-				.append(extraLabelAttributes)
-				.append('>')
-				.append(renderValue)
-				.append(' ');
-			}
-			
-			@Override
-			void after(AppendingStringBuffer buffer, String idAttr, StringBuilder extraLabelAttributes, CharSequence renderValue)
-			{
-				buffer.append("</label>");
-			}
-		},
-
-		/**
-		 * render the label around and the text will be after the the choice
-		 */
-		WRAP_AFTER {
-			@Override
-			void before(AppendingStringBuffer buffer, String idAttr, StringBuilder extraLabelAttributes, CharSequence renderValue)
-			{
-				buffer.append("<label")
-				.append(extraLabelAttributes)
-				.append('>');
-			}
-			
-			@Override
-			void after(AppendingStringBuffer buffer, String idAttr, StringBuilder extraLabelAttributes, CharSequence renderValue)
-			{
-				buffer.append(' ')
-				.append(renderValue)
-				.append("</label>");
-			}
-		};
-		
-		void before(AppendingStringBuffer buffer, String idAttr, StringBuilder extraLabelAttributes, CharSequence renderValue) {
-		}
-		
-		void after(AppendingStringBuffer buffer, String idAttr, StringBuilder extraLabelAttributes, CharSequence renderValue) {
-		}
-	}
-
 	/** The list of objects. */
 	private IModel<? extends List<? extends E>> choices;
 
@@ -316,12 +228,9 @@ public abstract class AbstractChoice<T, E> extends FormComponent<T>
 	 */
 	public final AbstractChoice<T, E> setChoices(IModel<? extends List<? extends E>> choices)
 	{
-		if (this.choices != null && this.choices != choices)
-		{
-			if (isVersioned())
-			{
-				addStateChange();
-			}
+		boolean condition = this.choices != null && this.choices != choices && isVersioned();
+		if (condition) {
+			addStateChange();
 		}
 		this.choices = wrap(choices);
 		return this;
@@ -336,12 +245,9 @@ public abstract class AbstractChoice<T, E> extends FormComponent<T>
 	 */
 	public final AbstractChoice<T, E> setChoices(List<? extends E> choices)
 	{
-		if ((this.choices != null))
-		{
-			if (isVersioned())
-			{
-				addStateChange();
-			}
+		boolean condition = (this.choices != null) && isVersioned();
+		if (condition) {
+			addStateChange();
 		}
 		this.choices = new ListModel<>(choices);
 		return this;
@@ -495,7 +401,7 @@ public abstract class AbstractChoice<T, E> extends FormComponent<T>
 		
 		if (localizeDisplayValues())
 		{
-			String localized = getLocalizer().getString(getId() + "." + displayValue, this, "");
+			String localized = getLocalizer().getString(new StringBuilder().append(getId()).append(".").append(displayValue).toString(), this, "");
 			if (Strings.isEmpty(localized)) {
 				localized = getLocalizer().getString(displayValue, this, displayValue);
 			}
@@ -569,12 +475,100 @@ public abstract class AbstractChoice<T, E> extends FormComponent<T>
 			"This class does not support type-conversion because it is performed "
 				+ "exclusively by the IChoiceRenderer assigned to this component");
 	}
-	
+
 	@Override
 	protected void onDetach()
 	{
 		renderer.detach();
 		
 		super.onDetach();
+	}
+
+	/**
+	 * An enumeration of possible positions of the label for a choice
+	 */
+	public enum LabelPosition
+	{
+		/**
+		 * will render the label before the choice
+		 */
+		BEFORE {
+			@Override
+			void before(AppendingStringBuffer buffer, String idAttr, StringBuilder extraLabelAttributes, CharSequence renderValue)
+			{
+				buffer.append("<label for=\"")
+				.append(Strings.escapeMarkup(idAttr))
+				.append('"')
+				.append(extraLabelAttributes)
+				.append('>')
+				.append(renderValue)
+				.append("</label>");
+			}
+		},
+
+		/**
+		 * will render the label after the choice
+		 */
+		AFTER {
+			@Override
+			void after(AppendingStringBuffer buffer, String idAttr, StringBuilder extraLabelAttributes, CharSequence renderValue)
+			{
+				buffer.append("<label for=\"")
+				.append(Strings.escapeMarkup(idAttr))
+				.append('"')
+				.append(extraLabelAttributes)
+				.append('>')
+				.append(renderValue)
+				.append("</label>");
+			}
+		},
+
+		/**
+		 * render the label around and the text will be before the the choice
+		 */
+		WRAP_BEFORE {
+			@Override
+			void before(AppendingStringBuffer buffer, String idAttr, StringBuilder extraLabelAttributes, CharSequence renderValue)
+			{
+				buffer.append("<label")
+				.append(extraLabelAttributes)
+				.append('>')
+				.append(renderValue)
+				.append(' ');
+			}
+			
+			@Override
+			void after(AppendingStringBuffer buffer, String idAttr, StringBuilder extraLabelAttributes, CharSequence renderValue)
+			{
+				buffer.append("</label>");
+			}
+		},
+
+		/**
+		 * render the label around and the text will be after the the choice
+		 */
+		WRAP_AFTER {
+			@Override
+			void before(AppendingStringBuffer buffer, String idAttr, StringBuilder extraLabelAttributes, CharSequence renderValue)
+			{
+				buffer.append("<label")
+				.append(extraLabelAttributes)
+				.append('>');
+			}
+			
+			@Override
+			void after(AppendingStringBuffer buffer, String idAttr, StringBuilder extraLabelAttributes, CharSequence renderValue)
+			{
+				buffer.append(' ')
+				.append(renderValue)
+				.append("</label>");
+			}
+		};
+		
+		void before(AppendingStringBuffer buffer, String idAttr, StringBuilder extraLabelAttributes, CharSequence renderValue) {
+		}
+		
+		void after(AppendingStringBuffer buffer, String idAttr, StringBuilder extraLabelAttributes, CharSequence renderValue) {
+		}
 	};
 }

@@ -24,6 +24,8 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.time.Instant;
 import org.apache.wicket.util.file.Files;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link URLConnection} related utilities
@@ -32,6 +34,8 @@ import org.apache.wicket.util.file.Files;
  */
 public class Connections
 {
+	private static final Logger logger = LoggerFactory.getLogger(Connections.class);
+
 	private Connections()
 	{
 	}
@@ -105,6 +109,7 @@ public class Connections
 		}
 		catch (Exception e)
 		{
+			logger.error(e.getMessage(), e);
 			// ignore
 		}
 	}

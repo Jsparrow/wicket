@@ -34,6 +34,7 @@ import org.apache.wicket.validation.IValidatable;
 import org.apache.wicket.validation.IValidator;
 import org.apache.wicket.validation.ValidationError;
 import org.junit.jupiter.api.Test;
+import java.util.Collections;
 
 /**
  * Test for {@link Palette}.
@@ -72,7 +73,7 @@ public class PaletteTest extends WicketTestCase
 	@Test
 	public void choicesModelMissingSelected()
 	{
-		IModel<List<String>> selected = new ListModel<>(new ArrayList<>(Arrays.asList("D")));
+		IModel<List<String>> selected = new ListModel<>(new ArrayList<>(Collections.singletonList("D")));
 
 		IModel<List<String>> all = new ListModel<>(new ArrayList<>(Arrays.asList("A", "B", "C")));
 
@@ -94,7 +95,7 @@ public class PaletteTest extends WicketTestCase
 	@Test
 	public void choicesModelAccountingForSelected()
 	{
-		final List<String> list = new ArrayList<>(Arrays.asList("D"));
+		final List<String> list = new ArrayList<>(Collections.singletonList("D"));
 
 		IModel<List<String>> selected = new ListModel<>(list);
 
@@ -136,7 +137,7 @@ public class PaletteTest extends WicketTestCase
 	{
 		IModel<List<String>> selected = new ListModel<>(new ArrayList<String>());
 
-		IModel<List<String>> all = new ListModel<>(new ArrayList<>(Arrays.asList("A")));
+		IModel<List<String>> all = new ListModel<>(new ArrayList<>(Collections.singletonList("A")));
 
 		PaletteTestPage testPage = new PaletteTestPage(selected, all);
 
@@ -179,7 +180,7 @@ public class PaletteTest extends WicketTestCase
 	{
 		IModel<List<String>> selected = new ListModel<>(new ArrayList<String>());
 
-		IModel<List<String>> all = new ListModel<>(new ArrayList<>(Arrays.asList("A")));
+		IModel<List<String>> all = new ListModel<>(new ArrayList<>(Collections.singletonList("A")));
 
 		PaletteTestPage testPage = new PaletteTestPage(selected, all);
 		testPage.palette.setRequired(true);

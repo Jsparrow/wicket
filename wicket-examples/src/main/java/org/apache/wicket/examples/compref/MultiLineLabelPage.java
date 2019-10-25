@@ -32,7 +32,7 @@ public class MultiLineLabelPage extends WicketExamplePage
 	 */
 	public MultiLineLabelPage()
 	{
-		String text = "\nThis is a line.\n" + "And this is another line.\n" + "End of lines.\n";
+		String text = new StringBuilder().append("\nThis is a line.\n").append("And this is another line.\n").append("End of lines.\n").toString();
 
 		add(new MultiLineLabel("multiLineLabel", text));
 	}
@@ -44,14 +44,8 @@ public class MultiLineLabelPage extends WicketExamplePage
 	protected void explain()
 	{
 		String html = "<span wicket:id=\"multiLineLabel\" class=\"mark\">this text will be replaced</span>";
-		String code = "&nbsp;&nbsp;&nbsp;&nbsp;public MultiLineLabelPage() {\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;String text =\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\"\\nThis is a line.\\n\" +\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\"And this is another line.\\n\" +\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\"End of lines.\\n\";\n"
-			+ "\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;add(new MultiLineLabel(\"multiLineLabel\", text));\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;}";
+		String code = new StringBuilder().append("&nbsp;&nbsp;&nbsp;&nbsp;public MultiLineLabelPage() {\n").append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;String text =\n").append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\"\\nThis is a line.\\n\" +\n").append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\"And this is another line.\\n\" +\n").append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\"End of lines.\\n\";\n").append("\n").append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;add(new MultiLineLabel(\"multiLineLabel\", text));\n").append("&nbsp;&nbsp;&nbsp;&nbsp;}")
+				.toString();
 		add(new ExplainPanel(html, code));
 	}
 }

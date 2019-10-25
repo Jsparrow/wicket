@@ -46,7 +46,7 @@ public class CouldNotLockPageException extends RuntimeException
 	 */
 	public CouldNotLockPageException(int page, String threadName, Duration timeout)
 	{
-		super("Could not lock page " + page + ". Attempt lasted " + timeout);
+		super(new StringBuilder().append("Could not lock page ").append(page).append(". Attempt lasted ").append(timeout).toString());
 		this.page = page;
 		this.timeout = timeout;
 		this.threadName = threadName;

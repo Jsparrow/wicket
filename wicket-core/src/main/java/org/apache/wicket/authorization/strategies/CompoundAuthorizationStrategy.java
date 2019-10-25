@@ -60,14 +60,7 @@ public class CompoundAuthorizationStrategy implements IAuthorizationStrategy
 	public final <T extends IRequestableComponent> boolean isInstantiationAuthorized(
 		Class<T> componentClass)
 	{
-		for (IAuthorizationStrategy strategy : strategies)
-		{
-			if (!strategy.isInstantiationAuthorized(componentClass))
-			{
-				return false;
-			}
-		}
-		return true;
+		return strategies.stream().allMatch(strategy -> strategy.isInstantiationAuthorized(componentClass));
 	}
 
 	/**
@@ -77,26 +70,12 @@ public class CompoundAuthorizationStrategy implements IAuthorizationStrategy
 	@Override
 	public final boolean isActionAuthorized(Component component, Action action)
 	{
-		for (IAuthorizationStrategy strategy : strategies)
-		{
-			if (!strategy.isActionAuthorized(component, action))
-			{
-				return false;
-			}
-		}
-		return true;
+		return strategies.stream().allMatch(strategy -> strategy.isActionAuthorized(component, action));
 	}
 
 	@Override
 	public boolean isResourceAuthorized(IResource resource, PageParameters parameters)
 	{
-		for (IAuthorizationStrategy strategy : strategies)
-		{
-			if (!strategy.isResourceAuthorized(resource, parameters))
-			{
-				return false;
-			}
-		}
-		return true;
+		return strategies.stream().allMatch(strategy -> strategy.isResourceAuthorized(resource, parameters));
 	}
 }

@@ -219,8 +219,7 @@ public class MultiFileUploadField extends FormComponentPanel<Collection<FileUplo
 		if (form == null)
 		{
 			// woops
-			throw new IllegalStateException("Component " + getClass().getName() + " must have a " +
-				Form.class.getName() + " component above in the hierarchy");
+			throw new IllegalStateException(new StringBuilder().append("Component ").append(getClass().getName()).append(" must have a ").append(Form.class.getName()).append(" component above in the hierarchy").toString());
 		}
 	}
 
@@ -235,10 +234,9 @@ public class MultiFileUploadField extends FormComponentPanel<Collection<FileUplo
 	{
 		// initialize the javascript library
 		response.render(JavaScriptHeaderItem.forReference(JS));
-		response.render(OnDomReadyHeaderItem.forScript("new MultiSelector('" + getInputName() +
-			"', document.getElementById('" + container.getMarkupId() + "'), " + max + ", " +
-			useMultipleAttr + ", '" + getString("org.apache.wicket.mfu.delete") +
-			"').addElement(document.getElementById('" + upload.getMarkupId() + "'));"));
+		response.render(OnDomReadyHeaderItem.forScript(new StringBuilder().append("new MultiSelector('").append(getInputName()).append("', document.getElementById('").append(container.getMarkupId()).append("'), ").append(max)
+				.append(", ").append(useMultipleAttr).append(", '").append(getString("org.apache.wicket.mfu.delete")).append("').addElement(document.getElementById('").append(upload.getMarkupId()).append("'));")
+				.toString()));
 	}
 
 	/**
@@ -291,7 +289,7 @@ public class MultiFileUploadField extends FormComponentPanel<Collection<FileUplo
 	}
 
 	@Override
-	protected Collection<FileUpload> convertValue(String[] value) throws ConversionException
+	protected Collection<FileUpload> convertValue(String[] value)
 	{
 		// convert the array of filenames into a collection of FileItems
 
@@ -338,10 +336,7 @@ public class MultiFileUploadField extends FormComponentPanel<Collection<FileUplo
 			Collection<FileUpload> uploads = getConvertedInput();
 			if (uploads != null)
 			{
-				for (FileUpload upload : uploads)
-				{
-					upload.closeStreams();
-				}
+				uploads.forEach(FileUpload::closeStreams);
 			}
 
 			// cleanup any caches

@@ -97,7 +97,7 @@ public class JavaSerializer implements ISerializer
 		}
 		catch (Exception e)
 		{
-			log.error("Error serializing object " + object.getClass() + " [object=" + object + "]",
+			log.error(new StringBuilder().append("Error serializing object ").append(object.getClass()).append(" [object=").append(object).append("]").toString(),
 				e);
 		}
 		return null;
@@ -182,6 +182,8 @@ public class JavaSerializer implements ISerializer
 	 */
 	private static class ClassResolverObjectInputStream extends ObjectInputStream
 	{
+		private final Logger logger = LoggerFactory.getLogger(ClassResolverObjectInputStream.class);
+
 		public ClassResolverObjectInputStream(InputStream in) throws IOException
 		{
 			super(in);
@@ -226,8 +228,9 @@ public class JavaSerializer implements ISerializer
 			catch (ClassNotFoundException cnfEx)
 			{
 				Class<?> ret = resolveClassInWicket(className);
-				if (ret == null)
+				if (ret == null) {
 					throw cnfEx;
+				}
 				return ret;
 			}
 		}
@@ -276,6 +279,7 @@ public class JavaSerializer implements ISerializer
 			}
 			catch (ClassNotFoundException cnfEx)
 			{
+				logger.error(cnfEx.getMessage(), cnfEx);
 				// ignore this exception.
 				log.debug(
 					"Proxy Class not found by the object outputstream itself, trying the IClassResolver");
@@ -401,7 +405,7 @@ public class JavaSerializer implements ISerializer
 			}
 			catch (Exception e)
 			{
-				log.error("error writing object " + obj + ": " + e.getMessage(), e);
+				log.error(new StringBuilder().append("error writing object ").append(obj).append(": ").append(e.getMessage()).toString(), e);
 				throw new WicketRuntimeException(e);
 			}
 		}

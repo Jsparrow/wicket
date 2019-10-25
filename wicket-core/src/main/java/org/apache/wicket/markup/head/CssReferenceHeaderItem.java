@@ -16,7 +16,6 @@
  */
 package org.apache.wicket.markup.head;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -28,6 +27,7 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.request.resource.ResourceReference;
 import org.apache.wicket.resource.bundles.IResourceBundle;
 import org.apache.wicket.util.string.Strings;
+import java.util.Collections;
 
 /**
  * {@link HeaderItem} for style tags that are rendered using a {@link ResourceReference}.
@@ -132,8 +132,9 @@ public class CssReferenceHeaderItem extends CssHeaderItem implements IReferenceH
 	@Override
 	public Iterable<? extends HeaderItem> getProvidedResources()
 	{
-		if (getReference() instanceof IResourceBundle)
+		if (getReference() instanceof IResourceBundle) {
 			return ((IResourceBundle)getReference()).getProvidedResources();
+		}
 		return super.getProvidedResources();
 	}
 
@@ -146,13 +147,13 @@ public class CssReferenceHeaderItem extends CssHeaderItem implements IReferenceH
 	@Override
 	public Iterable<?> getRenderTokens()
 	{
-		return Arrays.asList("css-" + Strings.stripJSessionId(getUrl()) + "-" + media);
+		return Collections.singletonList(new StringBuilder().append("css-").append(Strings.stripJSessionId(getUrl())).append("-").append(media).toString());
 	}
 
 	@Override
 	public String toString()
 	{
-		return "CSSReferenceHeaderItem(" + getReference() + ", " + getPageParameters() + ")";
+		return new StringBuilder().append("CSSReferenceHeaderItem(").append(getReference()).append(", ").append(getPageParameters()).append(")").toString();
 	}
 
 	private String getUrl()
@@ -171,12 +172,15 @@ public class CssReferenceHeaderItem extends CssHeaderItem implements IReferenceH
 	@Override
 	public boolean equals(Object o)
 	{
-		if (this == o)
+		if (this == o) {
 			return true;
-		if (o == null || getClass() != o.getClass())
+		}
+		if (o == null || getClass() != o.getClass()) {
 			return false;
-		if (!super.equals(o))
+		}
+		if (!super.equals(o)) {
 			return false;
+		}
 		CssReferenceHeaderItem that = (CssReferenceHeaderItem)o;
 		return Objects.equals(reference, that.reference) && Objects.equals(media, that.media) &&
 			Objects.equals(rel, that.rel) && Objects.equals(pageParameters, that.pageParameters);

@@ -55,7 +55,7 @@ public class CSVDataExporterTest extends WicketTestCase
 	{
 		CSVDataExporter exporter = new CSVDataExporter();
 
-		IDataProvider<Contact> dataProvider = new ListDataProvider<Contact>(contacts);
+		IDataProvider<Contact> dataProvider = new ListDataProvider<>(contacts);
 
 		List<IExportableColumn<Contact, ?>> columns = new ArrayList<>();
 		columns.add(new PropertyColumn<>(Model.of("firstName"), "firstName"));
@@ -65,9 +65,10 @@ public class CSVDataExporterTest extends WicketTestCase
 
 		exporter.exportData(dataProvider, columns, output);
 
-		assertEquals("\"firstName\",\"lastName\"\r\n" + //
-			"\"first0\",\"last\"\"0\"\r\n" + //
-			"\"first1\",\"last\"\"1\"\r\n" //
+		//
+		//
+		assertEquals(new StringBuilder().append("\"firstName\",\"lastName\"\r\n").append("\"first0\",\"last\"\"0\"\r\n").append("\"first1\",\"last\"\"1\"\r\n" //
+).toString()
 			, new String(output.toByteArray(), exporter.getCharacterSet()));
 	}
 }

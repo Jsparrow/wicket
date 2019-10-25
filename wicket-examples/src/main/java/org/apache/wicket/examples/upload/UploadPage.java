@@ -46,6 +46,75 @@ import org.apache.wicket.util.lang.Bytes;
 @SuppressWarnings("serial")
 public class UploadPage extends WicketExamplePage
 {
+	/** Reference to listview for easy access. */
+	private final FileListView fileListView;
+
+	/**
+	 * Constructor.
+	 * 
+	 * @param parameters
+	 *            Page parameters
+	 */
+	public UploadPage(final PageParameters parameters)
+	{
+		Folder uploadFolder = getUploadFolder();
+
+		// Create feedback panels
+		final FeedbackPanel uploadFeedback = new FeedbackPanel("uploadFeedback");
+
+		// Add uploadFeedback to the page itself
+		add(uploadFeedback);
+
+		// Add simple upload form, which is hooked up to its feedback panel by
+		// virtue of that panel being nested in the form.
+		final FileUploadForm simpleUploadForm = new FileUploadForm("simpleUpload");
+		add(simpleUploadForm);
+
+		// Add folder view
+		add(new Label("dir", uploadFolder.getAbsolutePath()));
+		fileListView = new FileListView("fileList", new LoadableDetachableModel<List<File>>()
+		{
+			@Override
+			protected List<File> load()
+			{
+				return Arrays.asList(getUploadFolder().listFiles());
+			}
+		});
+		add(fileListView);
+
+		// Add upload form with progress bar
+		final FileUploadForm progressUploadForm = new FileUploadForm("progressUpload");
+
+		progressUploadForm.add(new UploadProgressBar("progress", progressUploadForm,
+			progressUploadForm.fileUploadField));
+		add(progressUploadForm);
+
+		// Add upload form that uses HTML5 <input type="file" multiple />, so it can upload
+		// more than one file in browsers which support "multiple" attribute
+		final FileUploadForm html5UploadForm = new FileUploadForm("html5Upload");
+		add(html5UploadForm);
+	}
+
+	/**
+	 * Check whether the file allready exists, and if so, try to delete it.
+	 * 
+	 * @param newFile
+	 *            the file to check
+	 */
+	private void checkFileExists(File newFile)
+	{
+		boolean condition = newFile.exists() && !Files.remove(newFile);
+		// Try to delete the file
+		if (condition) {
+			throw new IllegalStateException("Unable to overwrite " + newFile.getAbsolutePath());
+		}
+	}
+
+	private Folder getUploadFolder()
+	{
+		return ((UploadApplication)Application.get()).getUploadFolder();
+	}
+
 	/**
 	 * List view for files in upload folder.
 	 */
@@ -142,77 +211,5 @@ public class UploadPage extends WicketExamplePage
 				}
 			}
 		}
-	}
-
-	/** Reference to listview for easy access. */
-	private final FileListView fileListView;
-
-	/**
-	 * Constructor.
-	 * 
-	 * @param parameters
-	 *            Page parameters
-	 */
-	public UploadPage(final PageParameters parameters)
-	{
-		Folder uploadFolder = getUploadFolder();
-
-		// Create feedback panels
-		final FeedbackPanel uploadFeedback = new FeedbackPanel("uploadFeedback");
-
-		// Add uploadFeedback to the page itself
-		add(uploadFeedback);
-
-		// Add simple upload form, which is hooked up to its feedback panel by
-		// virtue of that panel being nested in the form.
-		final FileUploadForm simpleUploadForm = new FileUploadForm("simpleUpload");
-		add(simpleUploadForm);
-
-		// Add folder view
-		add(new Label("dir", uploadFolder.getAbsolutePath()));
-		fileListView = new FileListView("fileList", new LoadableDetachableModel<List<File>>()
-		{
-			@Override
-			protected List<File> load()
-			{
-				return Arrays.asList(getUploadFolder().listFiles());
-			}
-		});
-		add(fileListView);
-
-		// Add upload form with progress bar
-		final FileUploadForm progressUploadForm = new FileUploadForm("progressUpload");
-
-		progressUploadForm.add(new UploadProgressBar("progress", progressUploadForm,
-			progressUploadForm.fileUploadField));
-		add(progressUploadForm);
-
-		// Add upload form that uses HTML5 <input type="file" multiple />, so it can upload
-		// more than one file in browsers which support "multiple" attribute
-		final FileUploadForm html5UploadForm = new FileUploadForm("html5Upload");
-		add(html5UploadForm);
-	}
-
-	/**
-	 * Check whether the file allready exists, and if so, try to delete it.
-	 * 
-	 * @param newFile
-	 *            the file to check
-	 */
-	private void checkFileExists(File newFile)
-	{
-		if (newFile.exists())
-		{
-			// Try to delete the file
-			if (!Files.remove(newFile))
-			{
-				throw new IllegalStateException("Unable to overwrite " + newFile.getAbsolutePath());
-			}
-		}
-	}
-
-	private Folder getUploadFolder()
-	{
-		return ((UploadApplication)Application.get()).getUploadFolder();
 	}
 }

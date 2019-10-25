@@ -78,6 +78,7 @@ public class Index extends BasePage
 		add(new BookmarkablePageLink<Void>("adminAnnotBookmarkableLink",
 			AdminAnnotationsBookmarkablePage.class));
 		add(new Link<Void>("adminAnnotInternalLink") {
+			@Override
 			public void onClick() {
 				setResponsePage(new AdminAnnotationsInternalPage("bar"));
 			}

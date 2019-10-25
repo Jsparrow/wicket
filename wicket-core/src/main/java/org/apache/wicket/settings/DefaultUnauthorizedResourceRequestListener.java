@@ -34,11 +34,11 @@ public class DefaultUnauthorizedResourceRequestListener implements IUnauthorized
 	public void onUnauthorizedRequest(IResource resource, PageParameters parameters)
 	{
 		RequestCycle cycle = RequestCycle.get();
-		if (cycle != null)
-		{
-			IRequestHandler handler = new ErrorCodeRequestHandler(HttpServletResponse.SC_FORBIDDEN, createErrorMessage(resource, parameters));
-			cycle.replaceAllRequestHandlers(handler);
+		if (cycle == null) {
+			return;
 		}
+		IRequestHandler handler = new ErrorCodeRequestHandler(HttpServletResponse.SC_FORBIDDEN, createErrorMessage(resource, parameters));
+		cycle.replaceAllRequestHandlers(handler);
 	}
 
 	protected String createErrorMessage(IResource resource, PageParameters parameters)

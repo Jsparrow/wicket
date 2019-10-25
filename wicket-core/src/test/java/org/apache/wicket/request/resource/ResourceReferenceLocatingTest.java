@@ -54,8 +54,9 @@ public class ResourceReferenceLocatingTest extends WicketTestCase
 			String line = br.readLine(); // read header line
 			while ((line = br.readLine()) != null)
 			{
-				if (!line.isEmpty())
+				if (!line.isEmpty()) {
 					result.add(TestCase.fromLine(line));
+				}
 			}
 
 			return result.stream();
@@ -170,7 +171,7 @@ public class ResourceReferenceLocatingTest extends WicketTestCase
 
 		private static boolean isNull(String s)
 		{
-			return s == null || s.isEmpty() || s.equals("null");
+			return s == null || s.isEmpty() || "null".equals(s);
 		}
 
 		private static String nullOrValue(String s)
@@ -181,15 +182,16 @@ public class ResourceReferenceLocatingTest extends WicketTestCase
 		static TestCase fromLine(String line)
 		{
 			String splitter;
-			if (line.contains("\t"))
+			if (line.contains("\t")) {
 				splitter = "\t";
-			else if (line.contains(";"))
+			} else if (line.contains(";")) {
 				splitter = ";";
-			else if (line.contains(","))
+			} else if (line.contains(",")) {
 				splitter = ",";
-			else
+			} else {
 				throw new IllegalArgumentException(
 					"Unable to split line with either tab, komma or semicolon");
+			}
 
 			String[] pars = line.split(splitter);
 
@@ -251,8 +253,8 @@ public class ResourceReferenceLocatingTest extends WicketTestCase
 		@Override
 		public String toString()
 		{
-			return "TestCase [locale=" + locale + ", style=" + style + ", variation=" + variation +
-				", extension=" + extension + "]";
+			return new StringBuilder().append("TestCase [locale=").append(locale).append(", style=").append(style).append(", variation=").append(variation)
+					.append(", extension=").append(extension).append("]").toString();
 		}
 	}
 }

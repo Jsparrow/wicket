@@ -154,7 +154,7 @@ class OnReAddTest
 			@Override
 			protected void onReAdd()
 			{
-				; // I should call super, but since I don't, this should throw an exception
+				// I should call super, but since I don't, this should throw an exception
 			}
 		};
 		brokenProbe.internalInitialize();

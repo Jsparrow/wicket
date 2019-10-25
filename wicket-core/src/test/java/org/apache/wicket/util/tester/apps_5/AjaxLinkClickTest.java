@@ -94,6 +94,7 @@ class AjaxLinkClickTest extends WicketTestCase
 		{
 			private static final long serialVersionUID = 1L;
 
+			@Override
 			public void onClick(Optional<AjaxRequestTarget> targetOptional)
 			{
 				linkClicked = true;

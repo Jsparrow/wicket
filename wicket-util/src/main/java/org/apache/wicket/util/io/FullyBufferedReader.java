@@ -280,8 +280,8 @@ public final class FullyBufferedReader
 		else if (quotationChar != 0)
 		{
 			// quotes not balanced!
-			throw new ParseException("Opening/closing quote not found for quote at " + "(line " +
-				getLineNumber() + ", column " + getColumnNumber() + ")", startPos);
+			throw new ParseException(new StringBuilder().append("Opening/closing quote not found for quote at ").append("(line ").append(getLineNumber()).append(", column ").append(getColumnNumber()).append(")")
+					.toString(), startPos);
 		}
 
 		return closeBracketIndex;

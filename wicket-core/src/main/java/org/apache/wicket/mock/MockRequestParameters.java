@@ -34,7 +34,7 @@ import org.apache.wicket.util.string.StringValue;
  */
 public class MockRequestParameters implements IWritableRequestParameters
 {
-	private final Map<String, List<StringValue>> parameters = new HashMap<String, List<StringValue>>();
+	private final Map<String, List<StringValue>> parameters = new HashMap<>();
 
 	@Override
 	public Set<String> getParameterNames()
@@ -72,7 +72,7 @@ public class MockRequestParameters implements IWritableRequestParameters
 	 */
 	public void setParameterValue(String name, String value)
 	{
-		List<StringValue> list = new ArrayList<StringValue>(1);
+		List<StringValue> list = new ArrayList<>(1);
 		list.add(StringValue.valueOf(value));
 		parameters.put(name, list);
 	}
@@ -88,7 +88,7 @@ public class MockRequestParameters implements IWritableRequestParameters
 		List<StringValue> list = parameters.get(name);
 		if (list == null)
 		{
-			list = new ArrayList<StringValue>(1);
+			list = new ArrayList<>(1);
 			parameters.put(name, list);
 		}
 		list.add(StringValue.valueOf(value));

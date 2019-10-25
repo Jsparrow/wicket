@@ -65,9 +65,6 @@ public class DynamicPage extends WicketExamplePage
 				return true;
 			}
 		});
-		for (Field field : fields)
-		{
-			panel.add(new TextField<>(field.getFieldName()));
-		}
+		fields.forEach(field -> panel.add(new TextField<>(field.getFieldName())));
 	}
 }

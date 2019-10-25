@@ -50,47 +50,6 @@ public class JsonRequestLogger extends AbstractRequestLogger
 {
 	// Reusing the logger from RequestLogger
 	private static final Logger LOG = LoggerFactory.getLogger(RequestLogger.class);
-
-	/**
-	 * Specify that the 'default' filter should be used for serialization. This filter will prevent
-	 * jackson from serializing the request handlers.
-	 */
-	private static final class FilteredIntrospector extends JacksonAnnotationIntrospector
-	{
-		@Override
-		public Object findFilterId(Annotated a)
-		{
-			return "default";
-		}
-	}
-
-	/**
-	 * A simple tuple for request and session.
-	 */
-	private static final class RequestSessionTuple implements Serializable
-	{
-		private static final long serialVersionUID = 1L;
-
-		private final RequestData request;
-		private final SessionData session;
-
-		public RequestSessionTuple(RequestData request, SessionData session)
-		{
-			this.request = request;
-			this.session = session;
-		}
-
-		public RequestData getRequest()
-		{
-			return request;
-		}
-
-		public SessionData getSession()
-		{
-			return session;
-		}
-	}
-
 	private final ObjectMapper mapper;
 
 	/**
@@ -133,6 +92,46 @@ public class JsonRequestLogger extends AbstractRequestLogger
 		catch (IOException e)
 		{
 			throw new RuntimeException(e);
+		}
+	}
+
+	/**
+	 * Specify that the 'default' filter should be used for serialization. This filter will prevent
+	 * jackson from serializing the request handlers.
+	 */
+	private static final class FilteredIntrospector extends JacksonAnnotationIntrospector
+	{
+		@Override
+		public Object findFilterId(Annotated a)
+		{
+			return "default";
+		}
+	}
+
+	/**
+	 * A simple tuple for request and session.
+	 */
+	private static final class RequestSessionTuple implements Serializable
+	{
+		private static final long serialVersionUID = 1L;
+
+		private final RequestData request;
+		private final SessionData session;
+
+		public RequestSessionTuple(RequestData request, SessionData session)
+		{
+			this.request = request;
+			this.session = session;
+		}
+
+		public RequestData getRequest()
+		{
+			return request;
+		}
+
+		public SessionData getSession()
+		{
+			return session;
 		}
 	}
 }

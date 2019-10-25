@@ -63,11 +63,10 @@ class ExternalImageTest extends WicketTestCase
 
 		TagTester tagById = tester.getTagById("externalImage2");
 		IModel<List<Serializable>> srcSet = externalImage2.getSrcSetModel();
-		for (Serializable model : srcSet.getObject())
-		{
+		srcSet.getObject().forEach(model -> {
 			String attribute = tagById.getAttribute("srcset");
 			assertTrue(attribute.contains(model.toString()));
-		}
+		});
 
 		String attribute = tagById.getAttribute("src");
 		assertEquals(externalImage2.getDefaultModelObject(), attribute);

@@ -44,7 +44,6 @@ public class MockLoginPage extends WebPage
 	 */
 	public MockLoginPage()
 	{
-		super();
 		add(new Label("label", "welcome please login"));
 		add(form = new Form<Void>("form")
 		{

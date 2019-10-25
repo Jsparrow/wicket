@@ -37,6 +37,8 @@ import org.apache.wicket.validation.IValidatable;
 import org.apache.wicket.validation.IValidator;
 import org.apache.wicket.validation.ValidationError;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Test of FileUploadField
@@ -45,6 +47,7 @@ import org.junit.jupiter.api.Test;
  */
 class FileUploadFieldTest extends WicketTestCase
 {
+	private static final Logger logger = LoggerFactory.getLogger(FileUploadFieldTest.class);
 	private static final String TEST_FILE_NAME = FileUploadFieldTest.class.getName();
 
 	/**
@@ -98,10 +101,12 @@ class FileUploadFieldTest extends WicketTestCase
 			}
 			catch (IOException e)
 			{
+				logger.error(e.getMessage(), e);
 				// Expected
 			}
 			catch (Exception e)
 			{
+				logger.error(e.getMessage(), e);
 				fail();
 			}
 		}
@@ -178,6 +183,60 @@ class FileUploadFieldTest extends WicketTestCase
 		tester.assertNoErrorMessage();
 	}
 
+	/**
+	 * @param numberOfowsToCreate
+	 * @return test file
+	 * @throws IOException
+	 */
+	public static File writeTestFile(int numberOfowsToCreate) throws IOException
+	{
+		File tmp = new File(java.io.File.createTempFile(TEST_FILE_NAME, ".txt"));
+		OutputStream os = new BufferedOutputStream(new FileOutputStream(tmp));
+		for (int i = 0; i < numberOfowsToCreate; i++)
+		{
+			os.write("test test test test test\n".getBytes());
+		}
+		os.close();
+		return tmp;
+	}
+
+	private static byte[] read(File file)
+	{
+		try
+		{
+			return readFile(file);
+		}
+		catch (IOException e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+
+	private static byte[] readFile(File file) throws IOException
+	{
+		InputStream stream = null;
+		byte[] bytes = new byte[0];
+		try
+		{
+			stream = new FileInputStream(file);
+			int length = (int)file.length();
+			bytes = new byte[length];
+			int offset = 0;
+			int bytesRead;
+
+			while (offset < bytes.length &&
+				(bytesRead = stream.read(bytes, offset, bytes.length - offset)) >= 0)
+			{
+				offset += bytesRead;
+			}
+		}
+		finally
+		{
+			stream.close();
+		}
+		return bytes;
+	}
+
 	public static class TestValidationPage extends MockPageWithFormAndUploadField
 	{
 		/** */
@@ -235,59 +294,5 @@ class FileUploadFieldTest extends WicketTestCase
 				}
 			}
 		}
-	}
-
-	/**
-	 * @param numberOfowsToCreate
-	 * @return test file
-	 * @throws IOException
-	 */
-	public static File writeTestFile(int numberOfowsToCreate) throws IOException
-	{
-		File tmp = new File(java.io.File.createTempFile(TEST_FILE_NAME, ".txt"));
-		OutputStream os = new BufferedOutputStream(new FileOutputStream(tmp));
-		for (int i = 0; i < numberOfowsToCreate; i++)
-		{
-			os.write("test test test test test\n".getBytes());
-		}
-		os.close();
-		return tmp;
-	}
-
-	private static byte[] read(File file)
-	{
-		try
-		{
-			return readFile(file);
-		}
-		catch (IOException e)
-		{
-			throw new RuntimeException(e);
-		}
-	}
-
-	private static byte[] readFile(File file) throws IOException
-	{
-		InputStream stream = null;
-		byte[] bytes = new byte[0];
-		try
-		{
-			stream = new FileInputStream(file);
-			int length = (int)file.length();
-			bytes = new byte[length];
-			int offset = 0;
-			int bytesRead;
-
-			while (offset < bytes.length &&
-				(bytesRead = stream.read(bytes, offset, bytes.length - offset)) >= 0)
-			{
-				offset += bytesRead;
-			}
-		}
-		finally
-		{
-			stream.close();
-		}
-		return bytes;
 	}
 }

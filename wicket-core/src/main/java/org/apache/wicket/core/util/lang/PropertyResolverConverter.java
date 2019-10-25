@@ -22,6 +22,8 @@ import org.apache.wicket.util.io.IClusterable;
 import org.apache.wicket.IConverterLocator;
 import org.apache.wicket.util.convert.IConverter;
 import org.apache.wicket.util.lang.Objects;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -29,6 +31,9 @@ import org.apache.wicket.util.lang.Objects;
  */
 public class PropertyResolverConverter implements IClusterable
 {
+	private static final Logger logger = LoggerFactory.getLogger(PropertyResolverConverter.class);
+
+
 	private static final long serialVersionUID = 1L;
 
 
@@ -87,6 +92,7 @@ public class PropertyResolverConverter implements IClusterable
 			}
 			catch (RuntimeException ex)
 			{
+				logger.error(ex.getMessage(), ex);
 				result = null;
 			}
 			if (result == null)

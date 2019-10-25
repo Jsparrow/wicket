@@ -55,6 +55,24 @@ public abstract class VelocityPanel extends Panel
 {
 	private static final long serialVersionUID = 1L;
 
+	private transient String stackTraceAsString;
+
+	private transient String evaluatedTemplate;
+
+	/**
+	 * Construct.
+	 * 
+	 * @param id
+	 *            Component id
+	 * @param model
+	 *            Model with variables that can be substituted by Velocity.
+	 */
+	@SuppressWarnings("rawtypes")
+	public VelocityPanel(final String id, final IModel<? extends Map> model)
+	{
+		super(id, model);
+	}
+
 	/**
 	 * Convenience factory method to create a {@link VelocityPanel} instance with a given
 	 * {@link IStringResourceStream template resource}.
@@ -86,24 +104,6 @@ public abstract class VelocityPanel extends Panel
 				return templateResource;
 			}
 		};
-	}
-
-	private transient String stackTraceAsString;
-
-	private transient String evaluatedTemplate;
-
-	/**
-	 * Construct.
-	 * 
-	 * @param id
-	 *            Component id
-	 * @param model
-	 *            Model with variables that can be substituted by Velocity.
-	 */
-	@SuppressWarnings("rawtypes")
-	public VelocityPanel(final String id, final IModel<? extends Map> model)
-	{
-		super(id, model);
 	}
 
 	/**
@@ -209,44 +209,40 @@ public abstract class VelocityPanel extends Panel
 	 */
 	private String evaluateVelocityTemplate(final Reader templateReader)
 	{
-		if (evaluatedTemplate == null)
-		{
-			// Get model as a map
-			@SuppressWarnings("rawtypes")
-			final Map map = (Map)getDefaultModelObject();
-
-			// create a Velocity context object using the model if set
-			final VelocityContext ctx = new VelocityContext(map);
-
-			// create a writer for capturing the Velocity output
-			StringWriter writer = new StringWriter();
-
-			// string to be used as the template name for log messages in case
-			// of error
-			final String logTag = getId();
-			try
-			{
-				// execute the velocity script and capture the output in writer
-				Velocity.evaluate(ctx, writer, logTag, templateReader);
-
-				// replace the tag's body the Velocity output
-				evaluatedTemplate = writer.toString();
-
-				if (escapeHtml())
-				{
-					// encode the result in order to get valid html output that
-					// does not break the rest of the page
-					evaluatedTemplate = Strings.escapeMarkup(evaluatedTemplate).toString();
-				}
-				return evaluatedTemplate;
-			}
-			catch (Exception e)
-			{
-				onException(e);
-			}
-			return null;
+		if (evaluatedTemplate != null) {
+			return evaluatedTemplate;
 		}
-		return evaluatedTemplate;
+		// Get model as a map
+		@SuppressWarnings("rawtypes")
+		final Map map = (Map)getDefaultModelObject();
+		// create a Velocity context object using the model if set
+		final VelocityContext ctx = new VelocityContext(map);
+		// create a writer for capturing the Velocity output
+		StringWriter writer = new StringWriter();
+		// string to be used as the template name for log messages in case
+		// of error
+		final String logTag = getId();
+		try
+		{
+			// execute the velocity script and capture the output in writer
+			Velocity.evaluate(ctx, writer, logTag, templateReader);
+
+			// replace the tag's body the Velocity output
+			evaluatedTemplate = writer.toString();
+
+			if (escapeHtml())
+			{
+				// encode the result in order to get valid html output that
+				// does not break the rest of the page
+				evaluatedTemplate = Strings.escapeMarkup(evaluatedTemplate).toString();
+			}
+			return evaluatedTemplate;
+		}
+		catch (Exception e)
+		{
+			onException(e);
+		}
+		return null;
 	}
 
 	/**

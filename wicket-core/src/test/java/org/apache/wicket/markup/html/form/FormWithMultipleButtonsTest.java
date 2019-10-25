@@ -92,7 +92,7 @@ class FormWithMultipleButtonsTest extends WicketTestCase
 	{
 		private static final long serialVersionUID = 1L;
 
-		List<Component> submitSequence = new ArrayList<Component>();
+		List<Component> submitSequence = new ArrayList<>();
 		Form<Void> form;
 		Button button;
 		AjaxFallbackButton ajaxFallbackButton;

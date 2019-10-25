@@ -54,9 +54,7 @@ public class CdiConfigurationTest extends WicketCdiTestCase
 	{
 		configure(new CdiConfiguration());
 
-		assertThrows(Exception.class, () -> {
-			new CdiConfiguration().configure(tester.getApplication());
-		});
+		assertThrows(Exception.class, () -> new CdiConfiguration().configure(tester.getApplication()));
 
 	}
 

@@ -62,6 +62,7 @@ public class CssPackageResource extends PackageResource
 	 * 
 	 * @return the configured application level Css compressor. May be {@code null}.
 	 */
+	@Override
 	protected ICssCompressor getCompressor()
 	{
 		ICssCompressor compressor = null;

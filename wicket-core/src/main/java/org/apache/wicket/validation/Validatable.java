@@ -120,7 +120,7 @@ public class Validatable<T> implements IValidatable<T>
 	{
 		if (errors == null)
 		{
-			errors = new ArrayList<IValidationError>();
+			errors = new ArrayList<>();
 		}
 		errors.add(error);
 	}

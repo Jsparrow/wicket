@@ -83,8 +83,8 @@ class AbstractRequestLoggerTest extends WicketTestCase
 	private RequestData requestData() {
 		RequestData data = new RequestData();
 
-		data.addUserData("someKey", "" + counter + "value");
-		data.setRequestedUrl("" + counter++);
+		data.addUserData("someKey", Integer.toString(counter) + "value");
+		data.setRequestedUrl(Integer.toString(counter++));
 
 		return data;
 	}

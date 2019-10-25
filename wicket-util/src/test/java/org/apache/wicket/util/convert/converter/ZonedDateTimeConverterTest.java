@@ -26,12 +26,15 @@ import java.time.ZonedDateTime;
 import java.util.Locale;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Tests for {@link ZonedDateTimeConverter}
  */
 public class ZonedDateTimeConverterTest
 {
+	private static final Logger logger = LoggerFactory.getLogger(ZonedDateTimeConverterTest.class);
 	private final ZoneId zoneUCT = ZoneId.of("Etc/UCT");
 	private final ZoneId zoneUTC = ZoneId.of("Etc/UTC");
 
@@ -65,6 +68,7 @@ public class ZonedDateTimeConverterTest
 		try {
 			converter.convertToObject("aaa", Locale.ENGLISH);
 		} catch (ConversionException expected) {
+			logger.error(expected.getMessage(), expected);
 		}
 	}
 }

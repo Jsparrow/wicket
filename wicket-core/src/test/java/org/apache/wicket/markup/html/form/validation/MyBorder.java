@@ -42,7 +42,7 @@ public class MyBorder extends Border
 	{
 		super(id);
 
-		form = new Form<Void>("form2");
+		form = new Form<>("form2");
 		form.setOutputMarkupId(true);
 		addToBorder(form);
 

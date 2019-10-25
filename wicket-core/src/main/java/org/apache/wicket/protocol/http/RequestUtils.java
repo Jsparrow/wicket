@@ -30,12 +30,23 @@ import org.apache.wicket.request.mapper.parameter.INamedParameters;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.util.encoding.UrlDecoder;
 import org.apache.wicket.util.string.Strings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Wicket Http specific utilities class.
  */
 public final class RequestUtils
 {
+	private static final Logger logger = LoggerFactory.getLogger(RequestUtils.class);
+
+	/**
+	 * Hidden utility class constructor.
+	 */
+	private RequestUtils()
+	{
+	}
+
 	/**
 	 * Decode the provided queryString as a series of key/ value pairs and set them in the provided
 	 * value map.
@@ -100,18 +111,15 @@ public final class RequestUtils
 
 		for (int i = 0; i < newcomponents.size(); i++)
 		{
-			if (i < newcomponents.size() - 1)
-			{
-				// Verify for a ".." component at next iteration
-				if ((newcomponents.get(i)).length() > 0 && newcomponents.get(i + 1).equals(".."))
+			boolean condition = i < newcomponents.size() - 1 && (newcomponents.get(i)).length() > 0 && "..".equals(newcomponents.get(i + 1));
+			// Verify for a ".." component at next iteration
+			if (condition) {
+				newcomponents.remove(i);
+				newcomponents.remove(i);
+				i -= 2;
+				if (i < -1)
 				{
-					newcomponents.remove(i);
-					newcomponents.remove(i);
-					i = i - 2;
-					if (i < -1)
-					{
-						i = -1;
-					}
+					i = -1;
 				}
 			}
 		}
@@ -122,14 +130,6 @@ public final class RequestUtils
 		}
 		return newpath;
 	}
-
-	/**
-	 * Hidden utility class constructor.
-	 */
-	private RequestUtils()
-	{
-	}
-
 
 	/**
 	 * Calculates absolute path to url relative to another absolute url.
@@ -226,6 +226,7 @@ public final class RequestUtils
 				}
 				catch (UnsupportedCharsetException useDefault)
 				{
+					logger.error(useDefault.getMessage(), useDefault);
 				}
 			}
 		}

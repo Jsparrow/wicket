@@ -47,7 +47,7 @@ public class PalettePage extends WicketExamplePage
 		List<Person> persons = ComponentReferenceApplication.getPersons();
 		IChoiceRenderer<Person> renderer = new ChoiceRenderer<>("fullName", "fullName");
 
-		final Palette<Person> palette = new Palette<Person>("palette", new ListModel<>(
+		final Palette<Person> palette = new Palette<>("palette", new ListModel<>(
 
 			new ArrayList<>()), new CollectionModel<>(persons), renderer, 10, true, true);
 
@@ -60,10 +60,7 @@ public class PalettePage extends WicketExamplePage
 			@Override
 			protected void onSubmit()
 			{
-				for (Person person : palette.getModelObject())
-				{
-					info("selected person: " + person);
-				}
+				palette.getModelObject().forEach(person -> info("selected person: " + person));
 			}
 		};
 
@@ -76,14 +73,8 @@ public class PalettePage extends WicketExamplePage
 	@Override
 	protected void explain()
 	{
-		String html = "<form wicket:id=\"form\">\n" + "<span wicket:id=\"palette\">\n"
-			+ "</span>\n</form>";
-		String code = "&nbsp;&nbsp;&nbsp;&nbsp;Form f=new Form(\"form\");<br/>"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;add(f);<br/>"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;List persons = ComponentReferenceApplication.getPersons();;<br/>"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;IChoiceRenderer renderer = new ChoiceRenderer(\"fullName\", \"fullName\");<br/>"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;final Palette palette = new Palette(\"palette\", new ListModel&lt;Person&gt;(new ArrayList&lt;Person&gt;()), new CollectionModel&lt;Person&gt;(<br/>"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;persons), renderer, 10, true);<br/>";
+		String html = new StringBuilder().append("<form wicket:id=\"form\">\n").append("<span wicket:id=\"palette\">\n").append("</span>\n</form>").toString();
+		String code = new StringBuilder().append("&nbsp;&nbsp;&nbsp;&nbsp;Form f=new Form(\"form\");<br/>").append("&nbsp;&nbsp;&nbsp;&nbsp;add(f);<br/>").append("&nbsp;&nbsp;&nbsp;&nbsp;List persons = ComponentReferenceApplication.getPersons();;<br/>").append("&nbsp;&nbsp;&nbsp;&nbsp;IChoiceRenderer renderer = new ChoiceRenderer(\"fullName\", \"fullName\");<br/>").append("&nbsp;&nbsp;&nbsp;&nbsp;final Palette palette = new Palette(\"palette\", new ListModel&lt;Person&gt;(new ArrayList&lt;Person&gt;()), new CollectionModel&lt;Person&gt;(<br/>").append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;persons), renderer, 10, true);<br/>").toString();
 		add(new ExplainPanel(html, code));
 	}
 }

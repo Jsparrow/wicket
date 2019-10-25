@@ -28,6 +28,7 @@ import org.apache.wicket.util.io.IClusterable;
 import org.apache.wicket.util.string.StringList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import java.util.stream.Collectors;
 
 /**
  * Holds list of feedback messages. The list can be added to, cleared, queried and filtered.
@@ -190,10 +191,7 @@ public final class FeedbackMessages implements IClusterable, Iterable<FeedbackMe
 
 		List<FeedbackMessage> toDelete = messages(filter);
 
-		for (FeedbackMessage message : toDelete)
-		{
-			message.detach();
-		}
+		toDelete.forEach(FeedbackMessage::detach);
 
 		synchronized(messages)
 		{
@@ -211,14 +209,7 @@ public final class FeedbackMessages implements IClusterable, Iterable<FeedbackMe
 	 */
 	public final boolean hasMessage(final IFeedbackMessageFilter filter)
 	{
-		for (final FeedbackMessage message : messages)
-		{
-			if (filter == null || filter.accept(message))
-			{
-				return true;
-			}
-		}
-		return false;
+		return messages.stream().anyMatch(message -> filter == null || filter.accept(message));
 	}
 
 	/**
@@ -232,14 +223,7 @@ public final class FeedbackMessages implements IClusterable, Iterable<FeedbackMe
 	 */
 	public final boolean hasMessage(final int level)
 	{
-		for (FeedbackMessage message : messages)
-		{
-			if (message.isLevel(level))
-			{
-				return true;
-			}
-		}
-		return false;
+		return messages.stream().anyMatch(message -> message.isLevel(level));
 	}
 
 	/**
@@ -261,14 +245,7 @@ public final class FeedbackMessages implements IClusterable, Iterable<FeedbackMe
 	 */
 	public final FeedbackMessage first(final int level)
 	{
-		for (FeedbackMessage message : messages)
-		{
-			if (message.isLevel(level))
-			{
-				return message;
-			}
-		}
-		return null;
+		return messages.stream().filter(message -> message.isLevel(level)).findFirst().orElse(null);
 	}
 
 	/**
@@ -296,14 +273,8 @@ public final class FeedbackMessages implements IClusterable, Iterable<FeedbackMe
 			return Collections.emptyList();
 		}
 
-		final List<FeedbackMessage> list = new ArrayList<FeedbackMessage>();
-		for (final FeedbackMessage message : messages)
-		{
-			if (filter == null || filter.accept(message))
-			{
-				list.add(message);
-			}
-		}
+		final List<FeedbackMessage> list = new ArrayList<>();
+		list.addAll(messages.stream().filter((final FeedbackMessage message) -> filter == null || filter.accept(message)).collect(Collectors.toList()));
 		return list;
 	}
 
@@ -354,7 +325,7 @@ public final class FeedbackMessages implements IClusterable, Iterable<FeedbackMe
 	@Override
 	public String toString()
 	{
-		return "[feedbackMessages = " + StringList.valueOf(messages) + ']';
+		return new StringBuilder().append("[feedbackMessages = ").append(StringList.valueOf(messages)).append(']').toString();
 	}
 
 	/**
@@ -372,9 +343,6 @@ public final class FeedbackMessages implements IClusterable, Iterable<FeedbackMe
 	 */
 	public void detach()
 	{
-		for (FeedbackMessage message : messages)
-		{
-			message.detach();
-		}
+		messages.forEach(FeedbackMessage::detach);
 	}
 }

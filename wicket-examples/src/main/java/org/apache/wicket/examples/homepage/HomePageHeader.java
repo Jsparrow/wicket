@@ -41,7 +41,7 @@ public class HomePageHeader extends Panel {
 
 			String version = p.getSpecificationVersion();
 
-			if (version == null || version.length() == 0)
+			if (version == null || version.isEmpty())
 			{
 				return "Missing Version";
 			}

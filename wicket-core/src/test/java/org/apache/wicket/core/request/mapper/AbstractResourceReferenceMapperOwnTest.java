@@ -50,16 +50,19 @@ class AbstractResourceReferenceMapperOwnTest
 	 */
 	private static class Mapper extends AbstractResourceReferenceMapper
 	{
+		@Override
 		public IRequestHandler mapRequest(Request request)
 		{
 			return null;
 		}
 
+		@Override
 		public int getCompatibilityScore(Request request)
 		{
 			return 0;
 		}
 
+		@Override
 		public Url mapHandler(IRequestHandler requestHandler)
 		{
 			return null;

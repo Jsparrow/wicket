@@ -32,13 +32,6 @@ public class ComponentInitializationListenerCollection extends
 	@Override
 	public void onInitialize(final Component component)
 	{
-		notify(new INotifier<IComponentInitializationListener>()
-		{
-			@Override
-			public void notify(IComponentInitializationListener listener)
-			{
-				listener.onInitialize(component);
-			}
-		});
+		notify((IComponentInitializationListener listener) -> listener.onInitialize(component));
 	}
 }

@@ -125,7 +125,7 @@ public class Address implements IClusterable
 	@Override
 	public String toString()
 	{
-		return "[Address address=" + address + ", postcode=" + postcode + ", city=" + city +
-				", country=" + country + "]";
+		return new StringBuilder().append("[Address address=").append(address).append(", postcode=").append(postcode).append(", city=").append(city).append(", country=")
+				.append(country).append("]").toString();
 	}
 }

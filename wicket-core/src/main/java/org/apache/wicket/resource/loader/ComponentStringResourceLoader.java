@@ -119,8 +119,8 @@ public class ComponentStringResourceLoader implements IStringResourceLoader
 
 		if (log.isDebugEnabled())
 		{
-			log.debug("key: '" + key + "'; class: '" + clazz.getName() + "'; locale: '" + locale +
-				"'; Style: '" + style + "'; Variation: '" + variation + '\'');
+			log.debug(new StringBuilder().append("key: '").append(key).append("'; class: '").append(clazz.getName()).append("'; locale: '").append(locale)
+					.append("'; Style: '").append(style).append("'; Variation: '").append(variation).append('\'').toString());
 		}
 
 		// Load the properties associated with the path
@@ -213,7 +213,7 @@ public class ComponentStringResourceLoader implements IStringResourceLoader
 
 		if (log.isDebugEnabled())
 		{
-			log.debug("component: '" + component.toString(false) + "'; key: '" + key + '\'');
+			log.debug(new StringBuilder().append("component: '").append(component.toString(false)).append("'; key: '").append(key).append('\'').toString());
 		}
 
 		// The return value
@@ -234,7 +234,7 @@ public class ComponentStringResourceLoader implements IStringResourceLoader
 			if (Strings.isEmpty(prefix) == false)
 			{
 				// lookup fully qualified path
-				string = loadStringResource(clazz, prefix + '.' + key, locale, style, variation);
+				string = loadStringResource(clazz, new StringBuilder().append(prefix).append('.').append(key).toString(), locale, style, variation);
 
 				// return string if we found it
 				if (string != null)
@@ -300,7 +300,7 @@ public class ComponentStringResourceLoader implements IStringResourceLoader
 	 */
 	private List<Component> getComponentTrail(Component component)
 	{
-		final List<Component> path = new ArrayList<Component>();
+		final List<Component> path = new ArrayList<>();
 
 		while (component != null)
 		{

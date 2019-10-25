@@ -146,6 +146,31 @@ public abstract class WebApplication extends Application
 	private RuntimeConfigurationType configurationType;
 
 	/**
+	 * the prefix for storing variables in the actual session (typically {@link HttpSession} for
+	 * this application instance.
+	 */
+	private String sessionAttributePrefix;
+
+	/** The WicketFilter that this application is attached to */
+	private WicketFilter wicketFilter;
+
+	/*
+	 * Can contain at most 1000 responses and each entry can live at most one minute. For now there
+	 * is no need to configure these parameters externally.
+	 */
+	private final StoredResponsesMap storedResponses = new StoredResponsesMap(1000,
+		Duration.ofSeconds(60));
+
+	/**
+	 * Constructor. <strong>Use {@link #init()} for any configuration of your application instead of
+	 * overriding the constructor.</strong>
+	 */
+	public WebApplication()
+	{
+		ajaxRequestTargetListeners = new AjaxRequestTargetListenerCollection();
+	}
+
+	/**
 	 * Covariant override for easy getting the current {@link WebApplication} without having to cast
 	 * it.
 	 */
@@ -161,24 +186,6 @@ public abstract class WebApplication extends Application
 		}
 
 		return (WebApplication)application;
-	}
-
-	/**
-	 * the prefix for storing variables in the actual session (typically {@link HttpSession} for
-	 * this application instance.
-	 */
-	private String sessionAttributePrefix;
-
-	/** The WicketFilter that this application is attached to */
-	private WicketFilter wicketFilter;
-
-	/**
-	 * Constructor. <strong>Use {@link #init()} for any configuration of your application instead of
-	 * overriding the constructor.</strong>
-	 */
-	public WebApplication()
-	{
-		ajaxRequestTargetListeners = new AjaxRequestTargetListenerCollection();
 	}
 
 	/**
@@ -203,12 +210,8 @@ public abstract class WebApplication extends Application
 		{
 			return wicketFilter.getFilterConfig().getInitParameter(key);
 		}
-		throw new IllegalStateException("init parameter '" + key +
-			"' is not set yet. Any code in your" +
-			" Application object that uses the wicketServlet/Filter instance should be put" +
-			" in the init() method instead of your constructor");
+		throw new IllegalStateException(new StringBuilder().append("init parameter '").append(key).append("' is not set yet. Any code in your").append(" Application object that uses the wicketServlet/Filter instance should be put").append(" in the init() method instead of your constructor").toString());
 	}
-
 
 	/**
 	 * Sets servlet context this application runs after. This is uaully done from a filter or a
@@ -231,9 +234,7 @@ public abstract class WebApplication extends Application
 	{
 		if (servletContext == null)
 		{
-			throw new IllegalStateException("servletContext is not set yet. Any code in your"
-				+ " Application object that uses the wicket filter instance should be put"
-				+ " in the init() method instead of your constructor");
+			throw new IllegalStateException(new StringBuilder().append("servletContext is not set yet. Any code in your").append(" Application object that uses the wicket filter instance should be put").append(" in the init() method instead of your constructor").toString());
 		}
 		return servletContext;
 	}
@@ -263,7 +264,7 @@ public abstract class WebApplication extends Application
 				filterName = getWicketFilter().getFilterConfig().getFilterName();
 			}
 			String namespace = getMapperContext().getNamespace();
-			sessionAttributePrefix = namespace + ':' + filterName + ':';
+			sessionAttributePrefix = new StringBuilder().append(namespace).append(':').append(filterName).append(':').toString();
 		}
 
 		// Namespacing for session attributes is provided by
@@ -415,45 +416,43 @@ public abstract class WebApplication extends Application
 		 * Only attempt to unmount if root request mapper is either a compound, or wraps a compound to avoid leaving the
 		 * application with no mappers installed.
 		 */
-		if (mapper instanceof ICompoundRequestMapper)
-		{
-			final Url url = Url.parse(path);
-
-			Request request = new Request()
-			{
-				@Override
-				public Url getUrl()
-				{
-					return url;
-				}
-
-				@Override
-				public Url getClientUrl()
-				{
-					return url;
-				}
-
-				@Override
-				public Locale getLocale()
-				{
-					return null;
-				}
-
-				@Override
-				public Charset getCharset()
-				{
-					return null;
-				}
-
-				@Override
-				public Object getContainerRequest()
-				{
-					return null;
-				}
-			};
-
-			unmountFromCompound((ICompoundRequestMapper) mapper, request);
+		if (!(mapper instanceof ICompoundRequestMapper)) {
+			return;
 		}
+		final Url url = Url.parse(path);
+		Request request = new Request()
+		{
+			@Override
+			public Url getUrl()
+			{
+				return url;
+			}
+
+			@Override
+			public Url getClientUrl()
+			{
+				return url;
+			}
+
+			@Override
+			public Locale getLocale()
+			{
+				return null;
+			}
+
+			@Override
+			public Charset getCharset()
+			{
+				return null;
+			}
+
+			@Override
+			public Object getContainerRequest()
+			{
+				return null;
+			}
+		};
+		unmountFromCompound((ICompoundRequestMapper) mapper, request);
 	}
 
 	/**
@@ -491,10 +490,7 @@ public abstract class WebApplication extends Application
 			}
 		}
 
-		for (IRequestMapper mapper : toRemove)
-		{
-			parent.remove(mapper);
-		}
+		toRemove.forEach(parent::remove);
 	}
 
 	/**
@@ -775,8 +771,7 @@ public abstract class WebApplication extends Application
 		if (this.configurationType != null)
 		{
 			throw new IllegalStateException(
-				"Configuration type is write-once. You can not change it. " + "" +
-					"Current value='" + configurationType + "'");
+				new StringBuilder().append("Configuration type is write-once. You can not change it. ").append("").append("Current value='").append(configurationType).append("'").toString());
 		}
 		this.configurationType = Args.notNull(configurationType, "configurationType");
 		return this;
@@ -797,6 +792,7 @@ public abstract class WebApplication extends Application
 			}
 			catch (SecurityException e)
 			{
+				log.error(e.getMessage(), e);
 				log.warn("SecurityManager doesn't allow to read the configuration type from " +
 						"the system properties. The configuration type will be read from the web.xml.");
 			}
@@ -834,11 +830,11 @@ public abstract class WebApplication extends Application
 				}
 				catch (IllegalArgumentException e)
 				{
+					log.error(e.getMessage(), e);
 					// Ignore : fall back to DEVELOPMENT mode
 					// log.warn("Unknown runtime configuration type '" + result +
 					// "', falling back to DEVELOPMENT mode.");
-					throw new IllegalArgumentException("Invalid configuration type: '" + result +
-						"'.  Must be \"development\" or \"deployment\".");
+					throw new IllegalArgumentException(new StringBuilder().append("Invalid configuration type: '").append(result).append("'.  Must be \"development\" or \"deployment\".").toString());
 				}
 			}
 		}
@@ -872,31 +868,29 @@ public abstract class WebApplication extends Application
 	 */
 	public void renderXmlDecl(final WebPage page, boolean insert)
 	{
-		if (insert || MarkupType.XML_MIME.equalsIgnoreCase(page.getMarkupType().getMimeType()))
+		if (!(insert || MarkupType.XML_MIME.equalsIgnoreCase(page.getMarkupType().getMimeType()))) {
+			return;
+		}
+		final RequestCycle cycle = RequestCycle.get();
+		if (insert == false)
 		{
-			final RequestCycle cycle = RequestCycle.get();
+			WebRequest request = (WebRequest)cycle.getRequest();
 
-			if (insert == false)
+			String accept = request.getHeader("Accept");
+			insert = ((accept == null) || (accept.contains(MarkupType.XML_MIME)));
+		}
+		if (insert)
+		{
+			WebResponse response = (WebResponse)cycle.getResponse();
+			response.write("<?xml version='1.0'");
+			String encoding = getRequestCycleSettings().getResponseRequestEncoding();
+			if (Strings.isEmpty(encoding) == false)
 			{
-				WebRequest request = (WebRequest)cycle.getRequest();
-
-				String accept = request.getHeader("Accept");
-				insert = ((accept == null) || (accept.indexOf(MarkupType.XML_MIME) != -1));
+				response.write(" encoding='");
+				response.write(encoding);
+				response.write("'");
 			}
-
-			if (insert)
-			{
-				WebResponse response = (WebResponse)cycle.getResponse();
-				response.write("<?xml version='1.0'");
-				String encoding = getRequestCycleSettings().getResponseRequestEncoding();
-				if (Strings.isEmpty(encoding) == false)
-				{
-					response.write(" encoding='");
-					response.write(encoding);
-					response.write("'");
-				}
-				response.write(" ?>");
-			}
+			response.write(" ?>");
 		}
 	}
 
@@ -950,20 +944,8 @@ public abstract class WebApplication extends Application
 	 */
 	protected void outputDevelopmentModeWarning()
 	{
-		System.err.print("********************************************************************\n"
-			+ "*** WARNING: Wicket is running in DEVELOPMENT mode.              ***\n"
-			+ "***                               ^^^^^^^^^^^                    ***\n"
-			+ "*** Do NOT deploy to your live server(s) without changing this.  ***\n"
-			+ "*** See Application#getConfigurationType() for more information. ***\n"
-			+ "********************************************************************\n");
+		log.error(new StringBuilder().append("********************************************************************\n").append("*** WARNING: Wicket is running in DEVELOPMENT mode.              ***\n").append("***                               ^^^^^^^^^^^                    ***\n").append("*** Do NOT deploy to your live server(s) without changing this.  ***\n").append("*** See Application#getConfigurationType() for more information. ***\n").append("********************************************************************\n").toString());
 	}
-
-	/*
-	 * Can contain at most 1000 responses and each entry can live at most one minute. For now there
-	 * is no need to configure these parameters externally.
-	 */
-	private final StoredResponsesMap storedResponses = new StoredResponsesMap(1000,
-		Duration.ofSeconds(60));
 
 	/**
 	 * 

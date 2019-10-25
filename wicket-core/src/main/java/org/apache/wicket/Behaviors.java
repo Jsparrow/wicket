@@ -83,12 +83,9 @@ final class Behaviors implements IDetachable
 		for (int i = component.data_start(); i < len; i++)
 		{
 			Object obj = component.data_get(i);
-			if (obj != null && obj instanceof Behavior)
-			{
-				if (type == null || type.isAssignableFrom(obj.getClass()))
-				{
-					subset.add((M)obj);
-				}
+			boolean condition = obj instanceof Behavior && (type == null || type.isAssignableFrom(obj.getClass()));
+			if (condition) {
+				subset.add((M)obj);
 			}
 		}
 		return Collections.unmodifiableList(subset);
@@ -130,7 +127,7 @@ final class Behaviors implements IDetachable
 		for (int i = component.data_start(); i < len; i++)
 		{
 			Object obj = component.data_get(i);
-			if (obj != null && obj instanceof Behavior)
+			if (obj instanceof Behavior)
 			{
 				final Behavior behavior = (Behavior)obj;
 
@@ -189,7 +186,7 @@ final class Behaviors implements IDetachable
 		for (int i = component.data_start(); i < component.data_length(); i++)
 		{
 			Object obj = component.data_get(i);
-			if (obj != null && obj instanceof BehaviorIdList)
+			if (obj instanceof BehaviorIdList)
 			{
 				component.data_remove(i);
 				return;
@@ -203,18 +200,17 @@ final class Behaviors implements IDetachable
 		for (int i = component.data_start(); i < len; i++)
 		{
 			Object obj = component.data_get(i);
-			if (obj != null && obj instanceof BehaviorIdList)
+			if (obj instanceof BehaviorIdList)
 			{
 				return (BehaviorIdList)obj;
 			}
 		}
-		if (createIfNotFound)
-		{
-			BehaviorIdList list = new BehaviorIdList();
-			component.data_add(list);
-			return list;
+		if (!createIfNotFound) {
+			return null;
 		}
-		return null;
+		BehaviorIdList list = new BehaviorIdList();
+		component.data_add(list);
+		return list;
 	}
 
 	/**
@@ -230,22 +226,12 @@ final class Behaviors implements IDetachable
 		for (int i = component.data_start(); i < len; i++)
 		{
 			Object obj = component.data_get(i);
-			if (obj != null && obj instanceof Behavior)
+			if (obj instanceof Behavior)
 			{
 				final Behavior behavior = (Behavior)obj;
 
 				behavior.onRemove(component);
 			}
-		}
-	}
-
-	private static class BehaviorIdList extends ArrayList<Behavior>
-	{
-		private static final long serialVersionUID = 1L;
-
-		public BehaviorIdList()
-		{
-			super(1);
 		}
 	}
 
@@ -265,8 +251,7 @@ final class Behaviors implements IDetachable
 		if (!found)
 		{
 			throw new IllegalStateException(
-				"Behavior must be added to component before its id can be generated. Behavior: " +
-					behavior + ", Component: " + this);
+				new StringBuilder().append("Behavior must be added to component before its id can be generated. Behavior: ").append(behavior).append(", Component: ").append(this).toString());
 		}
 
 		ArrayList<Behavior> ids = getBehaviorsIdList(true);
@@ -303,12 +288,9 @@ final class Behaviors implements IDetachable
 		Behavior behavior = null;
 
 		ArrayList<Behavior> ids = getBehaviorsIdList(false);
-		if (ids != null)
-		{
-			if (id >= 0 && id < ids.size())
-			{
-				behavior = ids.get(id);
-			}
+		boolean condition = ids != null && id >= 0 && id < ids.size();
+		if (condition) {
+			behavior = ids.get(id);
 		}
 
 		if (behavior != null)
@@ -316,6 +298,16 @@ final class Behaviors implements IDetachable
 			return behavior;
 		}
 		throw new InvalidBehaviorIdException(component, id);
+	}
+
+	private static class BehaviorIdList extends ArrayList<Behavior>
+	{
+		private static final long serialVersionUID = 1L;
+
+		public BehaviorIdList()
+		{
+			super(1);
+		}
 	}
 
 

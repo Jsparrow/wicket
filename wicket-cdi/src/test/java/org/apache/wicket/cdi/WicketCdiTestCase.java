@@ -64,11 +64,11 @@ public abstract class WicketCdiTestCase
 	@After
 	public void end()
 	{
-		if (contextManager.isRequestActive())
-		{
-			contextManager.deactivateContexts();
-			contextManager.destroy();
+		if (!contextManager.isRequestActive()) {
+			return;
 		}
+		contextManager.deactivateContexts();
+		contextManager.destroy();
 	}
 
 	@Before

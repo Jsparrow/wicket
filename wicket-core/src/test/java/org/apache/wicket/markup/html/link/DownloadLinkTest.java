@@ -115,14 +115,7 @@ class DownloadLinkTest extends WicketTestCase
 
 		FileNameModel fileNameModel = new FileNameModel();
 
-		DownloadLink link = new DownloadLink("test", new IModel<File>()
-		{
-			@Override
-			public File getObject()
-			{
-				return null;
-			}
-		}, fileNameModel);
+		DownloadLink link = new DownloadLink("test", () -> null, fileNameModel);
 
 		assertTrue(fileNameModel.wrapOnAssignmentCalled);
 

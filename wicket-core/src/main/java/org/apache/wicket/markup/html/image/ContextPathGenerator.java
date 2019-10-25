@@ -56,7 +56,7 @@ public class ContextPathGenerator extends Behavior
 	 */
 	public ContextPathGenerator(String contextRelativePath)
 	{
-		this.contextRelativePath = new Model<String>(contextRelativePath);
+		this.contextRelativePath = new Model<>(contextRelativePath);
 	}
 
 	/** {@inheritDoc} **/

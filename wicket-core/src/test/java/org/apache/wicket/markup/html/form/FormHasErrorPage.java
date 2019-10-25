@@ -31,23 +31,6 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
  */
 public class FormHasErrorPage extends WebPage
 {
-	/**
-	 */
-	public static final class InvalidPanel extends Panel
-	{
-		private static final long serialVersionUID = 1L;
-
-		/**
-		 * Construct.
-		 * 
-		 * @param id
-		 */
-		InvalidPanel(String id)
-		{
-			super(id);
-		}
-	}
-
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -59,7 +42,7 @@ public class FormHasErrorPage extends WebPage
 	public FormHasErrorPage(final PageParameters parameters)
 	{
 
-		final IModel<String> labelModel = new Model<String>("");
+		final IModel<String> labelModel = new Model<>("");
 		Label passFail = new Label("passFail", labelModel);
 		add(passFail);
 
@@ -127,5 +110,22 @@ public class FormHasErrorPage extends WebPage
 		form.add(formComponent);
 
 		add(new FeedbackPanel("feedback"));
+	}
+
+	/**
+	 */
+	public static final class InvalidPanel extends Panel
+	{
+		private static final long serialVersionUID = 1L;
+
+		/**
+		 * Construct.
+		 * 
+		 * @param id
+		 */
+		InvalidPanel(String id)
+		{
+			super(id);
+		}
 	}
 }

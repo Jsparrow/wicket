@@ -72,27 +72,6 @@ public abstract class AbstractResource implements IResource
 
 	public static final String CONTENT_DISPOSITION_HEADER_NAME = "content-disposition";
 
-	/**
-	 * All available content range types. The type name represents the name used in header
-	 * information.
-	 */
-	public enum ContentRangeType
-	{
-		BYTES("bytes"), NONE("none");
-
-		private final String typeName;
-
-		ContentRangeType(String typeName)
-		{
-			this.typeName = typeName;
-		}
-
-		public String getTypeName()
-		{
-			return typeName;
-		}
-	}
-
 	static
 	{
 		INTERNAL_HEADERS = new HashSet<>();
@@ -124,6 +103,343 @@ public abstract class AbstractResource implements IResource
 	 * @return resource data instance
 	 */
 	protected abstract ResourceResponse newResourceResponse(Attributes attributes);
+
+	/**
+	 * Configure the web response header for client cache control.
+	 * 
+	 * @param data
+	 *            resource data
+	 * @param attributes
+	 *            request attributes
+	 */
+	protected void configureCache(final ResourceResponse data, final Attributes attributes)
+	{
+		Response response = attributes.getResponse();
+
+		if (!(response instanceof WebResponse)) {
+			return;
+		}
+		Duration duration = data.getCacheDuration();
+		WebResponse webResponse = (WebResponse)response;
+		if (duration.compareTo(Duration.ZERO) > 0)
+		{
+			webResponse.enableCaching(duration, data.getCacheScope());
+		}
+		else
+		{
+			webResponse.disableCaching();
+		}
+	}
+
+	protected IResourceCachingStrategy getCachingStrategy()
+	{
+		return Application.get().getResourceSettings().getCachingStrategy();
+	}
+
+	/**
+	 * 
+	 * @see org.apache.wicket.request.resource.IResource#respond(org.apache.wicket.request.resource.IResource.Attributes)
+	 */
+	@Override
+	public void respond(final Attributes attributes)
+	{
+		// Sets the request attributes
+		setRequestMetaData(attributes);
+
+		// Get a "new" ResourceResponse to write a response
+		ResourceResponse data = newResourceResponse(attributes);
+
+		// is resource supposed to be cached?
+		if (this instanceof IStaticCacheableResource)
+		{
+			final IStaticCacheableResource cacheable = (IStaticCacheableResource)this;
+
+			// is caching enabled?
+			if (cacheable.isCachingEnabled())
+			{
+				// apply caching strategy to response
+				getCachingStrategy().decorateResponse(data, cacheable);
+			}
+		}
+		// set response header
+		setResponseHeaders(data, attributes);
+
+		if (!data.dataNeedsToBeWritten(attributes) || data.getErrorCode() != null ||
+			needsBody(data.getStatusCode()) == false)
+		{
+			return;
+		}
+
+		if (data.getWriteCallback() == null)
+		{
+			throw new IllegalStateException("ResourceResponse#setWriteCallback() must be set.");
+		}
+
+		try
+		{
+			data.getWriteCallback().writeData(attributes);
+		}
+		catch (IOException iox)
+		{
+			throw new WicketRuntimeException(iox);
+		}
+	}
+
+	/**
+	 * Decides whether a response body should be written back to the client depending on the set
+	 * status code
+	 *
+	 * @param statusCode
+	 *            the status code set by the application
+	 * @return {@code true} if the status code allows response body, {@code false} - otherwise
+	 */
+	private boolean needsBody(Integer statusCode)
+	{
+		return statusCode == null ||
+								(statusCode < 300 &&
+								statusCode != HttpServletResponse.SC_NO_CONTENT &&
+								statusCode != HttpServletResponse.SC_RESET_CONTENT);
+	}
+
+	/**
+	 * check if header is directly modifyable
+	 * 
+	 * @param name
+	 *            header name
+	 * 
+	 * @throws IllegalArgumentException
+	 *             if access is forbidden
+	 */
+	private void checkHeaderAccess(String name)
+	{
+		name = Args.notEmpty(name.trim().toLowerCase(Locale.ROOT), "name");
+
+		if (INTERNAL_HEADERS.contains(name))
+		{
+			throw new IllegalArgumentException(new StringBuilder().append("you are not allowed to directly access header [").append(name).append("], ").append("use one of the other specialized methods of ").append(Classes.simpleName(getClass())).append(" to get or modify its value").toString());
+		}
+	}
+
+	/**
+	 * Reads the plain request header information and applies enriched information as meta data to
+	 * the current request. Those information are available for the whole request cycle.
+	 *
+	 * @param attributes
+	 *            the attributes to get the plain request header information
+	 */
+	protected void setRequestMetaData(Attributes attributes)
+	{
+		Request request = attributes.getRequest();
+		if (!(request instanceof WebRequest)) {
+			return;
+		}
+		WebRequest webRequest = (WebRequest)request;
+		setRequestRangeMetaData(webRequest);
+	}
+
+	protected void setRequestRangeMetaData(WebRequest webRequest)
+	{
+		String rangeHeader = webRequest.getHeader("range");
+
+		// The content range header is only be calculated if a range is given
+		if (!(!Strings.isEmpty(rangeHeader) &&
+				rangeHeader.contains(ContentRangeType.BYTES.getTypeName()))) {
+			return;
+		}
+		// fixing white spaces
+		rangeHeader = rangeHeader.replaceAll(" ", "");
+		String range = rangeHeader.substring(rangeHeader.indexOf('=') + 1,
+				rangeHeader.length());
+		// support only the first range (WICKET-5995)
+		final int idxOfComma = range.indexOf(',');
+		String firstRange = idxOfComma > -1 ? range.substring(0, idxOfComma) : range;
+		String[] rangeParts = Strings.split(firstRange, '-');
+		String startByteString = rangeParts[0];
+		String endByteString = rangeParts[1];
+		long startbyte = !Strings.isEmpty(startByteString) ? Long.parseLong(startByteString) : 0;
+		long endbyte = !Strings.isEmpty(endByteString) ? Long.parseLong(endByteString) : -1;
+		// Make the content range information available for the whole request cycle
+		RequestCycle requestCycle = RequestCycle.get();
+		requestCycle.setMetaData(CONTENT_RANGE_STARTBYTE, startbyte);
+		requestCycle.setMetaData(CONTENT_RANGE_ENDBYTE, endbyte);
+	}
+
+	/**
+	 * Sets the response header of resource response to the response received from the attributes
+	 *
+	 * @param resourceResponse
+	 *            the resource response to get the header fields from
+	 * @param attributes
+	 *            the attributes to get the response from to which the header information are going
+	 *            to be applied
+	 */
+	protected void setResponseHeaders(final ResourceResponse resourceResponse,
+		final Attributes attributes)
+	{
+		Response response = attributes.getResponse();
+		if (!(response instanceof WebResponse)) {
+			return;
+		}
+		WebResponse webResponse = (WebResponse)response;
+		// 1. Last Modified
+		Instant lastModified = resourceResponse.getLastModified();
+		if (lastModified != null)
+		{
+			webResponse.setLastModifiedTime(lastModified);
+		}
+		// 2. Caching
+		configureCache(resourceResponse, attributes);
+		if (resourceResponse.getErrorCode() != null)
+		{
+			webResponse.sendError(resourceResponse.getErrorCode(),
+				resourceResponse.getErrorMessage());
+			return;
+		}
+		if (resourceResponse.getStatusCode() != null)
+		{
+			webResponse.setStatus(resourceResponse.getStatusCode());
+		}
+		if (!resourceResponse.dataNeedsToBeWritten(attributes))
+		{
+			webResponse.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+			return;
+		}
+		// 3. Content Disposition
+		String fileName = resourceResponse.getFileName();
+		ContentDisposition disposition = resourceResponse.getContentDisposition();
+		if (ContentDisposition.ATTACHMENT == disposition)
+		{
+			webResponse.setAttachmentHeader(fileName);
+		}
+		else if (ContentDisposition.INLINE == disposition)
+		{
+			webResponse.setInlineHeader(fileName);
+		}
+		// 4. Mime Type (+ encoding)
+		String mimeType = resourceResponse.getContentType();
+		if (mimeType != null)
+		{
+			final String encoding = resourceResponse.getTextEncoding();
+
+			if (encoding == null)
+			{
+				webResponse.setContentType(mimeType);
+			}
+			else
+			{
+				webResponse.setContentType(new StringBuilder().append(mimeType).append("; charset=").append(encoding).toString());
+			}
+		}
+		// 5. Accept Range
+		ContentRangeType acceptRange = resourceResponse.getAcceptRange();
+		if (acceptRange != null)
+		{
+			webResponse.setAcceptRange(acceptRange.getTypeName());
+		}
+		long contentLength = resourceResponse.getContentLength();
+		boolean contentRangeApplied = false;
+		// 6. Content Range
+		// for more information take a look here:
+		// http://stackoverflow.com/questions/8293687/sample-http-range-request-session
+		// if the content range header has been set directly
+		// to the resource response use it otherwise calculate it
+		String contentRange = resourceResponse.getContentRange();
+		if (contentRange != null)
+		{
+			webResponse.setContentRange(contentRange);
+		}
+		else
+		{
+			// content length has to be set otherwise the content range header can not be
+			// calculated - accept range must be set to bytes - others are not supported at the
+			// moment
+			if (contentLength != -1 && ContentRangeType.BYTES == acceptRange)
+			{
+				contentRangeApplied = setResponseContentRangeHeaderFields(webResponse,
+					attributes, contentLength);
+			}
+		}
+		// 7. Content Length
+		if (contentLength != -1 && !contentRangeApplied)
+		{
+			webResponse.setContentLength(contentLength);
+		}
+		// add custom headers and values
+		final HttpHeaderCollection headers = resourceResponse.getHeaders();
+		headers.getHeaderNames().forEach(name -> {
+			checkHeaderAccess(name);
+
+			for (String value : headers.getHeaderValues(name))
+			{
+				webResponse.addHeader(name, value);
+			}
+		});
+	}
+
+	/**
+	 * Sets the content range header fields to the given web response
+	 *
+	 * @param webResponse
+	 *            the web response to apply the content range information to
+	 * @param attributes
+	 *            the attributes to get the request from
+	 * @param contentLength
+	 *            the content length of the response
+	 * @return if the content range header information has been applied
+	 */
+	protected boolean setResponseContentRangeHeaderFields(WebResponse webResponse,
+		Attributes attributes, long contentLength)
+	{
+		boolean contentRangeApplied = false;
+		if (attributes.getRequest() instanceof WebRequest)
+		{
+			Long startbyte = RequestCycle.get().getMetaData(CONTENT_RANGE_STARTBYTE);
+			Long endbyte = RequestCycle.get().getMetaData(CONTENT_RANGE_ENDBYTE);
+
+			if (startbyte != null && endbyte != null)
+			{
+				// if end byte hasn't been set
+				if (endbyte == -1)
+				{
+					endbyte = contentLength - 1;
+				}
+
+				// Change the status code to 206 partial content
+				webResponse.setStatus(206);
+				// currently only bytes are supported.
+				webResponse.setContentRange(new StringBuilder().append(ContentRangeType.BYTES.getTypeName()).append(" ").append(startbyte).append('-').append(endbyte).append('/')
+						.append(contentLength).toString());
+				// WARNING - DO NOT SET THE CONTENT LENGTH, even if it is calculated right - 
+				// SAFARI / CHROME are causing issues otherwise!
+				// webResponse.setContentLength((endbyte - startbyte) + 1);
+
+				// content range has been applied do not set the content length again!
+				contentRangeApplied = true;
+			}
+		}
+		return contentRangeApplied;
+	}
+
+	/**
+	 * All available content range types. The type name represents the name used in header
+	 * information.
+	 */
+	public enum ContentRangeType
+	{
+		BYTES("bytes"), NONE("none");
+
+		private final String typeName;
+
+		ContentRangeType(String typeName)
+		{
+			this.typeName = typeName;
+		}
+
+		public String getTypeName()
+		{
+			return typeName;
+		}
+	}
 
 	/**
 	 * Represents data used to configure response and write resource data.
@@ -584,345 +900,6 @@ public abstract class AbstractResource implements IResource
 		{
 			return headers;
 		}
-	}
-
-	/**
-	 * Configure the web response header for client cache control.
-	 * 
-	 * @param data
-	 *            resource data
-	 * @param attributes
-	 *            request attributes
-	 */
-	protected void configureCache(final ResourceResponse data, final Attributes attributes)
-	{
-		Response response = attributes.getResponse();
-
-		if (response instanceof WebResponse)
-		{
-			Duration duration = data.getCacheDuration();
-			WebResponse webResponse = (WebResponse)response;
-			if (duration.compareTo(Duration.ZERO) > 0)
-			{
-				webResponse.enableCaching(duration, data.getCacheScope());
-			}
-			else
-			{
-				webResponse.disableCaching();
-			}
-		}
-	}
-
-	protected IResourceCachingStrategy getCachingStrategy()
-	{
-		return Application.get().getResourceSettings().getCachingStrategy();
-	}
-
-	/**
-	 * 
-	 * @see org.apache.wicket.request.resource.IResource#respond(org.apache.wicket.request.resource.IResource.Attributes)
-	 */
-	@Override
-	public void respond(final Attributes attributes)
-	{
-		// Sets the request attributes
-		setRequestMetaData(attributes);
-
-		// Get a "new" ResourceResponse to write a response
-		ResourceResponse data = newResourceResponse(attributes);
-
-		// is resource supposed to be cached?
-		if (this instanceof IStaticCacheableResource)
-		{
-			final IStaticCacheableResource cacheable = (IStaticCacheableResource)this;
-
-			// is caching enabled?
-			if (cacheable.isCachingEnabled())
-			{
-				// apply caching strategy to response
-				getCachingStrategy().decorateResponse(data, cacheable);
-			}
-		}
-		// set response header
-		setResponseHeaders(data, attributes);
-
-		if (!data.dataNeedsToBeWritten(attributes) || data.getErrorCode() != null ||
-			needsBody(data.getStatusCode()) == false)
-		{
-			return;
-		}
-
-		if (data.getWriteCallback() == null)
-		{
-			throw new IllegalStateException("ResourceResponse#setWriteCallback() must be set.");
-		}
-
-		try
-		{
-			data.getWriteCallback().writeData(attributes);
-		}
-		catch (IOException iox)
-		{
-			throw new WicketRuntimeException(iox);
-		}
-	}
-
-	/**
-	 * Decides whether a response body should be written back to the client depending on the set
-	 * status code
-	 *
-	 * @param statusCode
-	 *            the status code set by the application
-	 * @return {@code true} if the status code allows response body, {@code false} - otherwise
-	 */
-	private boolean needsBody(Integer statusCode)
-	{
-		return statusCode == null ||
-								(statusCode < 300 &&
-								statusCode != HttpServletResponse.SC_NO_CONTENT &&
-								statusCode != HttpServletResponse.SC_RESET_CONTENT);
-	}
-
-	/**
-	 * check if header is directly modifyable
-	 * 
-	 * @param name
-	 *            header name
-	 * 
-	 * @throws IllegalArgumentException
-	 *             if access is forbidden
-	 */
-	private void checkHeaderAccess(String name)
-	{
-		name = Args.notEmpty(name.trim().toLowerCase(Locale.ROOT), "name");
-
-		if (INTERNAL_HEADERS.contains(name))
-		{
-			throw new IllegalArgumentException("you are not allowed to directly access header [" +
-				name + "], " + "use one of the other specialized methods of " +
-						Classes.simpleName(getClass()) + " to get or modify its value");
-		}
-	}
-
-	/**
-	 * Reads the plain request header information and applies enriched information as meta data to
-	 * the current request. Those information are available for the whole request cycle.
-	 *
-	 * @param attributes
-	 *            the attributes to get the plain request header information
-	 */
-	protected void setRequestMetaData(Attributes attributes)
-	{
-		Request request = attributes.getRequest();
-		if (request instanceof WebRequest)
-		{
-			WebRequest webRequest = (WebRequest)request;
-
-			setRequestRangeMetaData(webRequest);
-		}
-	}
-
-	protected void setRequestRangeMetaData(WebRequest webRequest)
-	{
-		String rangeHeader = webRequest.getHeader("range");
-
-		// The content range header is only be calculated if a range is given
-		if (!Strings.isEmpty(rangeHeader) &&
-				rangeHeader.contains(ContentRangeType.BYTES.getTypeName()))
-		{
-			// fixing white spaces
-			rangeHeader = rangeHeader.replaceAll(" ", "");
-
-			String range = rangeHeader.substring(rangeHeader.indexOf('=') + 1,
-					rangeHeader.length());
-			
-			// support only the first range (WICKET-5995)
-			final int idxOfComma = range.indexOf(',');
-			String firstRange = idxOfComma > -1 ? range.substring(0, idxOfComma) : range;
-
-			String[] rangeParts = Strings.split(firstRange, '-');
-
-			String startByteString = rangeParts[0];
-			String endByteString = rangeParts[1];
-
-			long startbyte = !Strings.isEmpty(startByteString) ? Long.parseLong(startByteString) : 0;
-			long endbyte = !Strings.isEmpty(endByteString) ? Long.parseLong(endByteString) : -1;
-
-			// Make the content range information available for the whole request cycle
-			RequestCycle requestCycle = RequestCycle.get();
-			requestCycle.setMetaData(CONTENT_RANGE_STARTBYTE, startbyte);
-			requestCycle.setMetaData(CONTENT_RANGE_ENDBYTE, endbyte);
-		}
-	}
-
-	/**
-	 * Sets the response header of resource response to the response received from the attributes
-	 *
-	 * @param resourceResponse
-	 *            the resource response to get the header fields from
-	 * @param attributes
-	 *            the attributes to get the response from to which the header information are going
-	 *            to be applied
-	 */
-	protected void setResponseHeaders(final ResourceResponse resourceResponse,
-		final Attributes attributes)
-	{
-		Response response = attributes.getResponse();
-		if (response instanceof WebResponse)
-		{
-			WebResponse webResponse = (WebResponse)response;
-
-			// 1. Last Modified
-			Instant lastModified = resourceResponse.getLastModified();
-			if (lastModified != null)
-			{
-				webResponse.setLastModifiedTime(lastModified);
-			}
-
-			// 2. Caching
-			configureCache(resourceResponse, attributes);
-
-			if (resourceResponse.getErrorCode() != null)
-			{
-				webResponse.sendError(resourceResponse.getErrorCode(),
-					resourceResponse.getErrorMessage());
-				return;
-			}
-
-			if (resourceResponse.getStatusCode() != null)
-			{
-				webResponse.setStatus(resourceResponse.getStatusCode());
-			}
-
-			if (!resourceResponse.dataNeedsToBeWritten(attributes))
-			{
-				webResponse.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
-				return;
-			}
-
-			// 3. Content Disposition
-			String fileName = resourceResponse.getFileName();
-			ContentDisposition disposition = resourceResponse.getContentDisposition();
-			if (ContentDisposition.ATTACHMENT == disposition)
-			{
-				webResponse.setAttachmentHeader(fileName);
-			}
-			else if (ContentDisposition.INLINE == disposition)
-			{
-				webResponse.setInlineHeader(fileName);
-			}
-
-			// 4. Mime Type (+ encoding)
-			String mimeType = resourceResponse.getContentType();
-			if (mimeType != null)
-			{
-				final String encoding = resourceResponse.getTextEncoding();
-
-				if (encoding == null)
-				{
-					webResponse.setContentType(mimeType);
-				}
-				else
-				{
-					webResponse.setContentType(mimeType + "; charset=" + encoding);
-				}
-			}
-
-			// 5. Accept Range
-			ContentRangeType acceptRange = resourceResponse.getAcceptRange();
-			if (acceptRange != null)
-			{
-				webResponse.setAcceptRange(acceptRange.getTypeName());
-			}
-
-			long contentLength = resourceResponse.getContentLength();
-			boolean contentRangeApplied = false;
-
-			// 6. Content Range
-			// for more information take a look here:
-			// http://stackoverflow.com/questions/8293687/sample-http-range-request-session
-			// if the content range header has been set directly
-			// to the resource response use it otherwise calculate it
-			String contentRange = resourceResponse.getContentRange();
-			if (contentRange != null)
-			{
-				webResponse.setContentRange(contentRange);
-			}
-			else
-			{
-				// content length has to be set otherwise the content range header can not be
-				// calculated - accept range must be set to bytes - others are not supported at the
-				// moment
-				if (contentLength != -1 && ContentRangeType.BYTES.equals(acceptRange))
-				{
-					contentRangeApplied = setResponseContentRangeHeaderFields(webResponse,
-						attributes, contentLength);
-				}
-			}
-
-			// 7. Content Length
-			if (contentLength != -1 && !contentRangeApplied)
-			{
-				webResponse.setContentLength(contentLength);
-			}
-
-			// add custom headers and values
-			final HttpHeaderCollection headers = resourceResponse.getHeaders();
-
-			for (String name : headers.getHeaderNames())
-			{
-				checkHeaderAccess(name);
-
-				for (String value : headers.getHeaderValues(name))
-				{
-					webResponse.addHeader(name, value);
-				}
-			}
-		}
-	}
-
-	/**
-	 * Sets the content range header fields to the given web response
-	 *
-	 * @param webResponse
-	 *            the web response to apply the content range information to
-	 * @param attributes
-	 *            the attributes to get the request from
-	 * @param contentLength
-	 *            the content length of the response
-	 * @return if the content range header information has been applied
-	 */
-	protected boolean setResponseContentRangeHeaderFields(WebResponse webResponse,
-		Attributes attributes, long contentLength)
-	{
-		boolean contentRangeApplied = false;
-		if (attributes.getRequest() instanceof WebRequest)
-		{
-			Long startbyte = RequestCycle.get().getMetaData(CONTENT_RANGE_STARTBYTE);
-			Long endbyte = RequestCycle.get().getMetaData(CONTENT_RANGE_ENDBYTE);
-
-			if (startbyte != null && endbyte != null)
-			{
-				// if end byte hasn't been set
-				if (endbyte == -1)
-				{
-					endbyte = contentLength - 1;
-				}
-
-				// Change the status code to 206 partial content
-				webResponse.setStatus(206);
-				// currently only bytes are supported.
-				webResponse.setContentRange(ContentRangeType.BYTES.getTypeName() + " " + startbyte +
-					'-' + endbyte + '/' + contentLength);
-				// WARNING - DO NOT SET THE CONTENT LENGTH, even if it is calculated right - 
-				// SAFARI / CHROME are causing issues otherwise!
-				// webResponse.setContentLength((endbyte - startbyte) + 1);
-
-				// content range has been applied do not set the content length again!
-				contentRangeApplied = true;
-			}
-		}
-		return contentRangeApplied;
 	}
 
 	/**

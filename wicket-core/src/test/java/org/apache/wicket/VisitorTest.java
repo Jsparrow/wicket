@@ -76,14 +76,7 @@ class VisitorTest extends WicketTestCase
 
 		TestContainer container = new TestContainer();
 
-		container.visitChildren(new IVisitor<Component, Void>()
-		{
-			@Override
-			public void component(Component component, IVisit<Void> visit)
-			{
-				path.append(component.getId());
-			}
-		});
+		container.visitChildren((Component component, IVisit<Void> visit) -> path.append(component.getId()));
 
 		assertEquals("BCDEFGH", path.toString());
 	}
@@ -118,16 +111,11 @@ class VisitorTest extends WicketTestCase
 		final StringBuilder path = new StringBuilder();
 
 		TestContainer container = new TestContainer();
-		Object result = container.visitChildren(new IVisitor<Component, String>()
-		{
-			@Override
-			public void component(Component component, IVisit<String> visit)
+		Object result = container.visitChildren((Component component, IVisit<String> visit) -> {
+			path.append(component.getId());
+			if ("D".equals(component.getId()))
 			{
-				path.append(component.getId());
-				if ("D".equals(component.getId()))
-				{
-					visit.stop("RESULT");
-				}
+				visit.stop("RESULT");
 			}
 		});
 		assertEquals("BCD", path.toString());
@@ -143,16 +131,11 @@ class VisitorTest extends WicketTestCase
 		final StringBuilder path = new StringBuilder();
 
 		TestContainer container = new TestContainer();
-		container.visitChildren(new IVisitor<Component, Void>()
-		{
-			@Override
-			public void component(Component component, IVisit<Void> visit)
+		container.visitChildren((Component component, IVisit<Void> visit) -> {
+			path.append(component.getId());
+			if ("C".equals(component.getId()))
 			{
-				path.append(component.getId());
-				if ("C".equals(component.getId()))
-				{
-					visit.dontGoDeeper();
-				}
+				visit.dontGoDeeper();
 			}
 		});
 		assertEquals("BCGH", path.toString());
@@ -167,16 +150,11 @@ class VisitorTest extends WicketTestCase
 		final StringBuilder path = new StringBuilder();
 
 		TestContainer container = new TestContainer();
-		container.visitChildren(new IVisitor<Component, Void>()
-		{
-			@Override
-			public void component(Component component, IVisit<Void> visit)
+		container.visitChildren((Component component, IVisit<Void> visit) -> {
+			path.append(component.getId());
+			if ("E".equals(component.getId()))
 			{
-				path.append(component.getId());
-				if ("E".equals(component.getId()))
-				{
-					visit.dontGoDeeper();
-				}
+				visit.dontGoDeeper();
 			}
 		});
 		assertEquals("BCDEGH", path.toString());
@@ -191,14 +169,7 @@ class VisitorTest extends WicketTestCase
 	void testVisitParents()
 	{
 		TestContainer testContainer = new TestContainer();
-		IVisitor<MarkupContainer, MarkerInterface> visitor = new IVisitor<MarkupContainer, MarkerInterface>()
-		{
-			@Override
-			public void component(MarkupContainer object, IVisit<MarkerInterface> visit)
-			{
-				visit.stop((MarkerInterface)object);
-			}
-		};
+		IVisitor<MarkupContainer, MarkerInterface> visitor = (MarkupContainer object, IVisit<MarkerInterface> visit) -> visit.stop((MarkerInterface) object);
 		MarkerInterface markedParent = testContainer.get("G:H").visitParents(MarkupContainer.class,
 			visitor, new ClassVisitFilter(MarkerInterface.class));
 		assertEquals("G", markedParent.getId());
@@ -206,7 +177,7 @@ class VisitorTest extends WicketTestCase
 
 	private static interface MarkerInterface
 	{
-		public String getId();
+		String getId();
 	}
 
 	private static class MarkedWebMarkupContainer extends WebMarkupContainer

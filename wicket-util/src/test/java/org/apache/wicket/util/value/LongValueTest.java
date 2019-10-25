@@ -19,6 +19,8 @@ package org.apache.wicket.util.value;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link LongValue} tests
@@ -27,6 +29,8 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class LongValueTest
 {
+	private static final Logger logger = LoggerFactory.getLogger(LongValueTest.class);
+
 	/** Test {@link LongValue#max(LongValue, LongValue)} */
 	@Test
 	public void max()
@@ -44,6 +48,7 @@ public class LongValueTest
 		}
 		catch (IllegalArgumentException e)
 		{
+			logger.error(e.getMessage(), e);
 			// expected
 		}
 
@@ -54,6 +59,7 @@ public class LongValueTest
 		}
 		catch (IllegalArgumentException e)
 		{
+			logger.error(e.getMessage(), e);
 			// expected
 		}
 	}

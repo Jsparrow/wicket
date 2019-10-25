@@ -41,11 +41,6 @@ public class FieldBeansCollector
 	
 	private final Collection<Object> beansToInjectColl;
 	
-	public enum FieldType
-	{
-		LIST, SET, MAP, NONE
-	}
-
 	public FieldBeansCollector(final ResolvableType fieldResolvableType)
 	{
 		Class<?> clazz = fieldResolvableType.resolve();
@@ -78,7 +73,7 @@ public class FieldBeansCollector
 			beansToInjectMap = null;
 		}
 	}
-	
+
 	/**
 	 * Returns an instance containing all the beans collected for the field and
 	 * compatible with the type of the field.
@@ -99,7 +94,7 @@ public class FieldBeansCollector
 		
 		return null;
 	}
-	
+
 	/**
 	 * Adds compatible bean to the field. This means that the field type is Map, a List or a Set
 	 * and that the given bean is compatible with its elements type.
@@ -124,9 +119,14 @@ public class FieldBeansCollector
 				break;
 		}
 	}
-	
+
 	public FieldType getFieldType()
 	{
 		return fieldType;
+	}
+
+	public enum FieldType
+	{
+		LIST, SET, MAP, NONE
 	}
 }

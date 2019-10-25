@@ -208,24 +208,11 @@ public class AjaxEditableChoiceLabel<T> extends AjaxEditableLabel<T>
 				super.updateAjaxAttributes(attributes);
 				attributes.setEventNames("change", "blur", "keyup");
 
-				CharSequence dynamicExtraParameters = "var result = [], "
-						+ "kc=Wicket.Event.keyCode(attrs.event),"
-						+ "evtType=attrs.event.type;"
-						+ "if (evtType === 'blur' || (evtType === 'keyup' && kc===27)) {"
-						+ "  result.push( { name: 'save', value: false } );"
-						+ "}"
-						+ "else {"
-						+ "  result = Wicket.Form.serializeElement(attrs.c);"
-						+ "  result.push( { name: 'save', value: true } );"
-						+ "}"
-						+ "return result;";
+				CharSequence dynamicExtraParameters = new StringBuilder().append("var result = [], ").append("kc=Wicket.Event.keyCode(attrs.event),").append("evtType=attrs.event.type;").append("if (evtType === 'blur' || (evtType === 'keyup' && kc===27)) {").append("  result.push( { name: 'save', value: false } );").append("}").append("else {")
+						.append("  result = Wicket.Form.serializeElement(attrs.c);").append("  result.push( { name: 'save', value: true } );").append("}").append("return result;").toString();
 				attributes.getDynamicExtraParameters().add(dynamicExtraParameters);
 
-				CharSequence precondition = "var kc=Wicket.Event.keyCode(attrs.event),"
-						+ "evtType=attrs.event.type,"
-						+ "ret=false;"
-						+ "if(evtType==='blur' || evtType==='change' || (evtType==='keyup' && kc===27)) ret = true;"
-						+ "return ret;";
+				CharSequence precondition = new StringBuilder().append("var kc=Wicket.Event.keyCode(attrs.event),").append("evtType=attrs.event.type,").append("ret=false;").append("if(evtType==='blur' || evtType==='change' || (evtType==='keyup' && kc===27)) ret = true;").append("return ret;").toString();
 				AjaxCallListener ajaxCallListener = new AjaxCallListener();
 				ajaxCallListener.onPrecondition(precondition);
 				attributes.getAjaxCallListeners().add(ajaxCallListener);

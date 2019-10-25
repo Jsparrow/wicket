@@ -63,32 +63,27 @@ public class WebSocketMessageBroadcastHandler implements IRequestHandler
 	{
 		final Application application = Application.get();
 
-		final Runnable action = new Runnable()
-		{
-			@Override
-			public void run()
+		final Runnable action = () -> {
+			if (pageId != AbstractWebSocketProcessor.NO_PAGE_ID)
 			{
-				if (pageId != AbstractWebSocketProcessor.NO_PAGE_ID)
+				Page page = (Page) Session.get().getPageManager().getPage(pageId);
+				page.send(application, Broadcast.BREADTH, payload);
+			}
+			else
+			{
+				ResourceReference reference = new SharedResourceReference(resourceName);
+				IResource resource = reference.getResource();
+				if (resource instanceof WebSocketResource)
 				{
-					Page page = (Page) Session.get().getPageManager().getPage(pageId);
-					page.send(application, Broadcast.BREADTH, payload);
+					WebSocketResource wsResource = (WebSocketResource) resource;
+					wsResource.onPayload(payload);
 				}
 				else
 				{
-					ResourceReference reference = new SharedResourceReference(resourceName);
-					IResource resource = reference.getResource();
-					if (resource instanceof WebSocketResource)
-					{
-						WebSocketResource wsResource = (WebSocketResource) resource;
-						wsResource.onPayload(payload);
-					}
-					else
-					{
-						throw new IllegalStateException(
-								String.format("Shared resource with name '%s' is not a %s but %s",
-										resourceName, WebSocketResource.class.getSimpleName(),
-										Classes.name(resource.getClass())));
-					}
+					throw new IllegalStateException(
+							String.format("Shared resource with name '%s' is not a %s but %s",
+									resourceName, WebSocketResource.class.getSimpleName(),
+									Classes.name(resource.getClass())));
 				}
 			}
 		};

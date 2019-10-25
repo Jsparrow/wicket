@@ -71,22 +71,10 @@ class AbstractDefaultAjaxBehaviorTest
 
 		CharSequence json = behavior.renderAjaxAttributes(component, attributes);
 
-		String expected = "{\"" +
-			AjaxAttributeName.URL + "\":\"some/url\",\"" +
-			AjaxAttributeName.BEFORE_HANDLER +
-				"\":[function(attrs){alert('Before!');}],\"" +
-			AjaxAttributeName.AFTER_HANDLER + "\":[function(attrs){alert('After!');}],\"" +
-			AjaxAttributeName.SUCCESS_HANDLER +
-				"\":[function(attrs, jqXHR, data, textStatus){alert('Success!');}],\"" +
-			AjaxAttributeName.FAILURE_HANDLER +
-				"\":[function(attrs, jqXHR, errorMessage, textStatus){alert('Failure!');}],\"" +
-			AjaxAttributeName.COMPLETE_HANDLER +
-				"\":[function(attrs, jqXHR, textStatus){alert('Complete!');}],\"" +
-			AjaxAttributeName.PRECONDITION +
-				"\":[function(attrs){return somePrecondition();}],\"" +
-			AjaxAttributeName.EXTRA_PARAMETERS +
-			"\":[{\"name\":\"param1\",\"value\":123},{\"name\":\"param2\",\"value\":\"fr_CA\"}]" +
-			"}";
+		String expected = new StringBuilder().append("{\"").append(AjaxAttributeName.URL).append("\":\"some/url\",\"").append(AjaxAttributeName.BEFORE_HANDLER).append("\":[function(attrs){alert('Before!');}],\"")
+				.append(AjaxAttributeName.AFTER_HANDLER).append("\":[function(attrs){alert('After!');}],\"").append(AjaxAttributeName.SUCCESS_HANDLER).append("\":[function(attrs, jqXHR, data, textStatus){alert('Success!');}],\"").append(AjaxAttributeName.FAILURE_HANDLER)
+				.append("\":[function(attrs, jqXHR, errorMessage, textStatus){alert('Failure!');}],\"").append(AjaxAttributeName.COMPLETE_HANDLER).append("\":[function(attrs, jqXHR, textStatus){alert('Complete!');}],\"").append(AjaxAttributeName.PRECONDITION).append("\":[function(attrs){return somePrecondition();}],\"")
+				.append(AjaxAttributeName.EXTRA_PARAMETERS).append("\":[{\"name\":\"param1\",\"value\":123},{\"name\":\"param2\",\"value\":\"fr_CA\"}]").append("}").toString();
 
 		assertEquals(expected, json);
 	}

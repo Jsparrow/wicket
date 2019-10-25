@@ -57,7 +57,7 @@ public class MapperDemoResourceReference extends ResourceReference
 				StringValue sheetParam = parameters.get("sheet");
 				StringValue formatParam = parameters.get("format");
 				final String responseText = String.format(
-					"You just printed sheet '%s' in format '%s'.\n\n\nPress browser's back button to go to the examples.",
+					"You just printed sheet '%s' in format '%s'.%n%n%nPress browser's back button to go to the examples.",
 					sheetParam, formatParam);
 
 				resourceResponse.setContentType("text/plain");

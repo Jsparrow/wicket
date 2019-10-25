@@ -38,7 +38,6 @@ public class AjaxFormValidatingBehaviorTestPage extends WebPage
 	 */
 	public AjaxFormValidatingBehaviorTestPage()
 	{
-		super();
 		addFormWithOrdinaryFeedbackPanel();
 		addFormWithHiddenFeedbackPanel();
 	}

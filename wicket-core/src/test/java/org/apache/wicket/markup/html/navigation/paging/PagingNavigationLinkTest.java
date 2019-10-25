@@ -50,7 +50,7 @@ class PagingNavigationLinkTest extends AbstractPagingNavigationTest
 	@Test
 	void getPageNumber_1()
 	{
-		PagingNavigationLink<Void> link = new PagingNavigationLink<Void>("id", mock, 0);
+		PagingNavigationLink<Void> link = new PagingNavigationLink<>("id", mock, 0);
 
 		currentpage = 0;
 		pagecount = 0;
@@ -76,7 +76,7 @@ class PagingNavigationLinkTest extends AbstractPagingNavigationTest
 	@Test
 	void getPageNumber_2()
 	{
-		PagingNavigationLink<Void> link = new PagingNavigationLink<Void>("id", mock, 2);
+		PagingNavigationLink<Void> link = new PagingNavigationLink<>("id", mock, 2);
 
 		currentpage = 0;
 		pagecount = 0;
@@ -102,7 +102,7 @@ class PagingNavigationLinkTest extends AbstractPagingNavigationTest
 	@Test
 	void getPageNumber_3()
 	{
-		PagingNavigationLink<Void> link = new PagingNavigationLink<Void>("id", mock, -1);
+		PagingNavigationLink<Void> link = new PagingNavigationLink<>("id", mock, -1);
 
 		currentpage = 0;
 		pagecount = 0;
@@ -128,7 +128,7 @@ class PagingNavigationLinkTest extends AbstractPagingNavigationTest
 	@Test
 	void linksTo()
 	{
-		PagingNavigationLink<Void> link = new PagingNavigationLink<Void>("id", mock, -1);
+		PagingNavigationLink<Void> link = new PagingNavigationLink<>("id", mock, -1);
 
 		currentpage = 0;
 		pagecount = 0;

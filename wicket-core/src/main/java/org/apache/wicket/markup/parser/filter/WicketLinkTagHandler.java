@@ -34,6 +34,8 @@ import org.apache.wicket.markup.resolver.IComponentResolver;
 import org.apache.wicket.util.string.StringValueConversionException;
 import org.apache.wicket.util.string.Strings;
 import org.apache.wicket.util.value.IValueMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -52,6 +54,8 @@ import org.apache.wicket.util.value.IValueMap;
  */
 public class WicketLinkTagHandler extends AbstractMarkupFilter implements IComponentResolver
 {
+	private static final Logger logger = LoggerFactory.getLogger(WicketLinkTagHandler.class);
+
 	private static final long serialVersionUID = 1L;
 
 	/** */
@@ -143,8 +147,8 @@ public class WicketLinkTagHandler extends AbstractMarkupFilter implements ICompo
 					}
 					catch (StringValueConversionException e)
 					{
-						throw new WicketRuntimeException("Invalid autolink attribute value \"" +
-							autolink + "\"");
+						logger.error(e.getMessage(), e);
+						throw new WicketRuntimeException(new StringBuilder().append("Invalid autolink attribute value \"").append(autolink).append("\"").toString());
 					}
 				}
 				else if (tag.isClose())

@@ -41,7 +41,7 @@ import org.apache.wicket.core.util.resource.locator.IResourceStreamLocator;
  */
 public class XsltTransformer implements ITransformer
 {
-	private final static String extension = "xsl";
+	private static final String extension = "xsl";
 
 	/** an optional XSL file */
 	private final String xslFile;
@@ -133,12 +133,11 @@ public class XsltTransformer implements ITransformer
 		String filePath = xslFile;
 		if (filePath == null)
 		{
-			filePath = component.findParentWithAssociatedMarkup()
+			filePath = new StringBuilder().append(component.findParentWithAssociatedMarkup()
 				.getClass()
 				.getPackage()
 				.getName()
-				.replace('.', '/') +
-				"/" + component.getId();
+				.replace('.', '/')).append("/").append(component.getId()).toString();
 		}
 
 		resourceStream = Application.get()

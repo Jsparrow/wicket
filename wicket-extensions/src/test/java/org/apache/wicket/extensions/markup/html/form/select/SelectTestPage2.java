@@ -45,12 +45,12 @@ public class SelectTestPage2 extends WebPage
 			@Override
 			protected boolean isSelected(IModel<?> model)
 			{
-				return ((Foo)model.getObject()).string == getModelObject().string;
+				return ((Foo)model.getObject()).string.equals(getModelObject().string);
 			}
 		};
 		form.add(select);
 
-		select.add(option0 = new SelectOption<Foo>("option0", new Model<>(new Foo("foo"))));
+		select.add(option0 = new SelectOption<>("option0", new Model<>(new Foo("foo"))));
 	}
 
 	/**

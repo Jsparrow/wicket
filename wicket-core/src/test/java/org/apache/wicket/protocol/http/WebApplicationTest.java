@@ -93,9 +93,7 @@ class WebApplicationTest extends WicketTestCase
 	{
 		int retv = 0;
 
-		for (Iterator<IRequestMapper> it = compound.iterator(); it.hasNext();)
-		{
-			it.next();
+		for (IRequestMapper aCompound : compound) {
 			retv++;
 		}
 

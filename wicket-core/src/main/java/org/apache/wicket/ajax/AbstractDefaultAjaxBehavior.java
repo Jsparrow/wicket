@@ -105,8 +105,7 @@ public abstract class AbstractDefaultAjaxBehavior extends AbstractAjaxBehavior
 		RequestCycle requestCycle = component.getRequestCycle();
 		Url baseUrl = requestCycle.getUrlRenderer().getBaseUrl();
 		CharSequence ajaxBaseUrl = Strings.escapeMarkup(baseUrl.toString());
-		response.render(JavaScriptHeaderItem.forScript("Wicket.Ajax.baseUrl=\"" + ajaxBaseUrl
-			+ "\";", "wicket-ajax-base-url"));
+		response.render(JavaScriptHeaderItem.forScript(new StringBuilder().append("Wicket.Ajax.baseUrl=\"").append(ajaxBaseUrl).append("\";").toString(), "wicket-ajax-base-url"));
 
 		renderExtraHeaderContributors(component, response);
 	}
@@ -126,14 +125,7 @@ public abstract class AbstractDefaultAjaxBehavior extends AbstractAjaxBehavior
 		AjaxRequestAttributes attributes = getAttributes();
 
 		List<IAjaxCallListener> ajaxCallListeners = attributes.getAjaxCallListeners();
-		for (IAjaxCallListener ajaxCallListener : ajaxCallListeners)
-		{
-			if (ajaxCallListener instanceof IComponentAwareHeaderContributor)
-			{
-				IComponentAwareHeaderContributor contributor = (IComponentAwareHeaderContributor)ajaxCallListener;
-				contributor.renderHead(component, response);
-			}
-		}
+		ajaxCallListeners.stream().filter(ajaxCallListener -> ajaxCallListener instanceof IComponentAwareHeaderContributor).map(ajaxCallListener -> (IComponentAwareHeaderContributor)ajaxCallListener).forEach(contributor -> contributor.renderHead(component, response));
 	}
 
 	/**
@@ -254,56 +246,52 @@ public abstract class AbstractDefaultAjaxBehavior extends AbstractAjaxBehavior
 				attributesJson.put(AjaxAttributeName.INDICATOR_ID.jsonName(), indicatorId);
 			}
 
-			for (IAjaxCallListener ajaxCallListener : attributes.getAjaxCallListeners())
-			{
-				if (ajaxCallListener != null)
-				{
-					CharSequence initHandler = ajaxCallListener.getInitHandler(component);
-					appendListenerHandler(initHandler, attributesJson,
-						AjaxAttributeName.INIT_HANDLER.jsonName(),
-						INIT_HANDLER_FUNCTION_TEMPLATE);
+			attributes.getAjaxCallListeners().stream().filter(ajaxCallListener -> ajaxCallListener != null).forEach(ajaxCallListener -> {
+				CharSequence initHandler = ajaxCallListener.getInitHandler(component);
+				appendListenerHandler(initHandler, attributesJson,
+					AjaxAttributeName.INIT_HANDLER.jsonName(),
+					INIT_HANDLER_FUNCTION_TEMPLATE);
 
-						CharSequence beforeHandler = ajaxCallListener.getBeforeHandler(component);
-					appendListenerHandler(beforeHandler, attributesJson,
-						AjaxAttributeName.BEFORE_HANDLER.jsonName(),
-						BEFORE_HANDLER_FUNCTION_TEMPLATE);
+					CharSequence beforeHandler = ajaxCallListener.getBeforeHandler(component);
+				appendListenerHandler(beforeHandler, attributesJson,
+					AjaxAttributeName.BEFORE_HANDLER.jsonName(),
+					BEFORE_HANDLER_FUNCTION_TEMPLATE);
 
-					CharSequence beforeSendHandler = ajaxCallListener
-						.getBeforeSendHandler(component);
-					appendListenerHandler(beforeSendHandler, attributesJson,
-						AjaxAttributeName.BEFORE_SEND_HANDLER.jsonName(),
-						BEFORE_SEND_HANDLER_FUNCTION_TEMPLATE);
+				CharSequence beforeSendHandler = ajaxCallListener
+					.getBeforeSendHandler(component);
+				appendListenerHandler(beforeSendHandler, attributesJson,
+					AjaxAttributeName.BEFORE_SEND_HANDLER.jsonName(),
+					BEFORE_SEND_HANDLER_FUNCTION_TEMPLATE);
 
-					CharSequence afterHandler = ajaxCallListener.getAfterHandler(component);
-					appendListenerHandler(afterHandler, attributesJson,
-						AjaxAttributeName.AFTER_HANDLER.jsonName(), AFTER_HANDLER_FUNCTION_TEMPLATE);
+				CharSequence afterHandler = ajaxCallListener.getAfterHandler(component);
+				appendListenerHandler(afterHandler, attributesJson,
+					AjaxAttributeName.AFTER_HANDLER.jsonName(), AFTER_HANDLER_FUNCTION_TEMPLATE);
 
-					CharSequence successHandler = ajaxCallListener.getSuccessHandler(component);
-					appendListenerHandler(successHandler, attributesJson,
-						AjaxAttributeName.SUCCESS_HANDLER.jsonName(),
-						SUCCESS_HANDLER_FUNCTION_TEMPLATE);
+				CharSequence successHandler = ajaxCallListener.getSuccessHandler(component);
+				appendListenerHandler(successHandler, attributesJson,
+					AjaxAttributeName.SUCCESS_HANDLER.jsonName(),
+					SUCCESS_HANDLER_FUNCTION_TEMPLATE);
 
-					CharSequence failureHandler = ajaxCallListener.getFailureHandler(component);
-					appendListenerHandler(failureHandler, attributesJson,
-						AjaxAttributeName.FAILURE_HANDLER.jsonName(),
-						FAILURE_HANDLER_FUNCTION_TEMPLATE);
+				CharSequence failureHandler = ajaxCallListener.getFailureHandler(component);
+				appendListenerHandler(failureHandler, attributesJson,
+					AjaxAttributeName.FAILURE_HANDLER.jsonName(),
+					FAILURE_HANDLER_FUNCTION_TEMPLATE);
 
-					CharSequence completeHandler = ajaxCallListener.getCompleteHandler(component);
-					appendListenerHandler(completeHandler, attributesJson,
-						AjaxAttributeName.COMPLETE_HANDLER.jsonName(),
-						COMPLETE_HANDLER_FUNCTION_TEMPLATE);
+				CharSequence completeHandler = ajaxCallListener.getCompleteHandler(component);
+				appendListenerHandler(completeHandler, attributesJson,
+					AjaxAttributeName.COMPLETE_HANDLER.jsonName(),
+					COMPLETE_HANDLER_FUNCTION_TEMPLATE);
 
-					CharSequence precondition = ajaxCallListener.getPrecondition(component);
-					appendListenerHandler(precondition, attributesJson,
-						AjaxAttributeName.PRECONDITION.jsonName(), PRECONDITION_FUNCTION_TEMPLATE);
+				CharSequence precondition = ajaxCallListener.getPrecondition(component);
+				appendListenerHandler(precondition, attributesJson,
+					AjaxAttributeName.PRECONDITION.jsonName(), PRECONDITION_FUNCTION_TEMPLATE);
 
-					CharSequence doneHandler = ajaxCallListener.getDoneHandler(component);
-					appendListenerHandler(doneHandler, attributesJson,
-						AjaxAttributeName.DONE_HANDLER.jsonName(),
-						DONE_HANDLER_FUNCTION_TEMPLATE);
+				CharSequence doneHandler = ajaxCallListener.getDoneHandler(component);
+				appendListenerHandler(doneHandler, attributesJson,
+					AjaxAttributeName.DONE_HANDLER.jsonName(),
+					DONE_HANDLER_FUNCTION_TEMPLATE);
 
-				}
-			}
+			});
 
 			JSONArray extraParameters = JsonUtils.asArray(attributes.getExtraParameters());
 
@@ -354,13 +342,12 @@ public abstract class AbstractDefaultAjaxBehavior extends AbstractAjaxBehavior
 				attributesJson.put(AjaxAttributeName.IS_PREVENT_DEFAULT.jsonName(), true);
 			}
 
-			if (AjaxRequestAttributes.EventPropagation.STOP
-				.equals(attributes.getEventPropagation()))
+			if (AjaxRequestAttributes.EventPropagation.STOP == attributes.getEventPropagation())
 			{
 				attributesJson.put(AjaxAttributeName.EVENT_PROPAGATION.jsonName(), "stop");
 			}
-			else if (AjaxRequestAttributes.EventPropagation.STOP_IMMEDIATE.equals(attributes
-				.getEventPropagation()))
+			else if (AjaxRequestAttributes.EventPropagation.STOP_IMMEDIATE == attributes
+				.getEventPropagation())
 			{
 				attributesJson.put(AjaxAttributeName.EVENT_PROPAGATION.jsonName(), "stopImmediate");
 			}
@@ -417,22 +404,22 @@ public abstract class AbstractDefaultAjaxBehavior extends AbstractAjaxBehavior
 	}
 
 	private void appendListenerHandler(final CharSequence handler, final JSONObject attributesJson,
-		final String propertyName, final String functionTemplate) throws JSONException
+		final String propertyName, final String functionTemplate)
 	{
-		if (Strings.isEmpty(handler) == false)
-		{
-			final JSONFunction function;
-			if (handler instanceof JSONFunction)
-			{
-				function = (JSONFunction)handler;
-			}
-			else
-			{
-				String func = String.format(functionTemplate, handler);
-				function = new JSONFunction(func);
-			}
-			attributesJson.append(propertyName, function);
+		if (Strings.isEmpty(handler) != false) {
+			return;
 		}
+		final JSONFunction function;
+		if (handler instanceof JSONFunction)
+		{
+			function = (JSONFunction)handler;
+		}
+		else
+		{
+			String func = String.format(functionTemplate, handler);
+			function = new JSONFunction(func);
+		}
+		attributesJson.append(propertyName, function);
 	}
 
 	/**
@@ -447,7 +434,6 @@ public abstract class AbstractDefaultAjaxBehavior extends AbstractAjaxBehavior
 	 *             thrown if an error occurs while modifying {@literal attributesJson} argument
 	 */
 	protected void postprocessConfiguration(JSONObject attributesJson, Component component)
-		throws JSONException
 	{
 	}
 
@@ -470,7 +456,7 @@ public abstract class AbstractDefaultAjaxBehavior extends AbstractAjaxBehavior
 	protected CharSequence getCallbackScript(final Component component)
 	{
 		CharSequence ajaxAttributes = renderAjaxAttributes(component);
-		return "Wicket.Ajax.ajax(" + ajaxAttributes + ");";
+		return new StringBuilder().append("Wicket.Ajax.ajax(").append(ajaxAttributes).append(");").toString();
 	}
 
 	/**
@@ -498,10 +484,11 @@ public abstract class AbstractDefaultAjaxBehavior extends AbstractAjaxBehavior
 		{
 			if (curExtraParameter.getFunctionParameterName() != null)
 			{
-				if (!first)
+				if (!first) {
 					sb.append(',');
-				else
+				} else {
 					first = false;
+				}
 				sb.append(curExtraParameter.getFunctionParameterName());
 			}
 		}

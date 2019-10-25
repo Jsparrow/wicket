@@ -30,7 +30,6 @@ public class DummySubClassPage extends DummyPage
 	 */
 	public DummySubClassPage()
 	{
-		super();
 	}
 
 }

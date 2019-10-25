@@ -51,50 +51,29 @@ import org.slf4j.LoggerFactory;
  */
 public class ComponentTag extends MarkupElement
 {
-	/**
-	 * Factory that creates component during markup root container's initialization. These
-	 * components get queued, which allows other components to be dequeued under these auto
-	 * components.
-	 * 
-	 * @author igor
-	 */
-	public interface IAutoComponentFactory
-	{
-		/**
-		 * Creates a new instance of auto component to be queued
-		 *
-		 * @param container
-		 *                The component that will become a parent of the newly created auto component
-		 * @param tag
-		 *                The markup element for the newly created auto component
-		 */
-		Component newComponent(MarkupContainer container, ComponentTag tag);
-	}
-
-
 	/** Log. */
 	private static final Logger log = LoggerFactory.getLogger(ComponentTag.class);
 
 	/** True if a href attribute is available and autolinking is on */
-	private final static int AUTOLINK = 0x0001;
+	private static final int AUTOLINK = 0x0001;
 
 	/** True, if attributes have been modified or added */
-	private final static int MODIFIED = 0x0002;
+	private static final int MODIFIED = 0x0002;
 
 	/** If true, then the MarkupParser will ignore (remove) it. Temporary working variable */
-	private final static int IGNORE = 0x0004;
+	private static final int IGNORE = 0x0004;
 
 	/** If true, then the tag contain an automatically created wicket id */
-	private final static int AUTO_COMPONENT = 0x0008;
+	private static final int AUTO_COMPONENT = 0x0008;
 
 	/** Some HTML tags are allow to have no close tag, e.g. 'br' */
-	private final static int NO_CLOSE_TAG = 0x0010;
+	private static final int NO_CLOSE_TAG = 0x0010;
 
 	/** Render the tag as RawMarkup even if no Component can be found */
-	public final static int RENDER_RAW = 0x0020;
-	
+	public static final int RENDER_RAW = 0x0020;
+
 	/** If true, the current tag contains a child or a descendant with the "wicket:id" attribute */
-	public final static int CONTAINS_WICKET_ID = 0x0040;
+	public static final int CONTAINS_WICKET_ID = 0x0040;
 
 	/** If close tag, than reference to the corresponding open tag */
 	private ComponentTag openTag;
@@ -151,7 +130,6 @@ public class ComponentTag extends MarkupElement
 	 */
 	public ComponentTag(final XmlTag tag)
 	{
-		super();
 		xmlTag = tag;
 	}
 
@@ -229,13 +207,11 @@ public class ComponentTag extends MarkupElement
 	 */
 	public final Iterator<? extends Behavior> getBehaviors()
 	{
-		if (behaviors == null)
-		{
-			List<Behavior> lst = Collections.emptyList();
-			return lst.iterator();
+		if (behaviors != null) {
+			return Collections.unmodifiableCollection(behaviors).iterator();
 		}
-
-		return Collections.unmodifiableCollection(behaviors).iterator();
+		List<Behavior> lst = Collections.emptyList();
+		return lst.iterator();
 	}
 
 	/**
@@ -549,7 +525,7 @@ public class ComponentTag extends MarkupElement
 		}
 		else
 		{
-			xmlTag.put(key, current + separator + value);
+			xmlTag.put(key, new StringBuilder().append(current).append(separator).append(value).toString());
 		}
 
 		setModified(true);
@@ -603,7 +579,7 @@ public class ComponentTag extends MarkupElement
 		}
 		else
 		{
-			return HtmlHandler.requiresCloseTag(getNamespace() + ":" + getName());
+			return HtmlHandler.requiresCloseTag(new StringBuilder().append(getNamespace()).append(":").append(getName()).toString());
 		}
 	}
 
@@ -661,11 +637,11 @@ public class ComponentTag extends MarkupElement
 	 */
 	public final void setType(final TagType type)
 	{
-		if (type != xmlTag.getType())
-		{
-			xmlTag.setType(type);
-			setModified(true);
+		if (type == xmlTag.getType()) {
+			return;
 		}
+		xmlTag.setType(type);
+		setModified(true);
 	}
 
 	/**
@@ -830,7 +806,7 @@ public class ComponentTag extends MarkupElement
 	{
 		setFlag(NO_CLOSE_TAG, hasNoCloseTag);
 	}
-	
+
 	/**
 	 * Sets the flag to indicate if the current tag contains a child 
 	 * or a descendant with the "wicket:id" attribute. 
@@ -850,7 +826,7 @@ public class ComponentTag extends MarkupElement
     {
         return getFlag(CONTAINS_WICKET_ID);
     }
-    
+
 	/**
 	 * In case of inherited markup, the base and the extended markups are merged and the information
 	 * about the tags origin is lost. In some cases like wicket:head and wicket:link this
@@ -879,7 +855,7 @@ public class ComponentTag extends MarkupElement
 		}
 		else
 		{
-			markupClassRef = new WeakReference<Class<? extends Component>>(wicketHeaderClass);
+			markupClassRef = new WeakReference<>(wicketHeaderClass);
 		}
 	}
 
@@ -889,12 +865,11 @@ public class ComponentTag extends MarkupElement
 	@Override
 	public boolean equalTo(final MarkupElement element)
 	{
-		if (element instanceof ComponentTag)
-		{
-			final ComponentTag that = (ComponentTag)element;
-			return getXmlTag().equalTo(that.getXmlTag());
+		if (!(element instanceof ComponentTag)) {
+			return false;
 		}
-		return false;
+		final ComponentTag that = (ComponentTag)element;
+		return getXmlTag().equalTo(that.getXmlTag());
 	}
 
 	/**
@@ -991,6 +966,26 @@ public class ComponentTag extends MarkupElement
 	public void setAutoComponentFactory(IAutoComponentFactory autoComponentFactory)
 	{
 		this.autoComponentFactory = autoComponentFactory;
+	}
+
+	/**
+	 * Factory that creates component during markup root container's initialization. These
+	 * components get queued, which allows other components to be dequeued under these auto
+	 * components.
+	 * 
+	 * @author igor
+	 */
+	public interface IAutoComponentFactory
+	{
+		/**
+		 * Creates a new instance of auto component to be queued
+		 *
+		 * @param container
+		 *                The component that will become a parent of the newly created auto component
+		 * @param tag
+		 *                The markup element for the newly created auto component
+		 */
+		Component newComponent(MarkupContainer container, ComponentTag tag);
 	}
 
 

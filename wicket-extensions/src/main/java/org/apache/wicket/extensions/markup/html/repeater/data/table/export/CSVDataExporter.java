@@ -139,7 +139,8 @@ public class CSVDataExporter extends AbstractDataExporter
 	@Override
 	public String getContentType()
 	{
-		return super.getContentType() + "; charset=" + characterSet + "; header=" + ((exportHeadersEnabled) ? "present" : "absent");
+		return new StringBuilder().append(super.getContentType()).append("; charset=").append(characterSet).append("; header=")
+				.append((exportHeadersEnabled) ? "present" : "absent").toString();
 	}
 
 	/**
@@ -176,7 +177,7 @@ public class CSVDataExporter extends AbstractDataExporter
 	 */
 	protected String quoteValue(String value)
 	{
-		return quoteCharacter + value.replace("" + quoteCharacter, "" + quoteCharacter + quoteCharacter) + quoteCharacter;
+		return new StringBuilder().append(quoteCharacter).append(value.replace("" + quoteCharacter, "" + quoteCharacter + quoteCharacter)).append(quoteCharacter).toString();
 	}
 
 	@Override
@@ -193,16 +194,16 @@ public class CSVDataExporter extends AbstractDataExporter
 	
 	private <T> void writeHeaders(List<IExportableColumn<T, ?>> columns, Grid grid) throws IOException
 	{
-		if (isExportHeadersEnabled())
-		{
-			for (IExportableColumn<T, ?> col : columns)
-			{
-				IModel<String> displayModel = col.getDisplayModel();
-				String display = wrapModel(displayModel).getObject();
-				grid.cell(quoteValue(display));
-			}
-			grid.row();
+		if (!isExportHeadersEnabled()) {
+			return;
 		}
+		for (IExportableColumn<T, ?> col : columns)
+		{
+			IModel<String> displayModel = col.getDisplayModel();
+			String display = wrapModel(displayModel).getObject();
+			grid.cell(quoteValue(display));
+		}
+		grid.row();
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })

@@ -375,8 +375,12 @@ public abstract class CssHeaderItem extends AbstractCspHeaderItem
 	@Override
 	public boolean equals(Object o)
 	{
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
 		CssHeaderItem that = (CssHeaderItem) o;
 		return Objects.equals(condition, that.condition) &&
 				Objects.equals(markupId, that.markupId);

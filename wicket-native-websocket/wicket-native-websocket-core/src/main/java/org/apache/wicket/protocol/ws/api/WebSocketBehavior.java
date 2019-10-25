@@ -52,53 +52,52 @@ public abstract class WebSocketBehavior extends BaseWebSocketBehavior
 		super.onEvent(component, event);
 
 		Object payload = event.getPayload();
-		if (payload instanceof WebSocketPayload)
+		if (!(payload instanceof WebSocketPayload)) {
+			return;
+		}
+		WebSocketPayload<?> wsPayload = (WebSocketPayload<?>) payload;
+		WebSocketRequestHandler webSocketHandler = wsPayload.getHandler();
+		if (payload instanceof WebSocketTextPayload)
 		{
-			WebSocketPayload<?> wsPayload = (WebSocketPayload<?>) payload;
-			WebSocketRequestHandler webSocketHandler = wsPayload.getHandler();
-
-			if (payload instanceof WebSocketTextPayload)
-			{
-				WebSocketTextPayload textPayload = (WebSocketTextPayload) payload;
-				TextMessage data = textPayload.getMessage();
-				onMessage(webSocketHandler, data);
-			}
-			else if (wsPayload instanceof WebSocketBinaryPayload)
-			{
-				WebSocketBinaryPayload binaryPayload = (WebSocketBinaryPayload) wsPayload;
-				BinaryMessage binaryData = binaryPayload.getMessage();
-				onMessage(webSocketHandler, binaryData);
-			}
-			else if (wsPayload instanceof WebSocketConnectedPayload)
-			{
-				WebSocketConnectedPayload connectedPayload = (WebSocketConnectedPayload) wsPayload;
-				ConnectedMessage message = connectedPayload.getMessage();
-				onConnect(message);
-			}
-			else if (wsPayload instanceof WebSocketClosedPayload)
-			{
-				WebSocketClosedPayload closedPayload = (WebSocketClosedPayload) wsPayload;
-				ClosedMessage message = closedPayload.getMessage();
-				onClose(message);
-			}
-			else if (wsPayload instanceof WebSocketErrorPayload)
-			{
-				WebSocketErrorPayload errorPayload = (WebSocketErrorPayload) wsPayload;
-				ErrorMessage message = errorPayload.getMessage();
-				onError(webSocketHandler, message);
-			}
-			else if (wsPayload instanceof WebSocketAbortedPayload)
-			{
-				WebSocketAbortedPayload abortedPayload = (WebSocketAbortedPayload) wsPayload;
-				AbortedMessage message = abortedPayload.getMessage();
-				onAbort(message);
-			}
-			else if (wsPayload instanceof WebSocketPushPayload)
-			{
-				WebSocketPushPayload pushPayload = (WebSocketPushPayload) wsPayload;
-				IWebSocketPushMessage message = pushPayload.getMessage();
-				onPush(webSocketHandler, message);
-			}
+			WebSocketTextPayload textPayload = (WebSocketTextPayload) payload;
+			TextMessage data = textPayload.getMessage();
+			onMessage(webSocketHandler, data);
+		}
+		else if (wsPayload instanceof WebSocketBinaryPayload)
+		{
+			WebSocketBinaryPayload binaryPayload = (WebSocketBinaryPayload) wsPayload;
+			BinaryMessage binaryData = binaryPayload.getMessage();
+			onMessage(webSocketHandler, binaryData);
+		}
+		else if (wsPayload instanceof WebSocketConnectedPayload)
+		{
+			WebSocketConnectedPayload connectedPayload = (WebSocketConnectedPayload) wsPayload;
+			ConnectedMessage message = connectedPayload.getMessage();
+			onConnect(message);
+		}
+		else if (wsPayload instanceof WebSocketClosedPayload)
+		{
+			WebSocketClosedPayload closedPayload = (WebSocketClosedPayload) wsPayload;
+			ClosedMessage message = closedPayload.getMessage();
+			onClose(message);
+		}
+		else if (wsPayload instanceof WebSocketErrorPayload)
+		{
+			WebSocketErrorPayload errorPayload = (WebSocketErrorPayload) wsPayload;
+			ErrorMessage message = errorPayload.getMessage();
+			onError(webSocketHandler, message);
+		}
+		else if (wsPayload instanceof WebSocketAbortedPayload)
+		{
+			WebSocketAbortedPayload abortedPayload = (WebSocketAbortedPayload) wsPayload;
+			AbortedMessage message = abortedPayload.getMessage();
+			onAbort(message);
+		}
+		else if (wsPayload instanceof WebSocketPushPayload)
+		{
+			WebSocketPushPayload pushPayload = (WebSocketPushPayload) wsPayload;
+			IWebSocketPushMessage message = pushPayload.getMessage();
+			onPush(webSocketHandler, message);
 		}
 	}
 

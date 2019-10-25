@@ -53,7 +53,6 @@ public final class MetaDataEntry<T> implements IClusterable
 	@Override
 	public String toString()
 	{
-		return key + "=" + object.getClass().getName() + "@" +
-			Integer.toHexString(object.hashCode());
+		return new StringBuilder().append(key).append("=").append(object.getClass().getName()).append("@").append(Integer.toHexString(object.hashCode())).toString();
 	}
 }

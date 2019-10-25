@@ -101,6 +101,52 @@ public class AutoLabelTextResolver implements IComponentResolver
 {
 	public static final String LABEL = "label";
 
+	@Override
+	public Component resolve(MarkupContainer container, MarkupStream markupStream, ComponentTag tag)
+	{
+		if (tag instanceof WicketTag && "label".equals(tag.getName()))
+		{
+			// We need to find a FormComponent...
+			Component related = null;
+			// ...which could be explicitly specified...
+			String forAttributeValue = tag.getAttribute("for");
+			if (forAttributeValue != null)
+			{
+				Component component = AutoLabelResolver.findRelatedComponent(container, forAttributeValue);
+				related = component;
+			}
+			if (related == null)
+			{
+				// ...or available through an AutoLabel, either directly above us...
+				if (container instanceof AutoLabel)
+				{
+					related = ((AutoLabel)container).getRelatedComponent();
+				}
+				if (related == null)
+				{
+					// ...or perhaps further up...
+					AutoLabel autoLabel = container.findParent(AutoLabel.class);
+					if (autoLabel != null)
+					{
+						related = autoLabel.getRelatedComponent();
+					}
+				}
+			}
+			if (related == null)
+			{
+				// ...or it might just not be available.
+				String forAttr = forAttributeValue != null ? new StringBuilder().append(" for=\"").append(forAttributeValue).append("\"").toString() : "";
+				throw new ComponentNotFoundException(new StringBuilder().append("no related component found for <wicket:label").append(forAttr).append(">").toString());
+			}
+			else
+			{
+				// ...found the form component, so we can return our label.
+				return new TextLabel(tag.getId(), related);
+			}
+		}
+		return null;
+	}
+
 	/**
 	 * This is inserted by the resolver to render the label.
 	 */
@@ -160,13 +206,9 @@ public class AutoLabelTextResolver implements IComponentResolver
 			{
 				// check if the labeled component is a label provider
 				ILabelProvider<String> provider = (ILabelProvider<String>)labeled;
-				if (provider.getLabel() != null)
-				{
-					if (!Strings.isEmpty(provider.getLabel().getObject()))
-
-					{
-						return provider.getLabel();
-					}
+				boolean condition = provider.getLabel() != null && !Strings.isEmpty(provider.getLabel().getObject());
+				if (condition) {
+					return provider.getLabel();
 				}
 			}
 
@@ -220,52 +262,6 @@ public class AutoLabelTextResolver implements IComponentResolver
 
 			return null;
 		}
-	}
-
-	@Override
-	public Component resolve(MarkupContainer container, MarkupStream markupStream, ComponentTag tag)
-	{
-		if (tag instanceof WicketTag && "label".equals(tag.getName()))
-		{
-			// We need to find a FormComponent...
-			Component related = null;
-			// ...which could be explicitly specified...
-			String forAttributeValue = tag.getAttribute("for");
-			if (forAttributeValue != null)
-			{
-				Component component = AutoLabelResolver.findRelatedComponent(container, forAttributeValue);
-				related = component;
-			}
-			if (related == null)
-			{
-				// ...or available through an AutoLabel, either directly above us...
-				if (container instanceof AutoLabel)
-				{
-					related = ((AutoLabel)container).getRelatedComponent();
-				}
-				if (related == null)
-				{
-					// ...or perhaps further up...
-					AutoLabel autoLabel = container.findParent(AutoLabel.class);
-					if (autoLabel != null)
-					{
-						related = autoLabel.getRelatedComponent();
-					}
-				}
-			}
-			if (related == null)
-			{
-				// ...or it might just not be available.
-				String forAttr = forAttributeValue != null ? " for=\"" + forAttributeValue + "\"" : "";
-				throw new ComponentNotFoundException("no related component found for <wicket:label"+forAttr+">");
-			}
-			else
-			{
-				// ...found the form component, so we can return our label.
-				return new TextLabel(tag.getId(), related);
-			}
-		}
-		return null;
 	}
 
 }

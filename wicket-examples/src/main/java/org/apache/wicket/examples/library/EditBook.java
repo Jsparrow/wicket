@@ -85,7 +85,7 @@ public final class EditBook extends AuthenticatedWebPage
 	 * 
 	 * @author Jonathan Locke
 	 */
-	static public final class EditBookForm extends Form<Book>
+	public static final class EditBookForm extends Form<Book>
 	{
 		/**
 		 * Constructor

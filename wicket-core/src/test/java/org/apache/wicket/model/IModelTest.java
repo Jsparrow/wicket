@@ -60,7 +60,7 @@ class IModelTest
 	@Test
 	void filterNoMatch()
 	{
-		IModel<Person> johnModel = Model.of(person).filter((p) -> p.getName().equals("Jane"));
+		IModel<Person> johnModel = Model.of(person).filter((p) -> "Jane".equals(p.getName()));
 
 		assertNull(johnModel.getObject());
 	}
@@ -68,9 +68,7 @@ class IModelTest
 	@Test
 	void nullFilter()
 	{
-		assertThrows(IllegalArgumentException.class, () -> {
-			Model.of(person).filter(null);
-		});
+		assertThrows(IllegalArgumentException.class, () -> Model.of(person).filter(null));
 	}
 
 	@Test
@@ -92,9 +90,7 @@ class IModelTest
 	@Test
 	void nullMapper()
 	{
-		assertThrows(IllegalArgumentException.class, () -> {
-			Model.of(person).map(null);
-		});
+		assertThrows(IllegalArgumentException.class, () -> Model.of(person).map(null));
 
 	}
 
@@ -103,7 +99,7 @@ class IModelTest
 	{
 		IModel<String> janeModel = Model.of("Jane");
 		SerializableBiFunction<Person, String, String> function = (SerializableBiFunction<Person, String, String>)(
-			person1, other) -> person1.getName() + " is in relationship with " + other;
+			person1, other) -> new StringBuilder().append(person1.getName()).append(" is in relationship with ").append(other).toString();
 		IModel<String> relationShipModel = Model.of(person).combineWith(janeModel, function);
 		assertEquals("John is in relationship with Jane", relationShipModel.getObject());
 	}
@@ -113,7 +109,7 @@ class IModelTest
 	{
 		IModel<String> janeModel = Model.of((String)null);
 		SerializableBiFunction<Person, String, String> function = (SerializableBiFunction<Person, String, String>)(
-			person1, other) -> person1.getName() + " is in relationship with " + other;
+			person1, other) -> new StringBuilder().append(person1.getName()).append(" is in relationship with ").append(other).toString();
 		IModel<String> relationShipModel = Model.of(person).combineWith(janeModel, function);
 		assertNull(relationShipModel.getObject());
 	}
@@ -123,20 +119,16 @@ class IModelTest
 	{
 		IModel<String> janeModel = null;
 		SerializableBiFunction<Person, String, String> function = (SerializableBiFunction<Person, String, String>)(
-			person1, other) -> person1.getName() + " is in relationship with " + other;
+			person1, other) -> new StringBuilder().append(person1.getName()).append(" is in relationship with ").append(other).toString();
 
-		assertThrows(IllegalArgumentException.class, () -> {
-			Model.of(person).combineWith(janeModel, function);
-		});
+		assertThrows(IllegalArgumentException.class, () -> Model.of(person).combineWith(janeModel, function));
 
 	}
 
 	@Test
 	void combineWithNullCombiner()
 	{
-		assertThrows(IllegalArgumentException.class, () -> {
-			Model.of(person).combineWith(Model.of("Jane"), null);
-		});
+		assertThrows(IllegalArgumentException.class, () -> Model.of(person).combineWith(Model.of("Jane"), null));
 
 	}
 
@@ -155,9 +147,7 @@ class IModelTest
 	@Test
 	void nullFlatMapper()
 	{
-		assertThrows(IllegalArgumentException.class, () -> {
-			Model.of(person).flatMap(null);
-		});
+		assertThrows(IllegalArgumentException.class, () -> Model.of(person).flatMap(null));
 	}
 
 	@Test
@@ -185,9 +175,7 @@ class IModelTest
 	@Test
 	void orElseGetNullOther()
 	{
-		assertThrows(IllegalArgumentException.class, () -> {
-			Model.of(person).map(Person::getName).orElseGet(null);
-		});
+		assertThrows(IllegalArgumentException.class, () -> Model.of(person).map(Person::getName).orElseGet(null));
 	}
 
 	@Test
@@ -210,6 +198,18 @@ class IModelTest
 		assertNotNull(WicketObjects.cloneObject(m));
 	}
 
+	@Test
+	void serializableMethodChainReference()
+	{
+		IModel<Account> accountModel = LoadableDetachableModel.of(Account::new);
+		IModel<Person> personModel = accountModel.map(Account::getPerson);
+		IModel<String> nameModel = personModel.map(Person::getName);
+
+		IModel<String> clone = WicketObjects.cloneObject(nameModel);
+		assertNotNull(clone);
+		assertEquals("Some Name", clone.getObject());
+	}
+
 	static class Account
 	{
 		private Person person = new Person();
@@ -221,17 +221,5 @@ class IModelTest
 		{
 			return person;
 		}
-	}
-
-	@Test
-	void serializableMethodChainReference()
-	{
-		IModel<Account> accountModel = LoadableDetachableModel.of(Account::new);
-		IModel<Person> personModel = accountModel.map(Account::getPerson);
-		IModel<String> nameModel = personModel.map(Person::getName);
-
-		IModel<String> clone = WicketObjects.cloneObject(nameModel);
-		assertNotNull(clone);
-		assertEquals("Some Name", clone.getObject());
 	}
 }

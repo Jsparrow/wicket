@@ -92,10 +92,7 @@ class ButtonTest extends WicketTestCase
 			@Override
 			public IResourceStream getMarkupResourceStream(MarkupContainer container, Class<?> containerClass)
 			{
-				return new StringResourceStream("<html><body>"
-				                                + "<form wicket:id=\"form\"><button wicket:id=\"button\">"
-				                                + textInHtml
-				                                + "</button></form></body></html>");
+				return new StringResourceStream(new StringBuilder().append("<html><body>").append("<form wicket:id=\"form\"><button wicket:id=\"button\">").append(textInHtml).append("</button></form></body></html>").toString());
 			}
 		};
 		tester.startPage(testPage);
@@ -126,10 +123,11 @@ class ButtonTest extends WicketTestCase
 		/** */
 		TestPage(IModel<String> buttonModel)
 		{
-			add(form = new Form<Object>("form", new CompoundPropertyModel<>(new Object())));
+			add(form = new Form<>("form", new CompoundPropertyModel<>(new Object())));
 			form.add(button = new Button("button", buttonModel));
 		}
 
+		@Override
 		public IResourceStream getMarkupResourceStream(MarkupContainer container,
 			Class<?> containerClass)
 		{

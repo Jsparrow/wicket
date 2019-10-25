@@ -21,6 +21,8 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import org.apache.wicket.util.tester.WicketTestCase;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Test the {@link Component#onRemove()}. Test if it gets called and propagated to the Components
@@ -29,8 +31,8 @@ import org.junit.jupiter.api.Test;
 class RemoveTest extends WicketTestCase
 {
 
-	private static final String PATH = RemoveTestPage.COMPONENT + Component.PATH_SEPARATOR +
-		RemoveTestPage.LINK;
+	private static final Logger logger = LoggerFactory.getLogger(RemoveTest.class);
+	private static final String PATH = new StringBuilder().append(RemoveTestPage.COMPONENT).append(Component.PATH_SEPARATOR).append(RemoveTestPage.LINK).toString();
 
 	/**
 	 * The test
@@ -65,6 +67,7 @@ class RemoveTest extends WicketTestCase
 		}
 		catch (IllegalStateException wre)
 		{
+			logger.error(wre.getMessage(), wre);
 			// do nothing.
 			// This exception was expected.
 		}

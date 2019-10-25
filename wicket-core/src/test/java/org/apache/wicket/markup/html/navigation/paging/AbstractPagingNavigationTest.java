@@ -27,6 +27,12 @@ import org.apache.wicket.util.tester.WicketTestCase;
  */
 abstract class AbstractPagingNavigationTest extends WicketTestCase
 {
+	/** mock page count. */
+	long pagecount = 0;
+
+	/** mock current page. */
+	long currentpage = 0;
+
 	/**
 	 * Mock object for testing the increment link.
 	 */
@@ -74,10 +80,4 @@ abstract class AbstractPagingNavigationTest extends WicketTestCase
 			this.expectedPage = expectedPage;
 		}
 	}
-
-	/** mock page count. */
-	long pagecount = 0;
-
-	/** mock current page. */
-	long currentpage = 0;
 }

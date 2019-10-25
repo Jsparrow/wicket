@@ -89,14 +89,12 @@ class ComponentTagAttributeEscapingTest extends WicketTestCase
 		public IResourceStream getMarkupResourceStream(MarkupContainer container,
 			Class<?> containerClass)
 		{
-			return new StringResourceStream("<html>"//
-				+ "<body>"//
-				+
-				"<a wicket:id=\"link\" onclick=\"alert('alerting: &amp; &pound;&#163; ')\">link</a>"//
-				+
-				"<input type=\"submit\" wicket:id=\"button\" value=\"Watch escaped value: &gt;&gt;\"/>"//
-				+ "</body>" + //
-				"</html>");
+			//
+			return new StringResourceStream(new StringBuilder().append("<html>"//
+).append("<body>"//
+).append("<a wicket:id=\"link\" onclick=\"alert('alerting: &amp; &pound;&#163; ')\">link</a>"//
+).append("<input type=\"submit\" wicket:id=\"button\" value=\"Watch escaped value: &gt;&gt;\"/>"//
+).append("</body>").append("</html>").toString());
 		}
 	}
 }

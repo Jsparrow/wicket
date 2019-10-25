@@ -383,8 +383,12 @@ public abstract class JavaScriptHeaderItem extends AbstractCspHeaderItem
 	@Override
 	public boolean equals(Object o)
 	{
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
 		JavaScriptHeaderItem that = (JavaScriptHeaderItem) o;
 		return Objects.equals(condition, that.condition) &&
 				Objects.equals(markupId, that.markupId);

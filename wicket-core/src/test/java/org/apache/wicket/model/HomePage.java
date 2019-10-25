@@ -58,7 +58,7 @@ public class HomePage extends WebPage
 			super(s);
 			setDefaultModel(new CompoundPropertyModel<Booking>(booking));
 
-			TextField<String> name = new TextField<String>("partyDetails.name");
+			TextField<String> name = new TextField<>("partyDetails.name");
 			name.setRequired(Boolean.TRUE);
 			name.add(new StringValidator(1, 30));
 

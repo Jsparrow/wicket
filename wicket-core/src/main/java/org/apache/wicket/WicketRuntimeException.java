@@ -30,7 +30,6 @@ public class WicketRuntimeException extends RuntimeException
 	 */
 	public WicketRuntimeException()
 	{
-		super();
 	}
 
 	/**

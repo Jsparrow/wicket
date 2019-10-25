@@ -111,17 +111,12 @@ public abstract class NestedTree<T> extends AbstractTree<T>
 	public void updateBranch(T t, IPartialPageRequestHandler target)
 	{
 		final IModel<T> model = getProvider().model(t);
-		visitChildren(BranchItem.class, new IVisitor<BranchItem<T>, Void>()
-		{
-			@Override
-			public void component(BranchItem<T> branch, IVisit<Void> visit)
+		visitChildren(BranchItem.class, (BranchItem<T> branch, IVisit<Void> visit) -> {
+			if (model.equals(branch.getModel()))
 			{
-				if (model.equals(branch.getModel()))
-				{
-					// BranchItem always outputs its markupId
-					target.add(branch);
-					visit.stop();
-				}
+				// BranchItem always outputs its markupId
+				target.add(branch);
+				visit.stop();
 			}
 		});
 		model.detach();
@@ -143,19 +138,14 @@ public abstract class NestedTree<T> extends AbstractTree<T>
 	public void updateNode(T node, IPartialPageRequestHandler target)
 	{
 		final IModel<T> model = getProvider().model(node);
-		visitChildren(Node.class, new IVisitor<Node<T>, Void>()
-		{
-			@Override
-			public void component(Node<T> node, IVisit<Void> visit)
+		visitChildren(Node.class, (Node<T> node1, IVisit<Void> visit) -> {
+			if (model.equals(node1.getModel()))
 			{
-				if (model.equals(node.getModel()))
-				{
-					// nodes are configured to output their markup id, see #newNodeComponent()
-					target.add(node);
-					visit.stop();
-				}
-				visit.dontGoDeeper();
+				// nodes are configured to output their markup id, see #newNodeComponent()
+				target.add(node1);
+				visit.stop();
 			}
+			visit.dontGoDeeper();
 		});
 		model.detach();
 	}

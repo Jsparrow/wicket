@@ -82,7 +82,7 @@ public class LongEncoder
 		{
 			int mod = (int)(value % len);
 			buff.prepend(alphabet.charAt(mod));
-			value = value / len;
+			value /= len;
 		}
 		while (value > 0);
 		if (negative)

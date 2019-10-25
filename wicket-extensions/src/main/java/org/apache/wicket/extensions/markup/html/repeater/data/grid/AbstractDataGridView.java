@@ -129,10 +129,7 @@ public abstract class AbstractDataGridView<T> extends DataViewBase<T>
 		super.onDetach();
 		if (populators != null)
 		{
-			for (ICellPopulator<T> populator : populators)
-			{
-				populator.detach();
-			}
+			populators.forEach(ICellPopulator::detach);
 		}
 	}
 
@@ -158,10 +155,7 @@ public abstract class AbstractDataGridView<T> extends DataViewBase<T>
 			if (cellItem.get("cell") == null)
 			{
 				throw new WicketRuntimeException(
-					populator.getClass().getName() +
-						".populateItem() failed to add a component with id [" +
-						CELL_ITEM_ID +
-						"] to the provided [cellItem] object. Make sure you call add() on cellItem and make sure you gave the added component passed in 'componentId' id. ( *cellItem*.add(new MyComponent(*componentId*, rowModel) )");
+					new StringBuilder().append(populator.getClass().getName()).append(".populateItem() failed to add a component with id [").append(CELL_ITEM_ID).append("] to the provided [cellItem] object. Make sure you call add() on cellItem and make sure you gave the added component passed in 'componentId' id. ( *cellItem*.add(new MyComponent(*componentId*, rowModel) )").toString());
 			}
 		}
 

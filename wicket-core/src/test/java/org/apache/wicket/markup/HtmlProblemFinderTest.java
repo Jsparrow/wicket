@@ -39,8 +39,6 @@ class HtmlProblemFinderTest extends WicketTestCase
 		parser.add(new HtmlProblemFinder(HtmlProblemFinder.ERR_THROW_EXCEPTION),
 			RelativePathPrefixHandler.class);
 
-		assertThrows(MarkupException.class, () -> {
-			parser.parse();
-		});
+		assertThrows(MarkupException.class, parser::parse);
 	}
 }

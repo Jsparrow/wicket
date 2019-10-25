@@ -66,6 +66,19 @@ public class CheckBoxPage extends WicketExamplePage
 		form.add(new CheckBox("bool"));
 	}
 
+	/**
+	 * Override base method to provide an explanation
+	 */
+	@Override
+	protected void explain()
+	{
+		String html = "<input type=\"checkbox\" wicket:id=\"bool\" />";
+		String code = "&nbsp;&nbsp;&nbsp;&nbsp;// add a check box component that uses the model object's 'bool' property.\n"
+			+ "&nbsp;&nbsp;&nbsp;&nbsp;form.add(new CheckBox(\"bool\"));";
+		add(new ExplainPanel(html, code));
+
+	}
+
 	/** Simple data class that acts as a model for the input fields. */
 	private static class Input implements IClusterable
 	{
@@ -78,21 +91,8 @@ public class CheckBoxPage extends WicketExamplePage
 		@Override
 		public String toString()
 		{
-			return "bool = '" + bool + "'";
+			return new StringBuilder().append("bool = '").append(bool).append("'").toString();
 		}
-	}
-
-	/**
-	 * Override base method to provide an explanation
-	 */
-	@Override
-	protected void explain()
-	{
-		String html = "<input type=\"checkbox\" wicket:id=\"bool\" />";
-		String code = "&nbsp;&nbsp;&nbsp;&nbsp;// add a check box component that uses the model object's 'bool' property.\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;form.add(new CheckBox(\"bool\"));";
-		add(new ExplainPanel(html, code));
-
 	}
 
 }

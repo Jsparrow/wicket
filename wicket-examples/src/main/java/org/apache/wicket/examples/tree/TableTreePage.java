@@ -89,7 +89,7 @@ public class TableTreePage extends AdvancedTreePage
 			{
 				NodeModel<Foo> nodeModel = (NodeModel<Foo>)rowModel;
 
-				cellItem.add(new Label(componentId, "" + nodeModel.getDepth()));
+				cellItem.add(new Label(componentId, Integer.toString(nodeModel.getDepth())));
 			}
 
 			@Override

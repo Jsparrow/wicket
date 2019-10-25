@@ -34,65 +34,9 @@ import org.junit.jupiter.api.Test;
  */
 public class TabbedPanelTest extends WicketTestCase
 {
-	/**
-	 */
-	public class TestPage extends WebPage
-	{
-		private static final long serialVersionUID = 1L;
-
-		protected TabbedPanel<ITab> tabbedPanel;
-
-		/**
-		 */
-		public TestPage()
-		{
-			List<ITab> defaultTabs = new ArrayList<>();
-			defaultTabs.add(new AbstractTab(Model.of("default 1"))
-			{
-				private static final long serialVersionUID = 1L;
-
-				@Override
-				public WebMarkupContainer getPanel(String panelId)
-				{
-					return new TestPanel(panelId, "default 1");
-				}
-			});
-			defaultTabs.add(new AbstractTab(Model.of("default 2"))
-			{
-				private static final long serialVersionUID = 1L;
-
-				@Override
-				public WebMarkupContainer getPanel(String panelId)
-				{
-					return new TestPanel(panelId, "default 2");
-				}
-			});
-			tabbedPanel = newTabbedPanel(defaultTabs);
-			add(tabbedPanel);
-		}
-
-	}
-
 	TabbedPanel<ITab> newTabbedPanel(List<ITab> defaultTabs)
 	{
 		return new TabbedPanel<>("tabpanel", defaultTabs);
-	}
-
-	/**
-	 */
-	public static class TestPanel extends Panel
-	{
-		private static final long serialVersionUID = 1L;
-
-		/**
-		 * @param id
-		 * @param panelTestId
-		 */
-		public TestPanel(String id, String panelTestId)
-		{
-			super(id);
-			this.add(new Label("label", panelTestId));
-		}
 	}
 
 	/**
@@ -307,5 +251,61 @@ public class TabbedPanelTest extends WicketTestCase
 		tester.assertContainsNot("<span wicket:id=\"title\">added 1</span>");
 		tester.assertContains("<span wicket:id=\"title\">added 2</span>");
 		tester.assertContains("<span wicket:id=\"label\">added 2</span>");
+	}
+
+	/**
+	 */
+	public class TestPage extends WebPage
+	{
+		private static final long serialVersionUID = 1L;
+
+		protected TabbedPanel<ITab> tabbedPanel;
+
+		/**
+		 */
+		public TestPage()
+		{
+			List<ITab> defaultTabs = new ArrayList<>();
+			defaultTabs.add(new AbstractTab(Model.of("default 1"))
+			{
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				public WebMarkupContainer getPanel(String panelId)
+				{
+					return new TestPanel(panelId, "default 1");
+				}
+			});
+			defaultTabs.add(new AbstractTab(Model.of("default 2"))
+			{
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				public WebMarkupContainer getPanel(String panelId)
+				{
+					return new TestPanel(panelId, "default 2");
+				}
+			});
+			tabbedPanel = newTabbedPanel(defaultTabs);
+			add(tabbedPanel);
+		}
+
+	}
+
+	/**
+	 */
+	public static class TestPanel extends Panel
+	{
+		private static final long serialVersionUID = 1L;
+
+		/**
+		 * @param id
+		 * @param panelTestId
+		 */
+		public TestPanel(String id, String panelTestId)
+		{
+			super(id);
+			this.add(new Label("label", panelTestId));
+		}
 	}
 }

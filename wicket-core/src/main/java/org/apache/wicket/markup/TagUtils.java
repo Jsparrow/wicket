@@ -101,12 +101,11 @@ public class TagUtils
 	public static boolean isExtendTag(final IMarkupFragment markup, final int i)
 	{
 		MarkupElement elem = markup.get(i);
-		if (elem instanceof WicketTag)
-		{
-			WicketTag wtag = (WicketTag)elem;
-			return wtag.isExtendTag();
+		if (!(elem instanceof WicketTag)) {
+			return false;
 		}
-		return false;
+		WicketTag wtag = (WicketTag)elem;
+		return wtag.isExtendTag();
 	}
 
 	/**
@@ -201,15 +200,11 @@ public class TagUtils
 		if (elem instanceof ComponentTag)
 		{
 			ComponentTag panelTag = (ComponentTag)elem;
-			for (String key : panelTag.getAttributes().keySet())
-			{
-				// exclude "wicket:XX" attributes
-				if (key.startsWith(namespace) == false)
-				{
-					String separator = ATTRIBUTES_SEPARATORS.getString(key, DEFAULT_ATTRIBUTE_SEPARATOR);
-					tag.append(key, panelTag.getAttribute(key), separator);
-				}
-			}
+			// exclude "wicket:XX" attributes
+			panelTag.getAttributes().keySet().stream().filter(key -> key.startsWith(namespace) == false).forEach(key -> {
+				String separator = ATTRIBUTES_SEPARATORS.getString(key, DEFAULT_ATTRIBUTE_SEPARATOR);
+				tag.append(key, panelTag.getAttribute(key), separator);
+			});
 		}
 		else
 		{

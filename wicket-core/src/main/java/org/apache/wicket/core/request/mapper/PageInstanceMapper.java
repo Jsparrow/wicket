@@ -125,18 +125,14 @@ public class PageInstanceMapper extends AbstractComponentMapper
 			info = new PageComponentInfo(pageInfo, componentInfo);
 		}
 
-		if (info != null)
-		{
-			Url url = new Url();
-			url.getSegments().add(getContext().getNamespace());
-			url.getSegments().add(getContext().getPageIdentifier());
-			encodePageComponentInfo(url, info);
-			return url;
-		}
-		else
-		{
+		if (info == null) {
 			return null;
 		}
+		Url url = new Url();
+		url.getSegments().add(getContext().getNamespace());
+		url.getSegments().add(getContext().getPageIdentifier());
+		encodePageComponentInfo(url, info);
+		return url;
 	}
 
 	/**

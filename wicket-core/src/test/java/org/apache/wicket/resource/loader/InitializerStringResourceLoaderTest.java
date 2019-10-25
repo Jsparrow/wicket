@@ -18,10 +18,9 @@ package org.apache.wicket.resource.loader;
 
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-import java.util.Arrays;
-
 import org.apache.wicket.IInitializer;
 import org.apache.wicket.resource.StringResourceLoaderTestBase;
+import java.util.Collections;
 
 /**
  * 
@@ -33,7 +32,7 @@ public class InitializerStringResourceLoaderTest extends StringResourceLoaderTes
 	protected IStringResourceLoader createLoader()
 	{
 		return new InitializerStringResourceLoader(
-			Arrays.<IInitializer> asList(new FooInitializer()));
+			Collections.<IInitializer> singletonList(new FooInitializer()));
 	}
 
 	@Override

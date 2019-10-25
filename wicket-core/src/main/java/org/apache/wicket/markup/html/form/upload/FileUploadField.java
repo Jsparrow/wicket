@@ -110,13 +110,8 @@ public class FileUploadField extends FormComponent<List<FileUpload>>
 
 			if (fileItems != null)
 			{
-				for (FileItem item : fileItems)
-				{
-					// WICKET-6270 detect empty field by missing file name
-					if (Strings.isEmpty(item.getName()) == false) {
-						fileUploads.add(new FileUpload(item));
-					}
-				}
+				// WICKET-6270 detect empty field by missing file name
+				fileItems.stream().filter(item -> Strings.isEmpty(item.getName()) == false).forEach(item -> fileUploads.add(new FileUpload(item)));
 			}
 		}
 		
@@ -136,20 +131,16 @@ public class FileUploadField extends FormComponent<List<FileUpload>>
 	public String[] getInputAsArray()
 	{
 		List<FileUpload> fileUploads = getFileUploads();
-		if (fileUploads.isEmpty() == false)
-		{
-			List<String> clientFileNames = new ArrayList<>();
-			for (FileUpload fu : fileUploads)
-			{
-				clientFileNames.add(fu.getClientFileName());
-			}
-			return clientFileNames.toArray(new String[clientFileNames.size()]);
+		if (fileUploads.isEmpty() != false) {
+			return null;
 		}
-		return null;
+		List<String> clientFileNames = new ArrayList<>();
+		fileUploads.forEach(fu -> clientFileNames.add(fu.getClientFileName()));
+		return clientFileNames.toArray(new String[clientFileNames.size()]);
 	}
 
 	@Override
-	protected List<FileUpload> convertValue(String[] value) throws ConversionException
+	protected List<FileUpload> convertValue(String[] value)
 	{
 		final String[] filenames = getInputAsArray();
 		if (filenames == null)
@@ -190,10 +181,7 @@ public class FileUploadField extends FormComponent<List<FileUpload>>
 		if (fileUploads != null)
 		{
 			if (forceCloseStreamsOnDetach()) {
-				for (FileUpload fu : fileUploads)
-				{
-					fu.closeStreams();
-				}
+				fileUploads.forEach(FileUpload::closeStreams);
 
 				if (getModel() != null)
 				{

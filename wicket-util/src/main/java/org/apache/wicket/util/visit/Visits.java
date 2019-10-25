@@ -31,22 +31,6 @@ public class Visits
 	{
 	}
 
-	private static class SingletonIterable<T> implements Iterable<T>
-	{
-		private final T singleton;
-
-		public SingletonIterable(final T singleton)
-		{
-			this.singleton = singleton;
-		}
-
-		@Override
-		public Iterator<T> iterator()
-		{
-			return Collections.singleton(singleton).iterator();
-		}
-	}
-
 	/**
 	 * Visits container and its children pre-order (parent first). Children are determined by
 	 * calling {@link Iterable#iterator()}.
@@ -272,6 +256,22 @@ public class Visits
 		if (filter.visitObject(component))
 		{
 			visitor.component((S)component, visit);
+		}
+	}
+
+	private static class SingletonIterable<T> implements Iterable<T>
+	{
+		private final T singleton;
+
+		public SingletonIterable(final T singleton)
+		{
+			this.singleton = singleton;
+		}
+
+		@Override
+		public Iterator<T> iterator()
+		{
+			return Collections.singleton(singleton).iterator();
 		}
 	}
 }

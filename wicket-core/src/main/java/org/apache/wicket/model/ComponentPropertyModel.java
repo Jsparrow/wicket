@@ -61,7 +61,7 @@ public class ComponentPropertyModel<T> implements IComponentAssignedModel<T>
 	@Override
 	public IWrapModel<T> wrapOnAssignment(final Component component)
 	{
-		return new AssignmentWrapper<T>(component, propertyName);
+		return new AssignmentWrapper<>(component, propertyName);
 	}
 
 	/**

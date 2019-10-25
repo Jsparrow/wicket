@@ -32,34 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class PrimitivesTest
 {
-	/**
-	 * Test stub for testing the hashcode function.
-	 */
-	private class HashCodeObject
-	{
-		int value;
-
-		/**
-		 * Sets the value.
-		 * 
-		 * @param value
-		 *            the value to use
-		 */
-		public HashCodeObject(int value)
-		{
-			this.value = value;
-		}
-
-		/**
-		 * @see java.lang.Object#hashCode()
-		 */
-		@Override
-		public int hashCode()
-		{
-			return Primitives.hashCode(value);
-		}
-	}
-
 	private HashCodeObject eq1;
 	private HashCodeObject eq2;
 	private HashCodeObject eq3;
@@ -110,6 +82,34 @@ public class PrimitivesTest
 			assertEquals(eq2Hash, eq2.hashCode(), "2nd equal instance");
 			assertEquals(eq3Hash, eq3.hashCode(), "3rd equal instance");
 			assertEquals(neqHash, neq.hashCode(), "not-equal instance");
+		}
+	}
+
+	/**
+	 * Test stub for testing the hashcode function.
+	 */
+	private class HashCodeObject
+	{
+		int value;
+
+		/**
+		 * Sets the value.
+		 * 
+		 * @param value
+		 *            the value to use
+		 */
+		public HashCodeObject(int value)
+		{
+			this.value = value;
+		}
+
+		/**
+		 * @see java.lang.Object#hashCode()
+		 */
+		@Override
+		public int hashCode()
+		{
+			return Primitives.hashCode(value);
 		}
 	}
 }

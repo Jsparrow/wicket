@@ -189,7 +189,7 @@ public class ExternalImage extends WebComponent
 				xValue = xValues.size() > srcSetPosition && xValues.get(srcSetPosition) != null
 					? " " + xValues.get(srcSetPosition) : "";
 			}
-			tag.put("srcset", (srcset != null ? srcset + ", " : "") + srcSet + xValue);
+			tag.put("srcset", new StringBuilder().append(srcset != null ? srcset + ", " : "").append(srcSet).append(xValue).toString());
 			srcSetPosition++;
 		}
 	}

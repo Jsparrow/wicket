@@ -23,6 +23,8 @@ import org.apache.wicket.WicketRuntimeException;
 import org.apache.wicket.markup.MarkupException;
 import org.apache.wicket.util.tester.WicketTestCase;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Simple application that demonstrates the mock http application code (and checks that it is
@@ -32,6 +34,8 @@ import org.junit.jupiter.api.Test;
  */
 class HeaderSectionTest extends WicketTestCase
 {
+	private static final Logger logger = LoggerFactory.getLogger(HeaderSectionTest.class);
+
 	/**
 	 * @throws Exception
 	 */
@@ -153,6 +157,7 @@ class HeaderSectionTest extends WicketTestCase
 		}
 		catch (WicketRuntimeException ex)
 		{
+			logger.error(ex.getMessage(), ex);
 			hit = true;
 		}
 		assertTrue(hit, "Expected a MarkupException to be thrown");
@@ -227,8 +232,6 @@ class HeaderSectionTest extends WicketTestCase
 	@Test
 	void doubleHeadTagPage()
 	{
-		assertThrows(MarkupException.class, () -> {
-			tester.startPage(DoubleHeadTagPage.class);
-		});
+		assertThrows(MarkupException.class, () -> tester.startPage(DoubleHeadTagPage.class));
 	}
 }

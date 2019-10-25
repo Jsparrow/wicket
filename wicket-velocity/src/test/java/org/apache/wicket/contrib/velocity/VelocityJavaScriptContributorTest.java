@@ -18,12 +18,16 @@ package org.apache.wicket.contrib.velocity;
 
 import org.apache.wicket.util.tester.WicketTester;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Test header contributions.
  */
 public class VelocityJavaScriptContributorTest
 {
+	private static final Logger logger = LoggerFactory.getLogger(VelocityJavaScriptContributorTest.class);
+
 	/**
 	 * Test that the header contribution is added correctly.
 	 */
@@ -34,7 +38,7 @@ public class VelocityJavaScriptContributorTest
 		try
 		{
 			tester.startPage(VelocityJavaScriptPage.class);
-			System.out.println(tester.getLastResponseAsString());
+			logger.info(tester.getLastResponseAsString());
 			tester.assertContains("msg1: " + VelocityJavaScriptPage.MSG1);
 		}
 		finally

@@ -109,9 +109,7 @@ class ExceptionSettingsNotRenderableErrorStrategyTest extends WicketTestCase {
     }
 
     private void assertWicketTagException(WicketRuntimeException wrx) {
-        assertThat(wrx.getCause().getMessage(), is(equalTo("Markup id set on a component that is usually not "
-                                                           + "rendered into markup. Markup id: test1, component id: test, "
-                                                           + "component tag: wicket:label.")));
+        assertThat(wrx.getCause().getMessage(), is(equalTo(new StringBuilder().append("Markup id set on a component that is usually not ").append("rendered into markup. Markup id: test1, component id: test, ").append("component tag: wicket:label.").toString())));
     }
 
     private void assertRenderBodyOnlyException(final WicketRuntimeException wrx) {

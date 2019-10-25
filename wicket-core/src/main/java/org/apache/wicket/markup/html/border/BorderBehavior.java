@@ -78,9 +78,8 @@ public class BorderBehavior extends Behavior
 					else
 					{
 						throw new WicketRuntimeException(
-							"Unexpected tag encountered in markup of component border " +
-								getClass().getName() + ". Tag: " + wTag.toString() +
-								", expected tag: <wicket:border>");
+							new StringBuilder().append("Unexpected tag encountered in markup of component border ").append(getClass().getName()).append(". Tag: ").append(wTag.toString()).append(", expected tag: <wicket:border>")
+									.toString());
 					}
 				}
 				else
@@ -92,9 +91,8 @@ public class BorderBehavior extends Behavior
 					else
 					{
 						throw new WicketRuntimeException(
-							"Unexpected tag encountered in markup of component border " +
-								getClass().getName() + ". Tag: " + wTag.toString() +
-								", expected tag: <wicket:body> or </wicket:body>");
+							new StringBuilder().append("Unexpected tag encountered in markup of component border ").append(getClass().getName()).append(". Tag: ").append(wTag.toString()).append(", expected tag: <wicket:body> or </wicket:body>")
+									.toString());
 					}
 				}
 			}
@@ -106,8 +104,7 @@ public class BorderBehavior extends Behavior
 
 		if (!stream.isCurrentIndexInsideTheStream())
 		{
-			throw new WicketRuntimeException("Markup for component border " + getClass().getName() +
-				" ended prematurely, was expecting </wicket:border>");
+			throw new WicketRuntimeException(new StringBuilder().append("Markup for component border ").append(getClass().getName()).append(" ended prematurely, was expecting </wicket:border>").toString());
 		}
 	}
 
@@ -131,9 +128,8 @@ public class BorderBehavior extends Behavior
 				else
 				{
 					throw new WicketRuntimeException(
-						"Unexpected tag encountered in markup of component border " +
-							getClass().getName() + ". Tag: " + wTag.toString() +
-							", expected tag: </wicket:border>");
+						new StringBuilder().append("Unexpected tag encountered in markup of component border ").append(getClass().getName()).append(". Tag: ").append(wTag.toString()).append(", expected tag: </wicket:border>")
+								.toString());
 				}
 			}
 			response.write(elem.toCharSequence());
@@ -205,8 +201,7 @@ public class BorderBehavior extends Behavior
 
 		if (markupResourceStream == null)
 		{
-			throw new WicketRuntimeException("Could not find markup for component border `" +
-				getClass().getName() + "`");
+			throw new WicketRuntimeException(new StringBuilder().append("Could not find markup for component border `").append(getClass().getName()).append("`").toString());
 		}
 
 		try

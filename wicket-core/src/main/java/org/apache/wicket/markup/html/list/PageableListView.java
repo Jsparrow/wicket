@@ -198,7 +198,7 @@ public abstract class PageableListView<T> extends ListView<T> implements IPageab
 	 *             always
 	 */
 	@Override
-	public ListView<T> setStartIndex(int startIndex) throws UnsupportedOperationException
+	public ListView<T> setStartIndex(int startIndex)
 	{
 		throw new UnsupportedOperationException(
 			"You must not use setStartIndex() with PageableListView");
@@ -215,7 +215,7 @@ public abstract class PageableListView<T> extends ListView<T> implements IPageab
 	 * @see org.apache.wicket.markup.html.list.ListView#setStartIndex(int)
 	 */
 	@Override
-	public ListView<T> setViewSize(int size) throws UnsupportedOperationException
+	public ListView<T> setViewSize(int size)
 	{
 		throw new UnsupportedOperationException(
 			"You must not use setViewSize() with PageableListView");

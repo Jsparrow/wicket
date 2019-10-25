@@ -43,6 +43,33 @@ import org.slf4j.LoggerFactory;
 public final class BeanManagerLookup
 {
 	private static final Logger log = LoggerFactory.getLogger(BeanManagerLookup.class);
+	private static BeanManagerLookupStrategy lastSuccessful = BeanManagerLookupStrategy.JNDI;
+
+	private BeanManagerLookup()
+	{
+	}
+
+	public static BeanManager lookup()
+	{
+		BeanManager ret = lastSuccessful.lookup();
+		if (ret != null) {
+			return ret;
+		}
+
+		for (BeanManagerLookupStrategy curStrategy : BeanManagerLookupStrategy.values())
+		{
+			ret = curStrategy.lookup();
+			if (ret != null)
+			{
+				lastSuccessful = curStrategy;
+				return ret;
+			}
+		}
+
+		throw new IllegalStateException(
+				"No BeanManager found via the CDI provider and no fallback specified. Check your "
+						+ "CDI setup or specify a fallback BeanManager in the CdiConfiguration.");
+	}
 
 	private enum BeanManagerLookupStrategy {
 		JNDI {
@@ -55,6 +82,7 @@ public final class BeanManagerLookup
 				}
 				catch (NamingException e)
 				{
+					logger.error(e.getMessage(), e);
 					return null;
 				}
 			}
@@ -69,6 +97,7 @@ public final class BeanManagerLookup
 				}
 				catch (NamingException e)
 				{
+					logger.error(e.getMessage(), e);
 					return null;
 				}
 			}
@@ -96,33 +125,8 @@ public final class BeanManagerLookup
 			}
 		};
 
+		private final Logger logger = LoggerFactory.getLogger(BeanManagerLookupStrategy.class);
+
 		public abstract BeanManager lookup();
-	}
-
-	private static BeanManagerLookupStrategy lastSuccessful = BeanManagerLookupStrategy.JNDI;
-
-	private BeanManagerLookup()
-	{
-	}
-
-	public static BeanManager lookup()
-	{
-		BeanManager ret = lastSuccessful.lookup();
-		if (ret != null)
-			return ret;
-
-		for (BeanManagerLookupStrategy curStrategy : BeanManagerLookupStrategy.values())
-		{
-			ret = curStrategy.lookup();
-			if (ret != null)
-			{
-				lastSuccessful = curStrategy;
-				return ret;
-			}
-		}
-
-		throw new IllegalStateException(
-				"No BeanManager found via the CDI provider and no fallback specified. Check your "
-						+ "CDI setup or specify a fallback BeanManager in the CdiConfiguration.");
 	}
 }

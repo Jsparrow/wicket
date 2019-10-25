@@ -53,7 +53,7 @@ public class WicketExamplePage extends WebPage
 	{
 		super(pageParameters);
 
-		BookmarkablePageLink<Void> link = new BookmarkablePageLink<Void>("sources",
+		BookmarkablePageLink<Void> link = new BookmarkablePageLink<>("sources",
 			SourcesPage.class, SourcesPage.generatePageParameters(this));
 		add(link);
 		
@@ -69,17 +69,6 @@ public class WicketExamplePage extends WebPage
 		explain();
 	}
 
-	protected boolean showSourceButton() 
-	{
-		return true;
-	}
-
-	protected Panel buildHeader(String id) 
-	{
-		return new WicketExampleHeader(id);
-	}
-
-
 	/**
 	 * Construct.
 	 * 
@@ -90,13 +79,23 @@ public class WicketExamplePage extends WebPage
 		super(model);
 	}
 
+	protected boolean showSourceButton() 
+	{
+		return true;
+	}
+
+	protected Panel buildHeader(String id) 
+	{
+		return new WicketExampleHeader(id);
+	}
+
 	/**
 	 * Override base method to provide an explanation
 	 */
 	protected void explain()
 	{
 	}
-	
+
 	@Override
 	public void renderHead(IHeaderResponse response)
 	{

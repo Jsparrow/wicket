@@ -96,10 +96,7 @@ public class Foo implements Serializable
 		if (quux)
 		{
 			// set quux on all descendants
-			for (Foo foo : foos)
-			{
-				foo.setQuux(true);
-			}
+			foos.forEach(foo -> foo.setQuux(true));
 		}
 		else
 		{

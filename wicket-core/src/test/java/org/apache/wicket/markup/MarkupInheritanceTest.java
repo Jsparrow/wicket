@@ -88,7 +88,7 @@ class MarkupInheritanceTest extends WicketTestCase
 	@Test
 	void renderHomePage_4() throws Exception
 	{
-		System.out.println("=== " + MarkupInheritanceExtension_4.class.getName() + " ===");
+		log.info(new StringBuilder().append("=== ").append(MarkupInheritanceExtension_4.class.getName()).append(" ===").toString());
 
 		tester.startPage(MarkupInheritanceExtension_4.class);
 

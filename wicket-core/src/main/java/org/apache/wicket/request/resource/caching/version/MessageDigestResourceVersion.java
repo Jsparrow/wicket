@@ -178,7 +178,7 @@ public class MessageDigestResourceVersion implements IResourceVersion
 		}
 		catch (NoSuchAlgorithmException e)
 		{
-			throw new WicketRuntimeException("message digest " + algorithm + " not found", e);
+			throw new WicketRuntimeException(new StringBuilder().append("message digest ").append(algorithm).append(" not found").toString(), e);
 		}
 	}
 

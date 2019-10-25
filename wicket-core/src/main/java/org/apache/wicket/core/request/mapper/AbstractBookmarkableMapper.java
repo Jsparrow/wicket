@@ -63,91 +63,6 @@ public abstract class AbstractBookmarkableMapper extends AbstractComponentMapper
 	 */
 	private boolean isCaseSensitive = true;
 
-	/**
-	 * Represents information stored in URL.
-	 * 
-	 * @author Matej Knopp
-	 */
-	protected static final class UrlInfo
-	{
-		private final PageComponentInfo pageComponentInfo;
-		private final PageParameters pageParameters;
-		private final Class<? extends IRequestablePage> pageClass;
-
-		/**
-		 * Construct.
-		 * 
-		 * @param pageComponentInfo
-		 *            optional parameter providing the page instance and component information
-		 * @param pageClass
-		 *            mandatory parameter
-		 * @param pageParameters
-		 *            optional parameter providing pageParameters
-		 */
-		public UrlInfo(PageComponentInfo pageComponentInfo,
-			Class<? extends IRequestablePage> pageClass, PageParameters pageParameters)
-		{
-			Args.notNull(pageClass, "pageClass");
-
-			this.pageComponentInfo = pageComponentInfo;
-			this.pageParameters = cleanPageParameters(pageParameters);
-
-			this.pageClass = pageClass;
-		}
-
-		/**
-		 * Cleans the original parameters from entries used by Wicket internals.
-		 * 
-		 * @param originalParameters
-		 *            the current request's non-modified parameters
-		 * @return all parameters but Wicket internal ones
-		 */
-		private PageParameters cleanPageParameters(final PageParameters originalParameters)
-		{
-			PageParameters cleanParameters = null;
-			if (originalParameters != null)
-			{
-				cleanParameters = new PageParameters(originalParameters);
-
-				// WICKET-4038: Ajax related parameters are set by wicket-ajax.js when needed.
-				// They shouldn't be propagated to the next requests
-				cleanParameters.remove(WebRequest.PARAM_AJAX);
-				cleanParameters.remove(WebRequest.PARAM_AJAX_BASE_URL);
-				cleanParameters.remove(WebRequest.PARAM_AJAX_REQUEST_ANTI_CACHE);
-
-				if (cleanParameters.isEmpty())
-				{
-					cleanParameters = null;
-				}
-			}
-			return cleanParameters;
-		}
-
-		/**
-		 * @return PageComponentInfo instance or <code>null</code>
-		 */
-		public PageComponentInfo getPageComponentInfo()
-		{
-			return pageComponentInfo;
-		}
-
-		/**
-		 * @return page class
-		 */
-		public Class<? extends IRequestablePage> getPageClass()
-		{
-			return pageClass;
-		}
-
-		/**
-		 * @return PageParameters instance (never <code>null</code>)
-		 */
-		public PageParameters getPageParameters()
-		{
-			return pageParameters;
-		}
-	}
-
 	protected final List<MountPathSegment> pathSegments;
 
 	protected final String[] mountSegments;
@@ -203,22 +118,18 @@ public abstract class AbstractBookmarkableMapper extends AbstractComponentMapper
 	@Override
 	public int getCompatibilityScore(Request request)
 	{
-		if (urlStartsWith(request.getUrl(), mountSegments))
-		{
-			/* see WICKET-5056 - alter score with pathSegment type */
-			int countOptional = 0;
-			int fixedSegments = 0;
-			for (MountPathSegment pathSegment : pathSegments)
-			{
-				fixedSegments += pathSegment.getFixedPartSize();
-				countOptional += pathSegment.getOptionalParameters();
-			}
-			return mountSegments.length - countOptional + fixedSegments;
-		}
-		else
-		{
+		if (!urlStartsWith(request.getUrl(), mountSegments)) {
 			return 0;
 		}
+		/* see WICKET-5056 - alter score with pathSegment type */
+		int countOptional = 0;
+		int fixedSegments = 0;
+		for (MountPathSegment pathSegment : pathSegments)
+		{
+			fixedSegments += pathSegment.getFixedPartSize();
+			countOptional += pathSegment.getOptionalParameters();
+		}
+		return mountSegments.length - countOptional + fixedSegments;
 	}
 
 	/**
@@ -518,74 +429,9 @@ public abstract class AbstractBookmarkableMapper extends AbstractComponentMapper
 		return locale;
 	}
 
-	protected static class MountPathSegment
-	{
-		private int segmentIndex;
-		private String fixedPart;
-		private int minParameters;
-		private int optionalParameters;
-
-		public MountPathSegment(int segmentIndex)
-		{
-			this.segmentIndex = segmentIndex;
-		}
-
-		public void setFixedPart(String fixedPart)
-		{
-			this.fixedPart = fixedPart;
-		}
-
-		public void addRequiredParameter()
-		{
-			minParameters++;
-		}
-
-		public void addOptionalParameter()
-		{
-			optionalParameters++;
-		}
-
-		public int getSegmentIndex()
-		{
-			return segmentIndex;
-		}
-
-		public String getFixedPart()
-		{
-			return fixedPart;
-		}
-
-		public int getMinParameters()
-		{
-			return minParameters;
-		}
-
-		public int getOptionalParameters()
-		{
-			return optionalParameters;
-		}
-
-		public int getMaxParameters()
-		{
-			return getOptionalParameters() + getMinParameters();
-		}
-
-		public int getFixedPartSize()
-		{
-			return getFixedPart() == null ? 0 : 1;
-		}
-
-		@Override
-		public String toString()
-		{
-			return "(" + getSegmentIndex() + ") " + getMinParameters() + '-' + getMaxParameters() +
-					' ' + (getFixedPart() == null ? "(end)" : getFixedPart());
-		}
-	}
-
 	protected List<MountPathSegment> getPathSegments(String[] segments)
 	{
-		List<MountPathSegment> ret = new ArrayList<MountPathSegment>();
+		List<MountPathSegment> ret = new ArrayList<>();
 		int segmentIndex = 0;
 		MountPathSegment curPathSegment = new MountPathSegment(segmentIndex);
 		ret.add(curPathSegment);
@@ -614,7 +460,6 @@ public abstract class AbstractBookmarkableMapper extends AbstractComponentMapper
 	{
 		return getOptionalPlaceholder(segment) == null && getPlaceholder(segment) == null;
 	}
-
 
 	/**
 	 * Extracts the PageParameters from URL if there are any
@@ -699,14 +544,16 @@ public abstract class AbstractBookmarkableMapper extends AbstractComponentMapper
 					break;
 				}
 			}
-			if (!foundFixedPart)
+			if (!foundFixedPart) {
 				return null;
+			}
 			pathSegmentIndex++;
 		}
 		MountPathSegment lastSegment = pathSegments.get(pathSegments.size() - 1);
 		segmentIndex += lastSegment.getMinParameters();
-		if (segmentIndex > url.getSegments().size())
+		if (segmentIndex > url.getSegments().size()) {
 			return null;
+		}
 		ret[pathSegmentIndex] = Math.min(lastSegment.getMaxParameters(), url.getSegments().size() -
 				segmentIndex + lastSegment.getMinParameters());
 		return ret;
@@ -817,7 +664,7 @@ public abstract class AbstractBookmarkableMapper extends AbstractComponentMapper
 
 		return mandatoryParametersSet;
 	}
-	
+
 	protected boolean urlStartsWithMountedSegments(Url url)
 	{
 		if (url == null)
@@ -827,6 +674,156 @@ public abstract class AbstractBookmarkableMapper extends AbstractComponentMapper
 		else
 		{
 			return getMatchedSegmentSizes(url) != null;
+		}
+	}
+
+	/**
+	 * Represents information stored in URL.
+	 * 
+	 * @author Matej Knopp
+	 */
+	protected static final class UrlInfo
+	{
+		private final PageComponentInfo pageComponentInfo;
+		private final PageParameters pageParameters;
+		private final Class<? extends IRequestablePage> pageClass;
+
+		/**
+		 * Construct.
+		 * 
+		 * @param pageComponentInfo
+		 *            optional parameter providing the page instance and component information
+		 * @param pageClass
+		 *            mandatory parameter
+		 * @param pageParameters
+		 *            optional parameter providing pageParameters
+		 */
+		public UrlInfo(PageComponentInfo pageComponentInfo,
+			Class<? extends IRequestablePage> pageClass, PageParameters pageParameters)
+		{
+			Args.notNull(pageClass, "pageClass");
+
+			this.pageComponentInfo = pageComponentInfo;
+			this.pageParameters = cleanPageParameters(pageParameters);
+
+			this.pageClass = pageClass;
+		}
+
+		/**
+		 * Cleans the original parameters from entries used by Wicket internals.
+		 * 
+		 * @param originalParameters
+		 *            the current request's non-modified parameters
+		 * @return all parameters but Wicket internal ones
+		 */
+		private PageParameters cleanPageParameters(final PageParameters originalParameters)
+		{
+			PageParameters cleanParameters = null;
+			if (originalParameters != null)
+			{
+				cleanParameters = new PageParameters(originalParameters);
+
+				// WICKET-4038: Ajax related parameters are set by wicket-ajax.js when needed.
+				// They shouldn't be propagated to the next requests
+				cleanParameters.remove(WebRequest.PARAM_AJAX);
+				cleanParameters.remove(WebRequest.PARAM_AJAX_BASE_URL);
+				cleanParameters.remove(WebRequest.PARAM_AJAX_REQUEST_ANTI_CACHE);
+
+				if (cleanParameters.isEmpty())
+				{
+					cleanParameters = null;
+				}
+			}
+			return cleanParameters;
+		}
+
+		/**
+		 * @return PageComponentInfo instance or <code>null</code>
+		 */
+		public PageComponentInfo getPageComponentInfo()
+		{
+			return pageComponentInfo;
+		}
+
+		/**
+		 * @return page class
+		 */
+		public Class<? extends IRequestablePage> getPageClass()
+		{
+			return pageClass;
+		}
+
+		/**
+		 * @return PageParameters instance (never <code>null</code>)
+		 */
+		public PageParameters getPageParameters()
+		{
+			return pageParameters;
+		}
+	}
+
+	protected static class MountPathSegment
+	{
+		private int segmentIndex;
+		private String fixedPart;
+		private int minParameters;
+		private int optionalParameters;
+
+		public MountPathSegment(int segmentIndex)
+		{
+			this.segmentIndex = segmentIndex;
+		}
+
+		public void setFixedPart(String fixedPart)
+		{
+			this.fixedPart = fixedPart;
+		}
+
+		public void addRequiredParameter()
+		{
+			minParameters++;
+		}
+
+		public void addOptionalParameter()
+		{
+			optionalParameters++;
+		}
+
+		public int getSegmentIndex()
+		{
+			return segmentIndex;
+		}
+
+		public String getFixedPart()
+		{
+			return fixedPart;
+		}
+
+		public int getMinParameters()
+		{
+			return minParameters;
+		}
+
+		public int getOptionalParameters()
+		{
+			return optionalParameters;
+		}
+
+		public int getMaxParameters()
+		{
+			return getOptionalParameters() + getMinParameters();
+		}
+
+		public int getFixedPartSize()
+		{
+			return getFixedPart() == null ? 0 : 1;
+		}
+
+		@Override
+		public String toString()
+		{
+			return new StringBuilder().append("(").append(getSegmentIndex()).append(") ").append(getMinParameters()).append('-').append(getMaxParameters())
+					.append(' ').append(getFixedPart() == null ? "(end)" : getFixedPart()).toString();
 		}
 	}
 }

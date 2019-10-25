@@ -234,7 +234,7 @@ public class StringsTest
 	}
 
 	@Test
-	public void isTrue() throws StringValueConversionException
+	public void isTrue()
 	{
 		assertFalse(Strings.isTrue(null));
 		assertFalse(Strings.isTrue(""));
@@ -261,9 +261,7 @@ public class StringsTest
 	@Test
 	public void invalidIsTrue()
 	{
-		assertThrows(StringValueConversionException.class, () -> {
-			Strings.isTrue("foo");
-		});
+		assertThrows(StringValueConversionException.class, () -> Strings.isTrue("foo"));
 
 	}
 
@@ -327,7 +325,7 @@ public class StringsTest
 	}
 
 	@Test
-	public void toBoolean() throws StringValueConversionException
+	public void toBoolean()
 	{
 		assertEquals(Boolean.FALSE, Strings.toBoolean(null));
 		assertEquals(Boolean.FALSE, Strings.toBoolean("off"));
@@ -346,9 +344,7 @@ public class StringsTest
 	@Test
 	public void invalidToBoolean()
 	{
-		assertThrows(StringValueConversionException.class, () -> {
-			Strings.toBoolean("waar");
-		});
+		assertThrows(StringValueConversionException.class, () -> Strings.toBoolean("waar"));
 	}
 
 	@Test
@@ -361,9 +357,7 @@ public class StringsTest
 	@Test
 	public void invalidToChar1()
 	{
-		assertThrows(StringValueConversionException.class, () -> {
-			Strings.toChar("");
-		});
+		assertThrows(StringValueConversionException.class, () -> Strings.toChar(""));
 
 	}
 
@@ -371,17 +365,13 @@ public class StringsTest
 	public void invalidToChar2()
 	{
 
-		assertThrows(StringValueConversionException.class, () -> {
-			Strings.toChar(null);
-		});
+		assertThrows(StringValueConversionException.class, () -> Strings.toChar(null));
 	}
 
 	@Test
 	public void invalidToChar3()
 	{
-		assertThrows(StringValueConversionException.class, () -> {
-			Strings.toChar("aa");
-		});
+		assertThrows(StringValueConversionException.class, () -> Strings.toChar("aa"));
 	}
 
 	@Test

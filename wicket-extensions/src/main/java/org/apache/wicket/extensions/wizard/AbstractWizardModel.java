@@ -42,7 +42,7 @@ public abstract class AbstractWizardModel implements IWizardModel
 	private boolean lastVisible = false;
 
 	/** Listeners for {@link IWizardModelListener model events}. */
-	private final List<IWizardModelListener> wizardModelListeners = new ArrayList<IWizardModelListener>(
+	private final List<IWizardModelListener> wizardModelListeners = new ArrayList<>(
 		1);
 
 	/**
@@ -155,10 +155,7 @@ public abstract class AbstractWizardModel implements IWizardModel
 	 */
 	protected final void fireActiveStepChanged(final IWizardStep step)
 	{
-		for (IWizardModelListener listener : wizardModelListeners)
-		{
-			listener.onActiveStepChanged(step);
-		}
+		wizardModelListeners.forEach(listener -> listener.onActiveStepChanged(step));
 	}
 
 	/**
@@ -166,10 +163,7 @@ public abstract class AbstractWizardModel implements IWizardModel
 	 */
 	protected final void fireWizardCancelled()
 	{
-		for (IWizardModelListener listener : wizardModelListeners)
-		{
-			listener.onCancel();
-		}
+		wizardModelListeners.forEach(IWizardModelListener::onCancel);
 	}
 
 	/**
@@ -177,9 +171,6 @@ public abstract class AbstractWizardModel implements IWizardModel
 	 */
 	protected final void fireWizardFinished()
 	{
-		for (IWizardModelListener listener : wizardModelListeners)
-		{
-			listener.onFinish();
-		}
+		wizardModelListeners.forEach(IWizardModelListener::onFinish);
 	}
 }

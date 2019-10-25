@@ -70,11 +70,12 @@ public class WizardButtonBar extends Panel
 		super.onBeforeRender();
 
 		WizardButton button = getDefaultButton(wizard.getWizardModel());
-		if (button != null) {
-			Form<?> form = button.getForm();
-			if (form != null) {
-				form.setDefaultButton(button);
-			}
+		if (button == null) {
+			return;
+		}
+		Form<?> form = button.getForm();
+		if (form != null) {
+			form.setDefaultButton(button);
 		}
 	}
 

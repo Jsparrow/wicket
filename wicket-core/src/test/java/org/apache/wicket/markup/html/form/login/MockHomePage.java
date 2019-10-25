@@ -39,7 +39,6 @@ public class MockHomePage extends WebPage
 	 */
 	public MockHomePage()
 	{
-		super();
 		add(new Label("label", "this page is secured"));
 		add(new BookmarkablePageLink<PageA>("link", PageA.class));
 	}

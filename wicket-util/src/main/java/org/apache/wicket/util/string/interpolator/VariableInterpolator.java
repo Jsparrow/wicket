@@ -153,8 +153,7 @@ public abstract class VariableInterpolator implements IClusterable
 				{
 					if (exceptionOnNullVarValue)
 					{
-						throw new IllegalArgumentException("Value of variable [[" + variableName +
-							"]] could not be resolved while interpolating [[" + string + "]]");
+						throw new IllegalArgumentException(new StringBuilder().append("Value of variable [[").append(variableName).append("]] could not be resolved while interpolating [[").append(string).append("]]").toString());
 					}
 					else
 					{

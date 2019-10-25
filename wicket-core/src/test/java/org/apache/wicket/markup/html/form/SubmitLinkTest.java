@@ -55,6 +55,7 @@ class SubmitLinkTest extends WicketTestCase
 		{
 			add(form = new Form<>("form")
 			{
+				@Override
 				protected void onSubmit()
 				{
 					super.onSubmit();

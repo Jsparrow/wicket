@@ -433,6 +433,214 @@ public class XForwardedRequestWrapperFactory extends AbstractRequestWrapperFacto
 
 	protected static final String TRUSTED_PROXIES_PARAMETER = "trustedProxies";
 
+	// Filter Config
+	private Config config = new Config();
+
+	/**
+	 * Construct.
+	 */
+	public XForwardedRequestWrapperFactory()
+	{
+	}
+
+	/**
+	 * @return XForwarded filter specific config
+	 */
+	public final Config getConfig()
+	{
+		return config;
+	}
+
+	/**
+	 * The Wicket application might want to provide its own config
+	 * 
+	 * @param config
+	 */
+	public final void setConfig(final Config config)
+	{
+		this.config = config;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean needsWrapper(final HttpServletRequest request)
+	{
+		boolean rtn = matchesOne(request.getRemoteAddr(), config.allowedInternalProxies);
+		boolean condition = rtn == false && log.isDebugEnabled();
+		if (condition) {
+			log.debug(new StringBuilder().append("Skip XForwardedFilter for request ").append(request.getRequestURI()).append(" with remote address ").append(request.getRemoteAddr()).toString());
+		}
+		return rtn;
+	}
+
+	/**
+	 * 
+	 * @param request
+	 * @return Either the original request or the wrapper
+	 */
+	@Override
+	public HttpServletRequest newRequestWrapper(final HttpServletRequest request)
+	{
+		String remoteIp = null;
+
+		// In java 6, proxiesHeaderValue should be declared as a java.util.Deque
+		LinkedList<String> proxiesHeaderValue = new LinkedList<>();
+
+		String[] remoteIPHeaderValue = commaDelimitedListToStringArray(request.getHeader(config.remoteIPHeader));
+
+		// loop on remoteIPHeaderValue to find the first trusted remote ip and to build the
+		// proxies chain
+		int idx;
+		for (idx = remoteIPHeaderValue.length - 1; idx >= 0; idx--)
+		{
+			String currentRemoteIp = remoteIPHeaderValue[idx];
+			remoteIp = currentRemoteIp;
+			if (matchesOne(currentRemoteIp, config.allowedInternalProxies))
+			{
+				// do nothing, allowedInternalProxies IPs are not appended to the
+			}
+			else if (matchesOne(currentRemoteIp, config.trustedProxies))
+			{
+				proxiesHeaderValue.addFirst(currentRemoteIp);
+			}
+			else
+			{
+				idx--; // decrement idx because break statement doesn't do it
+				break;
+			}
+		}
+
+		// continue to loop on remoteIPHeaderValue to build the new value of the remoteIPHeader
+		LinkedList<String> newRemoteIpHeaderValue = new LinkedList<>();
+		for (; idx >= 0; idx--)
+		{
+			String currentRemoteIp = remoteIPHeaderValue[idx];
+			newRemoteIpHeaderValue.addFirst(currentRemoteIp);
+		}
+
+		XForwardedRequestWrapper xRequest = new XForwardedRequestWrapper(request);
+		if (remoteIp != null)
+		{
+			xRequest.setRemoteAddr(remoteIp);
+			xRequest.setRemoteHost(remoteIp);
+
+			if (proxiesHeaderValue.size() == 0)
+			{
+				xRequest.removeHeader(config.proxiesHeader);
+			}
+			else
+			{
+				String commaDelimitedListOfProxies = listToCommaDelimitedString(proxiesHeaderValue);
+				xRequest.setHeader(config.proxiesHeader, commaDelimitedListOfProxies);
+			}
+			if (newRemoteIpHeaderValue.size() == 0)
+			{
+				xRequest.removeHeader(config.remoteIPHeader);
+			}
+			else
+			{
+				String commaDelimitedRemoteIpHeaderValue = listToCommaDelimitedString(newRemoteIpHeaderValue);
+				xRequest.setHeader(config.remoteIPHeader, commaDelimitedRemoteIpHeaderValue);
+			}
+		}
+
+		if (config.protocolHeader != null)
+		{
+			String protocolHeaderValue = request.getHeader(config.protocolHeader);
+			if (protocolHeaderValue == null)
+			{
+				// don't modify the secure,scheme and serverPort attributes of the request
+			}
+			else if (config.protocolHeaderSslValue.equalsIgnoreCase(protocolHeaderValue))
+			{
+				xRequest.setSecure(true);
+				xRequest.setScheme("https");
+				xRequest.setServerPort(config.httpsServerPort);
+			}
+			else
+			{
+				xRequest.setSecure(false);
+				xRequest.setScheme("http");
+				xRequest.setServerPort(config.httpServerPort);
+			}
+		}
+
+		if (log.isDebugEnabled())
+		{
+			log.debug(new StringBuilder().append("Incoming request ").append(request.getRequestURI()).append(" with originalRemoteAddr '").append(request.getRemoteAddr()).append("', originalRemoteHost='").append(request.getRemoteHost())
+					.append("', originalSecure='").append(request.isSecure()).append("', originalScheme='").append(request.getScheme()).append("', original[").append(config.remoteIPHeader)
+					.append("]='").append(request.getHeader(config.remoteIPHeader)).append(", original[").append(config.protocolHeader).append("]='")
+					.append(config.protocolHeader == null ? null : request.getHeader(config.protocolHeader)).append("' will be seen as newRemoteAddr='").append(xRequest.getRemoteAddr()).append("', newRemoteHost='").append(xRequest.getRemoteHost())
+					.append("', newScheme='").append(xRequest.getScheme()).append("', newSecure='").append(xRequest.isSecure()).append("', new[").append(config.remoteIPHeader)
+					.append("]='").append(xRequest.getHeader(config.remoteIPHeader)).append(", new[").append(config.proxiesHeader).append("]='").append(xRequest.getHeader(config.proxiesHeader))
+					.append("'").toString());
+		}
+		return xRequest;
+	}
+
+	/**
+	 * 
+	 * @param filterConfig
+	 */
+	public void init(final FilterConfig filterConfig)
+	{
+		if (filterConfig.getInitParameter(INTERNAL_PROXIES_PARAMETER) != null)
+		{
+			config.setAllowedInternalProxies(filterConfig.getInitParameter(INTERNAL_PROXIES_PARAMETER));
+		}
+
+		if (filterConfig.getInitParameter(PROTOCOL_HEADER_PARAMETER) != null)
+		{
+			config.setProtocolHeader(filterConfig.getInitParameter(PROTOCOL_HEADER_PARAMETER));
+		}
+
+		if (filterConfig.getInitParameter(PROTOCOL_HEADER_SSL_VALUE_PARAMETER) != null)
+		{
+			config.setProtocolHeaderSslValue(filterConfig.getInitParameter(PROTOCOL_HEADER_SSL_VALUE_PARAMETER));
+		}
+
+		if (filterConfig.getInitParameter(PROXIES_HEADER_PARAMETER) != null)
+		{
+			config.setProxiesHeader(filterConfig.getInitParameter(PROXIES_HEADER_PARAMETER));
+		}
+
+		if (filterConfig.getInitParameter(REMOTE_IP_HEADER_PARAMETER) != null)
+		{
+			config.setRemoteIPHeader(filterConfig.getInitParameter(REMOTE_IP_HEADER_PARAMETER));
+		}
+
+		if (filterConfig.getInitParameter(TRUSTED_PROXIES_PARAMETER) != null)
+		{
+			config.setTrustedProxies(filterConfig.getInitParameter(TRUSTED_PROXIES_PARAMETER));
+		}
+
+		if (filterConfig.getInitParameter(HTTP_SERVER_PORT_PARAMETER) != null)
+		{
+			try
+			{
+				config.setHttpServerPort(Integer.parseInt(filterConfig.getInitParameter(HTTP_SERVER_PORT_PARAMETER)));
+			}
+			catch (NumberFormatException e)
+			{
+				throw new NumberFormatException(new StringBuilder().append("Illegal ").append(HTTP_SERVER_PORT_PARAMETER).append(" : ").append(e.getMessage()).toString());
+			}
+		}
+
+		if (filterConfig.getInitParameter(HTTPS_SERVER_PORT_PARAMETER) != null)
+		{
+			try
+			{
+				config.setHttpsServerPort(Integer.parseInt(filterConfig.getInitParameter(HTTPS_SERVER_PORT_PARAMETER)));
+			}
+			catch (NumberFormatException e)
+			{
+				throw new NumberFormatException(new StringBuilder().append("Illegal ").append(HTTPS_SERVER_PORT_PARAMETER).append(" : ").append(e.getMessage()).toString());
+			}
+		}
+	}
+
 	/**
 	 * Filter Config
 	 */
@@ -597,226 +805,6 @@ public class XForwardedRequestWrapperFactory extends AbstractRequestWrapperFacto
 		public boolean isEnabled()
 		{
 			return enabled;
-		}
-	}
-
-	// Filter Config
-	private Config config = new Config();
-
-	/**
-	 * Construct.
-	 */
-	public XForwardedRequestWrapperFactory()
-	{
-	}
-
-	/**
-	 * @return XForwarded filter specific config
-	 */
-	public final Config getConfig()
-	{
-		return config;
-	}
-
-	/**
-	 * The Wicket application might want to provide its own config
-	 * 
-	 * @param config
-	 */
-	public final void setConfig(final Config config)
-	{
-		this.config = config;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean needsWrapper(final HttpServletRequest request)
-	{
-		boolean rtn = matchesOne(request.getRemoteAddr(), config.allowedInternalProxies);
-		if (rtn == false)
-		{
-			if (log.isDebugEnabled())
-			{
-				log.debug("Skip XForwardedFilter for request " + request.getRequestURI() +
-					" with remote address " + request.getRemoteAddr());
-			}
-		}
-		return rtn;
-	}
-
-	/**
-	 * 
-	 * @param request
-	 * @return Either the original request or the wrapper
-	 */
-	@Override
-	public HttpServletRequest newRequestWrapper(final HttpServletRequest request)
-	{
-		String remoteIp = null;
-
-		// In java 6, proxiesHeaderValue should be declared as a java.util.Deque
-		LinkedList<String> proxiesHeaderValue = new LinkedList<String>();
-
-		String[] remoteIPHeaderValue = commaDelimitedListToStringArray(request.getHeader(config.remoteIPHeader));
-
-		// loop on remoteIPHeaderValue to find the first trusted remote ip and to build the
-		// proxies chain
-		int idx;
-		for (idx = remoteIPHeaderValue.length - 1; idx >= 0; idx--)
-		{
-			String currentRemoteIp = remoteIPHeaderValue[idx];
-			remoteIp = currentRemoteIp;
-			if (matchesOne(currentRemoteIp, config.allowedInternalProxies))
-			{
-				// do nothing, allowedInternalProxies IPs are not appended to the
-			}
-			else if (matchesOne(currentRemoteIp, config.trustedProxies))
-			{
-				proxiesHeaderValue.addFirst(currentRemoteIp);
-			}
-			else
-			{
-				idx--; // decrement idx because break statement doesn't do it
-				break;
-			}
-		}
-
-		// continue to loop on remoteIPHeaderValue to build the new value of the remoteIPHeader
-		LinkedList<String> newRemoteIpHeaderValue = new LinkedList<String>();
-		for (; idx >= 0; idx--)
-		{
-			String currentRemoteIp = remoteIPHeaderValue[idx];
-			newRemoteIpHeaderValue.addFirst(currentRemoteIp);
-		}
-
-		XForwardedRequestWrapper xRequest = new XForwardedRequestWrapper(request);
-		if (remoteIp != null)
-		{
-			xRequest.setRemoteAddr(remoteIp);
-			xRequest.setRemoteHost(remoteIp);
-
-			if (proxiesHeaderValue.size() == 0)
-			{
-				xRequest.removeHeader(config.proxiesHeader);
-			}
-			else
-			{
-				String commaDelimitedListOfProxies = listToCommaDelimitedString(proxiesHeaderValue);
-				xRequest.setHeader(config.proxiesHeader, commaDelimitedListOfProxies);
-			}
-			if (newRemoteIpHeaderValue.size() == 0)
-			{
-				xRequest.removeHeader(config.remoteIPHeader);
-			}
-			else
-			{
-				String commaDelimitedRemoteIpHeaderValue = listToCommaDelimitedString(newRemoteIpHeaderValue);
-				xRequest.setHeader(config.remoteIPHeader, commaDelimitedRemoteIpHeaderValue);
-			}
-		}
-
-		if (config.protocolHeader != null)
-		{
-			String protocolHeaderValue = request.getHeader(config.protocolHeader);
-			if (protocolHeaderValue == null)
-			{
-				// don't modify the secure,scheme and serverPort attributes of the request
-			}
-			else if (config.protocolHeaderSslValue.equalsIgnoreCase(protocolHeaderValue))
-			{
-				xRequest.setSecure(true);
-				xRequest.setScheme("https");
-				xRequest.setServerPort(config.httpsServerPort);
-			}
-			else
-			{
-				xRequest.setSecure(false);
-				xRequest.setScheme("http");
-				xRequest.setServerPort(config.httpServerPort);
-			}
-		}
-
-		if (log.isDebugEnabled())
-		{
-			log.debug("Incoming request " + request.getRequestURI() + " with originalRemoteAddr '" +
-				request.getRemoteAddr() + "', originalRemoteHost='" + request.getRemoteHost() +
-				"', originalSecure='" + request.isSecure() + "', originalScheme='" +
-				request.getScheme() + "', original[" + config.remoteIPHeader + "]='" +
-				request.getHeader(config.remoteIPHeader) + ", original[" + config.protocolHeader +
-				"]='" +
-				(config.protocolHeader == null ? null : request.getHeader(config.protocolHeader)) +
-				"' will be seen as newRemoteAddr='" + xRequest.getRemoteAddr() +
-				"', newRemoteHost='" + xRequest.getRemoteHost() + "', newScheme='" +
-				xRequest.getScheme() + "', newSecure='" + xRequest.isSecure() + "', new[" +
-				config.remoteIPHeader + "]='" + xRequest.getHeader(config.remoteIPHeader) +
-				", new[" + config.proxiesHeader + "]='" + xRequest.getHeader(config.proxiesHeader) +
-				"'");
-		}
-		return xRequest;
-	}
-
-	/**
-	 * 
-	 * @param filterConfig
-	 */
-	public void init(final FilterConfig filterConfig)
-	{
-		if (filterConfig.getInitParameter(INTERNAL_PROXIES_PARAMETER) != null)
-		{
-			config.setAllowedInternalProxies(filterConfig.getInitParameter(INTERNAL_PROXIES_PARAMETER));
-		}
-
-		if (filterConfig.getInitParameter(PROTOCOL_HEADER_PARAMETER) != null)
-		{
-			config.setProtocolHeader(filterConfig.getInitParameter(PROTOCOL_HEADER_PARAMETER));
-		}
-
-		if (filterConfig.getInitParameter(PROTOCOL_HEADER_SSL_VALUE_PARAMETER) != null)
-		{
-			config.setProtocolHeaderSslValue(filterConfig.getInitParameter(PROTOCOL_HEADER_SSL_VALUE_PARAMETER));
-		}
-
-		if (filterConfig.getInitParameter(PROXIES_HEADER_PARAMETER) != null)
-		{
-			config.setProxiesHeader(filterConfig.getInitParameter(PROXIES_HEADER_PARAMETER));
-		}
-
-		if (filterConfig.getInitParameter(REMOTE_IP_HEADER_PARAMETER) != null)
-		{
-			config.setRemoteIPHeader(filterConfig.getInitParameter(REMOTE_IP_HEADER_PARAMETER));
-		}
-
-		if (filterConfig.getInitParameter(TRUSTED_PROXIES_PARAMETER) != null)
-		{
-			config.setTrustedProxies(filterConfig.getInitParameter(TRUSTED_PROXIES_PARAMETER));
-		}
-
-		if (filterConfig.getInitParameter(HTTP_SERVER_PORT_PARAMETER) != null)
-		{
-			try
-			{
-				config.setHttpServerPort(Integer.parseInt(filterConfig.getInitParameter(HTTP_SERVER_PORT_PARAMETER)));
-			}
-			catch (NumberFormatException e)
-			{
-				throw new NumberFormatException("Illegal " + HTTP_SERVER_PORT_PARAMETER + " : " +
-					e.getMessage());
-			}
-		}
-
-		if (filterConfig.getInitParameter(HTTPS_SERVER_PORT_PARAMETER) != null)
-		{
-			try
-			{
-				config.setHttpsServerPort(Integer.parseInt(filterConfig.getInitParameter(HTTPS_SERVER_PORT_PARAMETER)));
-			}
-			catch (NumberFormatException e)
-			{
-				throw new NumberFormatException("Illegal " + HTTPS_SERVER_PORT_PARAMETER + " : " +
-					e.getMessage());
-			}
 		}
 	}
 }

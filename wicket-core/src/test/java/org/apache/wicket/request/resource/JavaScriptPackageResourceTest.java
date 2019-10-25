@@ -48,14 +48,7 @@ class JavaScriptPackageResourceTest extends WicketTestCase
 			{
 				super.init();
 
-				getResourceSettings().setJavaScriptCompressor(new IJavaScriptCompressor()
-				{
-					@Override
-					public String compress(String original)
-					{
-						return APP_COMPRESSED;
-					}
-				});
+				getResourceSettings().setJavaScriptCompressor((String original) -> APP_COMPRESSED);
 			}
 		};
 	}

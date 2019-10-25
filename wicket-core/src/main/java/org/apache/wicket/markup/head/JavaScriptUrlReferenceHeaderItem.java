@@ -79,24 +79,31 @@ public class JavaScriptUrlReferenceHeaderItem extends AbstractJavaScriptReferenc
 	public Iterable<?> getRenderTokens()
 	{
 		String url = UrlUtils.rewriteToContextRelative(getUrl(), RequestCycle.get());
-		if (Strings.isEmpty(getId()))
+		if (Strings.isEmpty(getId())) {
 			return Collections.singletonList("javascript-" + url);
-		else
+		} else {
 			return Arrays.asList("javascript-" + getId(), "javascript-" + url);
+		}
 	}
 
 	@Override
 	public String toString()
 	{
-		return "JavaScriptUrlReferenceHeaderItem(" + getUrl() + ")";
+		return new StringBuilder().append("JavaScriptUrlReferenceHeaderItem(").append(getUrl()).append(")").toString();
 	}
 
 	@Override
 	public boolean equals(Object o)
 	{
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
-		if (!super.equals(o)) return false;
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+		if (!super.equals(o)) {
+			return false;
+		}
 		JavaScriptUrlReferenceHeaderItem that = (JavaScriptUrlReferenceHeaderItem) o;
 		return Objects.equals(url, that.url);
 	}

@@ -244,11 +244,10 @@ public class DefaultExceptionMapper implements IExceptionMapper
 			handler = requestCycle.getRequestHandlerScheduledAfterCurrent();
 		}
 
-		if (handler instanceof IPageRequestHandler)
-		{
-			IPageRequestHandler pageRequestHandler = (IPageRequestHandler)handler;
-			return (Page)pageRequestHandler.getPage();
+		if (!(handler instanceof IPageRequestHandler)) {
+			return null;
 		}
-		return null;
+		IPageRequestHandler pageRequestHandler = (IPageRequestHandler)handler;
+		return (Page)pageRequestHandler.getPage();
 	}
 }

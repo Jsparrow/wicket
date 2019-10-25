@@ -32,6 +32,7 @@ class IsParentOf extends TypeSafeMatcher<Component>
 		this.child = child;
 	}
 
+	@Override
 	public void describeTo(Description description)
 	{
 		description.appendText(toString(child.getParent()));
@@ -45,13 +46,16 @@ class IsParentOf extends TypeSafeMatcher<Component>
 			return false;
 		}
 
-		if (!(item instanceof MarkupContainer))
+		if (!(item instanceof MarkupContainer)) {
 			return false;
+		}
 		MarkupContainer container = (MarkupContainer)item;
-		if (container.get(child.getId()) != child)
+		if (container.get(child.getId()) != child) {
 			return false;
-		if (child.getParent() != container)
+		}
+		if (child.getParent() != container) {
 			return false;
+		}
 		return true;
 	}
 
@@ -84,7 +88,7 @@ class IsParentOf extends TypeSafeMatcher<Component>
 
 	private static String toString(Component c)
 	{
-		return c.getClass().getSimpleName() + "('" + c.getId() + "')";
+		return new StringBuilder().append(c.getClass().getSimpleName()).append("('").append(c.getId()).append("')").toString();
 	}
 
 	public static <T> Matcher<Component> isParentOf(Component child)

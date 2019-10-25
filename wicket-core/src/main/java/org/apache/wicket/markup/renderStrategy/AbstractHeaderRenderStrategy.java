@@ -30,6 +30,8 @@ import org.apache.wicket.markup.html.internal.InlineEnclosure;
 import org.apache.wicket.util.lang.Args;
 import org.apache.wicket.util.visit.IVisit;
 import org.apache.wicket.util.visit.IVisitor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An abstract implementation of a header render strategy which is only missing the code to traverse
@@ -48,6 +50,15 @@ import org.apache.wicket.util.visit.IVisitor;
  */
 public abstract class AbstractHeaderRenderStrategy implements IHeaderRenderStrategy
 {
+	private static final Logger logger = LoggerFactory.getLogger(AbstractHeaderRenderStrategy.class);
+
+	/**
+	 * Construct.
+	 */
+	public AbstractHeaderRenderStrategy()
+	{
+	}
+
 	/**
 	 * @return Gets the strategy registered with the application
 	 */
@@ -76,6 +87,7 @@ public abstract class AbstractHeaderRenderStrategy implements IHeaderRenderStrat
 			catch (ClassNotFoundException | InstantiationException | IllegalAccessException
 					| NoSuchMethodException | InvocationTargetException ex)
 			{
+				logger.error(ex.getMessage(), ex);
 				// ignore
 			}
 		}
@@ -86,13 +98,6 @@ public abstract class AbstractHeaderRenderStrategy implements IHeaderRenderStrat
 
 		// Since 1.5
 		return new ChildFirstHeaderRenderStrategy();
-	}
-
-	/**
-	 * Construct.
-	 */
-	public AbstractHeaderRenderStrategy()
-	{
 	}
 
 	@Override
@@ -131,7 +136,6 @@ public abstract class AbstractHeaderRenderStrategy implements IHeaderRenderStrat
 		}
 	}
 
-
 	/**
 	 * Searches for the siblings of the given enclosure for the controller of the given enclosure and
 	 * renders that controller's header contributions.
@@ -151,14 +155,11 @@ public abstract class AbstractHeaderRenderStrategy implements IHeaderRenderStrat
 		final String childId = enclosure.getChildId();
 
 		// Visit the siblings of the enclosure to attempt and find the controller of the enclosure
-		Component enclosureController = enclosure.getParent().visitChildren(new IVisitor<Component, Component>() {
-			@Override
-			public void component(Component object, IVisit<Component> visit) {
-				if (object.getId().equals(childId)){
-					visit.stop(object);
-				} else {
-					visit.dontGoDeeper();
-				}
+		Component enclosureController = enclosure.getParent().visitChildren((Component object, IVisit<Component> visit) -> {
+			if (object.getId().equals(childId)){
+				visit.stop(object);
+			} else {
+				visit.dontGoDeeper();
 			}
 		});
 
@@ -173,7 +174,7 @@ public abstract class AbstractHeaderRenderStrategy implements IHeaderRenderStrat
 	 * @param headerContainer
 	 * @param rootComponent
 	 */
-	abstract protected void renderChildHeaders(final HtmlHeaderContainer headerContainer,
+	protected abstract void renderChildHeaders(final HtmlHeaderContainer headerContainer,
 		final Component rootComponent);
 
 	/**
@@ -185,16 +186,15 @@ public abstract class AbstractHeaderRenderStrategy implements IHeaderRenderStrat
 	{
 		Args.notNull(headerContainer, "headerContainer");
 
-		if (Application.exists())
+		if (!Application.exists()) {
+			return;
+		}
+		HeaderContributorListenerCollection headerContributorListenerCollection =
+				Application.get().getHeaderContributorListeners();
+		IHeaderResponse headerResponse = headerContainer.getHeaderResponse();
+		for (IHeaderContributor listener : headerContributorListenerCollection)
 		{
-			HeaderContributorListenerCollection headerContributorListenerCollection =
-					Application.get().getHeaderContributorListeners();
-			IHeaderResponse headerResponse = headerContainer.getHeaderResponse();
-
-			for (IHeaderContributor listener : headerContributorListenerCollection)
-			{
-				listener.renderHead(headerResponse);
-			}
+			listener.renderHead(headerResponse);
 		}
 	}
 }

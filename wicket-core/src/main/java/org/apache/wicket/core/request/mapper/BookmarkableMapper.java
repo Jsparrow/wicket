@@ -83,12 +83,8 @@ public class BookmarkableMapper extends AbstractBookmarkableMapper
 	@Override
 	protected UrlInfo parseRequest(Request request)
 	{
-		if (Application.exists())
-		{
-			if (Application.get().getSecuritySettings().getEnforceMounts())
-			{
-				return null;
-			}
+		if (Application.exists() && Application.get().getSecuritySettings().getEnforceMounts()) {
+			return null;
 		}
 
 		if (matches(request))

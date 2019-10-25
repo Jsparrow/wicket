@@ -68,7 +68,7 @@ class NumberTextFieldTest extends WicketTestCase
 	@Test
 	void convertDouble()
 	{
-		TestPage<Double> testPage = new TestPage<Double>();
+		TestPage<Double> testPage = new TestPage<>();
 		testPage.textField.setType(Double.class);
 		testPage.textField.setMinimum(Double.valueOf("0.0"));
 		testPage.textField.setMaximum(Double.valueOf("2000.0"));
@@ -90,7 +90,7 @@ class NumberTextFieldTest extends WicketTestCase
 	@Test
 	void convertLong()
 	{
-		TestPage<Long> testPage = new TestPage<Long>();
+		TestPage<Long> testPage = new TestPage<>();
 		testPage.textField.setType(Long.class);
 		testPage.textField.setMinimum(Long.valueOf("0"));
 		testPage.textField.setMaximum(Long.valueOf("100"));
@@ -112,7 +112,7 @@ class NumberTextFieldTest extends WicketTestCase
 	@Test
 	void respectStepAny()
 	{
-		TestPage<Double> testPage = new TestPage<Double>();
+		TestPage<Double> testPage = new TestPage<>();
 		testPage.textField.setType(Double.class);
 		testPage.textField.setStep(Model.of(NumberTextField.ANY));
 		testPage.textField.setModelObject(Double.valueOf("1000.0"));
@@ -128,7 +128,7 @@ class NumberTextFieldTest extends WicketTestCase
 	@Test
 	void respectStepWithNumberValue()
 	{
-		TestPage<Double> testPage = new TestPage<Double>();
+		TestPage<Double> testPage = new TestPage<>();
 		testPage.textField.setType(Double.class);
 		testPage.textField.setStep(Double.valueOf(0.3d));
 		testPage.textField.setModelObject(Double.valueOf("1000.0"));
@@ -164,7 +164,7 @@ class NumberTextFieldTest extends WicketTestCase
 					return Locale.GERMAN;
 				}
 			});
-			form.add(textField = new NumberTextField<N>("number", Model.of((N)null)));
+			form.add(textField = new NumberTextField<>("number", Model.of((N)null)));
 		}
 
 		@Override

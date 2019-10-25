@@ -33,18 +33,20 @@ import org.apache.wicket.model.util.CollectionModel;
  */
 public class CheckGroupTestPage5 extends WebPage
 {
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * Constructor
 	 */
 	public CheckGroupTestPage5()
 	{
-		List<String> list = new ArrayList<String>();
-		Form<Void> form = new Form<Void>("form");
-		CheckGroup<String> group = new CheckGroup<String>("group",
+		List<String> list = new ArrayList<>();
+		Form<Void> form = new Form<>("form");
+		CheckGroup<String> group = new CheckGroup<>("group",
 			new CollectionModel<String>(list));
 		WebMarkupContainer container = new WebMarkupContainer("container");
-		Check<String> check1 = new Check<String>("check1", new Model<String>("check1"));
-		Check<String> check2 = new Check<String>("check2", new Model<String>("check2"));
+		Check<String> check1 = new Check<>("check1", new Model<String>("check1"));
+		Check<String> check2 = new Check<>("check2", new Model<String>("check2"));
 
 
 		add(form);
@@ -55,8 +57,6 @@ public class CheckGroupTestPage5 extends WebPage
 		// throw an exception when rendering
 		form.add(check2);
 	}
-
-	private static final long serialVersionUID = 1L;
 
 
 }

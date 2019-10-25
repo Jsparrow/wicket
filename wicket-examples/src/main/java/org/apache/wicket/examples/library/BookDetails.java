@@ -43,7 +43,7 @@ public final class BookDetails extends AuthenticatedWebPage
 	 *            Page parameters
 	 * @throws StringValueConversionException
 	 */
-	public BookDetails(final PageParameters parameters) throws StringValueConversionException
+	public BookDetails(final PageParameters parameters)
 	{
 		this(Book.get(parameters.get("id").toLong()));
 	}

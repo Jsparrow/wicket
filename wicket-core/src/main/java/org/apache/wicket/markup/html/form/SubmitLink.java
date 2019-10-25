@@ -162,12 +162,12 @@ public class SubmitLink extends AbstractSubmitLink
 
 		if (isEnabledInHierarchy())
 		{
-			if (tag.getName().equalsIgnoreCase("a") || tag.getName().equalsIgnoreCase("link")
-				|| tag.getName().equalsIgnoreCase("area"))
+			if ("a".equalsIgnoreCase(tag.getName()) || "link".equalsIgnoreCase(tag.getName())
+				|| "area".equalsIgnoreCase(tag.getName()))
 			{
 				tag.put("href", "javascript:;");
 			}
-			else if (tag.getName().equalsIgnoreCase("button"))
+			else if ("button".equalsIgnoreCase(tag.getName()))
 			{
 				// WICKET-5597 prevent default submit
 				tag.put("type", "button");
@@ -200,27 +200,20 @@ public class SubmitLink extends AbstractSubmitLink
 	 */
 	protected CharSequence getTriggerJavaScript()
 	{
-		if (getForm() != null)
-		{
-			// find the root form - the one we are really going to submit
-			Form<?> root = getForm().getRootForm();
-
-			StringBuilder script = new StringBuilder();
-			if (shouldInvokeJavaScriptFormOnsubmit())
-			{
-				script.append(String.format("var ff=document.getElementById('%s');", getForm().getMarkupId()));
-				script.append("if (typeof ff.onsubmit === 'function' && ff.onsubmit() == false) return false;");
-			}
-			
-			script.append(root.getJsForSubmitter(this));
-			script.append("return false;");
-			
-			return script;
-		}
-		else
-		{
+		if (getForm() == null) {
 			return null;
 		}
+		// find the root form - the one we are really going to submit
+		Form<?> root = getForm().getRootForm();
+		StringBuilder script = new StringBuilder();
+		if (shouldInvokeJavaScriptFormOnsubmit())
+		{
+			script.append(String.format("var ff=document.getElementById('%s');", getForm().getMarkupId()));
+			script.append("if (typeof ff.onsubmit === 'function' && ff.onsubmit() == false) return false;");
+		}
+		script.append(root.getJsForSubmitter(this));
+		script.append("return false;");
+		return script;
 	}
 
 	/**

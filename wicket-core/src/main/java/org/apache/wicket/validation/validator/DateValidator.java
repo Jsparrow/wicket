@@ -58,6 +58,44 @@ import org.apache.wicket.validation.ValidationError;
 public class DateValidator extends RangeValidator<Date>
 {
 	private static final long serialVersionUID = 1L;
+	private String format;
+
+	/**
+	 * Constructor that sets the minimum and maximum date values and a custom date formating.
+	 * 
+	 * @param minimum
+	 *            the minimum date
+	 * @param maximum
+	 *            the maximum date
+	 * @param format
+	 *            The format string used to format the date with SimpleDateFormat
+	 */
+	public DateValidator(Date minimum, Date maximum, String format)
+	{
+		super(minimum, maximum);
+		this.format = format;
+	}
+
+	/**
+	 * Constructor that sets the minimum and maximum date values.
+	 * 
+	 * @param minimum
+	 *            the minimum date
+	 * @param maximum
+	 *            the maximum date
+	 */
+	public DateValidator(Date minimum, Date maximum)
+	{
+		this(minimum, maximum, null);
+	}
+
+	/**
+	 * Constructor used for subclasses who want to set the range using
+	 * {@link #setRange(Comparable, Comparable)}
+	 */
+	protected DateValidator()
+	{
+	}
 
 	/**
 	 * @param minimum
@@ -134,45 +172,6 @@ public class DateValidator extends RangeValidator<Date>
 	public static DateValidator maximum(Date maximum, String format)
 	{
 		return new DateValidator(null, maximum, format);
-	}
-
-	private String format;
-
-	/**
-	 * Constructor that sets the minimum and maximum date values and a custom date formating.
-	 * 
-	 * @param minimum
-	 *            the minimum date
-	 * @param maximum
-	 *            the maximum date
-	 * @param format
-	 *            The format string used to format the date with SimpleDateFormat
-	 */
-	public DateValidator(Date minimum, Date maximum, String format)
-	{
-		super(minimum, maximum);
-		this.format = format;
-	}
-
-	/**
-	 * Constructor that sets the minimum and maximum date values.
-	 * 
-	 * @param minimum
-	 *            the minimum date
-	 * @param maximum
-	 *            the maximum date
-	 */
-	public DateValidator(Date minimum, Date maximum)
-	{
-		this(minimum, maximum, null);
-	}
-
-	/**
-	 * Constructor used for subclasses who want to set the range using
-	 * {@link #setRange(Comparable, Comparable)}
-	 */
-	protected DateValidator()
-	{
 	}
 
 	@Override

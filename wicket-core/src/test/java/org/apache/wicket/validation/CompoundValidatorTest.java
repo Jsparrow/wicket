@@ -34,12 +34,7 @@ class CompoundValidatorTest
     void delegate() {
 		CompoundValidator<String> compound = new CompoundValidator<>();
 		
-		compound.add(new IValidator<String>()
-		{
-			@Override
-			public void validate(IValidatable<String> validatable)
-			{
-			}
+		compound.add((IValidatable<String> validatable) -> {
 		});
 		
 		RangeValidator<String> validator = Mockito.mock(RangeValidator.class);

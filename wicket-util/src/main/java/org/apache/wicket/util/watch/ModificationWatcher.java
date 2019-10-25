@@ -49,21 +49,6 @@ public class ModificationWatcher implements IModificationWatcher
 	private Task task;
 
 	/**
-	 * Container class for holding modifiable entries to watch.
-	 */
-	protected static final class Entry
-	{
-		// The most recent lastModificationTime polled on the object
-		public Instant lastModifiedTime;
-
-		// The set of listeners to call when the modifiable changes
-		public final ChangeListenerSet<IModifiable> listeners = new ChangeListenerSet<>();
-
-		// The modifiable thing
-		public IModifiable modifiable;
-	}
-
-	/**
 	 * Default constructor for two-phase construction.
 	 */
 	public ModificationWatcher()
@@ -88,34 +73,30 @@ public class ModificationWatcher implements IModificationWatcher
 		final Entry entry = modifiableToEntry.get(modifiable);
 
 		// Found it?
-		if (entry == null)
-		{
-			Instant lastModifiedTime = modifiable.lastModifiedTime();
-			if (lastModifiedTime != null)
-			{
-				// Construct new entry
-				final Entry newEntry = new Entry();
-
-				newEntry.modifiable = modifiable;
-				newEntry.lastModifiedTime = lastModifiedTime;
-				newEntry.listeners.add(listener);
-
-				// Put in map
-				modifiableToEntry.putIfAbsent(modifiable, newEntry);
-			}
-			else
-			{
-				// The IModifiable is not returning a valid lastModifiedTime
-				log.info("Cannot track modifications to resource '{}'", modifiable);
-			}
-
-			return true;
-		}
-		else
-		{
+		// Add listener to existing entry
+		if (entry != null) {
 			// Add listener to existing entry
 			return !entry.listeners.add(listener);
 		}
+		Instant lastModifiedTime = modifiable.lastModifiedTime();
+		if (lastModifiedTime != null)
+		{
+			// Construct new entry
+			final Entry newEntry = new Entry();
+
+			newEntry.modifiable = modifiable;
+			newEntry.lastModifiedTime = lastModifiedTime;
+			newEntry.listeners.add(listener);
+
+			// Put in map
+			modifiableToEntry.putIfAbsent(modifiable, newEntry);
+		}
+		else
+		{
+			// The IModifiable is not returning a valid lastModifiedTime
+			log.info("Cannot track modifications to resource '{}'", modifiable);
+		}
+		return true;
 	}
 
 	@Override
@@ -135,14 +116,7 @@ public class ModificationWatcher implements IModificationWatcher
 		// Construct task with the given polling frequency
 		task = new Task("ModificationWatcher");
 
-		task.run(pollFrequency, new ICode()
-		{
-			@Override
-			public void run(final Logger log)
-			{
-				checkModified();
-			}
-		});
+		task.run(pollFrequency, (final Logger log) -> checkModified());
 	}
 
 	/**
@@ -150,8 +124,7 @@ public class ModificationWatcher implements IModificationWatcher
 	 */
 	protected void checkModified()
 	{
-		for (Entry entry : modifiableToEntry.values())
-		{
+		modifiableToEntry.values().forEach(entry -> {
 			// If the modifiable has been modified after the last known
 			// modification time
 			final Instant modifiableLastModified = entry.modifiable.lastModifiedTime();
@@ -164,7 +137,7 @@ public class ModificationWatcher implements IModificationWatcher
 				// Update timestamp
 				entry.lastModifiedTime = modifiableLastModified;
 			}
-		}
+		});
 	}
 
 	@Override
@@ -181,5 +154,20 @@ public class ModificationWatcher implements IModificationWatcher
 	public final Set<IModifiable> getEntries()
 	{
 		return modifiableToEntry.keySet();
+	}
+
+	/**
+	 * Container class for holding modifiable entries to watch.
+	 */
+	protected static final class Entry
+	{
+		// The most recent lastModificationTime polled on the object
+		public Instant lastModifiedTime;
+
+		// The set of listeners to call when the modifiable changes
+		public final ChangeListenerSet<IModifiable> listeners = new ChangeListenerSet<>();
+
+		// The modifiable thing
+		public IModifiable modifiable;
 	}
 }

@@ -30,7 +30,6 @@ public abstract class AuthorizationException extends WicketRuntimeException
 	 */
 	public AuthorizationException()
 	{
-		super();
 	}
 
 	/**

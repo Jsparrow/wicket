@@ -77,8 +77,7 @@ public final class DefaultPageFactory implements IPageFactory
 			}
 			else
 			{
-				throw new WicketRuntimeException("Unable to create page from " + pageClass +
-					". Class does not have a visible default constructor.", e);
+				throw new WicketRuntimeException(new StringBuilder().append("Unable to create page from ").append(pageClass).append(". Class does not have a visible default constructor.").toString(), e);
 			}
 		}
 	}
@@ -91,16 +90,13 @@ public final class DefaultPageFactory implements IPageFactory
 		Constructor<C> constructor = constructor(pageClass, PageParameters.class);
 
 		// If we got a PageParameters constructor
-		if (constructor != null)
-		{
-			final PageParameters nullSafeParams = parameters == null ? new PageParameters() : parameters;
-
-			// return new Page(parameters)
-			return processPage(newPage(constructor, nullSafeParams), nullSafeParams);
+		if (constructor == null) {
+			// Always try default constructor if one exists
+			return processPage(newPage(pageClass), parameters);
 		}
-
-		// Always try default constructor if one exists
-		return processPage(newPage(pageClass), parameters);
+		final PageParameters nullSafeParams = parameters == null ? new PageParameters() : parameters;
+		// return new Page(parameters)
+		return processPage(newPage(constructor, nullSafeParams), nullSafeParams);
 	}
 
 	/**
@@ -139,6 +135,7 @@ public final class DefaultPageFactory implements IPageFactory
 			}
 			catch (NoSuchMethodException e)
 			{
+				log.error(e.getMessage(), e);
 				log.debug(
 					"Page of type '{}' has not visible constructor with an argument of type '{}'.",
 					pageClass, argumentType);
@@ -175,11 +172,7 @@ public final class DefaultPageFactory implements IPageFactory
 				return constructor.newInstance();
 			}
 		}
-		catch (InstantiationException e)
-		{
-			throw new WicketRuntimeException(createDescription(constructor, argument), e);
-		}
-		catch (IllegalAccessException e)
+		catch (IllegalAccessException | InstantiationException e)
 		{
 			throw new WicketRuntimeException(createDescription(constructor, argument), e);
 		}
@@ -253,6 +246,7 @@ public final class DefaultPageFactory implements IPageFactory
 			}
 			catch (Exception ignore)
 			{
+				log.error(ignore.getMessage(), ignore);
 				try
 				{
 					if (pageClass.getDeclaredConstructor(new Class[] { PageParameters.class }) != null)
@@ -262,6 +256,7 @@ public final class DefaultPageFactory implements IPageFactory
 				}
 				catch (Exception ignored)
 				{
+					log.error(ignored.getMessage(), ignored);
 				}
 			}
 

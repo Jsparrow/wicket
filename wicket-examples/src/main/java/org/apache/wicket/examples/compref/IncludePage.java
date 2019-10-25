@@ -41,12 +41,8 @@ public class IncludePage extends WicketExamplePage
 	@Override
 	protected void explain()
 	{
-		String html = "<span wicket:id=\"include\">\n"
-			+ "Inclusion contents to be inserted here.\n" + "</span>";
-		String code = "&nbsp;&nbsp;&nbsp;&nbsp;public IncludePage()\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;{\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;add(new Include(\"include\", \"to_be_included.html\"));\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;}";
+		String html = new StringBuilder().append("<span wicket:id=\"include\">\n").append("Inclusion contents to be inserted here.\n").append("</span>").toString();
+		String code = new StringBuilder().append("&nbsp;&nbsp;&nbsp;&nbsp;public IncludePage()\n").append("&nbsp;&nbsp;&nbsp;&nbsp;{\n").append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;add(new Include(\"include\", \"to_be_included.html\"));\n").append("&nbsp;&nbsp;&nbsp;&nbsp;}").toString();
 		add(new ExplainPanel(html, code));
 	}
 }

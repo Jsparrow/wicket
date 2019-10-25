@@ -22,6 +22,8 @@ import java.util.ResourceBundle;
 
 import org.apache.wicket.Component;
 import org.apache.wicket.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -34,6 +36,7 @@ import org.apache.wicket.Session;
  */
 public class BundleStringResourceLoader implements IStringResourceLoader
 {
+	private static final Logger logger = LoggerFactory.getLogger(BundleStringResourceLoader.class);
 	/** The name of the underlying resource bundle. */
 	private final String bundleName;
 
@@ -65,12 +68,14 @@ public class BundleStringResourceLoader implements IStringResourceLoader
 		}
 		catch (MissingResourceException mrx)
 		{
+			logger.error(mrx.getMessage(), mrx);
 			try
 			{
 				return ResourceBundle.getBundle(bundleName, locale, Thread.currentThread().getContextClassLoader()).getString(key);
 			}
 			catch (MissingResourceException mrx2)
 			{
+				logger.error(mrx2.getMessage(), mrx2);
 				return null;
 			}
 		}

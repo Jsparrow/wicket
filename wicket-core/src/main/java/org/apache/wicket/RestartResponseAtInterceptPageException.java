@@ -45,6 +45,48 @@ import org.apache.wicket.util.string.StringValue;
 public class RestartResponseAtInterceptPageException extends ResetResponseException
 {
 	private static final long serialVersionUID = 1L;
+	static IRequestMapper MAPPER = new IRequestMapper()
+	{
+		@Override
+		public int getCompatibilityScore(Request request)
+		{
+			return matchedData(request) != null ? Integer.MAX_VALUE : 0;
+		}
+
+		@Override
+		public Url mapHandler(IRequestHandler requestHandler)
+		{
+			return null;
+		}
+
+		@Override
+		public IRequestHandler mapRequest(Request request)
+		{
+			InterceptData data = matchedData(request);
+			if (data != null)
+			{
+				if (data.postParameters.isEmpty() == false &&
+					request.getPostParameters() instanceof IWritableRequestParameters)
+				{
+					IWritableRequestParameters parameters = (IWritableRequestParameters)request.getPostParameters();
+					parameters.reset();
+					data.postParameters.keySet().forEach(s -> parameters.setParameterValues(s, data.postParameters.get(s)));
+				}
+				InterceptData.clear();
+			}
+			return null;
+		}
+
+		private InterceptData matchedData(Request request)
+		{
+			InterceptData data = InterceptData.get();
+			if (data != null && data.originalUrl.equals(request.getOriginalUrl()))
+			{
+				return data;
+			}
+			return null;
+		}
+	};
 
 	/**
 	 * Redirects to the specified {@code interceptPage}.
@@ -112,6 +154,21 @@ public class RestartResponseAtInterceptPageException extends ResetResponseExcept
 		return postParameters;
 	}
 
+	static void continueToOriginalDestination()
+	{
+		InterceptData data = InterceptData.get();
+		if (data == null) {
+			return;
+		}
+		String url = RequestCycle.get().getUrlRenderer().renderUrl(data.originalUrl);
+		throw new NonResettingRestartException(url);
+	}
+
+	static void clearOriginalDestination()
+	{
+		InterceptData.clear();
+	}
+
 	/**
 	 * INTERNAL CLASS, DO NOT USE
 	 * 
@@ -121,7 +178,13 @@ public class RestartResponseAtInterceptPageException extends ResetResponseExcept
 	{
 		private static final long serialVersionUID = 1L;
 
+		private static final MetaDataKey<InterceptData> key = new MetaDataKey<>()
+		{
+			private static final long serialVersionUID = 1L;
+		};
+
 		private Url originalUrl;
+
 		private Map<String, List<StringValue>> postParameters;
 
 		public Url getOriginalUrl()
@@ -184,71 +247,5 @@ public class RestartResponseAtInterceptPageException extends ResetResponseExcept
 				Session.get().setMetaData(key, null);
 			}
 		}
-
-		private static final MetaDataKey<InterceptData> key = new MetaDataKey<>()
-		{
-			private static final long serialVersionUID = 1L;
-		};
 	}
-
-	static void continueToOriginalDestination()
-	{
-		InterceptData data = InterceptData.get();
-		if (data != null)
-		{
-			String url = RequestCycle.get().getUrlRenderer().renderUrl(data.originalUrl);
-			throw new NonResettingRestartException(url);
-		}
-	}
-
-	static void clearOriginalDestination()
-	{
-		InterceptData.clear();
-	}
-
-	static IRequestMapper MAPPER = new IRequestMapper()
-	{
-		@Override
-		public int getCompatibilityScore(Request request)
-		{
-			return matchedData(request) != null ? Integer.MAX_VALUE : 0;
-		}
-
-		@Override
-		public Url mapHandler(IRequestHandler requestHandler)
-		{
-			return null;
-		}
-
-		@Override
-		public IRequestHandler mapRequest(Request request)
-		{
-			InterceptData data = matchedData(request);
-			if (data != null)
-			{
-				if (data.postParameters.isEmpty() == false &&
-					request.getPostParameters() instanceof IWritableRequestParameters)
-				{
-					IWritableRequestParameters parameters = (IWritableRequestParameters)request.getPostParameters();
-					parameters.reset();
-					for (String s : data.postParameters.keySet())
-					{
-						parameters.setParameterValues(s, data.postParameters.get(s));
-					}
-				}
-				InterceptData.clear();
-			}
-			return null;
-		}
-
-		private InterceptData matchedData(Request request)
-		{
-			InterceptData data = InterceptData.get();
-			if (data != null && data.originalUrl.equals(request.getOriginalUrl()))
-			{
-				return data;
-			}
-			return null;
-		}
-	};
 }

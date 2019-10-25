@@ -36,49 +36,6 @@ public class Track extends WebMarkupContainer
 {
 	private static final long serialVersionUID = 1L;
 
-	/**
-	 * To be used for the kind attribute
-	 */
-	public enum Kind {
-		/**
-		 * the track is used for subtitles
-		 */
-		SUBTITLES("subtitles"),
-		/**
-		 * the track is used for captions
-		 */
-		CAPTIONS("captions"),
-		/**
-		 * the track is used for descriptions
-		 */
-		DESCRIPTIONS("descriptions"),
-		/**
-		 * the track is used for chapters
-		 */
-		CHAPTERS("chapters"),
-		/**
-		 * the track is used to provide metadata
-		 */
-		METADATA("metadata");
-
-		private String realName;
-
-		Kind(String realName)
-		{
-			this.realName = realName;
-		}
-
-		/**
-		 * The real name of the kind
-		 * 
-		 * @return the real name
-		 */
-		public String getRealName()
-		{
-			return realName;
-		}
-	}
-
 	private Kind kind;
 
 	private String label;
@@ -386,5 +343,48 @@ public class Track extends WebMarkupContainer
 	public void setPageParameters(PageParameters pageParameters)
 	{
 		this.pageParameters = pageParameters;
+	}
+
+	/**
+	 * To be used for the kind attribute
+	 */
+	public enum Kind {
+		/**
+		 * the track is used for subtitles
+		 */
+		SUBTITLES("subtitles"),
+		/**
+		 * the track is used for captions
+		 */
+		CAPTIONS("captions"),
+		/**
+		 * the track is used for descriptions
+		 */
+		DESCRIPTIONS("descriptions"),
+		/**
+		 * the track is used for chapters
+		 */
+		CHAPTERS("chapters"),
+		/**
+		 * the track is used to provide metadata
+		 */
+		METADATA("metadata");
+
+		private String realName;
+
+		Kind(String realName)
+		{
+			this.realName = realName;
+		}
+
+		/**
+		 * The real name of the kind
+		 * 
+		 * @return the real name
+		 */
+		public String getRealName()
+		{
+			return realName;
+		}
 	}
 }

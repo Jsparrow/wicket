@@ -48,49 +48,11 @@ public class UnicodeConverter extends WicketExamplePage
 	private String translationType = translationTypes.get(0);
 
 	/**
-	 * Model that does the conversion. Note that as we 'pull' the value every time we render (we get
-	 * the current value of message), we don't need to update the model itself. The alternative
-	 * strategy would be to have a model with it's own, translated, string representation of the
-	 * source, which should be updated on every form post (e.g. by overriding {@link Form#onSubmit}
-	 * and in that method explicitly setting the new value). But as you can see, this method is
-	 * slightly easier, and if we wanted to use the translated value in e.g. a database, we could
-	 * just query this model directly or indirectly by calling {@link Component#getDefaultModelObject()} on
-	 * the component that holds it, and we would have a recent value.
-	 */
-	private final class ConverterModel extends Model<String>
-	{
-		@Override
-		public String getObject()
-		{
-			String result;
-			if (TO_ESCAPED_UNICODE.equals(translationType))
-			{
-				result = Strings.toEscapedUnicode(source);
-			}
-			else
-			{
-				result = Strings.fromEscapedUnicode(source);
-			}
-			return result;
-		}
-
-		@Override
-		public void setObject(String object)
-		{
-			// Ignore. We are not interested in updating any value,
-			// and we don't want to throw an exception like
-			// AbstractReadOnlyModel either. Alternatively, we
-			// could have overriden updateModel of FormInputComponent
-			// and ignore any input there.
-		}
-	}
-
-	/**
 	 * Constructor.
 	 */
 	public UnicodeConverter()
 	{
-		Form<UnicodeConverter> form = new Form<UnicodeConverter>("form",
+		Form<UnicodeConverter> form = new Form<>("form",
 			new CompoundPropertyModel<>(this));
 		form.add(new TextArea<>("source"));
 		form.add(new DropDownChoice<>("translationType", translationTypes));
@@ -130,5 +92,43 @@ public class UnicodeConverter extends WicketExamplePage
 	public void setTranslationType(String translationType)
 	{
 		this.translationType = translationType;
+	}
+
+	/**
+	 * Model that does the conversion. Note that as we 'pull' the value every time we render (we get
+	 * the current value of message), we don't need to update the model itself. The alternative
+	 * strategy would be to have a model with it's own, translated, string representation of the
+	 * source, which should be updated on every form post (e.g. by overriding {@link Form#onSubmit}
+	 * and in that method explicitly setting the new value). But as you can see, this method is
+	 * slightly easier, and if we wanted to use the translated value in e.g. a database, we could
+	 * just query this model directly or indirectly by calling {@link Component#getDefaultModelObject()} on
+	 * the component that holds it, and we would have a recent value.
+	 */
+	private final class ConverterModel extends Model<String>
+	{
+		@Override
+		public String getObject()
+		{
+			String result;
+			if (TO_ESCAPED_UNICODE.equals(translationType))
+			{
+				result = Strings.toEscapedUnicode(source);
+			}
+			else
+			{
+				result = Strings.fromEscapedUnicode(source);
+			}
+			return result;
+		}
+
+		@Override
+		public void setObject(String object)
+		{
+			// Ignore. We are not interested in updating any value,
+			// and we don't want to throw an exception like
+			// AbstractReadOnlyModel either. Alternatively, we
+			// could have overriden updateModel of FormInputComponent
+			// and ignore any input there.
+		}
 	}
 }

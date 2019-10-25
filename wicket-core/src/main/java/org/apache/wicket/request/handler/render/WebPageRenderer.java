@@ -223,8 +223,7 @@ public class WebPageRenderer extends PageRenderer
 						isAjax(requestCycle), getRedirectPolicy(), currentUrl, targetUrl,
 						isNewPageInstance(), isPageStateless(), isSessionTemporary());
 				logger
-					.debug("Falling back to Redirect_To_Buffer render strategy because none of the conditions "
-						+ "matched. Details: " + details);
+					.debug(new StringBuilder().append("Falling back to Redirect_To_Buffer render strategy because none of the conditions ").append("matched. Details: ").append(details).toString());
 			}
 
 			// force creation of possible stateful page to get the final target url

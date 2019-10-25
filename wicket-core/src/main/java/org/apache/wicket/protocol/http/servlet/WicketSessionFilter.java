@@ -179,10 +179,8 @@ public class WicketSessionFilter implements Filter
 		{
 			if (logger.isDebugEnabled())
 			{
-				logger.debug("could not set Wicket session: key " + sessionKey +
-					" not found in http session for " +
-					((HttpServletRequest)request).getContextPath() + "," + request.getServerName() +
-					", or http session does not exist");
+				logger.debug(new StringBuilder().append("could not set Wicket session: key ").append(sessionKey).append(" not found in http session for ").append(((HttpServletRequest)request).getContextPath()).append(",").append(request.getServerName())
+						.append(", or http session does not exist").toString());
 			}
 		}
 		else
@@ -198,10 +196,7 @@ public class WicketSessionFilter implements Filter
 		WebApplication application = (WebApplication)Application.get(filterName);
 		if (application == null)
 		{
-			throw new IllegalStateException("Could not find wicket application mapped to filter: " +
-				filterName +
-				". Make sure you set filterName attribute to the name of the wicket filter " +
-				"for the wicket application whose session you want to access.");
+			throw new IllegalStateException(new StringBuilder().append("Could not find wicket application mapped to filter: ").append(filterName).append(". Make sure you set filterName attribute to the name of the wicket filter ").append("for the wicket application whose session you want to access.").toString());
 		}
 		ThreadContext.setApplication(application);
 		return application;
@@ -209,19 +204,17 @@ public class WicketSessionFilter implements Filter
 
 	private Session getSession(HttpSession session, WebApplication application)
 	{
-		if (session != null)
-		{
-			if (sessionKey == null)
-			{
-				sessionKey = application.getSessionAttributePrefix(null, filterName) +
-					Session.SESSION_ATTRIBUTE_NAME;
-
-				logger.debug("will use {} as the session key to get the Wicket session", sessionKey);
-			}
-
-			return (Session)session.getAttribute(sessionKey);
+		if (session == null) {
+			return null;
 		}
-		return null;
+		if (sessionKey == null)
+		{
+			sessionKey = application.getSessionAttributePrefix(null, filterName) +
+				Session.SESSION_ATTRIBUTE_NAME;
+
+			logger.debug("will use {} as the session key to get the Wicket session", sessionKey);
+		}
+		return (Session)session.getAttribute(sessionKey);
 	}
 
 	/**

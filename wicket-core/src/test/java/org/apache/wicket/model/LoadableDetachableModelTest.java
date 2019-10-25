@@ -29,6 +29,8 @@ import java.io.Serializable;
 
 import org.apache.wicket.util.tester.WicketTestCase;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Tests the states of a LoadableDetachableModel
@@ -36,6 +38,8 @@ import org.junit.jupiter.api.Test;
 @SuppressWarnings("javadoc")
 class LoadableDetachableModelTest extends WicketTestCase
 {
+	private static final Logger logger = LoggerFactory.getLogger(LoadableDetachableModelTest.class);
+
 	/**
 	 * Checks whether the LDM can escape recursive calls.
 	 */
@@ -128,23 +132,11 @@ class LoadableDetachableModelTest extends WicketTestCase
 		}
 		catch (RuntimeException e)
 		{
+			logger.error(e.getMessage(), e);
 		}
 		ldm.detach();
 		assertEquals(false, ldm.isAttached());
 		assertEquals(true, ldm.detachCalled);
-	}
-
-	private static class SerializedLoad extends LoadableDetachableModel<Integer>
-	{
-		private static final long serialVersionUID = 1L;
-
-		private int count = 0;
-
-		@Override
-		protected Integer load()
-		{
-			return ++count;
-		}
 	}
 
 	/**
@@ -196,5 +188,18 @@ class LoadableDetachableModelTest extends WicketTestCase
 			stream = baos.toByteArray();
 		}
 		return stream;
+	}
+
+	private static class SerializedLoad extends LoadableDetachableModel<Integer>
+	{
+		private static final long serialVersionUID = 1L;
+
+		private int count = 0;
+
+		@Override
+		protected Integer load()
+		{
+			return ++count;
+		}
 	}
 }

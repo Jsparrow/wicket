@@ -75,6 +75,17 @@ public class MetaDataRoleAuthorizationStrategy extends AbstractRoleAuthorization
 	public static final String NO_ROLE = "wicket:NO_ROLE";
 
 	/**
+	 * Construct.
+	 * 
+	 * @param roleCheckingStrategy
+	 *            the authorizer object
+	 */
+	public MetaDataRoleAuthorizationStrategy(final IRoleCheckingStrategy roleCheckingStrategy)
+	{
+		super(roleCheckingStrategy);
+	}
+
+	/**
 	 * Authorizes the given role to create component instances of type componentClass. This
 	 * authorization is added to any previously authorized roles.
 	 * 
@@ -235,17 +246,6 @@ public class MetaDataRoleAuthorizationStrategy extends AbstractRoleAuthorization
 	{
 		authorizeAll(component, action);
 		authorize(component, action, NO_ROLE);
-	}
-
-	/**
-	 * Construct.
-	 * 
-	 * @param roleCheckingStrategy
-	 *            the authorizer object
-	 */
-	public MetaDataRoleAuthorizationStrategy(final IRoleCheckingStrategy roleCheckingStrategy)
-	{
-		super(roleCheckingStrategy);
 	}
 
 	/**

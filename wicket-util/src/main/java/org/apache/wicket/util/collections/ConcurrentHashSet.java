@@ -23,6 +23,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class implements the <tt>Set</tt> interface, backed by a ConcurrentHashMap instance.
@@ -32,17 +34,18 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ConcurrentHashSet<E> extends AbstractSet<E>
 	implements
-		Set<E>,
 		Cloneable,
 		java.io.Serializable
 {
+	private static final Logger logger = LoggerFactory.getLogger(ConcurrentHashSet.class);
+
 	/** */
 	private static final long serialVersionUID = 1L;
 
-	private transient ConcurrentHashMap<E, Object> map;
-
 	// Dummy value to associate with an Object in the backing Map
 	private static final Object PRESENT = new Object();
+
+	private transient ConcurrentHashMap<E, Object> map;
 
 	/**
 	 * Constructs a new, empty set; the backing <tt>ConcurrentHashMap</tt> instance has default
@@ -177,6 +180,7 @@ public class ConcurrentHashSet<E> extends AbstractSet<E>
 		}
 		catch (CloneNotSupportedException e)
 		{
+			logger.error(e.getMessage(), e);
 			throw new InternalError();
 		}
 	}

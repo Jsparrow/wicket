@@ -43,11 +43,6 @@ public abstract class AbstractOptions<T> extends FormComponent<T>
 
 	private final Palette<T> palette;
 
-	protected Palette<T> getPalette()
-	{
-		return palette;
-	}
-
 	/**
 	 * @param id
 	 *            component id
@@ -59,6 +54,11 @@ public abstract class AbstractOptions<T> extends FormComponent<T>
 		super(id);
 		this.palette = palette;
 		setOutputMarkupId(true);
+	}
+
+	protected Palette<T> getPalette()
+	{
+		return palette;
 	}
 
 	protected abstract Iterator<T> getOptionsIterator();
@@ -121,14 +121,7 @@ public abstract class AbstractOptions<T> extends FormComponent<T>
 			Map<String, String> additionalAttributesMap = getAdditionalAttributes(choice);
 			if (additionalAttributesMap != null)
 			{
-				for (Map.Entry<String, String> entry : additionalAttributesMap.entrySet())
-				{
-					buffer.append(' ')
-						.append(entry.getKey())
-						.append("=\"")
-						.append(entry.getValue())
-						.append("\"");
-				}
+				additionalAttributesMap.entrySet().forEach(entry -> buffer.append(' ').append(entry.getKey()).append("=\"").append(entry.getValue()).append("\""));
 			}
 
 			buffer.append(">").append(value).append("</option>");
@@ -186,10 +179,8 @@ public abstract class AbstractOptions<T> extends FormComponent<T>
 	protected void avoidAjaxSerialization()
 	{
 		getResponse().write(
-			JavaScriptUtils.SCRIPT_OPEN_TAG +
-				"if (typeof(Wicket) != \"undefined\" && typeof(Wicket.Form) != \"undefined\")" +
-				"    Wicket.Form.excludeFromAjaxSerialization." + getMarkupId() + "='true';" +
-				JavaScriptUtils.SCRIPT_CLOSE_TAG);
+			new StringBuilder().append(JavaScriptUtils.SCRIPT_OPEN_TAG).append("if (typeof(Wicket) != \"undefined\" && typeof(Wicket.Form) != \"undefined\")").append("    Wicket.Form.excludeFromAjaxSerialization.").append(getMarkupId()).append("='true';")
+					.append(JavaScriptUtils.SCRIPT_CLOSE_TAG).toString());
 	}
 
 	/**

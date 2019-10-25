@@ -44,11 +44,9 @@ public class ResourceDecorationApplication extends WebApplication
 			new CssResourceReference(HomePage.class, "footer.css"),
 			new CssResourceReference(HomePage.class, "header.css"));
 
-		setHeaderResponseDecorator(response -> {
-			// use this header resource decorator to load all JavaScript resources in the page
-			// footer (after </body>)
-			return new ResourceAggregator(new JavaScriptFilteredIntoFooterHeaderResponse(response, "footerJS"));
-		});
+		// use this header resource decorator to load all JavaScript resources in the page
+		// footer (after </body>)
+		setHeaderResponseDecorator(response -> new ResourceAggregator(new JavaScriptFilteredIntoFooterHeaderResponse(response, "footerJS")));
 	}
 
 	@Override

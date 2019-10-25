@@ -154,6 +154,7 @@ public class ListenerRequestHandler
 		}
 		catch (ComponentNotFoundException e)
 		{
+			LOG.error(e.getMessage(), e);
 			// either the page is stateless and the component we are looking for is not added in the
 			// constructor
 			// or the page is stateful+stale and a new instances was created by pageprovider
@@ -163,8 +164,7 @@ public class ListenerRequestHandler
 
 		if ((component == null && !freshPage) || (component != null && component.getPage() != page))
 		{
-			throw new ComponentNotFoundException("Component '" + getComponentPath()
-					+ "' has been removed from page.");
+			throw new ComponentNotFoundException(new StringBuilder().append("Component '").append(getComponentPath()).append("' has been removed from page.").toString());
 		}
 
 		if (page instanceof Page)

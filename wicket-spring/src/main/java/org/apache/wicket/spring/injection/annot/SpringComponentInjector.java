@@ -55,16 +55,16 @@ public class SpringComponentInjector extends Injector
 		IComponentInstantiationListener,
 		IBehaviorInstantiationListener
 {
-	private final IFieldValueFactory fieldValueFactory;
-
 	/**
 	 * Metadata key used to store application context in application's metadata
 	 */
-	private static MetaDataKey<ApplicationContext> CONTEXT_KEY = new MetaDataKey<>()
+	private static MetaDataKey<ApplicationContext> contextKey = new MetaDataKey<>()
 	{
 		private static final long serialVersionUID = 1L;
 
 	};
+
+	private final IFieldValueFactory fieldValueFactory;
 
 	/**
 	 * Constructor used when spring application context is declared in the spring standard way and
@@ -112,7 +112,7 @@ public class SpringComponentInjector extends Injector
 		Args.notNull(ctx, "ctx");
 
 		// store context in application's metadata ...
-		webapp.setMetaData(CONTEXT_KEY, ctx);
+		webapp.setMetaData(contextKey, ctx);
 		fieldValueFactory = new AnnotProxyFieldValueFactory(new ContextLocator(), wrapInProxies);
 		webapp.getBehaviorInstantiationListeners().add(this);
 		bind(webapp);
@@ -137,30 +137,6 @@ public class SpringComponentInjector extends Injector
 	}
 
 	/**
-	 * A context locator that locates the context in application's metadata. This locator also keeps
-	 * a transient cache of the lookup.
-	 * 
-	 * @author ivaynberg
-	 */
-	private static class ContextLocator implements ISpringContextLocator
-	{
-		private transient ApplicationContext context;
-
-		private static final long serialVersionUID = 1L;
-
-		@Override
-		public ApplicationContext getSpringContext()
-		{
-			if (context == null)
-			{
-				context = Application.get().getMetaData(CONTEXT_KEY);
-			}
-			return context;
-		}
-
-	}
-
-	/**
 	 * Try to use an already pre-configured application context or locate it through Spring's default
 	 * location mechanism.
 	 * 
@@ -169,7 +145,7 @@ public class SpringComponentInjector extends Injector
 	 */
 	private static ApplicationContext getDefaultContext(final WebApplication webapp)
 	{
-		ApplicationContext context = webapp.getMetaData(CONTEXT_KEY);
+		ApplicationContext context = webapp.getMetaData(contextKey);
 		if (context == null)
 		{
 			context = WebApplicationContextUtils.getRequiredWebApplicationContext(webapp.getServletContext());
@@ -189,9 +165,33 @@ public class SpringComponentInjector extends Injector
 	{
 		Args.notNull(context, "context");
 
-		if (webapp.getMetaData(CONTEXT_KEY) == null)
+		if (webapp.getMetaData(contextKey) == null)
 		{
-			webapp.setMetaData(CONTEXT_KEY, context);
+			webapp.setMetaData(contextKey, context);
 		}
+	}
+
+	/**
+	 * A context locator that locates the context in application's metadata. This locator also keeps
+	 * a transient cache of the lookup.
+	 * 
+	 * @author ivaynberg
+	 */
+	private static class ContextLocator implements ISpringContextLocator
+	{
+		private static final long serialVersionUID = 1L;
+
+		private transient ApplicationContext context;
+
+		@Override
+		public ApplicationContext getSpringContext()
+		{
+			if (context == null)
+			{
+				context = Application.get().getMetaData(contextKey);
+			}
+			return context;
+		}
+
 	}
 }

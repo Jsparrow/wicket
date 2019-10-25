@@ -69,6 +69,18 @@ public class ListChoicePage extends WicketExamplePage
 		form.add(listChoice);
 	}
 
+	/**
+	 * Override base method to provide an explanation
+	 */
+	@Override
+	protected void explain()
+	{
+		String html = new StringBuilder().append("<select wicket:id=\"site\">\n").append("    <option>site 1</option>\n").append("    <option>site 2</option>\n").append("</select>").toString();
+		String code = new StringBuilder().append("private static final List SITES = Arrays.asList(new String[] { \"The Server Side\", \"Java Lobby\", \"Java.Net\" });\n").append("...\n").append("&nbsp;&nbsp;&nbsp;&nbsp;// Add a list choice component that uses the model object's 'site' property to designate the\n").append("&nbsp;&nbsp;&nbsp;&nbsp;// current selection, and that uses the SITES list for the available options.\n").append("&nbsp;&nbsp;&nbsp;&nbsp;ListChoice listChoice = new ListChoice(\"site\", SITES);\n").append("&nbsp;&nbsp;&nbsp;&nbsp;listChoice.setMaxRows(4);\n").append("&nbsp;&nbsp;&nbsp;&nbsp;form.add(listChoice);").toString();
+		add(new ExplainPanel(html, code));
+
+	}
+
 	/** Simple data class that acts as a model for the input fields. */
 	public static class Input implements IClusterable
 	{
@@ -78,27 +90,8 @@ public class ListChoicePage extends WicketExamplePage
 		@Override
 		public String toString()
 		{
-			return "site = '" + site + "'";
+			return new StringBuilder().append("site = '").append(site).append("'").toString();
 		}
-	}
-
-	/**
-	 * Override base method to provide an explanation
-	 */
-	@Override
-	protected void explain()
-	{
-		String html = "<select wicket:id=\"site\">\n" + "    <option>site 1</option>\n"
-			+ "    <option>site 2</option>\n" + "</select>";
-		String code = "private static final List SITES = Arrays.asList(new String[] { \"The Server Side\", \"Java Lobby\", \"Java.Net\" });\n"
-			+ "...\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;// Add a list choice component that uses the model object's 'site' property to designate the\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;// current selection, and that uses the SITES list for the available options.\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;ListChoice listChoice = new ListChoice(\"site\", SITES);\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;listChoice.setMaxRows(4);\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;form.add(listChoice);";
-		add(new ExplainPanel(html, code));
-
 	}
 
 }

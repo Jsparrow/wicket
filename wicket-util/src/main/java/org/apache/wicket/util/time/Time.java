@@ -64,6 +64,17 @@ public final class Time extends AbstractTime
 	public static final TimeZone GMT = TimeZone.getTimeZone("GMT");
 	
 	/**
+	 * Private constructor forces use of static factory methods.
+	 * 
+	 * @param time
+	 *            the <code>Time</code> value in milliseconds since START_OF_UNIX_TIME
+	 */
+	private Time(final long time)
+	{
+		super(time);
+	}
+
+	/**
 	 * Retrieves a <code>Time</code> instance based on the current time.
 	 * 
 	 * @return the current <code>Time</code>
@@ -224,17 +235,6 @@ public final class Time extends AbstractTime
 	public static Time valueOf(final TimeOfDay timeOfDay)
 	{
 		return valueOf(localtime, timeOfDay);
-	}
-
-	/**
-	 * Private constructor forces use of static factory methods.
-	 * 
-	 * @param time
-	 *            the <code>Time</code> value in milliseconds since START_OF_UNIX_TIME
-	 */
-	private Time(final long time)
-	{
-		super(time);
 	}
 
 	/**
@@ -522,7 +522,7 @@ public final class Time extends AbstractTime
 	@Override
 	public String toString()
 	{
-		return toDateString() + "-" + toTimeString();
+		return new StringBuilder().append(toDateString()).append("-").append(toTimeString()).toString();
 	}
 
 	/**

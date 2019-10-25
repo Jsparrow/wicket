@@ -52,7 +52,7 @@ class ContextRelativeResourceReferenceTest extends WicketTestCase
 	void testCustomSuffix() throws Exception
 	{
 		ContextRelativeResourceReference resourceReference = new ContextRelativeResourceReference(TO_BE_MINIFIED, CUSTOM_SUFFIX);
-		assertTrue(testResourceKey(resourceReference, RESOURCE_NAME + "." + CUSTOM_SUFFIX + ".js"));
+		assertTrue(testResourceKey(resourceReference, new StringBuilder().append(RESOURCE_NAME).append(".").append(CUSTOM_SUFFIX).append(".js").toString()));
 	}
 	
 	@Override

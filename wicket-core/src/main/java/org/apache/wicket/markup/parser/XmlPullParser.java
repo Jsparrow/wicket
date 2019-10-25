@@ -127,7 +127,7 @@ public final class XmlPullParser implements IXmlPullParser
 			if ((pos == -1) || ((pos + (tagNameLen + 2)) >= input.size()))
 			{
 				throw new ParseException(
-					skipUntilText + " tag not closed" + getLineAndColumnText(), startIndex);
+					new StringBuilder().append(skipUntilText).append(" tag not closed").append(getLineAndColumnText()).toString(), startIndex);
 			}
 
 			lastPos = pos + 2;
@@ -142,7 +142,7 @@ public final class XmlPullParser implements IXmlPullParser
 		lastPos = input.find('>', lastPos + tagNameLen);
 		if (lastPos == -1)
 		{
-			throw new ParseException(skipUntilText + " tag not closed" + getLineAndColumnText(),
+			throw new ParseException(new StringBuilder().append(skipUntilText).append(" tag not closed").append(getLineAndColumnText()).toString(),
 				startIndex);
 		}
 
@@ -156,7 +156,7 @@ public final class XmlPullParser implements IXmlPullParser
 	 */
 	private String getLineAndColumnText()
 	{
-		return " (line " + input.getLineNumber() + ", column " + input.getColumnNumber() + ")";
+		return new StringBuilder().append(" (line ").append(input.getLineNumber()).append(", column ").append(input.getColumnNumber()).append(")").toString();
 	}
 
 	/**
@@ -210,10 +210,11 @@ public final class XmlPullParser implements IXmlPullParser
 		{
 			char nextChar = input.charAt(openBracketIndex + 1);
 
-			if ((nextChar == '!') || (nextChar == '?'))
+			if ((nextChar == '!') || (nextChar == '?')) {
 				closeBracketIndex = input.find('>', openBracketIndex);
-			else
+			} else {
 				closeBracketIndex = input.findOutOfQuotes('>', openBracketIndex);
+			}
 		}
 
 		if (closeBracketIndex == -1)
@@ -227,7 +228,7 @@ public final class XmlPullParser implements IXmlPullParser
 
 		// Get the tagtext between open and close brackets
 		String tagText = lastText.subSequence(1, lastText.length() - 1).toString();
-		if (tagText.length() == 0)
+		if (tagText.isEmpty())
 		{
 			throw new ParseException("Found empty tag: '<>' at" + getLineAndColumnText(),
 				input.getPosition());
@@ -389,7 +390,7 @@ public final class XmlPullParser implements IXmlPullParser
 		// The closing tag of a conditional comment, e.g.
 		// "<!--[if IE]><a href='test.html'>my link</a><![endif]-->
 		// and also <!--<![endif]-->"
-		if (tagText.equals("![endif]--"))
+		if ("![endif]--".equals(tagText))
 		{
 			lastType = HttpTagType.CONDITIONAL_COMMENT_ENDIF;
 			input.setPosition(closeBracketIndex + 1);
@@ -401,7 +402,7 @@ public final class XmlPullParser implements IXmlPullParser
 		if (tagText.startsWith("!["))
 		{
 			final String startText = (tagText.length() <= 8 ? tagText : tagText.substring(0, 8));
-			if (startText.toUpperCase(Locale.ROOT).equals("![CDATA["))
+			if ("![CDATA[".equals(startText.toUpperCase(Locale.ROOT)))
 			{
 				int pos1 = openBracketIndex;
 				do
@@ -648,69 +649,63 @@ public final class XmlPullParser implements IXmlPullParser
 
 		// If we match tagname pattern
 		final TagNameParser tagnameParser = new TagNameParser(tagText);
-		if (tagnameParser.matcher().lookingAt())
+		if (!tagnameParser.matcher().lookingAt()) {
+			return false;
+		}
+		// Extract the tag from the pattern matcher
+		tag.name = tagnameParser.getName();
+		tag.namespace = tagnameParser.getNamespace();
+		// Are we at the end? Then there are no attributes, so we just
+		// return the tag
+		int pos = tagnameParser.matcher().end(0);
+		if (pos == tagTextLength)
 		{
-			// Extract the tag from the pattern matcher
-			tag.name = tagnameParser.getName();
-			tag.namespace = tagnameParser.getNamespace();
+			return true;
+		}
+		// Extract attributes
+		final VariableAssignmentParser attributeParser = new VariableAssignmentParser(tagText);
+		while (attributeParser.matcher().find(pos))
+		{
+			// Get key and value using attribute pattern
+			String value = attributeParser.getValue();
 
-			// Are we at the end? Then there are no attributes, so we just
-			// return the tag
-			int pos = tagnameParser.matcher().end(0);
+			// In case like <html xmlns:wicket> will the value be null
+			if (value == null)
+			{
+				value = "";
+			}
+
+			// Set new position to end of attribute
+			pos = attributeParser.matcher().end(0);
+
+			// Chop off double quotes or single quotes
+			if (value.startsWith("\"") || value.startsWith("\'"))
+			{
+				value = value.substring(1, value.length() - 1);
+			}
+
+			// Trim trailing whitespace
+			value = value.trim();
+
+			// Unescape
+			value = Strings.unescapeMarkup(value).toString();
+
+			// Get key
+			final String key = attributeParser.getKey();
+
+			// Put the attribute in the attributes hash
+			if (null != tag.getAttributes().put(key, value))
+			{
+				throw new ParseException(new StringBuilder().append("Same attribute found twice: ").append(key).append(getLineAndColumnText()).toString(), input.getPosition());
+			}
+
+			// The input has to match exactly (no left over junk after
+			// attributes)
 			if (pos == tagTextLength)
 			{
 				return true;
 			}
-
-			// Extract attributes
-			final VariableAssignmentParser attributeParser = new VariableAssignmentParser(tagText);
-			while (attributeParser.matcher().find(pos))
-			{
-				// Get key and value using attribute pattern
-				String value = attributeParser.getValue();
-
-				// In case like <html xmlns:wicket> will the value be null
-				if (value == null)
-				{
-					value = "";
-				}
-
-				// Set new position to end of attribute
-				pos = attributeParser.matcher().end(0);
-
-				// Chop off double quotes or single quotes
-				if (value.startsWith("\"") || value.startsWith("\'"))
-				{
-					value = value.substring(1, value.length() - 1);
-				}
-
-				// Trim trailing whitespace
-				value = value.trim();
-
-				// Unescape
-				value = Strings.unescapeMarkup(value).toString();
-
-				// Get key
-				final String key = attributeParser.getKey();
-
-				// Put the attribute in the attributes hash
-				if (null != tag.getAttributes().put(key, value))
-				{
-					throw new ParseException("Same attribute found twice: " + key +
-						getLineAndColumnText(), input.getPosition());
-				}
-
-				// The input has to match exactly (no left over junk after
-				// attributes)
-				if (pos == tagTextLength)
-				{
-					return true;
-				}
-			}
-
-			return true;
 		}
-
-		return false;
+		return true;
 	}
 }

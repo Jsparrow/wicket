@@ -75,9 +75,7 @@ class ReplaceWithTest extends WicketTestCase
 	{
 		HomePage page = new HomePage();
 
-		Exception e = assertThrows(IllegalStateException.class, () -> {
-			page.add(new ReplaceInConstructorPanel("panel"));
-		});
+		Exception e = assertThrows(IllegalStateException.class, () -> page.add(new ReplaceInConstructorPanel("panel")));
 
 		assertEquals(
 			"This method can only be called on a component that has already been added to its parent.",

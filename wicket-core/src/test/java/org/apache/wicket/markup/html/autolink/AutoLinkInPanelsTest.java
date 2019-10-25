@@ -32,14 +32,6 @@ import org.junit.jupiter.api.Test;
  */
 class AutoLinkInPanelsTest extends WicketTestCase
 {
-	public static class TestPage extends WebPage
-	{
-		public TestPage()
-		{
-			add(new LogoPanel("logo"));
-		}
-	}
-
 	@BeforeEach
     void setUp()
 	{
@@ -74,5 +66,13 @@ class AutoLinkInPanelsTest extends WicketTestCase
 	{
 		tester.startPage(TestPage.class);
 		tester.assertContains("<img src=\"\\./wicket/resource/org.apache.wicket.markup.html.autolink.sub.LogoPanel/logo2-ver-\\d+.png\"/>");
+	}
+
+	public static class TestPage extends WebPage
+	{
+		public TestPage()
+		{
+			add(new LogoPanel("logo"));
+		}
 	}
 }

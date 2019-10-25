@@ -43,10 +43,7 @@ public class ContextParamWebApplicationFactory implements IWebApplicationFactory
 		if (applicationClassName == null)
 		{
 			throw new WicketRuntimeException(
-				"servlet init param [" +
-					APP_CLASS_PARAM +
-					"] is missing. If you are trying to use your own implementation of IWebApplicationFactory and get this message then the servlet init param [" +
-					WicketFilter.APP_FACT_PARAM + "] is missing");
+				new StringBuilder().append("servlet init param [").append(APP_CLASS_PARAM).append("] is missing. If you are trying to use your own implementation of IWebApplicationFactory and get this message then the servlet init param [").append(WicketFilter.APP_FACT_PARAM).append("] is missing").toString());
 		}
 
 		return createApplication(applicationClassName);
@@ -79,8 +76,7 @@ public class ContextParamWebApplicationFactory implements IWebApplicationFactory
 			}
 			else
 			{
-				throw new WicketRuntimeException("Application class " + applicationClassName +
-					" must be a subclass of WebApplication");
+				throw new WicketRuntimeException(new StringBuilder().append("Application class ").append(applicationClassName).append(" must be a subclass of WebApplication").toString());
 			}
 		}
 		catch (ClassNotFoundException | InstantiationException | IllegalAccessException | SecurityException

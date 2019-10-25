@@ -161,7 +161,7 @@ public final class ValidationError implements IValidationError
 		String key = Classes.simpleName(validator.getClass());
 		if (!Strings.isEmpty(variation))
 		{
-			key = key + "." + variation.trim();
+			key = new StringBuilder().append(key).append(".").append(variation.trim()).toString();
 		}
 		addKey(key);
 		return this;

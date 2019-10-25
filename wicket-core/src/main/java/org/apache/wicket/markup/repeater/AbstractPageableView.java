@@ -159,12 +159,9 @@ public abstract class AbstractPageableView<T> extends RefreshingView<T> implemen
 			throw new IllegalArgumentException("Argument [itemsPerPage] cannot be less than 1");
 		}
 
-		if (itemsPerPage != items)
-		{
-			if (isVersioned())
-			{
-				addStateChange();
-			}
+		boolean condition = itemsPerPage != items && isVersioned();
+		if (condition) {
+			addStateChange();
 		}
 
 		itemsPerPage = items;
@@ -231,13 +228,11 @@ public abstract class AbstractPageableView<T> extends RefreshingView<T> implemen
 		 * requests
 		 */
 
-		if (page > 0 && page >= getPageCount())
-		{
-			page = Math.max(getPageCount() - 1, 0);
-			currentPage = page;
+		if (!(page > 0 && page >= getPageCount())) {
 			return page;
 		}
-
+		page = Math.max(getPageCount() - 1, 0);
+		currentPage = page;
 		return page;
 	}
 
@@ -247,13 +242,10 @@ public abstract class AbstractPageableView<T> extends RefreshingView<T> implemen
 	@Override
 	public final void setCurrentPage(long page)
 	{
-		if (currentPage != page)
-		{
-			if (isVersioned())
-			{
-				addStateChange();
+		boolean condition = currentPage != page && isVersioned();
+		if (condition) {
+			addStateChange();
 
-			}
 		}
 		currentPage = page;
 	}
@@ -297,6 +289,16 @@ public abstract class AbstractPageableView<T> extends RefreshingView<T> implemen
 	// /////////////////////////////////////////////////////////////////////////
 	// HELPER CLASSES
 	// /////////////////////////////////////////////////////////////////////////
+
+	/**
+	 * @see org.apache.wicket.Component#onDetach()
+	 */
+	@Override
+	protected void onDetach()
+	{
+		clearCachedItemCount();
+		super.onDetach();
+	}
 
 	/**
 	 * Iterator adapter that makes sure only the specified max number of items can be accessed from
@@ -357,15 +359,5 @@ public abstract class AbstractPageableView<T> extends RefreshingView<T> implemen
 			return delegate.next();
 		}
 
-	}
-
-	/**
-	 * @see org.apache.wicket.Component#onDetach()
-	 */
-	@Override
-	protected void onDetach()
-	{
-		clearCachedItemCount();
-		super.onDetach();
 	}
 }

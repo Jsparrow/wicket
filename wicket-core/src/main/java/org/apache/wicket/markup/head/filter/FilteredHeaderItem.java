@@ -94,10 +94,7 @@ public class FilteredHeaderItem extends HeaderItem implements IWrappedHeaderItem
 	public List<HeaderItem> getDependencies()
 	{
 		List<FilteredHeaderItem> ret = new ArrayList<>();
-		for (HeaderItem curDependency : getWrapped().getDependencies())
-		{
-			ret.add(wrap(curDependency));
-		}
+		getWrapped().getDependencies().forEach(curDependency -> ret.add(wrap(curDependency)));
 		List<HeaderItem> dependencies = super.getDependencies();
 		dependencies.addAll(ret);
 		return dependencies;
@@ -118,8 +115,12 @@ public class FilteredHeaderItem extends HeaderItem implements IWrappedHeaderItem
 	@Override
 	public boolean equals(Object o)
 	{
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
 		FilteredHeaderItem that = (FilteredHeaderItem) o;
 		return Objects.equals(wrapped, that.wrapped) &&
 				Objects.equals(filterName, that.filterName);
@@ -128,6 +129,6 @@ public class FilteredHeaderItem extends HeaderItem implements IWrappedHeaderItem
 	@Override
 	public String toString()
 	{
-		return "FilteredHeaderItem(" + getWrapped() + ", " + getFilterName() + ")";
+		return new StringBuilder().append("FilteredHeaderItem(").append(getWrapped()).append(", ").append(getFilterName()).append(")").toString();
 	}
 }

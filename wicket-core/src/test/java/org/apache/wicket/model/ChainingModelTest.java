@@ -54,7 +54,7 @@ class ChainingModelTest
 			{
 				detached = true;
 			}
-		};
+		}
 		TestDetachable test = new TestDetachable();
 		
 		ChainingModel<TestDetachable> model = new ChainingModel<>(test);
@@ -92,7 +92,7 @@ class ChainingModelTest
 			{
 				detached = true;
 			}
-		};
+		}
 		TestModel test = new TestModel();
 		
 		ChainingModel<Integer> model = new ChainingModel<>(test);

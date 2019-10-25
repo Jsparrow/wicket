@@ -94,7 +94,7 @@ public class PageAccessSynchronizer implements Serializable
 	 * @throws CouldNotLockPageException
 	 *             if lock could not be acquired
 	 */
-	public void lockPage(int pageId) throws CouldNotLockPageException
+	public void lockPage(int pageId)
 	{
 		final Thread thread = Thread.currentThread();
 		final PageLock lock = new PageLock(pageId, thread);

@@ -38,13 +38,13 @@ public class CheckGroupDisabledTestPage extends WebPage
 	 */
 	public CheckGroupDisabledTestPage()
 	{
-		Form<Void> form = new Form<Void>("form");
-		CheckGroup<String> group = new CheckGroup<String>("group", new CollectionModel<String>(
+		Form<Void> form = new Form<>("form");
+		CheckGroup<String> group = new CheckGroup<>("group", new CollectionModel<String>(
 			Arrays.asList("check1", "check2")));
 		group.setRenderBodyOnly(false);
 		WebMarkupContainer container = new WebMarkupContainer("container");
-		Check<String> check1 = new Check<String>("check1", new Model<String>("check1"));
-		Check<String> check2 = new Check<String>("check2", new Model<String>("check2"));
+		Check<String> check1 = new Check<>("check1", new Model<String>("check1"));
+		Check<String> check2 = new Check<>("check2", new Model<String>("check2"));
 
 		add(form);
 		form.add(group);

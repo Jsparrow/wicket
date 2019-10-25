@@ -27,6 +27,13 @@ import org.apache.wicket.util.string.StringList;
 public final class Packages
 {
 	/**
+	 * Instantiation not allowed.
+	 */
+	private Packages()
+	{
+	}
+
+	/**
 	 * Takes a package and a path to a resource and returns an absolute path to the resource.
 	 * <p>
 	 * See {@link #absolutePath(String, String)} for details.
@@ -153,7 +160,6 @@ public final class Packages
 		return parent;
 	}
 
-
 	/**
 	 * Resolve scope for the given class by extracting it's package name and converting all dots to
 	 * slashes.
@@ -166,12 +172,5 @@ public final class Packages
 	{
 		String packName = extractPackageName(forClass);
 		return packName.replace('.', '/');
-	}
-
-	/**
-	 * Instantiation not allowed.
-	 */
-	private Packages()
-	{
 	}
 }

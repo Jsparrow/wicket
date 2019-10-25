@@ -47,11 +47,11 @@ import com.google.inject.name.Names;
 public abstract class AbstractInjectorTest
 {
 
+	private final MockApplication app = new MockApplication();
+
 	protected abstract TestNoComponentInterface newTestNoComponent();
 
 	protected abstract TestComponentInterface newTestComponent(String id);
-
-	private final MockApplication app = new MockApplication();
 
 	@BeforeEach
 	public void before()

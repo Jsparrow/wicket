@@ -43,8 +43,8 @@ class LambdaModelTest
 	{
 		Person person = new Person();
 		IModel<String> personNameModel = LambdaModel.<String>of(
-				() -> person.getName(),
-				(name) -> person.setName(name));
+				person::getName,
+				person::setName);
 		check(personNameModel);
 	}
 

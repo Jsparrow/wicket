@@ -21,8 +21,6 @@ import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 public class PageA extends BasePage {
 
 	public PageA() {
-		super();
-
 		add(new BookmarkablePageLink<Void>("goToB", PageB.class));
     }
 }

@@ -58,10 +58,10 @@ public final class InlineEnclosureHandler extends AbstractMarkupFilter
 	private static final long serialVersionUID = 1L;
 
 	/** The Component id prefix. */
-	public final static String INLINE_ENCLOSURE_ID_PREFIX = "InlineEnclosure-";
+	public static final String INLINE_ENCLOSURE_ID_PREFIX = "InlineEnclosure-";
 
 	/** Attribute to identify inline enclosures */
-	public final static String INLINE_ENCLOSURE_ATTRIBUTE_NAME = "enclosure";
+	public static final String INLINE_ENCLOSURE_ATTRIBUTE_NAME = "enclosure";
 
 	/** enclosures inside enclosures */
 	private Deque<ComponentTag> enclosures;
@@ -109,8 +109,7 @@ public final class InlineEnclosureHandler extends AbstractMarkupFilter
 				{
 					if (Strings.isEmpty(htmlId))
 					{
-						String id = getWicketNamespace() + "_" + INLINE_ENCLOSURE_ID_PREFIX + 
-							getRequestUniqueId();
+						String id = new StringBuilder().append(getWicketNamespace()).append("_").append(INLINE_ENCLOSURE_ID_PREFIX).append(getRequestUniqueId()).toString();
 						tag.setId(id);
 					}
 					else
@@ -119,15 +118,10 @@ public final class InlineEnclosureHandler extends AbstractMarkupFilter
 					}
 
 					tag.setAutoComponentTag(true);
-					tag.setAutoComponentFactory(new ComponentTag.IAutoComponentFactory()
-					{
-						@Override
-						public Component newComponent(MarkupContainer container, ComponentTag tag)
-						{
-							String attributeName = getInlineEnclosureAttributeName(null);
-							String childId = tag.getAttribute(attributeName);
-							return new InlineEnclosure(tag.getId(), childId);
-						}
+					tag.setAutoComponentFactory((MarkupContainer container, ComponentTag tag1) -> {
+						String attributeName = getInlineEnclosureAttributeName(null);
+						String childId = tag1.getAttribute(attributeName);
+						return new InlineEnclosure(tag1.getId(), childId);
 					});
 					tag.setModified(true);
 				}
@@ -197,20 +191,17 @@ public final class InlineEnclosureHandler extends AbstractMarkupFilter
 		final ComponentTag tag)
 	{
 		String inlineEnclosureChildId = getAttribute(tag, markupStream);
-		if (Strings.isEmpty(inlineEnclosureChildId) == false)
-		{
-			String id = tag.getId();
-
-			// Yes, we handled the tag
-			return new InlineEnclosure(id, inlineEnclosureChildId);
+		if (Strings.isEmpty(inlineEnclosureChildId) != false) {
+			// We were not able to handle the tag
+			return null;
 		}
-
-		// We were not able to handle the tag
-		return null;
+		String id = tag.getId();
+		// Yes, we handled the tag
+		return new InlineEnclosure(id, inlineEnclosureChildId);
 	}
 
 	private String getInlineEnclosureAttributeName(MarkupStream markupStream) {
-		return getWicketNamespace(markupStream) + ':' + INLINE_ENCLOSURE_ATTRIBUTE_NAME;
+		return new StringBuilder().append(getWicketNamespace(markupStream)).append(':').append(INLINE_ENCLOSURE_ATTRIBUTE_NAME).toString();
 	}
 
 }

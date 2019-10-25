@@ -78,6 +78,22 @@ class BehaviorUrlTest extends WicketTestCase
 
 	}
 
+	@Test
+	void testBehaviorUrlNotDoubleEscaped()
+	{
+		tester.startPage(EscapeTestPage.class);
+
+		String response = tester.getLastResponseAsString();
+//		System.err.println(response);
+		assertTrue(response.contains(EscapeTestPage.TEST_QUERY_STRING));
+
+		tester.executeAjaxEvent("form:textfield", "change");
+
+		EscapeTestPage testPage = (EscapeTestPage)tester.getLastRenderedPage();
+		IRequestParameters lastParameters = testPage.getLastQueryParameters();
+		assertEquals(StringValue.valueOf("value_1"), lastParameters.getParameterValue("query_p_1"));
+	}
+
 	/**
 	 */
 	public static class TestPage extends WebPage implements IMarkupResourceStreamProvider
@@ -142,22 +158,6 @@ class BehaviorUrlTest extends WicketTestCase
 		}
 	}
 
-
-	@Test
-	void testBehaviorUrlNotDoubleEscaped()
-	{
-		tester.startPage(EscapeTestPage.class);
-
-		String response = tester.getLastResponseAsString();
-//		System.err.println(response);
-		assertTrue(response.contains(EscapeTestPage.TEST_QUERY_STRING));
-
-		tester.executeAjaxEvent("form:textfield", "change");
-
-		EscapeTestPage testPage = (EscapeTestPage)tester.getLastRenderedPage();
-		IRequestParameters lastParameters = testPage.getLastQueryParameters();
-		assertEquals(StringValue.valueOf("value_1"), lastParameters.getParameterValue("query_p_1"));
-	}
 
 	/** */
 	public static class EscapeTestPage extends MockPageParametersAware

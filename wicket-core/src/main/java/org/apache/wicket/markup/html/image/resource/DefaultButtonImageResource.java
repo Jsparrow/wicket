@@ -51,26 +51,8 @@ public class DefaultButtonImageResource extends RenderedDynamicImageResource
 	private static final int DEFAULT_TEXT_COLOR = Color.WHITE.getRGB();
 
 	/** default font: Helvetica bold 16. */
-	private static final Map<TextAttribute, Object> DEFAULT_FONT = new HashMap<TextAttribute, Object>(
+	private static final Map<TextAttribute, Object> DEFAULT_FONT = new HashMap<>(
 		new Font("Helvetica", Font.BOLD, 16).getAttributes());
-
-	/**
-	 * @param defaultHeight
-	 *            The defaultHeight to set.
-	 */
-	public static void setDefaultHeight(int defaultHeight)
-	{
-		DefaultButtonImageResource.defaultHeight = defaultHeight;
-	}
-
-	/**
-	 * @param defaultWidth
-	 *            The defaultWidth to set.
-	 */
-	public static void setDefaultWidth(int defaultWidth)
-	{
-		DefaultButtonImageResource.defaultWidth = defaultWidth;
-	}
 
 	/** The height of the arc in the corner */
 	private int arcHeight = 10;
@@ -116,6 +98,24 @@ public class DefaultButtonImageResource extends RenderedDynamicImageResource
 	public DefaultButtonImageResource(final String label)
 	{
 		this(defaultWidth, defaultHeight, label);
+	}
+
+	/**
+	 * @param defaultHeight
+	 *            The defaultHeight to set.
+	 */
+	public static void setDefaultHeight(int defaultHeight)
+	{
+		DefaultButtonImageResource.defaultHeight = defaultHeight;
+	}
+
+	/**
+	 * @param defaultWidth
+	 *            The defaultWidth to set.
+	 */
+	public static void setDefaultWidth(int defaultWidth)
+	{
+		DefaultButtonImageResource.defaultWidth = defaultWidth;
 	}
 
 	/**

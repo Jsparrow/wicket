@@ -279,7 +279,7 @@ public class ServletWebResponse extends WebResponse
 				 * not used and that is the only way javascript has access to response headers.
 				 */
 				httpServletResponse.getWriter().write(
-					"<ajax-response><redirect><![CDATA[" + url + "]]></redirect></ajax-response>");
+					new StringBuilder().append("<ajax-response><redirect><![CDATA[").append(url).append("]]></redirect></ajax-response>").toString());
 			}
 			else
 			{

@@ -47,6 +47,8 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.request.mapper.parameter.PageParametersEncoder;
 import org.apache.wicket.request.resource.ResourceReference;
 import org.apache.wicket.util.collections.ConcurrentHashSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A push header item to be used in the http/2 context and to reduce the latency of the web
@@ -63,6 +65,8 @@ import org.apache.wicket.util.collections.ConcurrentHashSet;
  */
 public class PushHeaderItem extends HeaderItem
 {
+	private static final Logger logger = LoggerFactory.getLogger(PushHeaderItem.class);
+
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -96,7 +100,7 @@ public class PushHeaderItem extends HeaderItem
 	/**
 	 * The URLs of resources to be pushed to the client
 	 */
-	private Set<PushItem> pushItems = new ConcurrentHashSet<PushItem>(new TreeSet<PushItem>());
+	private Set<PushItem> pushItems = new ConcurrentHashSet<>(new TreeSet<PushItem>());
 	/**
 	 * The web response of the page to apply the caching information to
 	 */
@@ -126,13 +130,11 @@ public class PushHeaderItem extends HeaderItem
 	 */
 	public PushHeaderItem(Page page, Request pageRequest, Response pageResponse)
 	{
-		if (page == null || !(page instanceof WebPage) || pageResponse == null ||
+		if (!(page instanceof WebPage) || pageResponse == null ||
 			!(pageResponse instanceof WebResponse))
 		{
 			throw new WicketRuntimeException(
-				"Please hand over the web page, the web request and the web response to the push header item like \"new PushHeaderItem(this, yourWebPageRequest, yourWebPageResponse)\" - " +
-					"The webPageResponse / webPageRequest can be obtained via \"getRequestCycle().getRequest()\" / \"getRequestCycle().getResponse()\" and placed into the page as fields " +
-					"\"private transient Response webPageResponse;\" / \"private transient Request webPageRequest;\"");
+				new StringBuilder().append("Please hand over the web page, the web request and the web response to the push header item like \"new PushHeaderItem(this, yourWebPageRequest, yourWebPageResponse)\" - ").append("The webPageResponse / webPageRequest can be obtained via \"getRequestCycle().getRequest()\" / \"getRequestCycle().getResponse()\" and placed into the page as fields ").append("\"private transient Response webPageResponse;\" / \"private transient Request webPageRequest;\"").toString());
 		}
 		this.pageWebRequest = (WebRequest)pageRequest;
 		this.pageWebResponse = (WebResponse)pageResponse;
@@ -145,11 +147,8 @@ public class PushHeaderItem extends HeaderItem
 	@Override
 	public Iterable<?> getRenderTokens()
 	{
-		Set<String> tokens = new TreeSet<String>();
-		for (PushItem pushItem : pushItems)
-		{
-			tokens.add(pushItem.getUrl() + TOKEN_SUFFIX);
-		}
+		Set<String> tokens = new TreeSet<>();
+		pushItems.forEach(pushItem -> tokens.add(pushItem.getUrl() + TOKEN_SUFFIX));
 		return tokens;
 	}
 
@@ -223,49 +222,47 @@ public class PushHeaderItem extends HeaderItem
 
 		HttpServletRequest request = getContainerRequest(RequestCycle.get().getRequest());
 		// Check if the protocol is http/2 or http/2.0 to only push the resources in this case
-		if (isHttp2(request))
+		if (!isHttp2(request)) {
+			return;
+		}
+		Instant pageModificationTime = getPageModificationTime();
+		String ifModifiedSinceHeader = pageWebRequest.getHeader("If-Modified-Since");
+		// Check if the if-modified-since header is set - if not push all resources
+		if (ifModifiedSinceHeader != null)
 		{
 
-			Instant pageModificationTime = getPageModificationTime();
-			String ifModifiedSinceHeader = pageWebRequest.getHeader("If-Modified-Since");
+			// Try to parse RFC1123
+			Instant ifModifiedSinceFromRequestTime = parseIfModifiedSinceHeader(
+				ifModifiedSinceHeader, headerDateFormat_RFC1123);
 
-			// Check if the if-modified-since header is set - if not push all resources
-			if (ifModifiedSinceHeader != null)
+			// Try to parse ASCTIME
+			if (ifModifiedSinceFromRequestTime == null)
 			{
-
-				// Try to parse RFC1123
-				Instant ifModifiedSinceFromRequestTime = parseIfModifiedSinceHeader(
-					ifModifiedSinceHeader, headerDateFormat_RFC1123);
-
-				// Try to parse ASCTIME
-				if (ifModifiedSinceFromRequestTime == null)
-				{
-					ifModifiedSinceFromRequestTime = parseIfModifiedSinceHeader(
-						ifModifiedSinceHeader, headerDateFormat_ASCTIME);
-				}
-
-				// Try to parse RFC1036 - because it is obsolete due to RFC 1036 check this last.
-				if (ifModifiedSinceFromRequestTime == null)
-				{
-					ifModifiedSinceFromRequestTime = parseIfModifiedSinceHeader(
-						ifModifiedSinceHeader, headerDateFormat_RFC1036);
-				}
-
-				// if the modified since header is before the page modification time or if it can't
-				// be parsed push it.
-				if (ifModifiedSinceFromRequestTime == null ||
-					ifModifiedSinceFromRequestTime.isBefore(pageModificationTime))
-				{
-					// Some browsers like IE 9-11 or Chrome 39 that does not send right headers
-					// receive the resource via push all the time
-					push(request);
-				}
+				ifModifiedSinceFromRequestTime = parseIfModifiedSinceHeader(
+					ifModifiedSinceHeader, headerDateFormat_ASCTIME);
 			}
-			else
+
+			// Try to parse RFC1036 - because it is obsolete due to RFC 1036 check this last.
+			if (ifModifiedSinceFromRequestTime == null)
 			{
-				// Push the resources if the "if-modified-since" is not available
+				ifModifiedSinceFromRequestTime = parseIfModifiedSinceHeader(
+					ifModifiedSinceHeader, headerDateFormat_RFC1036);
+			}
+
+			// if the modified since header is before the page modification time or if it can't
+			// be parsed push it.
+			if (ifModifiedSinceFromRequestTime == null ||
+				ifModifiedSinceFromRequestTime.isBefore(pageModificationTime))
+			{
+				// Some browsers like IE 9-11 or Chrome 39 that does not send right headers
+				// receive the resource via push all the time
 				push(request);
 			}
+		}
+		else
+		{
+			// Push the resources if the "if-modified-since" is not available
+			push(request);
 		}
 	}
 
@@ -289,6 +286,7 @@ public class PushHeaderItem extends HeaderItem
 		}
 		catch (DateTimeParseException e)
 		{
+			logger.error(e.getMessage(), e);
 			// NOOP
 		}
 		return null;
@@ -320,7 +318,7 @@ public class PushHeaderItem extends HeaderItem
 	public PushHeaderItem push(List<PushItem> pushItems)
 	{
 		RequestCycle requestCycle = RequestCycle.get();
-		if (isHttp2(getContainerRequest(requestCycle.getRequest())))
+		if (isHttp2(getContainerRequest(requestCycle.getRequest()))) {
 			for (PushItem pushItem : pushItems)
 			{
 				Object object = pushItem.getObject();
@@ -356,7 +354,7 @@ public class PushHeaderItem extends HeaderItem
 					url = object.toString() + (queryString != null ? "?" + queryString : "");
 				}
 
-				if (url.toString().equals("."))
+				if (".".equals(url.toString()))
 				{
 					url = "/";
 				}
@@ -392,6 +390,7 @@ public class PushHeaderItem extends HeaderItem
 				// Apply the push item to be used during the push process
 				this.pushItems.add(pushItem);
 			}
+		}
 		return this;
 	}
 
@@ -448,10 +447,12 @@ public class PushHeaderItem extends HeaderItem
 	@Override
 	public boolean equals(Object o)
 	{
-		if (this == o)
+		if (this == o) {
 			return true;
-		if (o == null || getClass() != o.getClass())
+		}
+		if (o == null || getClass() != o.getClass()) {
 			return false;
+		}
 		PushHeaderItem that = (PushHeaderItem)o;
 		return Objects.equals(pushItems, that.pushItems) &&
 			Objects.equals(pageWebResponse, that.pageWebResponse) &&

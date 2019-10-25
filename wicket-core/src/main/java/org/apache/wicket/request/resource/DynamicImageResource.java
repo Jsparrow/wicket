@@ -60,7 +60,7 @@ public abstract class DynamicImageResource extends AbstractResource
 	/**
 	 * @return Returns the image format.
 	 */
-	public synchronized final String getFormat()
+	public final synchronized String getFormat()
 	{
 		return format;
 	}
@@ -71,7 +71,7 @@ public abstract class DynamicImageResource extends AbstractResource
 	 * @param format
 	 *            The format (jpg, png or gif..)
 	 */
-	public synchronized final void setFormat(String format)
+	public final synchronized void setFormat(String format)
 	{
 		Args.notNull(format, "format");
 		this.format = format;

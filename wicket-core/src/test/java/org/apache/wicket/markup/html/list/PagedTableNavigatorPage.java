@@ -36,8 +36,7 @@ public class PagedTableNavigatorPage extends WebPage
 	 */
 	public PagedTableNavigatorPage()
 	{
-		super();
-		List<String> list = new ArrayList<String>();
+		List<String> list = new ArrayList<>();
 		list.add("one");
 		list.add("two");
 		list.add("three");

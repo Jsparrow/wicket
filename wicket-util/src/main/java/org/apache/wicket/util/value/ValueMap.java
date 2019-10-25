@@ -33,6 +33,8 @@ import org.apache.wicket.util.string.IStringIterator;
 import org.apache.wicket.util.string.StringList;
 import org.apache.wicket.util.string.StringValue;
 import org.apache.wicket.util.string.StringValueConversionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -61,6 +63,8 @@ import org.apache.wicket.util.string.StringValueConversionException;
  */
 public class ValueMap extends LinkedHashMap<String, Object> implements IValueMap
 {
+	private static final Logger logger = LoggerFactory.getLogger(ValueMap.class);
+
 	/** an empty <code>ValueMap</code>. */
 	public static final ValueMap EMPTY_MAP;
 
@@ -83,7 +87,6 @@ public class ValueMap extends LinkedHashMap<String, Object> implements IValueMap
 	 */
 	public ValueMap()
 	{
-		super();
 	}
 
 	/**
@@ -94,8 +97,6 @@ public class ValueMap extends LinkedHashMap<String, Object> implements IValueMap
 	 */
 	public ValueMap(final Map<? extends String, ?> map)
 	{
-		super();
-
 		super.putAll(map);
 	}
 
@@ -128,8 +129,6 @@ public class ValueMap extends LinkedHashMap<String, Object> implements IValueMap
 	 */
 	public ValueMap(final String keyValuePairs, final String delimiter)
 	{
-		super();
-
 		int start = 0;
 		int equalsIndex = keyValuePairs.indexOf('=');
 		int delimiterIndex = keyValuePairs.indexOf(delimiter, equalsIndex);
@@ -189,8 +188,6 @@ public class ValueMap extends LinkedHashMap<String, Object> implements IValueMap
 	public ValueMap(final String keyValuePairs, final String delimiter,
 		final MetaPattern valuePattern)
 	{
-		super();
-
 		// Get list of strings separated by the delimiter
 		final StringList pairs = StringList.tokenize(keyValuePairs, delimiter);
 
@@ -211,8 +208,7 @@ public class ValueMap extends LinkedHashMap<String, Object> implements IValueMap
 			}
 			else
 			{
-				throw new IllegalArgumentException("Invalid key value list: '" + keyValuePairs +
-					'\'');
+				throw new IllegalArgumentException(new StringBuilder().append("Invalid key value list: '").append(keyValuePairs).append('\'').toString());
 			}
 		}
 	}
@@ -231,7 +227,7 @@ public class ValueMap extends LinkedHashMap<String, Object> implements IValueMap
 	 * @see IValueMap#getBoolean(String)
 	 */
 	@Override
-	public final boolean getBoolean(final String key) throws StringValueConversionException
+	public final boolean getBoolean(final String key)
 	{
 		return getStringValue(key).toBoolean();
 	}
@@ -240,7 +236,7 @@ public class ValueMap extends LinkedHashMap<String, Object> implements IValueMap
 	 * @see IValueMap#getDouble(String)
 	 */
 	@Override
-	public final double getDouble(final String key) throws StringValueConversionException
+	public final double getDouble(final String key)
 	{
 		return getStringValue(key).toDouble();
 	}
@@ -258,7 +254,7 @@ public class ValueMap extends LinkedHashMap<String, Object> implements IValueMap
 	 * @see IValueMap#getDuration(String)
 	 */
 	@Override
-	public final Duration getDuration(final String key) throws StringValueConversionException
+	public final Duration getDuration(final String key)
 	{
 		return getStringValue(key).toDuration();
 	}
@@ -267,7 +263,7 @@ public class ValueMap extends LinkedHashMap<String, Object> implements IValueMap
 	 * @see IValueMap#getInt(String)
 	 */
 	@Override
-	public final int getInt(final String key) throws StringValueConversionException
+	public final int getInt(final String key)
 	{
 		return getStringValue(key).toInt();
 	}
@@ -285,7 +281,7 @@ public class ValueMap extends LinkedHashMap<String, Object> implements IValueMap
 	 * @see IValueMap#getLong(String)
 	 */
 	@Override
-	public final long getLong(final String key) throws StringValueConversionException
+	public final long getLong(final String key)
 	{
 		return getStringValue(key).toLong();
 	}
@@ -424,7 +420,7 @@ public class ValueMap extends LinkedHashMap<String, Object> implements IValueMap
 	 * @see IValueMap#getInstant(String)
 	 */
 	@Override
-	public final Instant getInstant(final String key) throws StringValueConversionException
+	public final Instant getInstant(final String key)
 	{
 		return getStringValue(key).toInstant();
 	}
@@ -526,14 +522,7 @@ public class ValueMap extends LinkedHashMap<String, Object> implements IValueMap
 	@Override
 	public String getKey(final String key)
 	{
-		for (String other : keySet())
-		{
-			if (other.equalsIgnoreCase(key))
-			{
-				return other;
-			}
-		}
-		return null;
+		return keySet().stream().filter(other -> other.equalsIgnoreCase(key)).findFirst().orElse(null);
 	}
 
 	/**
@@ -609,6 +598,7 @@ public class ValueMap extends LinkedHashMap<String, Object> implements IValueMap
 		}
 		catch (StringValueConversionException ignored)
 		{
+			logger.error(ignored.getMessage(), ignored);
 			return null;
 		}
 	}
@@ -631,6 +621,7 @@ public class ValueMap extends LinkedHashMap<String, Object> implements IValueMap
 		}
 		catch (StringValueConversionException ignored)
 		{
+			logger.error(ignored.getMessage(), ignored);
 			return defaultValue;
 		}
 	}
@@ -652,6 +643,7 @@ public class ValueMap extends LinkedHashMap<String, Object> implements IValueMap
 		}
 		catch (StringValueConversionException ignored)
 		{
+			logger.error(ignored.getMessage(), ignored);
 			return null;
 		}
 	}
@@ -682,6 +674,7 @@ public class ValueMap extends LinkedHashMap<String, Object> implements IValueMap
 		}
 		catch (StringValueConversionException ignored)
 		{
+			logger.error(ignored.getMessage(), ignored);
 			return null;
 		}
 	}
@@ -712,6 +705,7 @@ public class ValueMap extends LinkedHashMap<String, Object> implements IValueMap
 		}
 		catch (StringValueConversionException ignored)
 		{
+			logger.error(ignored.getMessage(), ignored);
 			return null;
 		}
 	}
@@ -751,6 +745,7 @@ public class ValueMap extends LinkedHashMap<String, Object> implements IValueMap
 		}
 		catch (StringValueConversionException ignored)
 		{
+			logger.error(ignored.getMessage(), ignored);
 			return defaultValue;
 		}
 	}
@@ -781,6 +776,7 @@ public class ValueMap extends LinkedHashMap<String, Object> implements IValueMap
 		}
 		catch (StringValueConversionException ignored)
 		{
+			logger.error(ignored.getMessage(), ignored);
 			return defaultValue;
 		}
 	}

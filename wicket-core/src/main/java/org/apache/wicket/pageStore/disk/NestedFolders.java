@@ -93,21 +93,17 @@ public class NestedFolders
 	public void remove(String name)
 	{
 		File folder = get(name, false);
-		if (folder.exists())
-		{
-			Files.removeFolder(folder);
-			
-			File high = folder.getParentFile();
-			if (high.list().length == 0)
+		if (!folder.exists()) {
+			return;
+		}
+		Files.removeFolder(folder);
+		File high = folder.getParentFile();
+		boolean condition = high.list().length == 0 && Files.removeFolder(high);
+		if (condition) {
+			File low = high.getParentFile();
+			if (low.list().length == 0)
 			{
-				if (Files.removeFolder(high))
-				{
-					File low = high.getParentFile();
-					if (low.list().length == 0)
-					{
-						Files.removeFolder(low);
-					}
-				}
+				Files.removeFolder(low);
 			}
 		}
 	}

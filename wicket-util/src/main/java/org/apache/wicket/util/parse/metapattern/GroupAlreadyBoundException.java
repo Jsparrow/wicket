@@ -30,6 +30,5 @@ public final class GroupAlreadyBoundException extends RuntimeException
 	 */
 	public GroupAlreadyBoundException()
 	{
-		super();
 	}
 }

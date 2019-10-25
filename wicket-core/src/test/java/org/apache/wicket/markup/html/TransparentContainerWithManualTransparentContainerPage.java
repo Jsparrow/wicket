@@ -76,6 +76,7 @@ public class TransparentContainerWithManualTransparentContainerPage extends WebP
 		{
 			private static final long serialVersionUID = 1L;
 
+			@Override
 			public void onClick(Optional<AjaxRequestTarget> targetOptional)
 			{
 				targetOptional.ifPresent(target -> target.add(label));

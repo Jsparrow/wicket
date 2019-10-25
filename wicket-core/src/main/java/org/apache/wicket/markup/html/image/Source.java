@@ -44,18 +44,6 @@ public class Source extends Image
 	 * 
 	 * @param id
 	 *            the component id
-	 * @see org.apache.wicket.markup.html.image.Image
-	 */
-	protected Source(final String id)
-	{
-		super(id);
-	}
-
-	/**
-	 * Creates a source for a picture
-	 * 
-	 * @param id
-	 *            the component id
 	 * @param resourceReferences
 	 *            the resource references applied to the source in the given order
 	 * @see org.apache.wicket.markup.html.image.Image
@@ -122,6 +110,18 @@ public class Source extends Image
 	public Source(final String id, final String string)
 	{
 		super(id, string);
+	}
+
+	/**
+	 * Creates a source for a picture
+	 * 
+	 * @param id
+	 *            the component id
+	 * @see org.apache.wicket.markup.html.image.Image
+	 */
+	protected Source(final String id)
+	{
+		super(id);
 	}
 
 	@Override

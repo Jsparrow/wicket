@@ -30,13 +30,13 @@ public final class CssUtils
 {
 	// FIXME type text/css can be omitted for the style tag in supported browsers
 	/** start of CSS inline open tag */
-	public final static String INLINE_OPEN_TAG_START = "<style type=\"text/css\"";
+	public static final String INLINE_OPEN_TAG_START = "<style type=\"text/css\"";
 
 	/** CSS inline open tag */
-	public final static String INLINE_OPEN_TAG = INLINE_OPEN_TAG_START + ">\n";
+	public static final String INLINE_OPEN_TAG = INLINE_OPEN_TAG_START + ">\n";
 
 	/** CSS inline close tag */
-	public final static String INLINE_CLOSE_TAG = "</style>\n";
+	public static final String INLINE_CLOSE_TAG = "</style>\n";
 
 	public static final String ATTR_ID = "id";
 	public static final String ATTR_TYPE = "type";
@@ -202,6 +202,6 @@ public final class CssUtils
 	 */
 	public static String key(Class<?> scope, String facet)
 	{
-		return Classes.simpleName(scope) + ".CSS." + facet;
+		return new StringBuilder().append(Classes.simpleName(scope)).append(".CSS.").append(facet).toString();
 	}
 }

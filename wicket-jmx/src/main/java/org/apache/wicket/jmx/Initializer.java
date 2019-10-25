@@ -109,6 +109,7 @@ public class Initializer implements IInitializer
 			}
 			catch (SecurityException e)
 			{
+				log.error(e.getMessage(), e);
 				// Ignore - we're not allowed to read this property.
 				log.warn("not allowed to read property wicket.mbean.server.agentid due to security settings; ignoring");
 			}
@@ -133,6 +134,7 @@ public class Initializer implements IInitializer
 				}
 				catch (SecurityException e)
 				{
+					log.error(e.getMessage(), e);
 					// Ignore - we're not allowed to read this property.
 					log.warn("not allowed to read property wicket.mbean.server.class due to security settings; ignoring");
 				}
@@ -173,7 +175,7 @@ public class Initializer implements IInitializer
 			int i = 0;
 			while (mbeanServer.isRegistered(appBeanName))
 			{
-				tempDomain = name + "-" + i++;
+				tempDomain = new StringBuilder().append(name).append("-").append(i++).toString();
 				appBeanName = new ObjectName(tempDomain + ":type=Application");
 			}
 			domain = tempDomain;

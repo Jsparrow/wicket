@@ -45,24 +45,17 @@ public class MetaPattern implements IClusterable
 {
 	private static final long serialVersionUID = 1L;
 
-	/**
-	 * Compiled regular expression pattern, or null if patterns variable is valid instead
-	 */
-	private Pattern pattern;
-
-	/** List of patterns, or null if pattern variable is valid instead */
-	private List<MetaPattern> patterns;
-
-	/** The compiled MetaPattern */
-	private Pattern compiledPattern;
-
 	// Regexps that are used multiple times in defining meta patterns
 	private static final String _DOUBLE_QUOTED_STRING = "\"[^\"]*?\"";
+
 	private static final String _SINGLE_QUOTED_STRING = "'[^']*?\'";
-	private static final String _STRING = "(?:[\\w\\-\\.]+|" + _DOUBLE_QUOTED_STRING + "|" +
-		_SINGLE_QUOTED_STRING + ")";
+
+	private static final String _STRING = new StringBuilder().append("(?:[\\w\\-\\.]+|").append(_DOUBLE_QUOTED_STRING).append("|").append(_SINGLE_QUOTED_STRING).append(")").toString();
+
 	private static final String _OPTIONAL_STRING = _STRING + "?";
+
 	private static final String _VARIABLE_NAME = "[A-Za-z_][A-Za-z0-9_]*";
+
 	private static final String _XML_NAME = "[A-Za-z_][A-Za-z0-9_.-]*";
 
 	// Delimiters and punctuation
@@ -197,8 +190,7 @@ public class MetaPattern implements IClusterable
 	public static final MetaPattern XML_ATTRIBUTE_NAME = new MetaPattern(_XML_NAME);
 
 	/** Constant for perl interpolation. */
-	public static final MetaPattern PERL_INTERPOLATION = new MetaPattern("$\\{" + _VARIABLE_NAME +
-		"\\}");
+	public static final MetaPattern PERL_INTERPOLATION = new MetaPattern(new StringBuilder().append("$\\{").append(_VARIABLE_NAME).append("\\}").toString());
 
 	/** Constant for a double quoted string. */
 	public static final MetaPattern DOUBLE_QUOTED_STRING = new MetaPattern(_DOUBLE_QUOTED_STRING);
@@ -208,6 +200,17 @@ public class MetaPattern implements IClusterable
 
 	/** Constant for an optional string. */
 	public static final MetaPattern OPTIONAL_STRING = new MetaPattern(_OPTIONAL_STRING);
+
+	/**
+	 * Compiled regular expression pattern, or null if patterns variable is valid instead
+	 */
+	private Pattern pattern;
+
+	/** List of patterns, or null if pattern variable is valid instead */
+	private List<MetaPattern> patterns;
+
+	/** The compiled MetaPattern */
+	private Pattern compiledPattern;
 
 	/**
 	 * Constructor for a simple pattern.
@@ -326,10 +329,7 @@ public class MetaPattern implements IClusterable
 		else
 		{
 			final StringBuilder buffer = new StringBuilder();
-			for (MetaPattern metaPattern : patterns)
-			{
-				buffer.append(metaPattern);
-			}
+			patterns.forEach(buffer::append);
 			return buffer.toString();
 		}
 	}
@@ -343,11 +343,11 @@ public class MetaPattern implements IClusterable
 	 */
 	private synchronized void compile(final int flags)
 	{
-		if (compiledPattern == null)
-		{
-			bind(1);
-			compiledPattern = Pattern.compile(toString(), flags);
+		if (compiledPattern != null) {
+			return;
 		}
+		bind(1);
+		compiledPattern = Pattern.compile(toString(), flags);
 	}
 
 	/**

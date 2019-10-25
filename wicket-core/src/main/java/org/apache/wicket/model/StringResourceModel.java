@@ -217,74 +217,6 @@ public class StringResourceModel extends LoadableDetachableModel<String>
 	/** The default value of the message. */
 	private IModel<String> defaultValue;
 
-	@Override
-	public IWrapModel<String> wrapOnAssignment(Component component)
-	{
-		return new AssignmentWrapper(component);
-	}
-
-	private class AssignmentWrapper extends LoadableDetachableModel<String>
-		implements
-			IWrapModel<String>
-	{
-		private static final long serialVersionUID = 1L;
-
-		private final Component component;
-
-		/**
-		 * Construct.
-		 * 
-		 * @param component
-		 */
-		public AssignmentWrapper(Component component)
-		{
-			this.component = component;
-		}
-
-		@Override
-		public void detach()
-		{
-			super.detach();
-
-			StringResourceModel.this.detach();
-		}
-
-		@Override
-		protected void onDetach()
-		{
-			if (StringResourceModel.this.component == null)
-			{
-				StringResourceModel.this.onDetach();
-			}
-		}
-
-		@Override
-		protected String load()
-		{
-			if (StringResourceModel.this.component != null)
-			{
-				// ignore assignment if component was specified explicitly
-				return StringResourceModel.this.getObject();
-			}
-			else
-			{
-				return getString(component);
-			}
-		}
-
-		@Override
-		public void setObject(String object)
-		{
-			StringResourceModel.this.setObject(object);
-		}
-
-		@Override
-		public IModel<String> getWrappedModel()
-		{
-			return StringResourceModel.this;
-		}
-	}
-
 	/**
 	 * Creates a new string resource model using the supplied parameters.
 	 * <p>
@@ -326,7 +258,7 @@ public class StringResourceModel extends LoadableDetachableModel<String>
 	{
 		this(resourceKey, component, null);
 	}
-	
+
 	/**
 	 * Creates a new string resource model using the supplied parameter.
 	 *
@@ -339,7 +271,7 @@ public class StringResourceModel extends LoadableDetachableModel<String>
 	{
 		this(resourceKey, null, model);
 	}
-	
+
 	/**
 	 * Creates a new string resource model using the supplied parameter.
 	 *
@@ -349,6 +281,12 @@ public class StringResourceModel extends LoadableDetachableModel<String>
 	public StringResourceModel(final String resourceKey)
 	{
 		this(resourceKey, null, null);
+	}
+
+	@Override
+	public IWrapModel<String> wrapOnAssignment(Component component)
+	{
+		return new AssignmentWrapper(component);
 	}
 
 	/**
@@ -363,7 +301,7 @@ public class StringResourceModel extends LoadableDetachableModel<String>
 		this.defaultValue = defaultValue;
 		return this;
 	}
-	
+
 	/**
 	 * Sets the default value if the resource key is not found.
 	 *
@@ -651,5 +589,67 @@ public class StringResourceModel extends LoadableDetachableModel<String>
 	public void setObject(String object)
 	{
 		throw new UnsupportedOperationException();
+	}
+
+	private class AssignmentWrapper extends LoadableDetachableModel<String>
+		implements
+			IWrapModel<String>
+	{
+		private static final long serialVersionUID = 1L;
+
+		private final Component component;
+
+		/**
+		 * Construct.
+		 * 
+		 * @param component
+		 */
+		public AssignmentWrapper(Component component)
+		{
+			this.component = component;
+		}
+
+		@Override
+		public void detach()
+		{
+			super.detach();
+
+			StringResourceModel.this.detach();
+		}
+
+		@Override
+		protected void onDetach()
+		{
+			if (StringResourceModel.this.component == null)
+			{
+				StringResourceModel.this.onDetach();
+			}
+		}
+
+		@Override
+		protected String load()
+		{
+			if (StringResourceModel.this.component != null)
+			{
+				// ignore assignment if component was specified explicitly
+				return StringResourceModel.this.getObject();
+			}
+			else
+			{
+				return getString(component);
+			}
+		}
+
+		@Override
+		public void setObject(String object)
+		{
+			StringResourceModel.this.setObject(object);
+		}
+
+		@Override
+		public IModel<String> getWrappedModel()
+		{
+			return StringResourceModel.this;
+		}
 	}
 }

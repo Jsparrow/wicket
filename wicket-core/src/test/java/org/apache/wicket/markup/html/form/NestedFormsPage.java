@@ -88,8 +88,8 @@ public class NestedFormsPage extends WebPage
 			super(id);
 			setDefaultModel(new CompoundPropertyModel<NestableForm>(this));
 
-			TextField<String> firstField = new RequiredTextField<String>("first");
-			TextField<String> secondField = new TextField<String>("second");
+			TextField<String> firstField = new RequiredTextField<>("first");
+			TextField<String> secondField = new TextField<>("second");
 			add(firstField);
 			add(secondField);
 
@@ -149,7 +149,7 @@ public class NestedFormsPage extends WebPage
 		public void onClick()
 		{
 			form.setEnabled(!form.isEnabled());
-			form.info(form.getId() + ".isEnabled() == " + form.isEnabled());
+			form.info(new StringBuilder().append(form.getId()).append(".isEnabled() == ").append(form.isEnabled()).toString());
 		}
 
 		@Override

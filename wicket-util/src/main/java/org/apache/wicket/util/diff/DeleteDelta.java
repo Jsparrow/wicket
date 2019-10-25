@@ -65,19 +65,19 @@ public class DeleteDelta extends Delta
 {
 	/**
 	 * Construct.
-	 */
-	DeleteDelta()
-	{
-	}
-
-	/**
-	 * Construct.
 	 * 
 	 * @param orig
 	 */
 	public DeleteDelta(final Chunk orig)
 	{
 		init(orig, null);
+	}
+
+	/**
+	 * Construct.
+	 */
+	DeleteDelta()
+	{
 	}
 
 	/**

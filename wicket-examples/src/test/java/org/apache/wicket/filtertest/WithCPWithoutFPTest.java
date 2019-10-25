@@ -34,8 +34,9 @@ public class WithCPWithoutFPTest extends WithoutCPWithoutFPTest
 		setContextPath("/somecontext");
 		String basedir = System.getProperty("basedir");
 		String path = "";
-		if (basedir != null)
+		if (basedir != null) {
 			path = basedir + "/";
+		}
 		path += "src/main/testwebapp2";
 		setWebappLocation(path);
 

@@ -34,14 +34,6 @@ public abstract class AbstractAuthenticatedWebSession extends WebSession
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * @return Current authenticated web session
-	 */
-	public static AbstractAuthenticatedWebSession get()
-	{
-		return (AbstractAuthenticatedWebSession)Session.get();
-	}
-
-	/**
 	 * Construct.
 	 * 
 	 * @param request
@@ -50,6 +42,14 @@ public abstract class AbstractAuthenticatedWebSession extends WebSession
 	public AbstractAuthenticatedWebSession(final Request request)
 	{
 		super(request);
+	}
+
+	/**
+	 * @return Current authenticated web session
+	 */
+	public static AbstractAuthenticatedWebSession get()
+	{
+		return (AbstractAuthenticatedWebSession)Session.get();
 	}
 
 	/**

@@ -16,7 +16,7 @@
  */
 package org.apache.wicket.util.license;
 
-import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * Test that the license headers are in place in this project. The tests are run from
@@ -38,10 +38,10 @@ public class ApacheLicenceHeaderTest extends ApacheLicenseHeaderTestCase
 		 * This is an example project. Therefore we'd rather not have license headers in html files,
 		 * because it removes the focus away from what the example is about.
 		 */
-		htmlIgnore = Arrays.asList("src");
+		htmlIgnore = Collections.singletonList("src");
 
 		/* same, same */
-		velocityIgnore = Arrays.asList("src");
+		velocityIgnore = Collections.singletonList("src");
 
 		/*
 		 * Prototype, released under MIT. See NOTICE
@@ -80,6 +80,6 @@ public class ApacheLicenceHeaderTest extends ApacheLicenseHeaderTestCase
 		propertiesIgnore.add("src/main/java/commons-logging.properties");
 		propertiesIgnore.add("src/main/java/log4j.properties");
 
-		xmlPrologIgnore = Arrays.asList("src");
+		xmlPrologIgnore = Collections.singletonList("src");
 	}
 }

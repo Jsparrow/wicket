@@ -23,6 +23,8 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Tests {@link MapVariableInterpolator}
@@ -31,6 +33,8 @@ import static org.junit.jupiter.api.Assertions.fail;
  */
 public class VariableInterpolatorTest
 {
+	private static final Logger logger = LoggerFactory.getLogger(VariableInterpolatorTest.class);
+
 	/**
 	 * 
 	 */
@@ -69,6 +73,7 @@ public class VariableInterpolatorTest
 		}
 		catch (Exception e)
 		{
+			logger.error(e.getMessage(), e);
 
 		}
 	}

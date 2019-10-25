@@ -51,7 +51,7 @@ public final class MarkupException extends WicketRuntimeException
 	 */
 	public MarkupException(final IResourceStream resource, final String message)
 	{
-		super(resource.toString() + ": " + message);
+		super(new StringBuilder().append(resource.toString()).append(": ").append(message).toString());
 		markupStream = null;
 	}
 
@@ -66,7 +66,7 @@ public final class MarkupException extends WicketRuntimeException
 	public MarkupException(final IResourceStream resource, final String message,
 		final Throwable cause)
 	{
-		super(resource.toString() + ": " + message, cause);
+		super(new StringBuilder().append(resource.toString()).append(": ").append(message).toString(), cause);
 		markupStream = null;
 	}
 
@@ -130,7 +130,6 @@ public final class MarkupException extends WicketRuntimeException
 	@Override
 	public String toString()
 	{
-		return getMessage() + "\n MarkupStream: " +
-			(markupStream == null ? "[unknown]" : markupStream.toString());
+		return new StringBuilder().append(getMessage()).append("\n MarkupStream: ").append(markupStream == null ? "[unknown]" : markupStream.toString()).toString();
 	}
 }

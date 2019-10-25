@@ -49,6 +49,7 @@ import org.apache.wicket.util.lang.Args;
 import org.apache.wicket.util.lang.Bytes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import java.util.stream.Collectors;
 
 /**
  * A storage of pages on disk.
@@ -181,15 +182,14 @@ public class DiskPageStore extends AbstractPersistentPageStore implements IPersi
 	protected void removePersistedPage(String sessionIdentifier, IManageablePage page)
 	{
 		DiskData diskData = getDiskData(sessionIdentifier, false);
-		if (diskData != null)
-		{
-			if (log.isDebugEnabled())
-			{
-				log.debug("Removing page with id '{}' in session with id '{}'", page.getPageId(), sessionIdentifier);
-			}
-			
-			diskData.removeData(page.getPageId());
+		if (diskData == null) {
+			return;
 		}
+		if (log.isDebugEnabled())
+		{
+			log.debug("Removing page with id '{}' in session with id '{}'", page.getPageId(), sessionIdentifier);
+		}
+		diskData.removeData(page.getPageId());
 	}
 
 	@Override
@@ -260,15 +260,14 @@ public class DiskPageStore extends AbstractPersistentPageStore implements IPersi
 
 				diskDatas.clear();
 
-				for (DiskData diskData : (List<DiskData>)ois.readObject())
-				{
+				((List<DiskData>)ois.readObject()).forEach(diskData -> {
 					diskData.pageStore = this;
 					diskDatas.put(diskData.sessionIdentifier, diskData);
-				}
+				});
 			}
 			catch (Exception e)
 			{
-				log.error("Couldn't load DiskPageStore index from file " + index + ".", e);
+				log.error(new StringBuilder().append("Couldn't load DiskPageStore index from file ").append(index).append(".").toString(), e);
 			}
 		}
 		Files.remove(index);
@@ -277,28 +276,22 @@ public class DiskPageStore extends AbstractPersistentPageStore implements IPersi
 	private void saveIndex()
 	{
 		File storeFolder = folders.getBase();
-		if (storeFolder.exists())
+		if (!storeFolder.exists()) {
+			return;
+		}
+		File index = new File(storeFolder, INDEX_FILE_NAME);
+		Files.remove(index);
+		try (OutputStream stream = new FileOutputStream(index))
 		{
-			File index = new File(storeFolder, INDEX_FILE_NAME);
-			Files.remove(index);
-			try (OutputStream stream = new FileOutputStream(index))
-			{
-				ObjectOutputStream oos = new ObjectOutputStream(stream);
-				
-				List<DiskData> list = new ArrayList<>(diskDatas.size());
-				for (DiskData diskData : diskDatas.values())
-				{
-					if (diskData.sessionIdentifier != null)
-					{
-						list.add(diskData);
-					}
-				}
-				oos.writeObject(list);
-			}
-			catch (Exception e)
-			{
-				log.error("Couldn't write DiskPageStore index to file " + index + ".", e);
-			}
+			ObjectOutputStream oos = new ObjectOutputStream(stream);
+			
+			List<DiskData> list = new ArrayList<>(diskDatas.size());
+			list.addAll(diskDatas.values().stream().filter(diskData -> diskData.sessionIdentifier != null).collect(Collectors.toList()));
+			oos.writeObject(list);
+		}
+		catch (Exception e)
+		{
+			log.error(new StringBuilder().append("Couldn't write DiskPageStore index to file ").append(index).append(".").toString(), e);
 		}
 	}
 
@@ -338,11 +331,24 @@ public class DiskPageStore extends AbstractPersistentPageStore implements IPersi
 		{
 			for (DiskData diskData : diskDatas.values())
 			{
-				size = size + diskData.size();
+				size += diskData.size();
 			}
 		}
 
 		return Bytes.bytes(size);
+	}
+
+	/**
+	 * Returns the file name for specified session. If the session folder (folder that contains the
+	 * file) does not exist, the folder will be created.
+	 * 
+	 * @param sessionIdentifier
+	 * @return file name for pagemap
+	 */
+	private String getSessionFileName(String sessionIdentifier)
+	{
+		File sessionFolder = folders.get(sessionIdentifier, true);
+		return new File(sessionFolder, "data").getAbsolutePath();
 	}
 
 	/**
@@ -413,34 +419,33 @@ public class DiskPageStore extends AbstractPersistentPageStore implements IPersi
 			}
 
 			// only save page that has some data
-			if (data != null)
+			if (data == null) {
+				return;
+			}
+			// allocate window for page
+			FileWindow window = getManager().createPageWindow(pageId, pageType, data.length);
+			FileChannel channel = getFileChannel(true);
+			if (channel != null)
 			{
-				// allocate window for page
-				FileWindow window = getManager().createPageWindow(pageId, pageType, data.length);
-
-				FileChannel channel = getFileChannel(true);
-				if (channel != null)
+				try
 				{
-					try
-					{
-						// write the content
-						channel.write(ByteBuffer.wrap(data), window.getFilePartOffset());
-					}
-					catch (IOException e)
-					{
-						log.error("Error writing to a channel " + channel, e);
-					}
-					finally
-					{
-						IOUtils.closeQuietly(channel);
-					}
+					// write the content
+					channel.write(ByteBuffer.wrap(data), window.getFilePartOffset());
 				}
-				else
+				catch (IOException e)
 				{
-					log.warn(
-						"Cannot save page with id '{}' because the data file cannot be opened.",
-						pageId);
+					log.error("Error writing to a channel " + channel, e);
 				}
+				finally
+				{
+					IOUtils.closeQuietly(channel);
+				}
+			}
+			else
+			{
+				log.warn(
+					"Cannot save page with id '{}' because the data file cannot be opened.",
+					pageId);
 			}
 		}
 
@@ -544,18 +549,5 @@ public class DiskPageStore extends AbstractPersistentPageStore implements IPersi
 
 			sessionIdentifier = null;
 		}
-	}
-
-	/**
-	 * Returns the file name for specified session. If the session folder (folder that contains the
-	 * file) does not exist, the folder will be created.
-	 * 
-	 * @param sessionIdentifier
-	 * @return file name for pagemap
-	 */
-	private String getSessionFileName(String sessionIdentifier)
-	{
-		File sessionFolder = folders.get(sessionIdentifier, true);
-		return new File(sessionFolder, "data").getAbsolutePath();
 	}
 }

@@ -64,7 +64,6 @@ public class SignInPanelTest
 	{
 		private TestPage(AtomicInteger constructorCalls)
 		{
-			super();
 			constructorCalls.incrementAndGet();
 
 			add(new SignInPanel("signInPanel"));

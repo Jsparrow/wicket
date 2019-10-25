@@ -95,7 +95,7 @@ public class EnumChoiceRenderer<T extends Enum<T>> extends ChoiceRenderer<T>
 	 */
 	protected String resourceKey(T object)
 	{
-		return Classes.simpleName(object.getDeclaringClass()) + '.' + object.name();
+		return new StringBuilder().append(Classes.simpleName(object.getDeclaringClass())).append('.').append(object.name()).toString();
 	}
 
 	/** {@inheritDoc} */

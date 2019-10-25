@@ -136,8 +136,7 @@ public class Check<T> extends LabeledWebMarkupContainer implements IGenericCompo
 			group = findParent(CheckGroup.class);
 			if (group == null)
 			{
-				throw new WicketRuntimeException("Check component [" + getPath() +
-					"] cannot find its parent CheckGroup");
+				throw new WicketRuntimeException(new StringBuilder().append("Check component [").append(getPath()).append("] cannot find its parent CheckGroup").toString());
 			}
 		}
 		return group;
@@ -173,8 +172,7 @@ public class Check<T> extends LabeledWebMarkupContainer implements IGenericCompo
 		// check for npe in group's model object
 		if (collection == null)
 		{
-			throw new WicketRuntimeException("CheckGroup [" + group.getPath() +
-				"] contains a null model object, must be an object of type java.util.Collection");
+			throw new WicketRuntimeException(new StringBuilder().append("CheckGroup [").append(group.getPath()).append("] contains a null model object, must be an object of type java.util.Collection").toString());
 		}
 
 		if (group.hasRawInput())

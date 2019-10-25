@@ -319,7 +319,8 @@ public class Diff extends ToString
 			{
 				for (int k = 0; k < len; k++, pos++)
 				{
-					result.add(pos, "[" + i + "] random edit[" + i + "][" + i + "]");
+					result.add(pos, new StringBuilder().append("[").append(i).append("] random edit[").append(i).append("][").append(i)
+							.append("]").toString());
 				}
 			}
 		}

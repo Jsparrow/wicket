@@ -37,6 +37,8 @@ import org.apache.wicket.util.file.IFileCleaner;
 import org.apache.wicket.util.tester.FormTester;
 import org.apache.wicket.util.tester.WicketTestCase;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Test of FileUpload
@@ -45,6 +47,8 @@ import org.junit.jupiter.api.Test;
  */
 public class FileUploadTest extends WicketTestCase
 {
+
+	private static final Logger logger = LoggerFactory.getLogger(FileUploadTest.class);
 
 	/**
 	 * Test that when getting an input stream a new input stream is returned every time.
@@ -100,6 +104,7 @@ public class FileUploadTest extends WicketTestCase
 		}
 		catch (Exception e)
 		{
+			logger.error(e.getMessage(), e);
 			fail();
 		}
 

@@ -128,27 +128,19 @@ public abstract class ApacheLicenseHeaderTestCase
 		for (final ILicenseHeaderHandler licenseHeaderHandler : licenseHeaderHandlers)
 		{
 			visitFiles(licenseHeaderHandler.getSuffixes(), licenseHeaderHandler.getIgnoreFiles(),
-				new FileVisitor()
-				{
-					@Override
-					public void visitFile(final File file)
-					{
-						if (licenseHeaderHandler.checkLicenseHeader(file) == false)
+				(final File file) -> {
+					boolean condition = licenseHeaderHandler.checkLicenseHeader(file) == false && ((addHeaders == false) ||
+						(licenseHeaderHandler.addLicenseHeader(file) == false));
+					if (condition) {
+						List<File> files = badFiles.get(licenseHeaderHandler);
+
+						if (files == null)
 						{
-							if ((addHeaders == false) ||
-								(licenseHeaderHandler.addLicenseHeader(file) == false))
-							{
-								List<File> files = badFiles.get(licenseHeaderHandler);
-
-								if (files == null)
-								{
-									files = new ArrayList<>();
-									badFiles.put(licenseHeaderHandler, files);
-								}
-
-								files.add(file);
-							}
+							files = new ArrayList<>();
+							badFiles.put(licenseHeaderHandler, files);
 						}
+
+						files.add(file);
 					}
 				});
 		}
@@ -158,36 +150,32 @@ public abstract class ApacheLicenseHeaderTestCase
 
 	private void failIncorrectLicenceHeaders(final Map<ILicenseHeaderHandler, List<File>> files)
 	{
-		if (files.size() > 0)
-		{
-			StringBuilder failString = new StringBuilder();
-
-			for (Entry<ILicenseHeaderHandler, List<File>> entry : files.entrySet())
-			{
-				ILicenseHeaderHandler licenseHeaderHandler = entry.getKey();
-				List<File> fileList = entry.getValue();
-
-				failString.append('\n');
-				failString.append(licenseHeaderHandler.getClass().getName());
-				failString.append(" failed. The following files(");
-				failString.append(fileList.size());
-				failString.append(") didn't have correct license header:\n");
-
-				for (File file : fileList)
-				{
-					String filename = file.getAbsolutePath();
-
-					// Find the license type
-					String licenseType = licenseHeaderHandler.getLicenseType(file);
-
-					failString.append(Objects.requireNonNullElse(licenseType, "NONE"));
-					failString.append(' ').append(filename).append(LINE_ENDING);
-				}
-			}
-
-			System.out.println(failString);
-			throw new AssertionError(failString.toString());
+		if (files.size() <= 0) {
+			return;
 		}
+		StringBuilder failString = new StringBuilder();
+		files.entrySet().forEach(entry -> {
+			ILicenseHeaderHandler licenseHeaderHandler = entry.getKey();
+			List<File> fileList = entry.getValue();
+
+			failString.append('\n');
+			failString.append(licenseHeaderHandler.getClass().getName());
+			failString.append(" failed. The following files(");
+			failString.append(fileList.size());
+			failString.append(") didn't have correct license header:\n");
+
+			fileList.forEach(file -> {
+				String filename = file.getAbsolutePath();
+
+				// Find the license type
+				String licenseType = licenseHeaderHandler.getLicenseType(file);
+
+				failString.append(Objects.requireNonNullElse(licenseType, "NONE"));
+				failString.append(' ').append(filename).append(LINE_ENDING);
+			});
+		});
+		log.info(String.valueOf(failString));
+		throw new AssertionError(failString.toString());
 	}
 
 	private void visitFiles(final List<String> suffixes, final List<String> ignoreFiles,

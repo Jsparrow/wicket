@@ -69,13 +69,10 @@ public class InheritedMarkupMarkupLoader implements IMarkupLoader
 		if ((baseMarkup == null) || (baseMarkup == Markup.NO_MARKUP))
 		{
 			throw new MarkupNotFoundException(
-				"Base markup of inherited markup not found. Component class: " +
-					markup.getMarkupResourceStream()
-						.getContainerInfo()
-						.getContainerClass()
-						.getName() +
-					". Enable debug messages for " + ResourceStreamLocator.class.getName() +
-					" to get a list of all filenames tried.");
+				new StringBuilder().append("Base markup of inherited markup not found. Component class: ").append(markup.getMarkupResourceStream()
+					.getContainerInfo()
+					.getContainerClass()
+					.getName()).append(". Enable debug messages for ").append(ResourceStreamLocator.class.getName()).append(" to get a list of all filenames tried.").toString());
 		}
 
 		// Merge base and derived markup

@@ -131,21 +131,16 @@ public class FeedbackCollector
 
 		if (component != null && recursive && component instanceof MarkupContainer)
 		{
-			((MarkupContainer)component).visitChildren(new IVisitor<Component, Void>()
-			{
-				@Override
-				public void component(Component object, IVisit<Void> visit)
+			((MarkupContainer)component).visitChildren((Component object, IVisit<Void> visit) -> {
+				if (!shouldRecurseInto(object))
 				{
-					if (!shouldRecurseInto(object))
-					{
-						visit.dontGoDeeper();
-						return;
-					}
+					visit.dontGoDeeper();
+					return;
+				}
 
-					if (object.hasFeedbackMessage())
-					{
-						messages.addAll(object.getFeedbackMessages().messages(filter));
-					}
+				if (object.hasFeedbackMessage())
+				{
+					messages.addAll(object.getFeedbackMessages().messages(filter));
 				}
 			});
 		}

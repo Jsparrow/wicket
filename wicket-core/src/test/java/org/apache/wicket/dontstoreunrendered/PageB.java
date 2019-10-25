@@ -29,8 +29,6 @@ public class PageB extends BasePage {
 	static final AtomicBoolean PAGE_B_RENDERED    = new AtomicBoolean(false);
 
 	public PageB() {
-		super();
-
 		throw new RestartResponseException(PageC.class);
 	}
 

@@ -65,22 +65,22 @@ public class ChoicePage extends WebPage
 	public boolean checkBox;
 
 	/** test CheckGroup initial value */
-	public List<Book> initialCheckGroup = new ArrayList<Book>();
+	public List<Book> initialCheckGroup = new ArrayList<>();
 
 	/** test ListMultipleChoice initial values */
-	public List<Book> initialListMultipleChoice = new ArrayList<Book>();
+	public List<Book> initialListMultipleChoice = new ArrayList<>();
 
 	/** test CheckBoxMultipleChoice initial values */
-	public List<Book> initialCheckBoxMultipleChoice = new ArrayList<Book>();
+	public List<Book> initialCheckBoxMultipleChoice = new ArrayList<>();
 
 	/** test CheckBoxMultipleChoice */
-	public List<Book> checkBoxMultipleChoice = new ArrayList<Book>();
+	public List<Book> checkBoxMultipleChoice = new ArrayList<>();
 
 	/** test CheckGroup */
-	public List<Book> checkGroup = new ArrayList<Book>();
+	public List<Book> checkGroup = new ArrayList<>();
 
 	/** test ListMultipleChoice */
-	public List<Book> listMultipleChoice = new ArrayList<Book>();
+	public List<Book> listMultipleChoice = new ArrayList<>();
 
 	/** test multiple button */
 	public boolean buttonPressed;
@@ -97,7 +97,7 @@ public class ChoicePage extends WebPage
 	{
 		IChoiceRenderer<Book> bookChoiceRenderer = new ChoiceRenderer<>("name", "id");
 
-		Form<ChoicePage> form = new Form<ChoicePage>("choiceForm");
+		Form<ChoicePage> form = new Form<>("choiceForm");
 		add(form);
 
 		form.setDefaultModel(new CompoundPropertyModel<>(this));
@@ -157,7 +157,7 @@ public class ChoicePage extends WebPage
 	private <S extends Serializable> CheckGroup<S> newCheckGroup(final String id,
 		List<S> candidateChoices)
 	{
-		CheckGroup<S> checkGroupComponent = new CheckGroup<S>(id);
+		CheckGroup<S> checkGroupComponent = new CheckGroup<>(id);
 		ListView<S> listView = new ListView<S>("loop", candidateChoices)
 		{
 			private static final long serialVersionUID = 1L;
@@ -175,7 +175,7 @@ public class ChoicePage extends WebPage
 
 	private RadioGroup<Book> newRadioGroup(List<Book> candidateChoices)
 	{
-		RadioGroup<Book> radioGroupComponent = new RadioGroup<Book>("radioGroup");
+		RadioGroup<Book> radioGroupComponent = new RadioGroup<>("radioGroup");
 		ListView<Book> listView = new ListView<Book>("loop", candidateChoices)
 		{
 			private static final long serialVersionUID = 1L;

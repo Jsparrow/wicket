@@ -28,6 +28,8 @@ import org.apache.wicket.WicketRuntimeException;
 import org.apache.wicket.request.HttpHeaderCollection;
 import org.apache.wicket.request.http.WebResponse;
 import org.apache.wicket.util.lang.Args;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Mocked {@link WebResponse}.
@@ -36,11 +38,13 @@ import org.apache.wicket.util.lang.Args;
  */
 public class MockWebResponse extends WebResponse
 {
+	private static final Logger logger = LoggerFactory.getLogger(MockWebResponse.class);
+
 	/** response headers */
 	private final HttpHeaderCollection headers = new HttpHeaderCollection();
 
 	/** response cookies */
-	private final List<Cookie> cookies = new ArrayList<Cookie>();
+	private final List<Cookie> cookies = new ArrayList<>();
 
 	/** url for redirection */
 	private String redirectUrl;
@@ -160,7 +164,7 @@ public class MockWebResponse extends WebResponse
 
 		if (time == null)
 		{
-			throw new WicketRuntimeException("Date header '" + name + "' is not set.");
+			throw new WicketRuntimeException(new StringBuilder().append("Date header '").append(name).append("' is not set.").toString());
 		}
 		return time;
 	}
@@ -189,12 +193,9 @@ public class MockWebResponse extends WebResponse
 	 */
 	private void internalSetContentType(String name, String value)
 	{
-		if ("Content-Type".equalsIgnoreCase(name))
-		{
-			if (headers.containsHeader(name) == false)
-			{
-				setContentType(value);
-			}
+		boolean condition = "Content-Type".equalsIgnoreCase(name) && headers.containsHeader(name) == false;
+		if (condition) {
+			setContentType(value);
 		}
 	}
 
@@ -291,6 +292,7 @@ public class MockWebResponse extends WebResponse
 		}
 		catch (IOException ignored)
 		{
+			logger.error(ignored.getMessage(), ignored);
 		}
 	}
 

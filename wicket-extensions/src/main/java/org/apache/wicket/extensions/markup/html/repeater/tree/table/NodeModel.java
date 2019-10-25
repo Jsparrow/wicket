@@ -103,13 +103,11 @@ public class NodeModel<T> implements IWrapModel<T>
 	@Override
 	public boolean equals(Object obj)
 	{
-		if (obj instanceof NodeModel<?>)
-		{
-			NodeModel<?> nodeModel = (NodeModel<?>)obj;
-
-			return Arrays.equals(this.branches, nodeModel.branches) &&
-				this.model.equals((nodeModel).model);
+		if (!(obj instanceof NodeModel<?>)) {
+			return false;
 		}
-		return false;
+		NodeModel<?> nodeModel = (NodeModel<?>)obj;
+		return Arrays.equals(this.branches, nodeModel.branches) &&
+			this.model.equals((nodeModel).model);
 	}
 }

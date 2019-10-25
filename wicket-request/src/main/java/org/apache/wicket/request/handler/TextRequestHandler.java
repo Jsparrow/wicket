@@ -87,7 +87,7 @@ public class TextRequestHandler implements IRequestHandler
 
 		// Get servlet response to use when responding with resource
 		final WebResponse response = (WebResponse)requestCycle.getResponse();
-		response.setContentType(contentType + ";charset=" + encoding);
+		response.setContentType(new StringBuilder().append(contentType).append(";charset=").append(encoding).toString());
 
 		// send string to client
 		try

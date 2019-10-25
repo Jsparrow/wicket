@@ -88,7 +88,7 @@ public final class HtmlProblemFinder extends AbstractMarkupFilter
 		if ("img".equals(tag.getName()) && (tag.isOpen() || tag.isOpenClose()))
 		{
 			String src = tag.getAttributes().getString("src");
-			if ((src != null) && (src.trim().length() == 0))
+			if ((src != null) && (src.trim().isEmpty()))
 			{
 				escalateWarning("Attribute 'src' should not be empty. Location: ", tag);
 			}

@@ -38,6 +38,6 @@ public class PageHeaderItem extends StringHeaderItem
 	@Override
 	public String toString()
 	{
-		return "PageHeaderItem(" + getString() + ")";
+		return new StringBuilder().append("PageHeaderItem(").append(getString()).append(")").toString();
 	}
 }

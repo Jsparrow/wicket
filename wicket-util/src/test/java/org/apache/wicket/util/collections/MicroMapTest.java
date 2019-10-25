@@ -22,12 +22,15 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import static org.junit.jupiter.api.Assertions.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author almaw
  */
 public class MicroMapTest
 {
+	private static final Logger logger = LoggerFactory.getLogger(MicroMapTest.class);
 	private static final Object FOO = new Object();
 	private static final Object BAR = new Object();
 
@@ -57,6 +60,7 @@ public class MicroMapTest
 		}
 		catch (NoSuchElementException e)
 		{
+			logger.error(e.getMessage(), e);
 			// Swallow this.
 		}
 
@@ -79,6 +83,7 @@ public class MicroMapTest
 		}
 		catch (NoSuchElementException e)
 		{
+			logger.error(e.getMessage(), e);
 			// Swallow this.
 		}
 
@@ -99,6 +104,7 @@ public class MicroMapTest
 		}
 		catch (NoSuchElementException e)
 		{
+			logger.error(e.getMessage(), e);
 			// Swallow this.
 		}
 	}

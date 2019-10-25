@@ -35,27 +35,13 @@ public class SessionListenerCollection extends ListenerCollection<ISessionListen
 	@Override
 	public void onCreated(final Session session)
 	{
-		notify(new INotifier<ISessionListener>()
-		{
-			@Override
-			public void notify(ISessionListener listener)
-			{
-				listener.onCreated(session);
-			}
-		});
+		notify((ISessionListener listener) -> listener.onCreated(session));
 	}
 
 	@Override
 	public void onUnbound(final String sessionId)
 	{
-		notify(new INotifier<ISessionListener>()
-		{
-			@Override
-			public void notify(ISessionListener listener)
-			{
-				listener.onUnbound(sessionId);
-			}
-		});
+		notify((ISessionListener listener) -> listener.onUnbound(sessionId));
 	}
 
 }

@@ -184,9 +184,121 @@ public abstract class Application implements UnboundListener, IEventSink, IMetad
 	/**
 	 * The decorator this application uses to decorate any header responses created by Wicket
 	 */
-	private IHeaderResponseDecorator headerResponseDecorator = (headerresponse) -> {
-		return new ResourceAggregator(headerresponse);
-	};
+	private IHeaderResponseDecorator headerResponseDecorator = ResourceAggregator::new;
+
+	/** */
+	private final ComponentOnBeforeRenderListenerCollection componentPreOnBeforeRenderListeners = new ComponentOnBeforeRenderListenerCollection();
+
+	/** */
+	private final ComponentOnBeforeRenderListenerCollection componentPostOnBeforeRenderListeners = new ComponentOnBeforeRenderListenerCollection();
+
+	/** */
+	private final ComponentOnAfterRenderListenerCollection componentOnAfterRenderListeners = new ComponentOnAfterRenderListenerCollection();
+
+	/** */
+	private final RequestCycleListenerCollection requestCycleListeners = new RequestCycleListenerCollection();
+
+	private final ApplicationListenerCollection applicationListeners = new ApplicationListenerCollection();
+
+	private final SessionListenerCollection sessionListeners = new SessionListenerCollection();
+
+	/** list of {@link IComponentInstantiationListener}s. */
+	private final ComponentInstantiationListenerCollection componentInstantiationListeners = new ComponentInstantiationListenerCollection();
+
+	/** list of {@link IComponentInitializationListener}s. */
+	private final ComponentInitializationListenerCollection componentInitializationListeners = new ComponentInitializationListenerCollection();
+
+	/** list of {@link org.apache.wicket.application.IComponentOnConfigureListener}s. */
+	private final ComponentOnConfigureListenerCollection componentOnConfigureListeners = new ComponentOnConfigureListenerCollection();
+
+	/** list of {@link IHeaderContributor}s. */
+	private final HeaderContributorListenerCollection headerContributorListeners = new HeaderContributorListenerCollection();
+
+	private final BehaviorInstantiationListenerCollection behaviorInstantiationListeners = new BehaviorInstantiationListenerCollection();
+
+	private final OnComponentTagListenerCollection onComponentTagListeners = new OnComponentTagListenerCollection();
+
+	/** Application settings */
+	private ApplicationSettings applicationSettings;
+
+	/** JavaScriptLibrary settings */
+	private JavaScriptLibrarySettings javaScriptLibrarySettings;
+
+	/** Debug Settings */
+	private DebugSettings debugSettings;
+
+	/** Exception Settings */
+	private ExceptionSettings exceptionSettings;
+
+	/** Framework Settings */
+	private FrameworkSettings frameworkSettings;
+
+	/** The Markup Settings */
+	private MarkupSettings markupSettings;
+
+	/** The Page Settings */
+	private PageSettings pageSettings;
+
+	/** The Request Cycle Settings */
+	private RequestCycleSettings requestCycleSettings;
+
+	/** The Request Logger Settings */
+	private RequestLoggerSettings requestLoggerSettings;
+
+	/** The Resource Settings */
+	private ResourceSettings resourceSettings;
+
+	/** The Security Settings */
+	private SecuritySettings securitySettings;
+
+	/** The settings for {@link IPageStore} and {@link IPageManager} */
+	private StoreSettings storeSettings;
+
+	/** can the settings object be set/used. */
+	private boolean settingsAccessible;
+
+	private volatile IPageManager pageManager;
+
+	private IPageManagerProvider pageManagerProvider;
+
+	private ResourceReferenceRegistry resourceReferenceRegistry;
+
+	private SharedResources sharedResources;
+
+	private ResourceBundles resourceBundles;
+
+	private IPageFactory pageFactory;
+
+	private IMapperContext encoderContext;
+
+	/**
+	 * Constructor. <strong>Use {@link #init()} for any configuration of your application instead of
+	 * overriding the constructor.</strong>
+	 */
+	public Application()
+	{
+		// Install default component instantiation listener that uses
+		// authorization strategy to check component instantiations.
+		getComponentInstantiationListeners().add(new IComponentInstantiationListener()
+		{
+			/**
+			 * @see org.apache.wicket.application.IComponentInstantiationListener#onInstantiation(org.apache.wicket.Component)
+			 */
+			@Override
+			public void onInstantiation(final Component component)
+			{
+				final Class<? extends Component> cl = component.getClass();
+				// If component instantiation is not authorized
+				if (!Session.get().getAuthorizationStrategy().isInstantiationAuthorized(cl))
+				{
+					// then call any unauthorized component instantiation
+					// listener
+					getSecuritySettings().getUnauthorizedComponentInstantiationListener()
+						.onUnauthorizedInstantiation(component);
+				}
+			}
+		});
+	}
 
 	/**
 	 * Checks if the <code>Application</code> threadlocal is set in this thread
@@ -239,35 +351,6 @@ public abstract class Application implements UnboundListener, IEventSink, IMetad
 	public static Set<String> getApplicationKeys()
 	{
 		return Collections.unmodifiableSet(applicationKeyToApplication.keySet());
-	}
-
-	/**
-	 * Constructor. <strong>Use {@link #init()} for any configuration of your application instead of
-	 * overriding the constructor.</strong>
-	 */
-	public Application()
-	{
-		// Install default component instantiation listener that uses
-		// authorization strategy to check component instantiations.
-		getComponentInstantiationListeners().add(new IComponentInstantiationListener()
-		{
-			/**
-			 * @see org.apache.wicket.application.IComponentInstantiationListener#onInstantiation(org.apache.wicket.Component)
-			 */
-			@Override
-			public void onInstantiation(final Component component)
-			{
-				final Class<? extends Component> cl = component.getClass();
-				// If component instantiation is not authorized
-				if (!Session.get().getAuthorizationStrategy().isInstantiationAuthorized(cl))
-				{
-					// then call any unauthorized component instantiation
-					// listener
-					getSecuritySettings().getUnauthorizedComponentInstantiationListener()
-						.onUnauthorizedInstantiation(component);
-				}
-			}
-		});
 	}
 
 	/**
@@ -508,7 +591,7 @@ public abstract class Application implements UnboundListener, IEventSink, IMetad
 	 * @see MetaDataKey
 	 */
 	@Override
-	public synchronized final <T> Application setMetaData(final MetaDataKey<T> key, final T object)
+	public final synchronized <T> Application setMetaData(final MetaDataKey<T> key, final T object)
 	{
 		metaData = key.set(metaData, object);
 		return this;
@@ -534,11 +617,10 @@ public abstract class Application implements UnboundListener, IEventSink, IMetad
 	 */
 	private void destroyInitializers()
 	{
-		for (IInitializer initializer : initializers)
-		{
+		initializers.forEach(initializer -> {
 			log.info("[{}] destroy: {}", getName(), initializer);
 			initializer.destroy(this);
-		}
+		});
 	}
 
 	/**
@@ -547,11 +629,10 @@ public abstract class Application implements UnboundListener, IEventSink, IMetad
 	 */
 	private void initInitializers()
 	{
-		for (IInitializer initializer : initializers)
-		{
+		initializers.forEach(initializer -> {
 			log.info("[{}] init: {}", getName(), initializer);
 			initializer.init(this);
-		}
+		});
 
 		final ServiceLoader<IInitializer> serviceLoaderInitializers = ServiceLoader.load(IInitializer.class);
 		for (IInitializer serviceLoaderInitializer : serviceLoaderInitializers) {
@@ -651,8 +732,8 @@ public abstract class Application implements UnboundListener, IEventSink, IMetad
 
 		pageFactory = newPageFactory();
 
-		requestCycleProvider = (context) -> new RequestCycle(context);
-		exceptionMapperProvider = () -> new DefaultExceptionMapper();
+		requestCycleProvider = RequestCycle::new;
+		exceptionMapperProvider = DefaultExceptionMapper::new;
 
 		// add a request cycle listener that logs each request for the requestlogger.
 		getRequestCycleListeners().add(new RequestLoggerRequestCycleListener());
@@ -805,7 +886,7 @@ public abstract class Application implements UnboundListener, IEventSink, IMetad
 
 		if (applicationKeyToApplication.get(name) != null)
 		{
-			throw new IllegalStateException("Application with name '" + name + "' already exists.'");
+			throw new IllegalStateException(new StringBuilder().append("Application with name '").append(name).append("' already exists.'").toString());
 		}
 
 		this.name = name;
@@ -828,46 +909,6 @@ public abstract class Application implements UnboundListener, IEventSink, IMetad
 	public void onEvent(final IEvent<?> event)
 	{
 	}
-
-	// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//
-	// Listeners
-	//
-	// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	/** */
-	private final ComponentOnBeforeRenderListenerCollection componentPreOnBeforeRenderListeners = new ComponentOnBeforeRenderListenerCollection();
-
-	/** */
-	private final ComponentOnBeforeRenderListenerCollection componentPostOnBeforeRenderListeners = new ComponentOnBeforeRenderListenerCollection();
-
-	/** */
-	private final ComponentOnAfterRenderListenerCollection componentOnAfterRenderListeners = new ComponentOnAfterRenderListenerCollection();
-
-	/** */
-	private final RequestCycleListenerCollection requestCycleListeners = new RequestCycleListenerCollection();
-
-	private final ApplicationListenerCollection applicationListeners = new ApplicationListenerCollection();
-
-	private final SessionListenerCollection sessionListeners = new SessionListenerCollection();
-
-	/** list of {@link IComponentInstantiationListener}s. */
-	private final ComponentInstantiationListenerCollection componentInstantiationListeners = new ComponentInstantiationListenerCollection();
-
-	/** list of {@link IComponentInitializationListener}s. */
-	private final ComponentInitializationListenerCollection componentInitializationListeners = new ComponentInitializationListenerCollection();
-
-	/** list of {@link org.apache.wicket.application.IComponentOnConfigureListener}s. */
-	private final ComponentOnConfigureListenerCollection componentOnConfigureListeners = new ComponentOnConfigureListenerCollection();
-
-	/** list of {@link IHeaderContributor}s. */
-	private final HeaderContributorListenerCollection headerContributorListeners = new HeaderContributorListenerCollection();
-
-	private final BehaviorInstantiationListenerCollection behaviorInstantiationListeners = new BehaviorInstantiationListenerCollection();
-
-	private final OnComponentTagListenerCollection onComponentTagListeners = new OnComponentTagListenerCollection();
 
 	/**
 	 * @return Gets the application's {@link HeaderContributorListenerCollection}
@@ -973,53 +1014,6 @@ public abstract class Application implements UnboundListener, IEventSink, IMetad
 	{
 		return requestCycleListeners;
 	}
-
-	// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//
-	// Settings
-	//
-	// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	/** Application settings */
-	private ApplicationSettings applicationSettings;
-
-	/** JavaScriptLibrary settings */
-	private JavaScriptLibrarySettings javaScriptLibrarySettings;
-
-	/** Debug Settings */
-	private DebugSettings debugSettings;
-
-	/** Exception Settings */
-	private ExceptionSettings exceptionSettings;
-
-	/** Framework Settings */
-	private FrameworkSettings frameworkSettings;
-
-	/** The Markup Settings */
-	private MarkupSettings markupSettings;
-
-	/** The Page Settings */
-	private PageSettings pageSettings;
-
-	/** The Request Cycle Settings */
-	private RequestCycleSettings requestCycleSettings;
-
-	/** The Request Logger Settings */
-	private RequestLoggerSettings requestLoggerSettings;
-
-	/** The Resource Settings */
-	private ResourceSettings resourceSettings;
-
-	/** The Security Settings */
-	private SecuritySettings securitySettings;
-
-	/** The settings for {@link IPageStore} and {@link IPageManager} */
-	private StoreSettings storeSettings;
-
-	/** can the settings object be set/used. */
-	private boolean settingsAccessible;
 
 	/**
 	 * @return Application's application-wide settings
@@ -1312,17 +1306,6 @@ public abstract class Application implements UnboundListener, IEventSink, IMetad
 		}
 	}
 
-	// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//
-	// Page Manager
-	//
-	// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	private volatile IPageManager pageManager;
-	private IPageManagerProvider pageManagerProvider;
-
 	/**
 	 * 
 	 * @return PageManagerProvider
@@ -1365,14 +1348,6 @@ public abstract class Application implements UnboundListener, IEventSink, IMetad
 		return pageManager;
 	}
 
-	// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//
-	// Page Rendering
-	//
-	// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 	/**
 	 * 
 	 * @return PageRendererProvider
@@ -1392,25 +1367,6 @@ public abstract class Application implements UnboundListener, IEventSink, IMetad
 		this.pageRendererProvider = pageRendererProvider;
 		return this;
 	}
-
-
-	// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//
-	// Request Handler encoding
-	//
-	// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	private ResourceReferenceRegistry resourceReferenceRegistry;
-
-	private SharedResources sharedResources;
-
-	private ResourceBundles resourceBundles;
-
-	private IPageFactory pageFactory;
-
-	private IMapperContext encoderContext;
 
 	/**
 	 * Override to create custom {@link ResourceReferenceRegistry}.
@@ -1624,7 +1580,7 @@ public abstract class Application implements UnboundListener, IEventSink, IMetad
 	 */
 	public final boolean usesDevelopmentConfig()
 	{
-		return RuntimeConfigurationType.DEVELOPMENT.equals(getConfigurationType());
+		return RuntimeConfigurationType.DEVELOPMENT == getConfigurationType();
 	}
 
 	/**
@@ -1633,6 +1589,52 @@ public abstract class Application implements UnboundListener, IEventSink, IMetad
 	 */
 	public final boolean usesDeploymentConfig()
 	{
-		return RuntimeConfigurationType.DEPLOYMENT.equals(getConfigurationType());
+		return RuntimeConfigurationType.DEPLOYMENT == getConfigurationType();
 	}
+
+	// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//
+	// Listeners
+	//
+	// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+	// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//
+	// Settings
+	//
+	// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+	// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//
+	// Page Manager
+	//
+	// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+	// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//
+	// Page Rendering
+	//
+	// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+	// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//
+	// Request Handler encoding
+	//
+	// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 }

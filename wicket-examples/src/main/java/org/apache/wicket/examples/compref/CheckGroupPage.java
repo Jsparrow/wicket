@@ -82,26 +82,10 @@ public class CheckGroupPage extends WicketExamplePage
 	@Override
 	protected void explain()
 	{
-		String html = "<form wicket:id=\"form\">\n" + "<span wicket:id=\"group\">\n"
-			+ "<input type=\"checkbox\" wicket:id=\"groupselector\">check/uncheck all</input>\n"
-			+ "<tr wicket:id=\"persons\">\n"
-			+ "<td><input type=\"checkbox\" wicket:id=\"checkbox\"/></td>\n"
-			+ "<td><span wicket:id=\"name\">[this is where name will be]</span></td>\n"
-			+ "<td><span wicket:id=\"lastName\">[this is where lastname will be]</span></td>\n"
-			+ "</tr>\n</span>\n</form>";
-		String code = "&nbsp;&nbsp;&nbsp;&nbsp;Form f=new Form(\"form\");<br/>"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;add(f);<br/>"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;CheckGroup group=new CheckGroup(\"group\");<br/>"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;form.add(group);<br/>"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;group.add(new CheckGroupSelector(\"groupselector\"));<br/>"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;ListView persons=new ListView(\"persons\", getPersons()) {<br/>"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;protected void populateItem(ListItem item) {<br/>"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;item.add(new Check(\"check\", item.getModel()));<br/>"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;item.add(new Label(\"name\", new PropertyModel(item.getModel(), \"name\")));<br/>"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;item.add(new Label(\"lastName\", new PropertyModel(item.getModel(), \"lastName\")));<br/>"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;};<br/>"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;persons.setReuseItems(true);<br/>"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;group.add(persons);<br/>";
+		String html = new StringBuilder().append("<form wicket:id=\"form\">\n").append("<span wicket:id=\"group\">\n").append("<input type=\"checkbox\" wicket:id=\"groupselector\">check/uncheck all</input>\n").append("<tr wicket:id=\"persons\">\n").append("<td><input type=\"checkbox\" wicket:id=\"checkbox\"/></td>\n").append("<td><span wicket:id=\"name\">[this is where name will be]</span></td>\n").append("<td><span wicket:id=\"lastName\">[this is where lastname will be]</span></td>\n").append("</tr>\n</span>\n</form>")
+				.toString();
+		String code = new StringBuilder().append("&nbsp;&nbsp;&nbsp;&nbsp;Form f=new Form(\"form\");<br/>").append("&nbsp;&nbsp;&nbsp;&nbsp;add(f);<br/>").append("&nbsp;&nbsp;&nbsp;&nbsp;CheckGroup group=new CheckGroup(\"group\");<br/>").append("&nbsp;&nbsp;&nbsp;&nbsp;form.add(group);<br/>").append("&nbsp;&nbsp;&nbsp;&nbsp;group.add(new CheckGroupSelector(\"groupselector\"));<br/>").append("&nbsp;&nbsp;&nbsp;&nbsp;ListView persons=new ListView(\"persons\", getPersons()) {<br/>").append("&nbsp;&nbsp;&nbsp;&nbsp;protected void populateItem(ListItem item) {<br/>").append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;item.add(new Check(\"check\", item.getModel()));<br/>")
+				.append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;item.add(new Label(\"name\", new PropertyModel(item.getModel(), \"name\")));<br/>").append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;item.add(new Label(\"lastName\", new PropertyModel(item.getModel(), \"lastName\")));<br/>").append("&nbsp;&nbsp;&nbsp;&nbsp;};<br/>").append("&nbsp;&nbsp;&nbsp;&nbsp;persons.setReuseItems(true);<br/>").append("&nbsp;&nbsp;&nbsp;&nbsp;group.add(persons);<br/>").toString();
 		add(new ExplainPanel(html, code));
 	}
 }

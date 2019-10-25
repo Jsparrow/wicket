@@ -88,7 +88,7 @@ public class SingleSortState<T> implements ISortState<T>, IClusterable
 	@Override
 	public String toString()
 	{
-		return "[SingleSortState sort=" + ((param == null) ? "null" : param.toString()) + ']';
+		return new StringBuilder().append("[SingleSortState sort=").append((param == null) ? "null" : param.toString()).append(']').toString();
 	}
 
 }

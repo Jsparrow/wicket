@@ -78,99 +78,6 @@ import org.apache.wicket.model.Model;
  */
 public class WizardStep extends Panel implements IWizardStep
 {
-	/**
-	 * Wraps form validators for this step such that they are only executed when this step is
-	 * active.
-	 */
-	private final class FormValidatorWrapper implements IFormValidator
-	{
-
-		private static final long serialVersionUID = 1L;
-
-		private final List<IFormValidator> validators = new ArrayList<>();
-
-		/**
-		 * Adds a form validator.
-		 * 
-		 * @param validator
-		 *            The validator to add
-		 */
-		public final void add(final IFormValidator validator)
-		{
-			validators.add(validator);
-		}
-
-		/**
-		 * @see org.apache.wicket.markup.html.form.validation.IFormValidator#getDependentFormComponents()
-		 */
-		@Override
-		public FormComponent<?>[] getDependentFormComponents()
-		{
-			if (isActiveStep())
-			{
-				Set<Component> components = new HashSet<>();
-				for (IFormValidator v : validators)
-				{
-					FormComponent<?>[] dependentComponents = v.getDependentFormComponents();
-					if (dependentComponents != null)
-					{
-						int len = dependentComponents.length;
-						components.addAll(Arrays.asList(dependentComponents).subList(0, len));
-					}
-				}
-				return components.toArray(new FormComponent[components.size()]);
-			}
-			return null;
-		}
-
-		/**
-		 * @see org.apache.wicket.markup.html.form.validation.IFormValidator#validate(org.apache.wicket.markup.html.form.Form)
-		 */
-		@Override
-		public void validate(final Form<?> form)
-		{
-			if (isActiveStep())
-			{
-				for (IFormValidator v : validators)
-				{
-					v.validate(form);
-				}
-			}
-		}
-
-		/**
-		 * @return whether the step this wrapper is part of is the current step
-		 */
-		private boolean isActiveStep()
-		{
-			return (wizardModel.getActiveStep().equals(WizardStep.this));
-		}
-	}
-
-	/**
-	 * Default header for wizards.
-	 */
-	private final class Header extends Panel
-	{
-		private static final long serialVersionUID = 1L;
-
-		/**
-		 * Construct.
-		 * 
-		 * @param id
-		 *            The component id
-		 * @param wizard
-		 *            The containing wizard
-		 */
-		public Header(final String id, final IWizard wizard)
-		{
-			super(id);
-			setDefaultModel(new CompoundPropertyModel<>(wizard));
-			add(new Label("title", WizardStep.this::getTitle));
-			add(new Label("summary", WizardStep.this::getSummary));
-		}
-	}
-
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -449,5 +356,93 @@ public class WizardStep extends Panel implements IWizardStep
 	public IWizardModel getWizardModel()
 	{
 		return wizardModel;
+	}
+
+	/**
+	 * Wraps form validators for this step such that they are only executed when this step is
+	 * active.
+	 */
+	private final class FormValidatorWrapper implements IFormValidator
+	{
+
+		private static final long serialVersionUID = 1L;
+
+		private final List<IFormValidator> validators = new ArrayList<>();
+
+		/**
+		 * Adds a form validator.
+		 * 
+		 * @param validator
+		 *            The validator to add
+		 */
+		public final void add(final IFormValidator validator)
+		{
+			validators.add(validator);
+		}
+
+		/**
+		 * @see org.apache.wicket.markup.html.form.validation.IFormValidator#getDependentFormComponents()
+		 */
+		@Override
+		public FormComponent<?>[] getDependentFormComponents()
+		{
+			if (!isActiveStep()) {
+				return null;
+			}
+			Set<Component> components = new HashSet<>();
+			validators.forEach(v -> {
+				FormComponent<?>[] dependentComponents = v.getDependentFormComponents();
+				if (dependentComponents != null)
+				{
+					int len = dependentComponents.length;
+					components.addAll(Arrays.asList(dependentComponents).subList(0, len));
+				}
+			});
+			return components.toArray(new FormComponent[components.size()]);
+		}
+
+		/**
+		 * @see org.apache.wicket.markup.html.form.validation.IFormValidator#validate(org.apache.wicket.markup.html.form.Form)
+		 */
+		@Override
+		public void validate(final Form<?> form)
+		{
+			if (isActiveStep())
+			{
+				validators.forEach(v -> v.validate(form));
+			}
+		}
+
+		/**
+		 * @return whether the step this wrapper is part of is the current step
+		 */
+		private boolean isActiveStep()
+		{
+			return (wizardModel.getActiveStep().equals(WizardStep.this));
+		}
+	}
+
+	/**
+	 * Default header for wizards.
+	 */
+	private final class Header extends Panel
+	{
+		private static final long serialVersionUID = 1L;
+
+		/**
+		 * Construct.
+		 * 
+		 * @param id
+		 *            The component id
+		 * @param wizard
+		 *            The containing wizard
+		 */
+		public Header(final String id, final IWizard wizard)
+		{
+			super(id);
+			setDefaultModel(new CompoundPropertyModel<>(wizard));
+			add(new Label("title", WizardStep.this::getTitle));
+			add(new Label("summary", WizardStep.this::getSummary));
+		}
 	}
 }

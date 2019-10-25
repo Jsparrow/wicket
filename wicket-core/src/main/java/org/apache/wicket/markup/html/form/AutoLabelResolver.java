@@ -81,7 +81,11 @@ public class AutoLabelResolver implements IComponentResolver
 	private static final String CSS_DISABLED_DEFAULT = "disabled";
 	private static final String CSS_REQUIRED_DEFAULT = "required";
 	private static final String CSS_ERROR_DEFAULT = "error";
-	
+
+	public static final MetaDataKey<AutoLabelMarker> MARKER_KEY = new MetaDataKey<>()
+	{
+	};
+
 
 
 	@Override
@@ -99,8 +103,7 @@ public class AutoLabelResolver implements IComponentResolver
 		Component component = findRelatedComponent(container, path);
 		if (component == null)
 		{
-			throw new ComponentNotFoundException("Could not find form component with path '" + path +
-				"' while trying to resolve wicket:for attribute");
+			throw new ComponentNotFoundException(new StringBuilder().append("Could not find form component with path '").append(path).append("' while trying to resolve wicket:for attribute").toString());
 		}
 		// check if component implements ILabelProviderLocator
 		if (component instanceof ILabelProviderLocator)
@@ -110,8 +113,7 @@ public class AutoLabelResolver implements IComponentResolver
 
 		if (!(component instanceof ILabelProvider))
 		{
-			throw new WicketRuntimeException("Component pointed to by wicket:for attribute '" + path +
-				"' does not implement " + ILabelProvider.class.getName());
+			throw new WicketRuntimeException(new StringBuilder().append("Component pointed to by wicket:for attribute '").append(path).append("' does not implement ").append(ILabelProvider.class.getName()).toString());
 		}
 
 		if (!component.getOutputMarkupId())
@@ -160,22 +162,17 @@ public class AutoLabelResolver implements IComponentResolver
 		while (container != null)
 		{
 			component = container.visitChildren(Component.class,
-				new IVisitor<Component, Component>()
-				{
-					@Override
-					public void component(Component child, IVisit<Component> visit)
+				(Component child, IVisit<Component> visit) -> {
+					if (child == searched[0])
 					{
-						if (child == searched[0])
-						{
-							// this container was already searched
-							visit.dontGoDeeper();
-							return;
-						}
-						if (path.equals(child.getId()))
-						{
-							visit.stop(child);
-							return;
-						}
+						// this container was already searched
+						visit.dontGoDeeper();
+						return;
+					}
+					if (path.equals(child.getId()))
+					{
+						visit.stop(child);
+						return;
 					}
 				});
 
@@ -196,10 +193,8 @@ public class AutoLabelResolver implements IComponentResolver
 	{
 		return component.getMarkupId() + "-w-lbl";
 	}
+	
 
-	public static final MetaDataKey<AutoLabelMarker> MARKER_KEY = new MetaDataKey<>()
-	{
-	};
 
 	/**
 	 * Marker used to track whether or not a form component has an associated auto label by its mere
@@ -225,7 +220,9 @@ public class AutoLabelResolver implements IComponentResolver
 
 		public void updateFrom(FormComponent<?> component, AjaxRequestTarget target)
 		{
-			boolean valid = component.isValid(), required = component.isRequired(), enabled = component.isEnabledInHierarchy();
+			boolean valid = component.isValid();
+			boolean required = component.isRequired();
+			boolean enabled = component.isEnabledInHierarchy();
 
 			if (isValid() != valid)
 			{

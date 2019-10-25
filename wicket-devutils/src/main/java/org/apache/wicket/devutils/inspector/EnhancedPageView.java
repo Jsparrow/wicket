@@ -17,7 +17,6 @@
 package org.apache.wicket.devutils.inspector;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -339,8 +338,9 @@ public final class EnhancedPageView extends GenericPanel<Page>
 			this.node = node;
 			this.parent = parent;
 			children = new ArrayList<>();
-			if (!(node instanceof Component) && !(node instanceof Behavior))
+			if (!(node instanceof Component) && !(node instanceof Behavior)) {
 				throw new IllegalArgumentException("Only accepts Components and Behaviors");
+			}
 		}
 
 		public boolean hasChildren()
@@ -360,8 +360,9 @@ public final class EnhancedPageView extends GenericPanel<Page>
 			while ((parent = nextChild.parent) != null)
 			{
 				int indexOf = parent.children.indexOf(nextChild);
-				if (indexOf < 0)
+				if (indexOf < 0) {
 					throw new AssertionError("Child not found in parent");
+				}
 				path.add(indexOf);
 				nextChild = parent;
 			}
@@ -381,7 +382,7 @@ public final class EnhancedPageView extends GenericPanel<Page>
 				Component parent = (Component)this.parent.node;
 				String parentPath = parent.getPath();
 				int indexOf = parent.getBehaviors().indexOf(behavior);
-				return parentPath + Component.PATH_SEPARATOR + "Behavior_" + indexOf;
+				return new StringBuilder().append(parentPath).append(Component.PATH_SEPARATOR).append("Behavior_").append(indexOf).toString();
 			}
 		}
 
@@ -425,20 +426,19 @@ public final class EnhancedPageView extends GenericPanel<Page>
 
 		public String getModel()
 		{
-			if (node instanceof Component)
-			{
-				String model;
-				try
-				{
-					model = ((Component)node).getDefaultModelObjectAsString();
-				}
-				catch (Exception e)
-				{
-					model = e.getMessage();
-				}
-				return model;
+			if (!(node instanceof Component)) {
+				return null;
 			}
-			return null;
+			String model;
+			try
+			{
+				model = ((Component)node).getDefaultModelObjectAsString();
+			}
+			catch (Exception e)
+			{
+				model = e.getMessage();
+			}
+			return model;
 		}
 
 		public boolean isStateless()
@@ -505,10 +505,11 @@ public final class EnhancedPageView extends GenericPanel<Page>
 		{
 			TreeNode tree = componentTreeModel.getObject();
 			List<TreeNode> roots;
-			if (tree == null)
+			if (tree == null) {
 				roots = Collections.emptyList();
-			else
-				roots = Arrays.asList(tree);
+			} else {
+				roots = Collections.singletonList(tree);
+			}
 			return roots.iterator();
 		}
 
@@ -541,8 +542,9 @@ public final class EnhancedPageView extends GenericPanel<Page>
 			protected TreeNode load()
 			{
 				Page page = getModelObject();
-				if (page == null)
+				if (page == null) {
 					return null;
+				}
 				return buildTree(page, null);
 			}
 
@@ -554,11 +556,7 @@ public final class EnhancedPageView extends GenericPanel<Page>
 				// Add its behaviors
 				if (showBehaviors)
 				{
-					for (Behavior behavior : node.getBehaviors())
-					{
-						if (!showStatefulAndParentsOnly || !behavior.getStatelessHint(node))
-							children.add(new TreeNode(behavior, treeNode));
-					}
+					node.getBehaviors().stream().filter(behavior -> !showStatefulAndParentsOnly || !behavior.getStatelessHint(node)).forEach(behavior -> children.add(new TreeNode(behavior, treeNode)));
 				}
 
 				// Add its children
@@ -572,7 +570,7 @@ public final class EnhancedPageView extends GenericPanel<Page>
 				}
 
 				// Sort the children list, putting behaviors first
-				Collections.sort(children, new Comparator<TreeNode>()
+				children.sort(new Comparator<TreeNode>()
 				{
 					@Override
 					public int compare(TreeNode o1, TreeNode o2)

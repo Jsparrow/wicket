@@ -31,6 +31,7 @@ public class MockPage extends WebPage
 {
 
 	private static final long serialVersionUID = 1L;
+	private int linkClickCount = 0;
 
 	/**
 	 * Construct.
@@ -70,6 +71,4 @@ public class MockPage extends WebPage
 	{
 		this.linkClickCount = linkClickCount;
 	}
-
-	private int linkClickCount = 0;
 }

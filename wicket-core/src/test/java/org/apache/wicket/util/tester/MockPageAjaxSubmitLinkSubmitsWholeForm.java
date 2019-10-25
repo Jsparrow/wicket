@@ -57,7 +57,7 @@ public class MockPageAjaxSubmitLinkSubmitsWholeForm extends WebPage
 
 		add(label);
 
-		Form<Void> form = new Form<Void>("form");
+		Form<Void> form = new Form<>("form");
 		form.add(new TextField<String>("name", new PropertyModel<String>(this, "name")));
 
 		add(form);

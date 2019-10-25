@@ -502,7 +502,7 @@ public class MarkupStream
 	 */
 	public final String getTagAttribute(final String name, final boolean withWicketNamespace)
 	{
-		String attr = (withWicketNamespace ? attr = getWicketNamespace() + ":" + name : name);
+		String attr = (withWicketNamespace ? attr = new StringBuilder().append(getWicketNamespace()).append(":").append(name).toString() : name);
 		return getTag().getAttributes().getString(attr);
 	}
 
@@ -567,7 +567,7 @@ public class MarkupStream
 	@Override
 	public String toString()
 	{
-		return "[markup = " + String.valueOf(markup) + ", index = " + currentIndex +
-			", current = " + ((current == null) ? "null" : current.toUserDebugString()) + "]";
+		return new StringBuilder().append("[markup = ").append(String.valueOf(markup)).append(", index = ").append(currentIndex).append(", current = ")
+				.append((current == null) ? "null" : current.toUserDebugString()).append("]").toString();
 	}
 }

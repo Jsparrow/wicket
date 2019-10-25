@@ -25,7 +25,7 @@ import org.apache.wicket.util.resource.IResourceStream;
  */
 class NullResourceStreamReference implements IResourceStreamReference
 {
-	final static NullResourceStreamReference INSTANCE = new NullResourceStreamReference();
+	static final NullResourceStreamReference INSTANCE = new NullResourceStreamReference();
 
 	@Override
 	public IResourceStream getReference()

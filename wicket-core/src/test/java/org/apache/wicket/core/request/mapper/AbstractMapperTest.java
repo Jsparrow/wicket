@@ -30,14 +30,14 @@ import org.apache.wicket.request.component.IRequestablePage;
  */
 abstract class AbstractMapperTest
 {
+	TestMapperContext context = new TestMapperContext();
+
 	/**
 	 * Construct.
 	 */
 	AbstractMapperTest()
 	{
 	}
-
-	TestMapperContext context = new TestMapperContext();
 
 	Request getRequest(final Url url)
 	{

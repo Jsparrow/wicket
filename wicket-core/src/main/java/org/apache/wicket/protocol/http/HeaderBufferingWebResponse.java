@@ -43,6 +43,8 @@ class HeaderBufferingWebResponse extends WebResponse implements IMetaDataBufferi
 	 */
 	private final BufferedWebResponse bufferedResponse;
 
+	private boolean buffering = true;
+
 	public HeaderBufferingWebResponse(WebResponse originalResponse)
 	{
 		this.originalResponse = originalResponse;
@@ -50,15 +52,13 @@ class HeaderBufferingWebResponse extends WebResponse implements IMetaDataBufferi
 		bufferedResponse = new BufferedWebResponse(originalResponse);
 	}
 
-	private boolean buffering = true;
-
 	private void stopBuffering()
 	{
-		if (buffering)
-		{
-			bufferedResponse.writeTo(originalResponse);
-			buffering = false;
+		if (!buffering) {
+			return;
 		}
+		bufferedResponse.writeTo(originalResponse);
+		buffering = false;
 	}
 
 	/**
@@ -185,7 +185,6 @@ class HeaderBufferingWebResponse extends WebResponse implements IMetaDataBufferi
 
 		originalResponse.write(array);
 	}
-
 
 	@Override
 	public void write(byte[] array, int offset, int length)

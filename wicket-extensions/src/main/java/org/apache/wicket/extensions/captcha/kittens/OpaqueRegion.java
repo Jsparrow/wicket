@@ -303,13 +303,12 @@ class OpaqueRegion
 		}
 
 		// Make pixels purple
-		for (final Rectangle rectangle : rectangles)
-		{
+		rectangles.forEach((final Rectangle rectangle) -> {
 			for (int x = rectangle.x; x < rectangle.x + rectangle.width; x++)
 			{
 				image.setRGB(x, rectangle.y, 0xff00ff00);
 			}
-		}
+		});
 
 		// Return debug image
 		return image;

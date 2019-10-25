@@ -31,20 +31,20 @@ public class JavaScriptUtils
 	 * Prefix for JavaScript CDATA content. If this is changed, also update
 	 * Wicket.Head.Contributor.processScript() function from wicket-ajax-jquery.js
 	 */
-	public final static String SCRIPT_CONTENT_PREFIX = "\n/*<![CDATA[*/\n";
+	public static final String SCRIPT_CONTENT_PREFIX = "\n/*<![CDATA[*/\n";
 
 	/**
 	 * Suffix for JavaScript CDATA content. If this is changed, also update
 	 * Wicket.Head.Contributor.processScript() function from wicket-ajax-jquery.js
 	 */
-	public final static String SCRIPT_CONTENT_SUFFIX = "\n/*]]>*/\n";
+	public static final String SCRIPT_CONTENT_SUFFIX = "\n/*]]>*/\n";
 
 	/** Script open tag including content prefix */
-	public final static String SCRIPT_OPEN_TAG = "<script type=\"text/javascript\">" +
+	public static final String SCRIPT_OPEN_TAG = "<script type=\"text/javascript\">" +
 		SCRIPT_CONTENT_PREFIX;
 
 	/** Script close tag including content suffix */
-	public final static String SCRIPT_CLOSE_TAG = SCRIPT_CONTENT_SUFFIX + "</script>\n";
+	public static final String SCRIPT_CLOSE_TAG = SCRIPT_CONTENT_SUFFIX + "</script>\n";
 
 	public static final String ATTR_ID = "id";
 	public static final String ATTR_TYPE = "type";

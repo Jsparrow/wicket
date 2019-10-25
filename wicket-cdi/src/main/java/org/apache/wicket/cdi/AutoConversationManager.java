@@ -57,13 +57,13 @@ public class AutoConversationManager implements IComponentOnBeforeRenderListener
 	@Override
 	public void onBeforeRender(Component component)
 	{
-		if (component instanceof Page)
-		{
-			Page page = (Page)component;
-			IRequestHandler activeRequestHandler = page.getRequestCycle().getActiveRequestHandler();
-			autoEndIfNecessary(page, activeRequestHandler);
-			autoBeginIfNecessary(page, activeRequestHandler);
+		if (!(component instanceof Page)) {
+			return;
 		}
+		Page page = (Page)component;
+		IRequestHandler activeRequestHandler = page.getRequestCycle().getActiveRequestHandler();
+		autoEndIfNecessary(page, activeRequestHandler);
+		autoBeginIfNecessary(page, activeRequestHandler);
 	}
 
 	protected void autoBeginIfNecessary(Page page, IRequestHandler handler)

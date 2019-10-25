@@ -29,6 +29,8 @@ import org.apache.wicket.request.handler.EmptyRequestHandler;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.util.tester.WicketTestCase;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Default page factory tests
@@ -37,14 +39,13 @@ import org.junit.jupiter.api.Test;
  */
 class DefaultPageFactoryTest extends WicketTestCase
 {
-	final private IPageFactory pageFactory = new DefaultPageFactory();
+	private static final Logger logger = LoggerFactory.getLogger(DefaultPageFactoryTest.class);
+	private final IPageFactory pageFactory = new DefaultPageFactory();
 
 	@Test
 	void throwExceptionInConstructor()
 	{
-		Exception e = assertThrows(WicketRuntimeException.class, () -> {
-			pageFactory.newPage(ThrowExceptionInConstructorPage.class);
-		});
+		Exception e = assertThrows(WicketRuntimeException.class, () -> pageFactory.newPage(ThrowExceptionInConstructorPage.class));
 
 		assertEquals(
 			"Can't instantiate page using constructor 'public org.apache.wicket.session.DefaultPageFactoryTest$ThrowExceptionInConstructorPage()'. An exception has been thrown during construction!",
@@ -54,9 +55,7 @@ class DefaultPageFactoryTest extends WicketTestCase
 	@Test
 	void privateConstructor()
 	{
-		Exception e = assertThrows(WicketRuntimeException.class, () -> {
-			pageFactory.newPage(PrivateDefaultConstructorPage.class);
-		});
+		Exception e = assertThrows(WicketRuntimeException.class, () -> pageFactory.newPage(PrivateDefaultConstructorPage.class));
 
 		assertEquals(
 			"Can't instantiate page using constructor 'private org.apache.wicket.session.DefaultPageFactoryTest$PrivateDefaultConstructorPage()'. This constructor is private!",
@@ -71,9 +70,7 @@ class DefaultPageFactoryTest extends WicketTestCase
 		parameters.add("key", "value");
 
 
-		Exception e = assertThrows(WicketRuntimeException.class, () -> {
-			pageFactory.newPage(PrivateConstructorWithParametersPage.class, parameters);
-		});
+		Exception e = assertThrows(WicketRuntimeException.class, () -> pageFactory.newPage(PrivateConstructorWithParametersPage.class, parameters));
 
 		assertEquals(
 			"Can't instantiate page using constructor 'private org.apache.wicket.session.DefaultPageFactoryTest$PrivateConstructorWithParametersPage(org.apache.wicket.request.mapper.parameter.PageParameters)' and argument 'key=[value]'. This constructor is private!",
@@ -83,9 +80,7 @@ class DefaultPageFactoryTest extends WicketTestCase
 	@Test
 	void nonDefaultConstructor()
 	{
-		Exception e = assertThrows(WicketRuntimeException.class, () -> {
-			pageFactory.newPage(NonDefaultConstructorPage.class);
-		});
+		Exception e = assertThrows(WicketRuntimeException.class, () -> pageFactory.newPage(NonDefaultConstructorPage.class));
 
 		assertEquals(
 			"Unable to create page from class org.apache.wicket.session.DefaultPageFactoryTest$NonDefaultConstructorPage. Class does not have a visible default constructor.",
@@ -105,6 +100,7 @@ class DefaultPageFactoryTest extends WicketTestCase
 		}
 		catch (ResetResponseException e)
 		{
+			logger.error(e.getMessage(), e);
 			// noop
 		}
 
@@ -115,6 +111,7 @@ class DefaultPageFactoryTest extends WicketTestCase
 		}
 		catch (ResetResponseException e)
 		{
+			logger.error(e.getMessage(), e);
 			// noop
 		}
 
@@ -125,6 +122,7 @@ class DefaultPageFactoryTest extends WicketTestCase
 		}
 		catch (ResetResponseException e)
 		{
+			logger.error(e.getMessage(), e);
 			// noop
 		}
 
@@ -135,6 +133,7 @@ class DefaultPageFactoryTest extends WicketTestCase
 		}
 		catch (ResetResponseException e)
 		{
+			logger.error(e.getMessage(), e);
 			// noop
 		}
 
@@ -145,6 +144,7 @@ class DefaultPageFactoryTest extends WicketTestCase
 		}
 		catch (ResetResponseException e)
 		{
+			logger.error(e.getMessage(), e);
 			// noop
 		}
 
@@ -161,6 +161,7 @@ class DefaultPageFactoryTest extends WicketTestCase
 		}
 		catch (Exception e)
 		{
+			logger.error(e.getMessage(), e);
 			fail();
 		}
 	}
@@ -276,7 +277,6 @@ class DefaultPageFactoryTest extends WicketTestCase
 	{
         public NonDefaultConstructorPage(String aa)
 		{
-			super();
 		}
 	}
 

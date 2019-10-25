@@ -34,65 +34,6 @@ import org.junit.jupiter.api.Test;
  */
 public class StatelessCheckerTest
 {
-	@StatelessComponent
-	public static class StatelessPage extends DummyHomePage
-	{
-		private static final long serialVersionUID = 1L;
-	}
-
-	@StatelessComponent
-	private static class StatelessLabel extends Label
-	{
-		private static final long serialVersionUID = 1L;
-
-		public StatelessLabel(final String id)
-		{
-			super(id);
-		}
-	}
-
-	@StatelessComponent
-	private static class StatefulMarkupContainer extends MarkupContainer
-	{
-		private static final long serialVersionUID = 1L;
-
-		public StatefulMarkupContainer(String id) {
-			super(id);
-		}
-
-		@Override
-		public boolean getStatelessHint()
-		{
-			return false;
-		}
-	}
-
-	private static class StatefulBehavior extends Behavior
-	{
-		private static final long serialVersionUID = 1L;
-
-		@Override
-		public boolean getStatelessHint(Component component)
-		{
-			return false;
-		}
-	}
-
-	private static class StatelessCheckerQuietly extends StatelessChecker
-	{
-		private StatelessCheckFailureException ex;
-
-		protected void fail(StatelessCheckFailureException e)
-		{
-			this.ex = e;
-		}
-
-		public StatelessCheckFailureException getFailureException()
-		{
-			return ex;
-		}
-	}
-
 	private StatelessChecker checker;
 
 	private StatelessCheckerQuietly checkerQuietly;
@@ -211,5 +152,65 @@ public class StatelessCheckerTest
 	{
 		assertEquals("'[StatefulMarkupContainer [Component id = foo]]' claims to be stateless but isn't. Possible reason: no stateless hint", ex.getMessage());
 		assertEquals(StatefulMarkupContainer.class, ex.getComponent().getClass());
+	}
+
+	@StatelessComponent
+	public static class StatelessPage extends DummyHomePage
+	{
+		private static final long serialVersionUID = 1L;
+	}
+
+	@StatelessComponent
+	private static class StatelessLabel extends Label
+	{
+		private static final long serialVersionUID = 1L;
+
+		public StatelessLabel(final String id)
+		{
+			super(id);
+		}
+	}
+
+	@StatelessComponent
+	private static class StatefulMarkupContainer extends MarkupContainer
+	{
+		private static final long serialVersionUID = 1L;
+
+		public StatefulMarkupContainer(String id) {
+			super(id);
+		}
+
+		@Override
+		public boolean getStatelessHint()
+		{
+			return false;
+		}
+	}
+
+	private static class StatefulBehavior extends Behavior
+	{
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public boolean getStatelessHint(Component component)
+		{
+			return false;
+		}
+	}
+
+	private static class StatelessCheckerQuietly extends StatelessChecker
+	{
+		private StatelessCheckFailureException ex;
+
+		@Override
+		protected void fail(StatelessCheckFailureException e)
+		{
+			this.ex = e;
+		}
+
+		public StatelessCheckFailureException getFailureException()
+		{
+			return ex;
+		}
 	}
 }

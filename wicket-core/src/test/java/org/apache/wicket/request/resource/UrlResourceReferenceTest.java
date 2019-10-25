@@ -80,9 +80,7 @@ class UrlResourceReferenceTest extends WicketTestCase
 		Url url = Url.parse("http://www.example.com/some/path.ext");
 		UrlResourceReference reference = new UrlResourceReference(url);
 
-		assertThrows(IllegalStateException.class, () -> {
-			reference.setContextRelative(true);
-		});
+		assertThrows(IllegalStateException.class, () -> reference.setContextRelative(true));
 	}
 
 	@Test

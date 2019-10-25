@@ -78,6 +78,18 @@ public class CheckBoxMultipleChoicePage extends WicketExamplePage
 		form.add(manyChoice);
 	}
 
+	/**
+	 * Override base method to provide an explanation
+	 */
+	@Override
+	protected void explain()
+	{
+		String html = new StringBuilder().append("<span wicket:id=\"sites\">\n").append("</span>\n").append("<span wicket:id=\"choices\">\n").append("</span>").toString();
+		String code = new StringBuilder().append("&nbsp;&nbsp;&nbsp;&nbsp;CheckBoxMultipleChoice siteChoice = new CheckBoxMultipleChoice(\"sites\", SITES);\n").append("&nbsp;&nbsp;&nbsp;&nbsp;form.add(siteChoice);\n").append("\n").append("&nbsp;&nbsp;&nbsp;&nbsp;CheckBoxMultipleChoice manyChoice = new CheckBoxMultipleChoice(\"choices\", MANY_CHOICES);\n").append("&nbsp;&nbsp;&nbsp;&nbsp;form.add(manyChoice);").toString();
+		add(new ExplainPanel(html, code));
+
+	}
+
 	/** Simple data class that acts as a model for the input fields. */
 	private static class Input implements IClusterable
 	{
@@ -101,7 +113,7 @@ public class CheckBoxMultipleChoicePage extends WicketExamplePage
 		@Override
 		public String toString()
 		{
-			return "sites = '" + listAsString(sites) + "', choices='" + listAsString(choices) + "'";
+			return new StringBuilder().append("sites = '").append(listAsString(sites)).append("', choices='").append(listAsString(choices)).append("'").toString();
 		}
 
 		private String listAsString(List<String> list)
@@ -117,22 +129,5 @@ public class CheckBoxMultipleChoicePage extends WicketExamplePage
 			}
 			return b.toString();
 		}
-	}
-
-	/**
-	 * Override base method to provide an explanation
-	 */
-	@Override
-	protected void explain()
-	{
-		String html = "<span wicket:id=\"sites\">\n" + "</span>\n"
-			+ "<span wicket:id=\"choices\">\n" + "</span>";
-		String code = "&nbsp;&nbsp;&nbsp;&nbsp;CheckBoxMultipleChoice siteChoice = new CheckBoxMultipleChoice(\"sites\", SITES);\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;form.add(siteChoice);\n"
-			+ "\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;CheckBoxMultipleChoice manyChoice = new CheckBoxMultipleChoice(\"choices\", MANY_CHOICES);\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;form.add(manyChoice);";
-		add(new ExplainPanel(html, code));
-
 	}
 }

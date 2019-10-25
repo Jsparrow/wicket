@@ -61,7 +61,7 @@ public class ResourceBundles
 	public ResourceBundles(final ResourceReferenceRegistry registry)
 	{
 		this.registry = Args.notNull(registry, "registry");
-		this.providedResourcesToBundles = new HashMap<HeaderItem, HeaderItem>();
+		this.providedResourcesToBundles = new HashMap<>();
 	}
 
 	/**
@@ -153,7 +153,7 @@ public class ResourceBundles
 	public CssReferenceHeaderItem addCssBundle(Class<?> scope, String name,
 		CssResourceReference... references)
 	{
-		List<CssReferenceHeaderItem> items = new ArrayList<CssReferenceHeaderItem>();
+		List<CssReferenceHeaderItem> items = new ArrayList<>();
 		for (CssResourceReference curReference : references)
 		{
 			items.add(CssHeaderItem.forReference(curReference));
@@ -183,7 +183,7 @@ public class ResourceBundles
 	 */
 	protected <T extends HeaderItem & IReferenceHeaderItem> ConcatResourceBundleReference<T> newBundleResourceReference(Class<?> scope, String name, List<T> items)
 	{
-		return new ConcatResourceBundleReference<T>(scope, name, items);
+		return new ConcatResourceBundleReference<>(scope, name, items);
 	}
 
 	/**
@@ -203,9 +203,7 @@ public class ResourceBundles
 			if (providedResourcesToBundles.containsKey(curProvidedResource))
 			{
 				throw new IllegalArgumentException(
-					"Only one bundle can provide a certain resource. " +
-						providedResourcesToBundles.get(curProvidedResource) +
-						" already provides the resource " + curProvidedResource);
+					new StringBuilder().append("Only one bundle can provide a certain resource. ").append(providedResourcesToBundles.get(curProvidedResource)).append(" already provides the resource ").append(curProvidedResource).toString());
 			}
 			providedResourcesToBundles.put(curProvidedResource, bundle);
 		}

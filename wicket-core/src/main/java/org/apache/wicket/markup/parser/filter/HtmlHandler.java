@@ -43,11 +43,8 @@ public final class HtmlHandler extends AbstractMarkupFilter
 	/** Logging */
 	private static final Logger log = LoggerFactory.getLogger(HtmlHandler.class);
 
-	/** Tag stack to find balancing tags */
-	final private ArrayDeque<ComponentTag> stack = new ArrayDeque<ComponentTag>();
-
 	/** Map of simple tags. */
-	private static final Map<String, Boolean> doesNotRequireCloseTag = new HashMap<String, Boolean>();
+	private static final Map<String, Boolean> doesNotRequireCloseTag = new HashMap<>();
 
 	static
 	{
@@ -73,6 +70,9 @@ public final class HtmlHandler extends AbstractMarkupFilter
 		doesNotRequireCloseTag.put("track", Boolean.TRUE);
 		doesNotRequireCloseTag.put("wbr", Boolean.TRUE);
 	}
+
+	/** Tag stack to find balancing tags */
+	private final ArrayDeque<ComponentTag> stack = new ArrayDeque<>();
 
 	/**
 	 * Construct.
@@ -148,8 +148,7 @@ public final class HtmlHandler extends AbstractMarkupFilter
 					// it must be a real mismatch.
 					if (mismatch)
 					{
-						throw new ParseException("Tag " + top.toUserDebugString() +
-							" has a mismatched close tag at " + tag.toUserDebugString(),
+						throw new ParseException(new StringBuilder().append("Tag ").append(top.toUserDebugString()).append(" has a mismatched close tag at ").append(tag.toUserDebugString()).toString(),
 							top.getPos());
 					}
 				}
@@ -170,7 +169,7 @@ public final class HtmlHandler extends AbstractMarkupFilter
 
 		return tag;
 	}
-	
+
 	/**
 	 * Checks if the tag is a Wicket component explicitly added. i.e 
 	 * it has the "wicket:id" attribute.
@@ -180,19 +179,16 @@ public final class HtmlHandler extends AbstractMarkupFilter
 	private void setContainsWicketIdFlag(ComponentTag tag)
 	{
 		// check if it is a wicket:id component
-		String wicketIdAttr = getWicketNamespace() + ":" + "id";
+		String wicketIdAttr = new StringBuilder().append(getWicketNamespace()).append(":").append("id").toString();
 		boolean hasWicketId = tag.getAttributes().get(wicketIdAttr) != null;
 
 		if (hasWicketId)
 		{
-			for (ComponentTag componentTag : stack)
-			{
-				componentTag.setContainsWicketId(hasWicketId);
-			}
+			stack.forEach(componentTag -> componentTag.setContainsWicketId(hasWicketId));
 		}
 	}
 
-    /**
+	/**
 	 * Gets whether this tag does not require a closing tag.
 	 * 
 	 * @param name

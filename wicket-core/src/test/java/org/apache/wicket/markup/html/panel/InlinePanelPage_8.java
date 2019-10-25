@@ -32,7 +32,7 @@ public class InlinePanelPage_8 extends WebPage
 {
 	private static final long serialVersionUID = 1L;
 	private int number = 0;
-	private final List<ListNode> nodes = new ArrayList<ListNode>();
+	private final List<ListNode> nodes = new ArrayList<>();
 
 	/**
 	 * Construct.

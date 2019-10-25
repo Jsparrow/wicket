@@ -90,6 +90,13 @@ public final class Objects
 	}
 
 	/**
+	 * Instantiation not allowed
+	 */
+	private Objects()
+	{
+	}
+
+	/**
 	 * Evaluates the given object as a BigDecimal.
 	 * 
 	 * @param value
@@ -98,7 +105,7 @@ public final class Objects
 	 * @throws NumberFormatException
 	 *             if the given object can't be understood as a BigDecimal
 	 */
-	public static BigDecimal bigDecValue(final Object value) throws NumberFormatException
+	public static BigDecimal bigDecValue(final Object value)
 	{
 		if (value == null)
 		{
@@ -137,7 +144,7 @@ public final class Objects
 	 * @throws NumberFormatException
 	 *             if the given object can't be understood as a BigInteger
 	 */
-	public static BigInteger bigIntValue(final Object value) throws NumberFormatException
+	public static BigInteger bigIntValue(final Object value)
 	{
 		if (value == null)
 		{
@@ -198,7 +205,6 @@ public final class Objects
 		return true; // non-null
 	}
 
-
 	/**
 	 * Compares two objects for equality, even if it has to convert one of them to the other type.
 	 * If both objects are numeric they are converted to the widest type and compared. If one is
@@ -231,7 +237,9 @@ public final class Objects
 		}
 		else
 		{
-			int t1 = getNumericType(v1), t2 = getNumericType(v2), type = getNumericType(t1, t2,
+			int t1 = getNumericType(v1);
+			int t2 = getNumericType(v2);
+			int type = getNumericType(t1, t2,
 				true);
 
 			switch (type)
@@ -255,21 +263,20 @@ public final class Objects
 						}
 						else
 						{
-							throw new IllegalArgumentException("invalid comparison: " +
-								v1.getClass().getName() + " and " + v2.getClass().getName());
+							throw new IllegalArgumentException(new StringBuilder().append("invalid comparison: ").append(v1.getClass().getName()).append(" and ").append(v2.getClass().getName()).toString());
 						}
 					}
 					// else fall through
 				case FLOAT :
 				case DOUBLE :
-					double dv1 = doubleValue(v1),
-					dv2 = doubleValue(v2);
+					double dv1 = doubleValue(v1);
+				double dv2 = doubleValue(v2);
 
 					return (dv1 == dv2) ? 0 : ((dv1 < dv2) ? -1 : 1);
 
 				default :
-					long lv1 = longValue(v1),
-					lv2 = longValue(v2);
+					long lv1 = longValue(v1);
+				long lv2 = longValue(v2);
 
 					return (lv1 == lv2) ? 0 : ((lv1 < lv2) ? -1 : 1);
 			}
@@ -378,7 +385,7 @@ public final class Objects
 	 * @throws NumberFormatException
 	 *             if the given object can't be understood as a double
 	 */
-	public static double doubleValue(final Object value) throws NumberFormatException
+	public static double doubleValue(final Object value)
 	{
 		if (value == null)
 		{
@@ -399,7 +406,7 @@ public final class Objects
 		}
 		String s = stringValue(value, true);
 
-		return (s.length() == 0) ? 0.0 : Double.parseDouble(s);
+		return (s.isEmpty()) ? 0.0 : Double.parseDouble(s);
 	}
 
 	/**
@@ -425,7 +432,6 @@ public final class Objects
 
 		return false;
 	}
-
 
 	/**
 	 * Returns the constant from the NumericTypes interface that best expresses the type of an
@@ -640,7 +646,7 @@ public final class Objects
 	 * @throws NumberFormatException
 	 *             if the given object can't be understood as a long integer
 	 */
-	public static long longValue(final Object value) throws NumberFormatException
+	public static long longValue(final Object value)
 	{
 		if (value == null)
 		{
@@ -661,7 +667,6 @@ public final class Objects
 		}
 		return Long.parseLong(stringValue(value, true));
 	}
-
 
 	/**
 	 * Returns a new Number object of an appropriate type to hold the given integer value. The type
@@ -702,7 +707,6 @@ public final class Objects
 				return BigInteger.valueOf(value);
 		}
 	}
-
 
 	/**
 	 * Evaluates the given object as a String.
@@ -779,13 +783,6 @@ public final class Objects
 	public static <T> T defaultIfNull(T originalObj, T defaultObj)
 	{
 		return originalObj != null ? originalObj : defaultObj;
-	}
-
-	/**
-	 * Instantiation not allowed
-	 */
-	private Objects()
-	{
 	}
 
 }

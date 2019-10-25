@@ -45,150 +45,6 @@ import org.apache.wicket.util.lang.Classes;
 public class ResourceAggregator extends DecoratingHeaderResponse
 {
 
-	/**
-	 * The location in which a {@link HeaderItem} is added, consisting of the component/behavior
-	 * that added the item, the index in the list for that component/behavior at which the item was
-	 * added and the index in the request.
-	 * 
-	 * @author papegaaij
-	 */
-	public static class RecordedHeaderItemLocation
-	{
-		private final Component renderBase;
-
-		private int indexInRequest;
-
-		private int depth = -1;
-
-		/**
-		 * Construct.
-		 * 
-		 * @param renderBase
-		 *            The component that added the item.
-		 */
-		public RecordedHeaderItemLocation(Component renderBase, int indexInRequest)
-		{
-			this.renderBase = renderBase;
-			
-			this.indexInRequest = indexInRequest;
-		}
-
-		/**
-		 * @return the component or behavior that added the item.
-		 */
-		public Object getRenderBase()
-		{
-			return renderBase;
-		}
-
-		/**
-		 * @return the number of items added before this one in the same request.
-		 */
-		public int getIndexInRequest()
-		{
-			return indexInRequest;
-		}
-
-		public int getDepth()
-		{
-			if (depth == -1) {
-				Component component = renderBase;
-				while (component != null)  {
-					depth++;
-					
-					component = component.getParent();
-				}
-
-			}
-			return depth;
-		}
-		
-		@Override
-		public String toString()
-		{
-			return Classes.simpleName(renderBase.getClass());
-		}
-	}
-
-	/**
-	 * Contains information about an {@link HeaderItem} that must be rendered.
-	 * 
-	 * @author papegaaij
-	 */
-	public static class RecordedHeaderItem
-	{
-		private final HeaderItem item;
-
-		private final List<RecordedHeaderItemLocation> locations;
-		
-		private int minDepth = Integer.MAX_VALUE;
-
-		/**
-		 * Construct.
-		 * 
-		 * @param item
-		 */
-		public RecordedHeaderItem(HeaderItem item)
-		{
-			this.item = item;
-			locations = new ArrayList<>();
-		}
-
-		/**
-		 * Records a location at which the item was added.
-		 * 
-		 * @param renderBase
-		 *            The component or behavior that added the item.
-		 * @param indexInRequest
-		 *            Indicates the number of items added before this one in this request.
-		 */
-		void addLocation(Component renderBase, int indexInRequest)
-		{
-			locations.add(new RecordedHeaderItemLocation(renderBase, indexInRequest));
-			
-			minDepth = Integer.MAX_VALUE;
-		}
-
-		/**
-		 * @return the actual item
-		 */
-		public HeaderItem getItem()
-		{
-			return item;
-		}
-
-		/**
-		 * @return The locations at which the item was added.
-		 */
-		public List<RecordedHeaderItemLocation> getLocations()
-		{
-			return locations;
-		}
-		
-		/**
-		 * Get the minimum depth in the component tree.
-		 * 
-		 * @return depth
-		 */
-		public int getMinDepth()
-		{
-			if (minDepth == Integer.MAX_VALUE) {
-				for (RecordedHeaderItemLocation location : locations) {
-					minDepth = Math.min(minDepth, location.getDepth());
-				}
-			}
-			
-			return minDepth;
-		}
-
-
-		@Override
-		public String toString()
-		{
-			return locations + ":" + item;
-		}
-	}
-
 	private final Map<HeaderItem, RecordedHeaderItem> itemsToBeRendered;
 
 	/**
@@ -196,13 +52,14 @@ public class ResourceAggregator extends DecoratingHeaderResponse
 	 * Collects OnDomReadyHeaderItems and OnEventHeaderItems
 	 */
 	private final List<HeaderItem> domReadyItemsToBeRendered;
+
 	private final List<OnLoadHeaderItem> loadItemsToBeRendered;
 
 	/**
 	 * The currently rendered component
 	 */
 	private Component renderBase;
-	
+
 	private int indexInRequest;
 
 	/**
@@ -286,12 +143,12 @@ public class ResourceAggregator extends DecoratingHeaderResponse
 		item = getItemToBeRendered(item);
 		if (item instanceof OnDomReadyHeaderItem || item instanceof OnEventHeaderItem)
 		{
-			renderDependencies(item, new LinkedHashSet<HeaderItem>());
+			renderDependencies(item, new LinkedHashSet<>());
 			domReadyItemsToBeRendered.add(item);
 		}
 		else if (item instanceof OnLoadHeaderItem)
 		{
-			renderDependencies(item, new LinkedHashSet<HeaderItem>());
+			renderDependencies(item, new LinkedHashSet<>());
 			loadItemsToBeRendered.add((OnLoadHeaderItem)item);
 		}
 		else
@@ -330,15 +187,9 @@ public class ResourceAggregator extends DecoratingHeaderResponse
 			.getHeaderItemComparator();
 		if (headerItemComparator != null)
 		{
-			Collections.sort(sortedItemsToBeRendered, headerItemComparator);
+			sortedItemsToBeRendered.sort(headerItemComparator);
 		}
-		for (RecordedHeaderItem curRenderItem : sortedItemsToBeRendered)
-		{
-			if (markItemRendered(curRenderItem.getItem()))
-			{
-				getRealResponse().render(curRenderItem.getItem());
-			}
-		}
+		sortedItemsToBeRendered.stream().filter(curRenderItem -> markItemRendered(curRenderItem.getItem())).forEach(curRenderItem -> getRealResponse().render(curRenderItem.getItem()));
 	}
 
 	/**
@@ -347,21 +198,17 @@ public class ResourceAggregator extends DecoratingHeaderResponse
 	private void renderCombinedEventScripts()
 	{
 		StringBuilder combinedScript = new StringBuilder();
-		for (HeaderItem curItem : domReadyItemsToBeRendered)
-		{
-			if (markItemRendered(curItem))
+		domReadyItemsToBeRendered.stream().filter(this::markItemRendered).forEach(curItem -> {
+			combinedScript.append('\n');
+			if (curItem instanceof OnDomReadyHeaderItem)
 			{
-				combinedScript.append('\n');
-				if (curItem instanceof OnDomReadyHeaderItem)
-				{
-					combinedScript.append(((OnDomReadyHeaderItem)curItem).getJavaScript());
-				} else if (curItem instanceof OnEventHeaderItem)
-				{
-					combinedScript.append(((OnEventHeaderItem)curItem).getCompleteJavaScript());
-				}
-				combinedScript.append(';');
+				combinedScript.append(((OnDomReadyHeaderItem)curItem).getJavaScript());
+			} else if (curItem instanceof OnEventHeaderItem)
+			{
+				combinedScript.append(((OnEventHeaderItem)curItem).getCompleteJavaScript());
 			}
-		}
+			combinedScript.append(';');
+		});
 		if (combinedScript.length() > 0)
 		{
 			combinedScript.append("\nWicket.Event.publish(Wicket.Event.Topic.AJAX_HANDLERS_BOUND);");
@@ -370,15 +217,11 @@ public class ResourceAggregator extends DecoratingHeaderResponse
 		}
 
 		combinedScript.setLength(0);
-		for (OnLoadHeaderItem curItem : loadItemsToBeRendered)
-		{
-			if (markItemRendered(curItem))
-			{
-				combinedScript.append('\n');
-				combinedScript.append(curItem.getJavaScript());
-				combinedScript.append(';');
-			}
-		}
+		loadItemsToBeRendered.stream().filter(this::markItemRendered).forEach(curItem -> {
+			combinedScript.append('\n');
+			combinedScript.append(curItem.getJavaScript());
+			combinedScript.append(';');
+		});
 		if (combinedScript.length() > 0)
 		{
 			getRealResponse().render(
@@ -391,27 +234,16 @@ public class ResourceAggregator extends DecoratingHeaderResponse
 	 */
 	private void renderSeparateEventScripts()
 	{
-		for (HeaderItem curItem : domReadyItemsToBeRendered)
-		{
-			if (markItemRendered(curItem))
-			{
-				getRealResponse().render(curItem);
-			}
-		}
+		domReadyItemsToBeRendered.stream().filter(this::markItemRendered).forEach(curItem -> getRealResponse().render(curItem));
 
-		for (OnLoadHeaderItem curItem : loadItemsToBeRendered)
-		{
-			if (markItemRendered(curItem))
-			{
-				getRealResponse().render(curItem);
-			}
-		}
+		loadItemsToBeRendered.stream().filter(this::markItemRendered).forEach(curItem -> getRealResponse().render(curItem));
 	}
 
 	private boolean markItemRendered(HeaderItem item)
 	{
-		if (wasRendered(item))
+		if (wasRendered(item)) {
 			return false;
+		}
 
 		if (item instanceof IWrappedHeaderItem)
 		{
@@ -551,5 +383,147 @@ public class ResourceAggregator extends DecoratingHeaderResponse
 			resultBundle = bundle;
 		}
 		return resultBundle;
+	}
+
+	/**
+	 * The location in which a {@link HeaderItem} is added, consisting of the component/behavior
+	 * that added the item, the index in the list for that component/behavior at which the item was
+	 * added and the index in the request.
+	 * 
+	 * @author papegaaij
+	 */
+	public static class RecordedHeaderItemLocation
+	{
+		private final Component renderBase;
+
+		private int indexInRequest;
+
+		private int depth = -1;
+
+		/**
+		 * Construct.
+		 * 
+		 * @param renderBase
+		 *            The component that added the item.
+		 */
+		public RecordedHeaderItemLocation(Component renderBase, int indexInRequest)
+		{
+			this.renderBase = renderBase;
+			
+			this.indexInRequest = indexInRequest;
+		}
+
+		/**
+		 * @return the component or behavior that added the item.
+		 */
+		public Object getRenderBase()
+		{
+			return renderBase;
+		}
+
+		/**
+		 * @return the number of items added before this one in the same request.
+		 */
+		public int getIndexInRequest()
+		{
+			return indexInRequest;
+		}
+
+		public int getDepth()
+		{
+			if (depth == -1) {
+				Component component = renderBase;
+				while (component != null)  {
+					depth++;
+					
+					component = component.getParent();
+				}
+
+			}
+			return depth;
+		}
+		
+		@Override
+		public String toString()
+		{
+			return Classes.simpleName(renderBase.getClass());
+		}
+	}
+
+	/**
+	 * Contains information about an {@link HeaderItem} that must be rendered.
+	 * 
+	 * @author papegaaij
+	 */
+	public static class RecordedHeaderItem
+	{
+		private final HeaderItem item;
+
+		private final List<RecordedHeaderItemLocation> locations;
+		
+		private int minDepth = Integer.MAX_VALUE;
+
+		/**
+		 * Construct.
+		 * 
+		 * @param item
+		 */
+		public RecordedHeaderItem(HeaderItem item)
+		{
+			this.item = item;
+			locations = new ArrayList<>();
+		}
+
+		/**
+		 * Records a location at which the item was added.
+		 * 
+		 * @param renderBase
+		 *            The component or behavior that added the item.
+		 * @param indexInRequest
+		 *            Indicates the number of items added before this one in this request.
+		 */
+		void addLocation(Component renderBase, int indexInRequest)
+		{
+			locations.add(new RecordedHeaderItemLocation(renderBase, indexInRequest));
+			
+			minDepth = Integer.MAX_VALUE;
+		}
+
+		/**
+		 * @return the actual item
+		 */
+		public HeaderItem getItem()
+		{
+			return item;
+		}
+
+		/**
+		 * @return The locations at which the item was added.
+		 */
+		public List<RecordedHeaderItemLocation> getLocations()
+		{
+			return locations;
+		}
+		
+		/**
+		 * Get the minimum depth in the component tree.
+		 * 
+		 * @return depth
+		 */
+		public int getMinDepth()
+		{
+			if (minDepth == Integer.MAX_VALUE) {
+				locations.forEach(location -> minDepth = Math.min(minDepth, location.getDepth()));
+			}
+			
+			return minDepth;
+		}
+
+
+		@Override
+		public String toString()
+		{
+			return new StringBuilder().append(locations).append(":").append(item).toString();
+		}
 	}
 }

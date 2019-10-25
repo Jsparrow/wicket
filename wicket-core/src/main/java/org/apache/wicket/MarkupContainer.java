@@ -135,24 +135,6 @@ public abstract class MarkupContainer extends Component implements Iterable<Comp
 	};
 
 	/**
-	 * Administrative class for detecting removed children during child iteration. Not intended to
-	 * be serializable but for e.g. determining the size of the component it has to be serializable.
-	 */
-	private static class RemovedChild implements Serializable
-	{
-		private static final long serialVersionUID = 1L;
-
-		private transient final Component removedChild;
-		private transient final Component previousSibling;
-
-		private RemovedChild(Component removedChild, Component previousSibling)
-		{
-			this.removedChild = removedChild;
-			this.previousSibling = previousSibling;
-		}
-	}
-
-	/**
 	 * Administrative counter to keep track of modifications to the list of children during
 	 * iteration.
 	 * 
@@ -168,6 +150,8 @@ public abstract class MarkupContainer extends Component implements Iterable<Comp
 	 * when there are more children.
 	 */
 	private Object children;
+
+	private transient ComponentQueue queue;
 
 	public MarkupContainer(final String id)
 	{
@@ -205,14 +189,12 @@ public abstract class MarkupContainer extends Component implements Iterable<Comp
 			{
 				if (child == parent)
 				{
-					String msg = "You can not add a component's parent as child to the component (loop): Component: " +
-						this.toString(false) + "; parent == child: " + parent.toString(false);
+					String msg = new StringBuilder().append("You can not add a component's parent as child to the component (loop): Component: ").append(this.toString(false)).append("; parent == child: ").append(parent.toString(false)).toString();
 
 					if (child instanceof Border.BorderBodyContainer)
 					{
-						msg += ". Please consider using Border.addToBorder(new " +
-							Classes.simpleName(this.getClass()) + "(\"" + this.getId() +
-							"\", ...) instead of add(...)";
+						msg += new StringBuilder().append(". Please consider using Border.addToBorder(new ").append(Classes.simpleName(this.getClass())).append("(\"").append(this.getId()).append("\", ...) instead of add(...)")
+								.toString();
 					}
 
 					throw new WicketRuntimeException(msg);
@@ -225,7 +207,7 @@ public abstract class MarkupContainer extends Component implements Iterable<Comp
 
 			if (log.isDebugEnabled())
 			{
-				log.debug("Add " + child.getId() + " to " + this);
+				log.debug(new StringBuilder().append("Add ").append(child.getId()).append(" to ").append(this).toString());
 			}
 
 			// Add the child to my children
@@ -233,8 +215,7 @@ public abstract class MarkupContainer extends Component implements Iterable<Comp
 			if (previousChild != null && previousChild != child)
 			{
 				throw new IllegalArgumentException(
-					exceptionMessage("A child '" + previousChild.getClass().getSimpleName() +
-						"' with id '" + child.getId() + "' already exists"));
+					exceptionMessage(new StringBuilder().append("A child '").append(previousChild.getClass().getSimpleName()).append("' with id '").append(child.getId()).append("' already exists").toString()));
 			}
 
 			addedComponent(child);
@@ -401,15 +382,12 @@ public abstract class MarkupContainer extends Component implements Iterable<Comp
 		Component child = container.children_get(id);
 
 		// Found child?
-		if (child != null)
-		{
-			String path2 = Strings.afterFirstPathComponent(path, Component.PATH_SEPARATOR);
-
-			// Recurse on latter part of path
-			return child.get(path2);
+		if (child == null) {
+			return null;
 		}
-
-		return null;
+		String path2 = Strings.afterFirstPathComponent(path, Component.PATH_SEPARATOR);
+		// Recurse on latter part of path
+		return child.get(path2);
 	}
 
 	/**
@@ -433,13 +411,8 @@ public abstract class MarkupContainer extends Component implements Iterable<Comp
 		{
 			// throw exception since there is no associated markup
 			throw new MarkupNotFoundException(
-				"Markup of type '" +
-					getMarkupType().getExtension() +
-					"' for component '" +
-					getClass().getName() +
-					"' not found." +
-					" Enable debug messages for org.apache.wicket.util.resource to get a list of all filenames tried.: " +
-					toString());
+				new StringBuilder().append("Markup of type '").append(getMarkupType().getExtension()).append("' for component '").append(getClass().getName()).append("' not found.").append(" Enable debug messages for org.apache.wicket.util.resource to get a list of all filenames tried.: ")
+						.append(toString()).toString());
 		}
 
 		return null;
@@ -464,13 +437,7 @@ public abstract class MarkupContainer extends Component implements Iterable<Comp
 
 			return null;
 		}
-		catch (MarkupException ex)
-		{
-			// re-throw it. The exception contains already all the information
-			// required.
-			throw ex;
-		}
-		catch (MarkupNotFoundException ex)
+		catch (MarkupNotFoundException | MarkupException ex)
 		{
 			// re-throw it. The exception contains already all the information
 			// required.
@@ -480,9 +447,8 @@ public abstract class MarkupContainer extends Component implements Iterable<Comp
 		{
 			// throw exception since there is no associated markup
 			throw new MarkupNotFoundException(
-				exceptionMessage("Markup of type '" + getMarkupType().getExtension() +
-					"' for component '" + getClass().getName() + "' not found." +
-					" Enable debug messages for org.apache.wicket.util.resource to get a list of all filenames tried"),
+				exceptionMessage(new StringBuilder().append("Markup of type '").append(getMarkupType().getExtension()).append("' for component '").append(getClass().getName()).append("' not found.").append(" Enable debug messages for org.apache.wicket.util.resource to get a list of all filenames tried")
+						.toString()),
 				ex);
 		}
 	}
@@ -537,7 +503,7 @@ public abstract class MarkupContainer extends Component implements Iterable<Comp
 	{
 		if (log.isDebugEnabled())
 		{
-			log.debug("internalAdd " + child.getId() + " to " + this);
+			log.debug(new StringBuilder().append("internalAdd ").append(child.getId()).append(" to ").append(this).toString());
 		}
 
 		// Add to map
@@ -590,8 +556,9 @@ public abstract class MarkupContainer extends Component implements Iterable<Comp
 
 			private void refreshInternalIteratorIfNeeded()
 			{
-				if (expectedModCounter >= modCounter)
+				if (expectedModCounter >= modCounter) {
 					return;
+				}
 
 				if (children == null)
 				{
@@ -621,9 +588,9 @@ public abstract class MarkupContainer extends Component implements Iterable<Comp
 				{
 					// move the new internal iterator to the place of the last processed component
 					while (internalIterator.hasNext() &&
-						internalIterator.next() != currentComponent)
+						internalIterator.next() != currentComponent) {
 						// noop
-						;
+					}
 				}
 			}
 
@@ -631,8 +598,9 @@ public abstract class MarkupContainer extends Component implements Iterable<Comp
 			{
 				while (true)
 				{
-					if (target == null)
+					if (target == null) {
 						return null;
+					}
 
 					RemovedChild removedChild = null;
 					for (int i = indexInRemovalsSinceLastUpdate; i < removals_size(); i++)
@@ -655,7 +623,7 @@ public abstract class MarkupContainer extends Component implements Iterable<Comp
 					}
 				}
 			}
-		};
+		}
 		return new MarkupChildIterator();
 	}
 
@@ -670,7 +638,7 @@ public abstract class MarkupContainer extends Component implements Iterable<Comp
 	public final Iterator<Component> iterator(Comparator<Component> comparator)
 	{
 		final List<Component> sorted = copyChildren();
-		Collections.sort(sorted, comparator);
+		sorted.sort(comparator);
 		return sorted.iterator();
 	}
 
@@ -711,8 +679,7 @@ public abstract class MarkupContainer extends Component implements Iterable<Comp
 		}
 		else
 		{
-			throw new WicketRuntimeException("Unable to find a component with id '" + id +
-				"' to remove");
+			throw new WicketRuntimeException(new StringBuilder().append("Unable to find a component with id '").append(id).append("' to remove").toString());
 		}
 
 		return this;
@@ -829,7 +796,7 @@ public abstract class MarkupContainer extends Component implements Iterable<Comp
 
 		if (log.isDebugEnabled())
 		{
-			log.debug("Replacing " + child.getId() + " in " + this);
+			log.debug(new StringBuilder().append("Replacing ").append(child.getId()).append(" in ").append(this).toString());
 		}
 
 		if (child.getParent() != this)
@@ -840,8 +807,7 @@ public abstract class MarkupContainer extends Component implements Iterable<Comp
 			if (replaced == null)
 			{
 				throw new WicketRuntimeException(
-					exceptionMessage("Cannot replace a component which has not been added: id='" +
-						child.getId() + "', component=" + child));
+					exceptionMessage(new StringBuilder().append("Cannot replace a component which has not been added: id='").append(child.getId()).append("', component=").append(child).toString()));
 			}
 
 			// first remove the component.
@@ -1036,14 +1002,7 @@ public abstract class MarkupContainer extends Component implements Iterable<Comp
 	public final void internalInitialize()
 	{
 		super.fireInitialize();
-		visitChildren(new IVisitor<Component, Void>()
-		{
-			@Override
-			public void component(final Component component, final IVisit<Void> visit)
-			{
-				component.fireInitialize();
-			}
-		});
+		visitChildren((final Component component, final IVisit<Void> visit) -> component.fireInitialize());
 	}
 
 	/*
@@ -1111,14 +1070,7 @@ public abstract class MarkupContainer extends Component implements Iterable<Comp
 		if (children instanceof List)
 		{
 			List<Component> kids = children();
-			for (Component child : kids)
-			{
-				if (child.getId().equals(childId))
-				{
-					return child;
-				}
-			}
-			return null;
+			return kids.stream().filter(child -> child.getId().equals(childId)).findFirst().orElse(null);
 		}
 		Map<String, Component> kids = children();
 		return kids.get(childId);
@@ -1198,12 +1150,11 @@ public abstract class MarkupContainer extends Component implements Iterable<Comp
 		{
 			return 1;
 		}
-		if (children instanceof List)
-		{
-			List<?> kids = children();
-			return kids.size();
+		if (!(children instanceof List)) {
+			return ((Map<?, ?>)children).size();
 		}
-		return ((Map<?, ?>)children).size();
+		List<?> kids = children();
+		return kids.size();
 	}
 
 	/**
@@ -1287,10 +1238,7 @@ public abstract class MarkupContainer extends Component implements Iterable<Comp
 			else
 			{
 				Map<String, Component> newChildren = new LinkedMap<>(MAPIFY_THRESHOLD * 2);
-				for (Component curChild : childrenList)
-				{
-					newChildren.put(curChild.getId(), curChild);
-				}
+				childrenList.forEach(curChild -> newChildren.put(curChild.getId(), curChild));
 				newChildren.put(child.getId(), child);
 				children = newChildren;
 			}
@@ -1479,7 +1427,7 @@ public abstract class MarkupContainer extends Component implements Iterable<Comp
 
 		return false;
 	}
-	
+
 	/**
 	 * Says if the given tag can be handled as a raw markup.
 	 * 
@@ -1495,7 +1443,7 @@ public abstract class MarkupContainer extends Component implements Iterable<Comp
 		
 		return !stripTag;
 	}
-	
+
 	/**
 	 * Throws a {@code org.apache.wicket.markup.MarkupException} when the
 	 * component markup is not consistent.
@@ -1513,18 +1461,12 @@ public abstract class MarkupContainer extends Component implements Iterable<Comp
 		{
 			if (((WicketTag)tag).isChildTag())
 			{
-				markupStream.throwMarkupException("Found " + tag.toString() +
-					" but no <wicket:extend>. Container: " + toString());
+				markupStream.throwMarkupException(new StringBuilder().append("Found ").append(tag.toString()).append(" but no <wicket:extend>. Container: ").append(toString()).toString());
 			}
 			else
 			{
-				markupStream.throwMarkupException("Failed to handle: " +
-					tag.toString() +
-					". It might be that no resolver has been registered to handle this special tag. " +
-					" But it also could be that you declared wicket:id=" + id +
-					" in your markup, but that you either did not add the " +
-					"component to your page at all, or that the hierarchy does not match. " +
-					"Container: " + toString());
+				markupStream.throwMarkupException(new StringBuilder().append("Failed to handle: ").append(tag.toString()).append(". It might be that no resolver has been registered to handle this special tag. ").append(" But it also could be that you declared wicket:id=").append(id).append(" in your markup, but that you either did not add the ")
+						.append("component to your page at all, or that the hierarchy does not match. ").append("Container: ").append(toString()).toString());
 			}
 		}
 
@@ -1555,16 +1497,11 @@ public abstract class MarkupContainer extends Component implements Iterable<Comp
 		Page page = findPage();
 		if (page != null)
 		{
-			page.visitChildren(new IVisitor<Component, Void>()
-			{
-				@Override
-				public void component(Component component, IVisit<Void> visit)
+			page.visitChildren((Component component, IVisit<Void> visit) -> {
+				if (Strings.getLevenshteinDistance(id.toLowerCase(Locale.ROOT), component.getId()
+					.toLowerCase(Locale.ROOT)) < 3)
 				{
-					if (Strings.getLevenshteinDistance(id.toLowerCase(Locale.ROOT), component.getId()
-						.toLowerCase(Locale.ROOT)) < 3)
-					{
-						names.add(component.getPageRelativePath());
-					}
+					names.add(component.getPageRelativePath());
 				}
 			});
 		}
@@ -1773,28 +1710,14 @@ public abstract class MarkupContainer extends Component implements Iterable<Comp
 	void onEnabledStateChanged()
 	{
 		super.onEnabledStateChanged();
-		visitChildren(new IVisitor<Component, Void>()
-		{
-			@Override
-			public void component(Component component, IVisit<Void> visit)
-			{
-				component.clearEnabledInHierarchyCache();
-			}
-		});
+		visitChildren((Component component, IVisit<Void> visit) -> component.clearEnabledInHierarchyCache());
 	}
 
 	@Override
 	void onVisibleStateChanged()
 	{
 		super.onVisibleStateChanged();
-		visitChildren(new IVisitor<Component, Void>()
-		{
-			@Override
-			public void component(Component component, IVisit<Void> visit)
-			{
-				component.clearVisibleInHierarchyCache();
-			}
-		});
+		visitChildren((Component component, IVisit<Void> visit) -> component.clearVisibleInHierarchyCache());
 	}
 
 	@Override
@@ -1812,8 +1735,6 @@ public abstract class MarkupContainer extends Component implements Iterable<Comp
 							getId(), queue));
 		}
 	}
-
-	private transient ComponentQueue queue;
 
 	/**
 	 * Queues one or more components to be dequeued later. The advantage of this method over the
@@ -1886,6 +1807,7 @@ public abstract class MarkupContainer extends Component implements Iterable<Comp
 		super.onInitialize();
 		dequeue();
 	}
+
 	/**
 	 * @return {@code true} when one or more components are queued
 	 */
@@ -1997,7 +1919,7 @@ public abstract class MarkupContainer extends Component implements Iterable<Comp
 	{
 		return get(tag.getId());
 	}
-	
+
 	/**
 	 * Propagates dequeuing to child component.
 	 * 
@@ -2054,14 +1976,14 @@ public abstract class MarkupContainer extends Component implements Iterable<Comp
 		throw new IllegalStateException(String.format("Could not find the closing tag for '%s'", tag));
 	}
 
-    private void dequeueChildrenContainer(DequeueContext dequeue, MarkupContainer child)
+	private void dequeueChildrenContainer(DequeueContext dequeue, MarkupContainer child)
     {
         dequeue.pushContainer(child);
         child.dequeue(dequeue);
         dequeue.popContainer();
     }
 
-    /** @see IQueueRegion#newDequeueContext() */
+	/** @see IQueueRegion#newDequeueContext() */
 	public DequeueContext newDequeueContext()
 	{
 		IMarkupFragment markup = getRegionMarkup();
@@ -2221,5 +2143,23 @@ public abstract class MarkupContainer extends Component implements Iterable<Comp
 		}
 		return StreamSupport.stream(
 			Spliterators.spliteratorUnknownSize(new ChildrenIterator<>(iterator()), 0), false);
+	}
+
+	/**
+	 * Administrative class for detecting removed children during child iteration. Not intended to
+	 * be serializable but for e.g. determining the size of the component it has to be serializable.
+	 */
+	private static class RemovedChild implements Serializable
+	{
+		private static final long serialVersionUID = 1L;
+
+		private final transient Component removedChild;
+		private final transient Component previousSibling;
+
+		private RemovedChild(Component removedChild, Component previousSibling)
+		{
+			this.removedChild = removedChild;
+			this.previousSibling = previousSibling;
+		}
 	}
 }

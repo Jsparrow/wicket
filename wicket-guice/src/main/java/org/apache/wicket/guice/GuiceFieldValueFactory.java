@@ -29,15 +29,17 @@ import org.apache.wicket.proxy.LazyInitProxyFactory;
 import com.google.inject.BindingAnnotation;
 import com.google.inject.Inject;
 import org.apache.wicket.util.lang.Generics;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  */
 public class GuiceFieldValueFactory implements IFieldValueFactory
 {
-	private final ConcurrentMap<GuiceProxyTargetLocator, Object> cache = Generics.newConcurrentHashMap();
+	private static final Logger logger = LoggerFactory.getLogger(GuiceFieldValueFactory.class);
 	private static final Object NULL_SENTINEL = new Object();
-
+	private final ConcurrentMap<GuiceProxyTargetLocator, Object> cache = Generics.newConcurrentHashMap();
 	private final boolean wrapInProxies;
 
 	/**
@@ -105,9 +107,9 @@ public class GuiceFieldValueFactory implements IFieldValueFactory
 				}
 				catch (MoreThanOneBindingException e)
 				{
+					logger.error(e.getMessage(), e);
 					throw new RuntimeException(
-							"Can't have more than one BindingAnnotation on field " + field.getName() +
-									" of class " + fieldOwner.getClass().getName());
+							new StringBuilder().append("Can't have more than one BindingAnnotation on field ").append(field.getName()).append(" of class ").append(fieldOwner.getClass().getName()).toString());
 				}
 			}
 		}
@@ -150,7 +152,6 @@ public class GuiceFieldValueFactory implements IFieldValueFactory
 		}
 		return bindingAnnotation;
 	}
-
 	/**
 	 *
 	 */

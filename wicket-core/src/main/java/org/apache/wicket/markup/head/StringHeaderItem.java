@@ -29,6 +29,18 @@ import org.apache.wicket.util.lang.Args;
  */
 public class StringHeaderItem extends HeaderItem
 {
+	private final CharSequence string;
+
+	/**
+	 * Construct.
+	 * 
+	 * @param string
+	 */
+	public StringHeaderItem(CharSequence string)
+	{
+		this.string = Args.notNull(string, "string");
+	}
+
 	/**
 	 * Creates a {@link StringHeaderItem} for the snippet.
 	 * 
@@ -40,18 +52,6 @@ public class StringHeaderItem extends HeaderItem
 	public static StringHeaderItem forString(CharSequence string)
 	{
 		return new StringHeaderItem(string);
-	}
-
-	private final CharSequence string;
-
-	/**
-	 * Construct.
-	 * 
-	 * @param string
-	 */
-	public StringHeaderItem(CharSequence string)
-	{
-		this.string = Args.notNull(string, "string");
 	}
 
 	/**
@@ -77,14 +77,18 @@ public class StringHeaderItem extends HeaderItem
 	@Override
 	public String toString()
 	{
-		return "StringHeaderItem(" + getString() + ")";
+		return new StringBuilder().append("StringHeaderItem(").append(getString()).append(")").toString();
 	}
 
 	@Override
 	public boolean equals(Object o)
 	{
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
 		StringHeaderItem that = (StringHeaderItem) o;
 		return Objects.equals(string, that.string);
 	}

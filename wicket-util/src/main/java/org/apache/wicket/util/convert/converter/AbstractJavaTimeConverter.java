@@ -23,6 +23,8 @@ import java.time.temporal.TemporalAccessor;
 import java.util.Locale;
 
 import org.apache.wicket.util.string.Strings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A base class for all java.time.** related converters
@@ -32,6 +34,7 @@ import org.apache.wicket.util.string.Strings;
  */
 public abstract class AbstractJavaTimeConverter<T extends Temporal> extends AbstractConverter<T>
 {
+	private static final Logger logger = LoggerFactory.getLogger(AbstractJavaTimeConverter.class);
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -56,6 +59,7 @@ public abstract class AbstractJavaTimeConverter<T extends Temporal> extends Abst
 		try {
 			temporalAccessor = dateTimeFormatter.parse(value);
 		} catch (DateTimeParseException ex) {
+			logger.error(ex.getMessage(), ex);
 			throw newConversionException("Cannot parse '" + value, value, locale);
 		}
 		

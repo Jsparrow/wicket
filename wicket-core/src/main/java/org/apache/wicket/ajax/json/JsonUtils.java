@@ -39,7 +39,7 @@ public final class JsonUtils
 	 * @return a JSONArray that contains JSONObject's with name/value pairs
 	 * @throws JSONException
 	 */
-	public static JSONArray asArray(Map<String, Object> map) throws JSONException
+	public static JSONArray asArray(Map<String, Object> map)
 	{
 		JSONArray jsonArray = new JSONArray();
 

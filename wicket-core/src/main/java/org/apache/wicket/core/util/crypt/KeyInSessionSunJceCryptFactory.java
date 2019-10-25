@@ -93,7 +93,7 @@ public class KeyInSessionSunJceCryptFactory implements ICryptFactory
 		if (key == null)
 		{
 			// generate new key
-			key = session.getId() + "." + UUID.randomUUID().toString();
+			key = new StringBuilder().append(session.getId()).append(".").append(UUID.randomUUID().toString()).toString();
 			session.setMetaData(KEY, key);
 		}
 

@@ -16,9 +16,8 @@
  */
 package org.apache.wicket.cdi;
 
-import java.util.Arrays;
-
 import org.apache.wicket.util.license.ApacheLicenseHeaderTestCase;
+import java.util.Collections;
 
 /**
  * Test that the license headers are in place in this project. The tests are run
@@ -37,6 +36,6 @@ public class ApacheLicenceHeaderTest extends ApacheLicenseHeaderTestCase
 		xmlIgnore.add(".settings");
 		xmlIgnore.add("src/main/resources/META-INF/beans.xml");
 		xmlIgnore.add("src/test/java/simplelogger.properties");
-		xmlPrologIgnore = Arrays.asList("src");
+		xmlPrologIgnore = Collections.singletonList("src");
 	}
 }

@@ -22,6 +22,8 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Tests {@link JavaScriptStripper}
@@ -30,6 +32,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class JavaScriptStripperTest
 {
+	private static final Logger logger = LoggerFactory.getLogger(JavaScriptStripperTest.class);
+	/**     */
+	// @formatter:off
+	private static String teststring2 =
+         new StringBuilder().append("   var test = function () {\n").append("   var c = \"!=\";\n").append("    /* from jquery 1.5.1 */\n").append("    if ( !l.match.PSEUDO.test(c) && !/!=/.test(c)) {\n").append("       alert(\"/something bad will happen */* \");\n").append("   }\n").append("\n").append("     var importantFunction = function () {alert(\"really important function \")}\n")
+			.append("   /*\n").append("     This code will be stripped\n").append("   */\n").append("\n").append("}").toString() ;
 	/**	 */
 	@Test
 	void unixWICKET501()
@@ -87,7 +95,7 @@ class JavaScriptStripperTest
 		String after = new JavaScriptStripper().stripCommentsAndWhitespace(before);
 		String expected = " attr:  \n /\\[((?:[\\w-]*:)?[\\w-]+)\\s*(?:([!^$*~|]?=)\\s*((['\"])([^\\4]*?)\\4|([^'\"][^\\]]*?)))?\\]/ after regex";
 		assertEquals(expected, after);
-		System.out.println(after);
+		logger.info(after);
 	}
 
 	/**	 */
@@ -141,34 +149,18 @@ class JavaScriptStripperTest
 		assertEquals(expected, after);
 	}
 
-	/**     */
-	// @formatter:off
-	private static String TESTSTRING2 =
-         "   var test = function () {\n" +
-         "   var c = \"!=\";\n" +
-         "    /* from jquery 1.5.1 */\n" +
-         "    if ( !l.match.PSEUDO.test(c) && !/!=/.test(c)) {\n" +
-         "       alert(\"/something bad will happen */* \");\n" +
-         "   }\n" +
-         "\n" +
-         "     var importantFunction = function () {alert(\"really important function \")}\n" +
-         "   /*\n" +
-         "     This code will be stripped\n" +
-         "   */\n" +
-         "\n" +
-         "}" ;
 	// @formatter:on
 
 	/**	 */
 	@Test
 	void regExThatStartsWithExclamationMark()
 	{
-		String result = new JavaScriptStripper().stripCommentsAndWhitespace(TESTSTRING2);
+		String result = new JavaScriptStripper().stripCommentsAndWhitespace(teststring2);
 		assertFalse(result.contains("This code will be stripped"));
 		assertTrue(result.contains("something bad will happen"));
 		assertTrue(result.contains("really important function"));
 
-		System.out.println(result);
+		logger.info(result);
 	}
 
 	/**	*/

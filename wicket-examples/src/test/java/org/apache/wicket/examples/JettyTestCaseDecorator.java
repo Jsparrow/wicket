@@ -59,17 +59,19 @@ public class JettyTestCaseDecorator
 		server.addConnector(http);
 
 		WebAppContext web = new WebAppContext();
-		if (contextPath == null)
+		if (contextPath == null) {
 			web.setContextPath("/wicket-examples");
-		else
+		} else {
 			web.setContextPath(contextPath);
+		}
 
 		if (webappLocation == null)
 		{
 			String basedir = System.getProperty("basedir");
 			String path = "";
-			if (basedir != null)
+			if (basedir != null) {
 				path = basedir + "/";
+			}
 			path += "src/main/webapp";
 
 			web.setWar(path);

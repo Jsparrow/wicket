@@ -109,6 +109,24 @@ public class SelectPage extends WicketExamplePage
 
 	}
 
+	/**
+	 * Override base method to provide an explanation
+	 */
+	@Override
+	protected void explain()
+	{
+		String html = new StringBuilder().append("<select wicket:id=\"sites\">\n").append("    <option>site 1</option>\n").append("    <option>site 2</option>\n").append("</select>\n").append("<select wicket:id=\"choices\">\n").append("    <option>choice 1</option>\n").append("    <option>choice 2</option>\n").append("</select>")
+				.toString();
+		String code = new StringBuilder().append("&nbsp;&nbsp;&nbsp;&nbsp;// Add a multiple list choice component that uses the model object's 'site'\n").append("&nbsp;&nbsp;&nbsp;&nbsp;// property to designate the current selection, and that uses the SITES\n").append("&nbsp;&nbsp;&nbsp;&nbsp;// list for the available options.\n").append("&nbsp;&nbsp;&nbsp;&nbsp;// Note that our model here holds a Collection, as we need to store\n").append("&nbsp;&nbsp;&nbsp;&nbsp;// multiple values too\n").append("&nbsp;&nbsp;&nbsp;&nbsp;ListMultipleChoice siteChoice = new ListMultipleChoice(\"sites\", SITES);\n").append("&nbsp;&nbsp;&nbsp;&nbsp;form.add(siteChoice);\n").append("\n")
+				.append("&nbsp;&nbsp;&nbsp;&nbsp;ListMultipleChoice manyChoice = new ListMultipleChoice(\"choices\", MANY_CHOICES).setMaxRows(5);\n").append("&nbsp;&nbsp;&nbsp;&nbsp;form.add(manyChoice);").toString();
+
+		html = "SEE INSIDE FOR NOW";
+		code = "SEE INSIDE FOR NOW";
+
+		add(new ExplainPanel(html, code));
+
+	}
+
 	/** Simple data class that acts as a model for the input fields. */
 	private static class Input implements IClusterable
 	{
@@ -134,7 +152,7 @@ public class SelectPage extends WicketExamplePage
 		@Override
 		public String toString()
 		{
-			return "site = '" + site + "', choices='" + listAsString(choices) + "'";
+			return new StringBuilder().append("site = '").append(site).append("', choices='").append(listAsString(choices)).append("'").toString();
 		}
 
 		private String listAsString(List<String> list)
@@ -150,32 +168,5 @@ public class SelectPage extends WicketExamplePage
 			}
 			return b.toString();
 		}
-	}
-
-	/**
-	 * Override base method to provide an explanation
-	 */
-	@Override
-	protected void explain()
-	{
-		String html = "<select wicket:id=\"sites\">\n" + "    <option>site 1</option>\n"
-			+ "    <option>site 2</option>\n" + "</select>\n" + "<select wicket:id=\"choices\">\n"
-			+ "    <option>choice 1</option>\n" + "    <option>choice 2</option>\n" + "</select>";
-		String code = "&nbsp;&nbsp;&nbsp;&nbsp;// Add a multiple list choice component that uses the model object's 'site'\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;// property to designate the current selection, and that uses the SITES\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;// list for the available options.\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;// Note that our model here holds a Collection, as we need to store\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;// multiple values too\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;ListMultipleChoice siteChoice = new ListMultipleChoice(\"sites\", SITES);\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;form.add(siteChoice);\n"
-			+ "\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;ListMultipleChoice manyChoice = new ListMultipleChoice(\"choices\", MANY_CHOICES).setMaxRows(5);\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;form.add(manyChoice);";
-
-		html = "SEE INSIDE FOR NOW";
-		code = "SEE INSIDE FOR NOW";
-
-		add(new ExplainPanel(html, code));
-
 	}
 }

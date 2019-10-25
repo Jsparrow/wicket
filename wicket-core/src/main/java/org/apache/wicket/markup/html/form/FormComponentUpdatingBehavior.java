@@ -61,15 +61,12 @@ public class FormComponentUpdatingBehavior extends Behavior implements IRequestL
 
 		if (!(component instanceof FormComponent))
 		{
-			throw new WicketRuntimeException("Behavior " + getClass().getName()
-				+ " can only be added to an instance of a FormComponent");
+			throw new WicketRuntimeException(new StringBuilder().append("Behavior ").append(getClass().getName()).append(" can only be added to an instance of a FormComponent").toString());
 		}
 
 		if (formComponent != null)
 		{
-			throw new IllegalStateException("this kind of handler cannot be attached to " +
-				"multiple components; it is already attached to component " + formComponent +
-				", but component " + component + " wants to be attached too");
+			throw new IllegalStateException(new StringBuilder().append("this kind of handler cannot be attached to ").append("multiple components; it is already attached to component ").append(formComponent).append(", but component ").append(component).append(" wants to be attached too").toString());
 		}
 
 		this.formComponent = (FormComponent<?>)component;

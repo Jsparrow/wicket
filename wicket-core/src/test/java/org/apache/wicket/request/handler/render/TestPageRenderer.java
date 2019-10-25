@@ -68,11 +68,13 @@ class TestPageRenderer extends WebPageRenderer
 		return shouldPreserveClientUrl;
 	}
 
+	@Override
 	public boolean isNewPageInstance()
 	{
 		return newPageInstance;
 	}
 
+	@Override
 	public boolean isPageStateless()
 	{
 		return pageStateless;

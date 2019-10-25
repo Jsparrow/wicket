@@ -37,6 +37,80 @@ import org.junit.jupiter.api.Test;
  */
 class CsrfPreventionRequestCycleListenerTest extends WicketTestCase
 {
+	/*
+	 * Infrastructure code for these test cases starts here.
+	 */
+
+	/** The listener under test */
+	private CsrfPreventionRequestCycleListener csrfListener;
+
+	/** Flag for enabling/disabling the CSRF listener */
+	private boolean csrfEnabled = true;
+
+	/** Flag for enabling/disabling the page check of the CSRF listener */
+	private boolean checkPage = true;
+
+	/** Value for reporting the error code when the request was aborted */
+	private int errorCode = 400;
+
+	/** Value for reporting the error message when the request was aborted */
+	private String errorMessage = "BAD REQUEST";
+
+	/** Checks for asserting the functionality of the CSRF listener */
+	private boolean matched;
+
+	/**
+	 * Checks for asserting the functionality of the CSRF listener 
+	 */
+	private boolean whitelisted;
+
+	/**
+	 * Checks for asserting the functionality of the CSRF listener 
+	 */
+	private boolean aborted;
+
+	/**
+	 * Checks for asserting the functionality of the CSRF listener 
+	 */
+	private boolean allowed;
+
+	/**
+	 * Checks for asserting the functionality of the CSRF listener 
+	 */
+	private boolean suppressed;
+
+	/**
+	 * Manner to override the default check whether the current request handler should be checked
+	 * for CSRF attacks.
+	 */
+	private Predicate<IRequestHandler> customRequestHandlerCheck;
+
+	/**
+	 * Handlers for specific tests (ensures that the listener calls the right handler in the right
+	 * circumstance.
+	 */
+	private Runnable abortHandler;
+
+	/**
+	 * Handlers for specific tests (ensures that the listener calls the right handler in the right circumstance.
+	 */
+	private Runnable allowHandler;
+
+	/**
+	 * Handlers for specific tests (ensures that the listener calls the right handler in the right circumstance.
+	 */
+	private Runnable suppressHandler;
+
+	/**
+	 * Handlers for specific tests (ensures that the listener calls the right handler in the right circumstance.
+	 */
+	private Runnable matchedHandler;
+
+	/**
+	 * Handlers for specific tests (ensures that the listener calls the right handler in the right circumstance.
+	 */
+	private Runnable whitelistHandler;
+
 	/**
 	 * Sets up the test cases. Installs the CSRF listener and renders the FirstPage.
 	 */
@@ -232,13 +306,8 @@ class CsrfPreventionRequestCycleListenerTest extends WicketTestCase
 		// redirect to third page to ensure we are not suppressed to the first page, nor that the
 		// request was not suppressed and the second page was rendered erroneously
 
-		Runnable thirdPageRedirect = new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				throw new RestartResponseException(new ThirdPage());
-			}
+		Runnable thirdPageRedirect = () -> {
+			throw new RestartResponseException(new ThirdPage());
 		};
 		setSuppressHandler(thirdPageRedirect);
 		csrfListener.setConflictingOriginAction(CsrfAction.SUPPRESS);
@@ -258,13 +327,8 @@ class CsrfPreventionRequestCycleListenerTest extends WicketTestCase
 		// redirect to third page to ensure we are not suppressed to the first page, nor that the
 		// request was not allowed and the second page was rendered erroneously
 
-		Runnable thirdPageRedirect = new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				throw new RestartResponseException(new ThirdPage());
-			}
+		Runnable thirdPageRedirect = () -> {
+			throw new RestartResponseException(new ThirdPage());
 		};
 		setAllowHandler(thirdPageRedirect);
 		csrfListener.setConflictingOriginAction(CsrfAction.ALLOW);
@@ -284,13 +348,8 @@ class CsrfPreventionRequestCycleListenerTest extends WicketTestCase
 		// redirect to third page to ensure we are not suppressed to the first page, nor that the
 		// request was not aborted and the second page was rendered erroneously
 
-		Runnable thirdPageRedirect = new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				throw new RestartResponseException(new ThirdPage());
-			}
+		Runnable thirdPageRedirect = () -> {
+			throw new RestartResponseException(new ThirdPage());
 		};
 		setAbortHandler(thirdPageRedirect);
 
@@ -302,8 +361,9 @@ class CsrfPreventionRequestCycleListenerTest extends WicketTestCase
 		// have to check manually, as the assert checks the error code (which is not set due to our
 		// custom handler)
 
-		if (!aborted)
+		if (!aborted) {
 			throw new AssertionError("Request was not aborted");
+		}
 
 		tester.assertRenderedPage(ThirdPage.class);
 	}
@@ -407,40 +467,6 @@ class CsrfPreventionRequestCycleListenerTest extends WicketTestCase
 		tester.assertRenderedPage(ThirdPage.class);
 	}
 
-	/*
-	 * Infrastructure code for these test cases starts here.
-	 */
-
-	/** The listener under test */
-	private CsrfPreventionRequestCycleListener csrfListener;
-
-	/** Flag for enabling/disabling the CSRF listener */
-	private boolean csrfEnabled = true;
-
-	/** Flag for enabling/disabling the page check of the CSRF listener */
-	private boolean checkPage = true;
-
-	/** Value for reporting the error code when the request was aborted */
-	private int errorCode = 400;
-
-	/** Value for reporting the error message when the request was aborted */
-	private String errorMessage = "BAD REQUEST";
-
-	/** Checks for asserting the functionality of the CSRF listener */
-	private boolean matched, whitelisted, aborted, allowed, suppressed;
-
-	/**
-	 * Manner to override the default check whether the current request handler should be checked
-	 * for CSRF attacks.
-	 */
-	private Predicate<IRequestHandler> customRequestHandlerCheck;
-
-	/**
-	 * Handlers for specific tests (ensures that the listener calls the right handler in the right
-	 * circumstance.
-	 */
-	private Runnable abortHandler, allowHandler, suppressHandler, matchedHandler, whitelistHandler;
-
 	private void setErrorCode(int errorCode)
 	{
 		this.errorCode = errorCode;
@@ -488,8 +514,9 @@ class CsrfPreventionRequestCycleListenerTest extends WicketTestCase
 	 */
 	private void assertOriginsMatched()
 	{
-		if (!matched)
+		if (!matched) {
 			throw new AssertionError("Origins were not matched");
+		}
 	}
 
 	/**
@@ -497,8 +524,9 @@ class CsrfPreventionRequestCycleListenerTest extends WicketTestCase
 	 */
 	private void assertOriginsWhitelisted()
 	{
-		if (!whitelisted)
+		if (!whitelisted) {
 			throw new AssertionError("Origins were not whitelisted");
+		}
 	}
 
 	/**
@@ -507,8 +535,9 @@ class CsrfPreventionRequestCycleListenerTest extends WicketTestCase
 	 */
 	private void assertConflictingOriginsRequestAborted()
 	{
-		if (!aborted)
+		if (!aborted) {
 			throw new AssertionError("Request was not aborted");
+		}
 
 		assertEquals(errorCode, tester.getLastResponse().getStatus(), "Response error code");
 		assertThat("Response error message", tester.getLastResponse().getErrorMessage(),
@@ -520,8 +549,9 @@ class CsrfPreventionRequestCycleListenerTest extends WicketTestCase
 	 */
 	private void assertConflictingOriginsRequestSuppressed()
 	{
-		if (!suppressed)
+		if (!suppressed) {
 			throw new AssertionError("Request was not suppressed");
+		}
 	}
 
 	/**
@@ -529,8 +559,9 @@ class CsrfPreventionRequestCycleListenerTest extends WicketTestCase
 	 */
 	private void assertConflictingOriginsRequestAllowed()
 	{
-		if (!allowed)
+		if (!allowed) {
 			throw new AssertionError("Request was not allowed");
+		}
 	}
 
 	/**
@@ -538,16 +569,21 @@ class CsrfPreventionRequestCycleListenerTest extends WicketTestCase
 	 */
 	void assertOriginsCheckedButNotConflicting()
 	{
-		if (aborted)
+		if (aborted) {
 			throw new AssertionError("Origin was checked and aborted");
-		if (suppressed)
+		}
+		if (suppressed) {
 			throw new AssertionError("Origin was checked and suppressed");
-		if (allowed)
+		}
+		if (allowed) {
 			throw new AssertionError("Origin was checked and allowed");
-		if (whitelisted)
+		}
+		if (whitelisted) {
 			throw new AssertionError("Origin was whitelisted");
-		if (!matched)
+		}
+		if (!matched) {
 			throw new AssertionError("Origin was not checked");
+		}
 	}
 
 	/**
@@ -555,16 +591,21 @@ class CsrfPreventionRequestCycleListenerTest extends WicketTestCase
 	 */
 	private void assertOriginsNotChecked()
 	{
-		if (aborted)
+		if (aborted) {
 			throw new AssertionError("Request was checked and aborted");
-		if (suppressed)
+		}
+		if (suppressed) {
 			throw new AssertionError("Request was checked and suppressed");
-		if (allowed)
+		}
+		if (allowed) {
 			throw new AssertionError("Request was checked and allowed");
-		if (whitelisted)
+		}
+		if (whitelisted) {
 			throw new AssertionError("Origin was whitelisted");
-		if (matched)
+		}
+		if (matched) {
 			throw new AssertionError("Origin was checked and matched");
+		}
 	}
 
 	private final class MockCsrfPreventionRequestCycleListener extends
@@ -579,8 +620,9 @@ class CsrfPreventionRequestCycleListenerTest extends WicketTestCase
 		@Override
 		protected boolean isChecked(IRequestHandler handler)
 		{
-			if (customRequestHandlerCheck != null)
+			if (customRequestHandlerCheck != null) {
 				return customRequestHandlerCheck.apply(handler);
+			}
 
 			return super.isChecked(handler);
 		}
@@ -596,8 +638,9 @@ class CsrfPreventionRequestCycleListenerTest extends WicketTestCase
 			IRequestablePage page)
 		{
 			aborted = true;
-			if (abortHandler != null)
+			if (abortHandler != null) {
 				abortHandler.run();
+			}
 		}
 
 		@Override
@@ -605,8 +648,9 @@ class CsrfPreventionRequestCycleListenerTest extends WicketTestCase
 			IRequestablePage page)
 		{
 			allowed = true;
-			if (allowHandler != null)
+			if (allowHandler != null) {
 				allowHandler.run();
+			}
 		}
 
 		@Override
@@ -614,8 +658,9 @@ class CsrfPreventionRequestCycleListenerTest extends WicketTestCase
 			IRequestablePage page)
 		{
 			suppressed = true;
-			if (suppressHandler != null)
+			if (suppressHandler != null) {
 				suppressHandler.run();
+			}
 		}
 
 		@Override
@@ -623,8 +668,9 @@ class CsrfPreventionRequestCycleListenerTest extends WicketTestCase
 			IRequestablePage page)
 		{
 			matched = true;
-			if (matchedHandler != null)
+			if (matchedHandler != null) {
 				matchedHandler.run();
+			}
 		}
 
 		@Override
@@ -632,8 +678,9 @@ class CsrfPreventionRequestCycleListenerTest extends WicketTestCase
 			IRequestablePage page)
 		{
 			whitelisted = true;
-			if (whitelistHandler != null)
+			if (whitelistHandler != null) {
 				whitelistHandler.run();
+			}
 		}
 	}
 

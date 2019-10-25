@@ -42,7 +42,7 @@ public interface IValueMap extends Map<String, Object>
 	 * @return the value
 	 * @throws StringValueConversionException
 	 */
-	boolean getBoolean(final String key) throws StringValueConversionException;
+	boolean getBoolean(final String key);
 
 	/**
 	 * Retrieves a <code>double</code> value by key.
@@ -52,7 +52,7 @@ public interface IValueMap extends Map<String, Object>
 	 * @return the value
 	 * @throws StringValueConversionException
 	 */
-	double getDouble(final String key) throws StringValueConversionException;
+	double getDouble(final String key);
 
 	/**
 	 * Retrieves a <code>double</code> value by key, using a default value if not found.
@@ -64,8 +64,7 @@ public interface IValueMap extends Map<String, Object>
 	 * @return the value
 	 * @throws StringValueConversionException
 	 */
-	double getDouble(final String key, final double defaultValue)
-		throws StringValueConversionException;
+	double getDouble(final String key, final double defaultValue);
 
 	/**
 	 * Retrieves a <code>Duration</code> by key.
@@ -75,7 +74,7 @@ public interface IValueMap extends Map<String, Object>
 	 * @return the <code>Duration</code> value
 	 * @throws StringValueConversionException
 	 */
-	Duration getDuration(final String key) throws StringValueConversionException;
+	Duration getDuration(final String key);
 
 	/**
 	 * Retrieves an <code>int</code> value by key.
@@ -85,7 +84,7 @@ public interface IValueMap extends Map<String, Object>
 	 * @return the value
 	 * @throws StringValueConversionException
 	 */
-	int getInt(final String key) throws StringValueConversionException;
+	int getInt(final String key);
 
 	/**
 	 * Retrieves an <code>int</code> value by key, using a default value if not found.
@@ -97,7 +96,7 @@ public interface IValueMap extends Map<String, Object>
 	 * @return the value
 	 * @throws StringValueConversionException
 	 */
-	int getInt(final String key, final int defaultValue) throws StringValueConversionException;
+	int getInt(final String key, final int defaultValue);
 
 	/**
 	 * Retrieves a <code>long</code> value by key.
@@ -107,7 +106,7 @@ public interface IValueMap extends Map<String, Object>
 	 * @return the value
 	 * @throws StringValueConversionException
 	 */
-	long getLong(final String key) throws StringValueConversionException;
+	long getLong(final String key);
 
 	/**
 	 * Retrieves a <code>long</code> value by key, using a default value if not found.
@@ -119,7 +118,7 @@ public interface IValueMap extends Map<String, Object>
 	 * @return the value
 	 * @throws StringValueConversionException
 	 */
-	long getLong(final String key, final long defaultValue) throws StringValueConversionException;
+	long getLong(final String key, final long defaultValue);
 
 	/**
 	 * Retrieves a <code>String</code> by key, using a default value if not found.
@@ -180,7 +179,7 @@ public interface IValueMap extends Map<String, Object>
 	 * @return the <code>Instant</code> object
 	 * @throws StringValueConversionException
 	 */
-	Instant getInstant(final String key) throws StringValueConversionException;
+	Instant getInstant(final String key);
 
 	/**
 	 * Returns whether or not this <code>IValueMap</code> is immutable.

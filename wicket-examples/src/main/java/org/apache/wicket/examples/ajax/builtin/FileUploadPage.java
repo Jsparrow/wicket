@@ -74,8 +74,7 @@ public class FileUploadPage extends BasePage
 				}
 				else
 				{
-					info("File-Name: " + upload.getClientFileName() + " File-Size: " +
-						Bytes.bytes(upload.getSize()).toString());
+					info(new StringBuilder().append("File-Name: ").append(upload.getClientFileName()).append(" File-Size: ").append(Bytes.bytes(upload.getSize()).toString()).toString());
 				}
 			}
 		};
@@ -118,6 +117,7 @@ public class FileUploadPage extends BasePage
 		
 		WebMarkupContainer drop = new WebMarkupContainer("drop");
 		drop.add(new AjaxFileDropBehavior() {
+			@Override
 			protected void onFileUpload(AjaxRequestTarget target, List<FileUpload> files) {
 			    
 				// display uploaded info
@@ -127,10 +127,7 @@ public class FileUploadPage extends BasePage
 				}
 				else
 				{
-				    for (FileUpload file : files) {
-				    	info("File-Name: " + file.getClientFileName() + " File-Size: " +
-				    		Bytes.bytes(file.getSize()).toString());
-				    }
+				    files.forEach(file -> info(new StringBuilder().append("File-Name: ").append(file.getClientFileName()).append(" File-Size: ").append(Bytes.bytes(file.getSize()).toString()).toString()));
 				}
 				
 				target.add(feedback);

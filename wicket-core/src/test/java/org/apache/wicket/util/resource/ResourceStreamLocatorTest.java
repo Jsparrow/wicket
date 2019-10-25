@@ -42,21 +42,21 @@ import org.junit.jupiter.api.Test;
  */
 public class ResourceStreamLocatorTest extends WicketTestCase
 {
-	private final Locale locale_de = new Locale("de");
-	private final Locale locale_de_DE = new Locale("de", "DE");
-	private final Locale locale_de_DE_POSIX = new Locale("de", "DE", "POSIX");
-	private final Locale locale_de_POSIX = new Locale("de", "", "POSIX");
-	private final Locale locale_de_CH = new Locale("de", "CH");
+	private final Locale localeDe = new Locale("de");
+	private final Locale localeDeDe = new Locale("de", "DE");
+	private final Locale localeDeDePosix = new Locale("de", "DE", "POSIX");
+	private final Locale localeDePosix = new Locale("de", "", "POSIX");
+	private final Locale localeDeCh = new Locale("de", "CH");
 
-	private final Locale locale_en = new Locale("en");
-	private final Locale locale_en_US = new Locale("en", "US");
-	private final Locale locale_en_US_WIN = new Locale("en", "US", "WIN");
-	private final Locale locale_en_WIN = new Locale("en", "", "WIN");
+	private final Locale localeEn = new Locale("en");
+	private final Locale localeEnUs = new Locale("en", "US");
+	private final Locale localeEnUsWin = new Locale("en", "US", "WIN");
+	private final Locale localeEnWin = new Locale("en", "", "WIN");
 
-	private final Locale locale_fr = new Locale("fr");
-	private final Locale locale_fr_FR = new Locale("fr", "FR");
-	private final Locale locale_fr_FR_WIN = new Locale("fr", "FR", "WIN");
-	private final Locale locale_fr_WIN = new Locale("fr", "", "WIN");
+	private final Locale localeFr = new Locale("fr");
+	private final Locale localeFrFr = new Locale("fr", "FR");
+	private final Locale localeFrFrWin = new Locale("fr", "FR", "WIN");
+	private final Locale localeFrWin = new Locale("fr", "", "WIN");
 
 	/**
 	 * 
@@ -85,29 +85,29 @@ public class ResourceStreamLocatorTest extends WicketTestCase
 		createAndTestResource(sourcePath, null, null, null, "");
 		createAndTestResource(sourcePath, "style", null, null, "_style");
 
-		createAndTestResource(sourcePath, null, null, locale_de, "_de");
-		createAndTestResource(sourcePath, null, null, locale_de_DE, "_de_DE");
-		createAndTestResource(sourcePath, null, null, locale_de_DE_POSIX, "_de_DE_POSIX");
-		createAndTestResource(sourcePath, null, null, locale_de_POSIX, "_de__POSIX");
-		createAndTestResource(sourcePath, null, null, locale_de_CH, "_de");
+		createAndTestResource(sourcePath, null, null, localeDe, "_de");
+		createAndTestResource(sourcePath, null, null, localeDeDe, "_de_DE");
+		createAndTestResource(sourcePath, null, null, localeDeDePosix, "_de_DE_POSIX");
+		createAndTestResource(sourcePath, null, null, localeDePosix, "_de__POSIX");
+		createAndTestResource(sourcePath, null, null, localeDeCh, "_de");
 
-		createAndTestResource(sourcePath, "style", null, locale_de, "_style_de");
-		createAndTestResource(sourcePath, "style", null, locale_de_DE, "_style_de_DE");
-		createAndTestResource(sourcePath, "style", null, locale_de_DE_POSIX, "_style_de_DE_POSIX");
-		createAndTestResource(sourcePath, "style", null, locale_de_POSIX, "_style_de__POSIX");
-		createAndTestResource(sourcePath, "style", null, locale_de_CH, "_style_de");
+		createAndTestResource(sourcePath, "style", null, localeDe, "_style_de");
+		createAndTestResource(sourcePath, "style", null, localeDeDe, "_style_de_DE");
+		createAndTestResource(sourcePath, "style", null, localeDeDePosix, "_style_de_DE_POSIX");
+		createAndTestResource(sourcePath, "style", null, localeDePosix, "_style_de__POSIX");
+		createAndTestResource(sourcePath, "style", null, localeDeCh, "_style_de");
 
-		createAndTestResource(sourcePath, null, null, locale_en, "");
-		createAndTestResource(sourcePath, null, null, locale_en_US, "");
-		createAndTestResource(sourcePath, null, null, locale_en_US_WIN, "");
-		createAndTestResource(sourcePath, null, null, locale_en_WIN, "");
-		createAndTestResource(sourcePath, "style", null, locale_en_WIN, "_style");
+		createAndTestResource(sourcePath, null, null, localeEn, "");
+		createAndTestResource(sourcePath, null, null, localeEnUs, "");
+		createAndTestResource(sourcePath, null, null, localeEnUsWin, "");
+		createAndTestResource(sourcePath, null, null, localeEnWin, "");
+		createAndTestResource(sourcePath, "style", null, localeEnWin, "_style");
 
-		createAndTestResource(sourcePath, null, null, locale_fr, "_fr");
-		createAndTestResource(sourcePath, null, null, locale_fr_FR, "_fr");
-		createAndTestResource(sourcePath, null, null, locale_fr_FR_WIN, "_fr");
-		createAndTestResource(sourcePath, null, null, locale_fr_WIN, "_fr");
-		createAndTestResource(sourcePath, "style", null, locale_fr_WIN, "_style");
+		createAndTestResource(sourcePath, null, null, localeFr, "_fr");
+		createAndTestResource(sourcePath, null, null, localeFrFr, "_fr");
+		createAndTestResource(sourcePath, null, null, localeFrFrWin, "_fr");
+		createAndTestResource(sourcePath, null, null, localeFrWin, "_fr");
+		createAndTestResource(sourcePath, "style", null, localeFrWin, "_style");
 	}
 
 	/**
@@ -141,12 +141,12 @@ public class ResourceStreamLocatorTest extends WicketTestCase
 		filename += name + ".txt";
 		String resourcePath = getPath(resource);
 
-		if (!resourcePath.endsWith(filename))
-		{
-			filename = Strings.afterLast(filename, '/');
-			resourcePath = Strings.afterLast(resourcePath, '/');
-			assertEquals(filename, resourcePath, "Did not find resource");
+		if (resourcePath.endsWith(filename)) {
+			return;
 		}
+		filename = Strings.afterLast(filename, '/');
+		resourcePath = Strings.afterLast(resourcePath, '/');
+		assertEquals(filename, resourcePath, "Did not find resource");
 	}
 
 	/**

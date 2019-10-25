@@ -126,8 +126,7 @@ class CssUrlReplacerTest extends WicketTestCase
 		String processed = replacer.process(input, scope, cssRelativePath);
 		assertThat(
 			processed,
-			is(".class {background-image: url('./wicket/resource/org.apache.wicket.resource.CssUrlReplacerTest/res/css/some.img" +
-				DECORATION_SUFFIX + "');}"));
+			is(new StringBuilder().append(".class {background-image: url('./wicket/resource/org.apache.wicket.resource.CssUrlReplacerTest/res/css/some.img").append(DECORATION_SUFFIX).append("');}").toString()));
 	}
 
 	@Test
@@ -141,8 +140,7 @@ class CssUrlReplacerTest extends WicketTestCase
 		String processed = replacer.process(input, scope, cssRelativePath);
 		assertThat(
 			processed,
-			is(".class {background-image: url('./wicket/resource/org.apache.wicket.resource.CssUrlReplacerTest/res/css/some.img" +
-				DECORATION_SUFFIX + "');}"));
+			is(new StringBuilder().append(".class {background-image: url('./wicket/resource/org.apache.wicket.resource.CssUrlReplacerTest/res/css/some.img").append(DECORATION_SUFFIX).append("');}").toString()));
 	}
 
 	@Test
@@ -156,8 +154,7 @@ class CssUrlReplacerTest extends WicketTestCase
 		String processed = replacer.process(input, scope, cssRelativePath);
 		assertThat(
 			processed,
-			is(".class {background-image: url('./wicket/resource/org.apache.wicket.resource.CssUrlReplacerTest/res/images/some.img" +
-				DECORATION_SUFFIX + "');}"));
+			is(new StringBuilder().append(".class {background-image: url('./wicket/resource/org.apache.wicket.resource.CssUrlReplacerTest/res/images/some.img").append(DECORATION_SUFFIX).append("');}").toString()));
 	}
 
 	@Test
@@ -171,8 +168,7 @@ class CssUrlReplacerTest extends WicketTestCase
 		String processed = replacer.process(input, scope, cssRelativePath);
 		assertThat(
 			processed,
-			is(".class {background-image: url('./wicket/resource/org.apache.wicket.resource.CssUrlReplacerTest/res/css/images/some.img" +
-				DECORATION_SUFFIX + "');}"));
+			is(new StringBuilder().append(".class {background-image: url('./wicket/resource/org.apache.wicket.resource.CssUrlReplacerTest/res/css/images/some.img").append(DECORATION_SUFFIX).append("');}").toString()));
 	}
 
 	@Test
@@ -191,15 +187,13 @@ class CssUrlReplacerTest extends WicketTestCase
 	@Test
 	void severalUrls()
 	{
-		String input = ".class {\n" + "a: url('../images/a.img');\n" + "b: url('./b.img');\n" + "}";
+		String input = new StringBuilder().append(".class {\n").append("a: url('../images/a.img');\n").append("b: url('./b.img');\n").append("}").toString();
 		Class<?> scope = CssUrlReplacerTest.class;
 		String cssRelativePath = "res/css/some.css";
 		CssUrlReplacer replacer = new CssUrlReplacer();
 
 		String processed = replacer.process(input, scope, cssRelativePath);
-		assertThat(processed, containsString("CssUrlReplacerTest/res/images/a.img" +
-			DECORATION_SUFFIX + "');"));
-		assertThat(processed, containsString("CssUrlReplacerTest/res/css/b.img" +
-			DECORATION_SUFFIX + "');"));
+		assertThat(processed, containsString(new StringBuilder().append("CssUrlReplacerTest/res/images/a.img").append(DECORATION_SUFFIX).append("');").toString()));
+		assertThat(processed, containsString(new StringBuilder().append("CssUrlReplacerTest/res/css/b.img").append(DECORATION_SUFFIX).append("');").toString()));
 	}
 }

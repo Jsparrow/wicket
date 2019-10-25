@@ -37,11 +37,11 @@ public class RadioGroupTestPage1 extends WebPage
 	 */
 	public RadioGroupTestPage1()
 	{
-		Form<Void> form = new Form<Void>("form");
-		RadioGroup<String> group = new RadioGroup<String>("group", new Model<String>("radio2"));
+		Form<Void> form = new Form<>("form");
+		RadioGroup<String> group = new RadioGroup<>("group", new Model<String>("radio2"));
 		WebMarkupContainer container = new WebMarkupContainer("container");
-		Radio<String> radio1 = new Radio<String>("radio1", new Model<String>("radio1"));
-		Radio<String> radio2 = new Radio<String>("radio2", new Model<String>("radio2"));
+		Radio<String> radio1 = new Radio<>("radio1", new Model<String>("radio1"));
+		Radio<String> radio2 = new Radio<>("radio2", new Model<String>("radio2"));
 
 
 		add(form);

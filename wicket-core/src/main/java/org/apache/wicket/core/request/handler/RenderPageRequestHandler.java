@@ -49,34 +49,6 @@ public class RenderPageRequestHandler
 	private PageLogData logData;
 
 	/**
-	 * Determines whether Wicket does a redirect when rendering a page
-	 *
-	 * @author Matej Knopp
-	 */
-	public enum RedirectPolicy {
-		/**
-		 * Always redirect if current request URL is different than page URL.
-		 */
-		ALWAYS_REDIRECT,
-
-		/**
-		 * Never redirect - always render the page to current response.
-		 */
-		NEVER_REDIRECT,
-
-		/**
-		 * Redirect if necessary. The redirect will happen when all of the following conditions are
-		 * met:
-		 * <ul>
-		 * <li>current request URL is different than page URL
-		 * <li>page is not stateless or (page is stateless and session is not temporary)
-		 * <li>render strategy is either REDIRECT_TO_BUFFER or REDIRECT_TO_RENDER
-		 * </ul>
-		 */
-		AUTO_REDIRECT
-	}
-
-	/**
 	 * Constructor.
 	 *
 	 * @param pageClass The class of the page to render
@@ -131,13 +103,9 @@ public class RenderPageRequestHandler
 		this.redirectPolicy = redirectPolicy;
 		this.pageProvider = pageProvider;
 
-		if (pageProvider.hasPageInstance())
-		{
-			if (Session.exists())
-			{
-				// WICKET-5499
-				Session.get().getPageManager().touchPage(pageProvider.getPageInstance());
-			}
+		if (pageProvider.hasPageInstance() && Session.exists()) {
+			// WICKET-5499
+			Session.get().getPageManager().touchPage(pageProvider.getPageInstance());
 		}
 	}
 
@@ -178,8 +146,9 @@ public class RenderPageRequestHandler
 	@Override
 	public void detach(IRequestCycle requestCycle)
 	{
-		if (logData == null)
+		if (logData == null) {
 			logData = new PageLogData(pageProvider);
+		}
 		pageProvider.detach();
 	}
 
@@ -212,5 +181,33 @@ public class RenderPageRequestHandler
 	public final Integer getRenderCount()
 	{
 		return pageProvider.getRenderCount();
+	}
+
+	/**
+	 * Determines whether Wicket does a redirect when rendering a page
+	 *
+	 * @author Matej Knopp
+	 */
+	public enum RedirectPolicy {
+		/**
+		 * Always redirect if current request URL is different than page URL.
+		 */
+		ALWAYS_REDIRECT,
+
+		/**
+		 * Never redirect - always render the page to current response.
+		 */
+		NEVER_REDIRECT,
+
+		/**
+		 * Redirect if necessary. The redirect will happen when all of the following conditions are
+		 * met:
+		 * <ul>
+		 * <li>current request URL is different than page URL
+		 * <li>page is not stateless or (page is stateless and session is not temporary)
+		 * <li>render strategy is either REDIRECT_TO_BUFFER or REDIRECT_TO_RENDER
+		 * </ul>
+		 */
+		AUTO_REDIRECT
 	}
 }

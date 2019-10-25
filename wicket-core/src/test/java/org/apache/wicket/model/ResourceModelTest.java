@@ -29,32 +29,6 @@ import org.junit.jupiter.api.Test;
 public class ResourceModelTest extends WicketTestCase
 {
 	/**
-	 * Test page.
-	 */
-	public static class TestPage extends WebPage
-	{
-		private static final long serialVersionUID = 1L;
-
-		/**
-		 * Construct.
-		 */
-        public TestPage()
-		{
-			add(new Label("testlabel", new ResourceModel("testlabel")));
-
-
-			Label testlabelWithDefault = new Label("testlabelWithDefault");
-			IModel<String> defaultModel = new ResourceModel("testlabel").wrapOnAssignment(testlabelWithDefault);
-			ResourceModel labelWithDefaultModel = new ResourceModel("missingKey", defaultModel);
-			testlabelWithDefault.setDefaultModel(labelWithDefaultModel);
-			add(testlabelWithDefault);
-
-			// another label with a model explicitly assigned to the page
-			add(new Label("otherlabel", new ResourceModel("testlabel").wrapOnAssignment(this)));
-		}
-	}
-
-	/**
 	 * Tests a simple {@link ResourceModel} on a test page.
 	 * 
 	 * @throws Exception
@@ -92,5 +66,31 @@ public class ResourceModelTest extends WicketTestCase
 		wrapped.detach();
 
 		assertTrue(detached[0]);
+	}
+
+	/**
+	 * Test page.
+	 */
+	public static class TestPage extends WebPage
+	{
+		private static final long serialVersionUID = 1L;
+
+		/**
+		 * Construct.
+		 */
+        public TestPage()
+		{
+			add(new Label("testlabel", new ResourceModel("testlabel")));
+
+
+			Label testlabelWithDefault = new Label("testlabelWithDefault");
+			IModel<String> defaultModel = new ResourceModel("testlabel").wrapOnAssignment(testlabelWithDefault);
+			ResourceModel labelWithDefaultModel = new ResourceModel("missingKey", defaultModel);
+			testlabelWithDefault.setDefaultModel(labelWithDefaultModel);
+			add(testlabelWithDefault);
+
+			// another label with a model explicitly assigned to the page
+			add(new Label("otherlabel", new ResourceModel("testlabel").wrapOnAssignment(this)));
+		}
 	}
 }

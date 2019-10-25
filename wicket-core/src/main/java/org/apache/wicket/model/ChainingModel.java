@@ -44,10 +44,7 @@ public class ChainingModel<T> implements IModel<T>
 	{
 		if (modelObject instanceof Session)
 		{
-			LOG.warn("It is not a good idea to reference the Session instance "
-					+ "in models directly as it may lead to serialization problems. "
-					+ "If you need to access a property of the session via the model use the "
-					+ "page instance as the model object and 'session.attribute' as the path.");
+			LOG.warn(new StringBuilder().append("It is not a good idea to reference the Session instance ").append("in models directly as it may lead to serialization problems. ").append("If you need to access a property of the session via the model use the ").append("page instance as the model object and 'session.attribute' as the path.").toString());
 		} else if (modelObject != null && (modelObject instanceof Serializable == false))
 		{
 			LOG.warn("It is not a good idea to reference non-serializable {} "

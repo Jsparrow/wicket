@@ -235,7 +235,7 @@ public class ClientProperties implements IClusterable
 					{
 						utc = utc.substring(1);
 					}
-					timeZone = TimeZone.getTimeZone("GMT" + ((offset > 0) ? '+' : '-') + utc);
+					timeZone = TimeZone.getTimeZone(new StringBuilder().append("GMT").append((offset > 0) ? '+' : '-').append(utc).toString());
 				}
 
 				String dstOffset = getUtcDSTOffset();
@@ -277,8 +277,7 @@ public class ClientProperties implements IClusterable
 						{
 							dstOffset = dstOffset.substring(1);
 						}
-						dstTimeZone = TimeZone.getTimeZone("GMT" + ((offset > 0) ? '+' : '-') +
-							dstOffset);
+						dstTimeZone = TimeZone.getTimeZone(new StringBuilder().append("GMT").append((offset > 0) ? '+' : '-').append(dstOffset).toString());
 					}
 					// if the dstTimezone (1 July) has a different offset then
 					// the real time zone (1 January) try to combine the 2.
@@ -558,21 +557,14 @@ public class ClientProperties implements IClusterable
 				{
 					value = field.get(this);
 				}
-				catch (IllegalArgumentException e)
-				{
-					throw new RuntimeException(e);
-				}
-				catch (IllegalAccessException e)
+				catch (IllegalAccessException | IllegalArgumentException e)
 				{
 					throw new RuntimeException(e);
 				}
 
-				if (field.getType().equals(Integer.TYPE))
-				{
-					if (Integer.valueOf(-1).equals(value))
-					{
-						value = null;
-					}
+				boolean condition = field.getType().equals(Integer.TYPE) && Integer.valueOf(-1).equals(value);
+				if (condition) {
+					value = null;
 				}
 
 				if (value != null)

@@ -114,8 +114,8 @@ class DisabledItemRetainingCheckBoxTest extends WicketTestCase
 
 		private static final long serialVersionUID = 1L;
 
-		Collection<Integer> selection = new ArrayList<Integer>(Arrays.asList(1, 2));
-		Collection<Integer> selection2 = new ArrayList<Integer>(Arrays.asList(1, 2));
+		Collection<Integer> selection = new ArrayList<>(Arrays.asList(1, 2));
+		Collection<Integer> selection2 = new ArrayList<>(Arrays.asList(1, 2));
 
 		/**
 		 * Construct.
@@ -125,7 +125,7 @@ class DisabledItemRetainingCheckBoxTest extends WicketTestCase
 		public TestPage(final PageParameters parameters)
 		{
 
-			Form<TestPage> form = new Form<TestPage>("form");
+			Form<TestPage> form = new Form<>("form");
 			add(form);
 			form.add(new CheckBoxMultipleChoice<Integer>("choices",
 				new PropertyModel<Collection<Integer>>(this, "selection"), Arrays.asList(0, 1, 2))

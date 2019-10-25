@@ -11,7 +11,12 @@ import org.apache.wicket.model.IWrapModel;
 final class ValidationModelResolver
 {
 
-    /**
+    private ValidationModelResolver()
+    {
+        // nop
+    }
+
+	/**
      * Lookup for property-aware model, attached to certain form component.
      *
      * @param component
@@ -40,11 +45,6 @@ final class ValidationModelResolver
             break; // not model found
         }
         return null;
-    }
-
-    private ValidationModelResolver()
-    {
-        // nop
     }
 
 }

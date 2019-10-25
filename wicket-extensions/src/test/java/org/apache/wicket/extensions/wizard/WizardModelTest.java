@@ -28,12 +28,16 @@ import java.util.Iterator;
 import org.apache.wicket.extensions.wizard.WizardModel.ICondition;
 import org.apache.wicket.util.tester.WicketTestCase;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Test for {@link WizardModel}.
  */
 public class WizardModelTest extends WicketTestCase
 {
+
+	private static final Logger logger = LoggerFactory.getLogger(WizardModelTest.class);
 
 	/**
 	 * Test steps are initialized correctly.
@@ -95,6 +99,7 @@ public class WizardModelTest extends WicketTestCase
 			iterator.next();
 			fail();
 		} catch (Exception expected) {
+			logger.error(expected.getMessage(), expected);
 		}
 
 		assertSame(step1, model.getActiveStep());
@@ -112,6 +117,7 @@ public class WizardModelTest extends WicketTestCase
 			model.next();
 			fail();
 		} catch (Exception expected) {
+			logger.error(expected.getMessage(), expected);
 		}
 	}
 }

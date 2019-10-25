@@ -304,12 +304,12 @@ public class TransparentWebMarkupContainerTest extends WicketTestCase
 		public IResourceStream getMarkupResourceStream(MarkupContainer container,
 			Class<?> containerClass)
 		{
-			return new StringResourceStream("" + //
-				"<html><body>" + //
-				"	<div wicket:id=\"border\">" + //
-				"		<div wicket:id=\"c1\"></div>" + // component is only at the markup
-				"	</div>" + //
-				"</body></html>");
+			//
+			//
+			//
+			// component is only at the markup
+			//
+			return new StringResourceStream(new StringBuilder().append("").append("<html><body>").append("	<div wicket:id=\"border\">").append("		<div wicket:id=\"c1\"></div>").append("	</div>").append("</body></html>").toString());
 		}
 	}
 
@@ -348,15 +348,16 @@ public class TransparentWebMarkupContainerTest extends WicketTestCase
 		public IResourceStream getMarkupResourceStream(MarkupContainer container,
 			Class<?> containerClass)
 		{
-			return new StringResourceStream("" + //
-				"<html><body>" + //
-				"	<div wicket:id=\"_wicket_enclosure\"></div>" + //
-				"	<div wicket:id=\"container\">" + //
-				"		<wicket:enclosure child=\"msg\">" + //
-				"			<span wicket:id=\"msg\"></span>" + //
-				"		</wicket:enclosure>" + //
-				"	</div>" + //
-				"</body></html>");
+			//
+			//
+			//
+			//
+			//
+			//
+			//
+			//
+			return new StringResourceStream(new StringBuilder().append("").append("<html><body>").append("	<div wicket:id=\"_wicket_enclosure\"></div>").append("	<div wicket:id=\"container\">").append("		<wicket:enclosure child=\"msg\">").append("			<span wicket:id=\"msg\"></span>").append("		</wicket:enclosure>").append("	</div>")
+					.append("</body></html>").toString());
 		}
 	}
 
@@ -376,13 +377,13 @@ public class TransparentWebMarkupContainerTest extends WicketTestCase
 		public IResourceStream getMarkupResourceStream(MarkupContainer container,
 			Class<?> containerClass)
 		{
-			return new StringResourceStream("" + //
-				"<html><body>" + //
-				"	<div wicket:id=\"_wicket_message\"></div>" + //
-				"	<div wicket:id=\"container\">" + //
-				"		<wicket:message key=\"null\" />" + //
-				"	</div>" + //
-				"</body></html>");
+			//
+			//
+			//
+			//
+			//
+			//
+			return new StringResourceStream(new StringBuilder().append("").append("<html><body>").append("	<div wicket:id=\"_wicket_message\"></div>").append("	<div wicket:id=\"container\">").append("		<wicket:message key=\"null\" />").append("	</div>").append("</body></html>").toString());
 		}
 	}
 	
@@ -443,15 +444,16 @@ public class TransparentWebMarkupContainerTest extends WicketTestCase
 		public IResourceStream getMarkupResourceStream(MarkupContainer container,
 			Class<?> containerClass)
 		{
-			return new StringResourceStream("" + //
-				"<html><body>" + //
-				"	<div wicket:id=\"container\">" + //
-				"		<div wicket:id=\"transparentContainer\">" + //
-				"			<a wicket:id=\"updateContainer\"></a>" + //
-				"			<a wicket:id=\"updateTransparentContainer\"></a>" + //
-				"		</div>" + //
-				"	</div>" + //
-				"</body></html>");
+			//
+			//
+			//
+			//
+			//
+			//
+			//
+			//
+			return new StringResourceStream(new StringBuilder().append("").append("<html><body>").append("	<div wicket:id=\"container\">").append("		<div wicket:id=\"transparentContainer\">").append("			<a wicket:id=\"updateContainer\"></a>").append("			<a wicket:id=\"updateTransparentContainer\"></a>").append("		</div>").append("	</div>")
+					.append("</body></html>").toString());
 		}
 	}
 	
@@ -473,14 +475,15 @@ public class TransparentWebMarkupContainerTest extends WicketTestCase
 		public IResourceStream getMarkupResourceStream(MarkupContainer container,
 			Class<?> containerClass)
 		{
-			return new StringResourceStream("" + //
-				"<html><body>" + //
-				"	<div wicket:id=\"outer\">" + //
-				"		<div wicket:id=\"inner\">" + //
-				"			" + LABEL_MARKUP + //
-				"		</div>" + //
-				"	</div>" + //
-				"</body></html>");
+			//
+			//
+			//
+			//
+			//
+			//
+			//
+			return new StringResourceStream(new StringBuilder().append("").append("<html><body>").append("	<div wicket:id=\"outer\">").append("		<div wicket:id=\"inner\">").append("			").append(LABEL_MARKUP).append("		</div>")
+					.append("	</div>").append("</body></html>").toString());
 		}
 	}
 	public static class PageWithAChildInsideATransparentContainer extends WebPage
@@ -499,12 +502,12 @@ public class TransparentWebMarkupContainerTest extends WicketTestCase
 		public IResourceStream getMarkupResourceStream(MarkupContainer container,
 				Class<?> containerClass)
 		{
-			return new StringResourceStream("" + //
-					"<html><body>" + //
-					" <div wicket:id=\"wrapper\">" + //
-					"	<wicket:child/>" + //
-					" </div>" + //
-					"</body></html>");
+			//
+			//
+			//
+			//
+			//
+			return new StringResourceStream(new StringBuilder().append("").append("<html><body>").append(" <div wicket:id=\"wrapper\">").append("	<wicket:child/>").append(" </div>").append("</body></html>").toString());
 		}
 	}
 	public static class SubPageWithAFragment extends PageWithAChildInsideATransparentContainer
@@ -522,15 +525,16 @@ public class TransparentWebMarkupContainerTest extends WicketTestCase
 		public IResourceStream getMarkupResourceStream(MarkupContainer container,
 				Class<?> containerClass)
 		{
-			if (PageWithAChildInsideATransparentContainer.class.equals(containerClass))
+			if (PageWithAChildInsideATransparentContainer.class.equals(containerClass)) {
 				return super.getMarkupResourceStream(container, containerClass);
-			return new StringResourceStream("" + //
-					"<html><body>" + //
-					"<wicket:extend>" + //
-					"	<div wicket:id=\"header\"></div>" + //
-					"	<wicket:fragment wicket:id=\"header\">content</wicket:fragment>" + //
-					"</wicket:extend>" + //
-					"</body></html>");
+			}
+			//
+			//
+			//
+			//
+			//
+			//
+			return new StringResourceStream(new StringBuilder().append("").append("<html><body>").append("<wicket:extend>").append("	<div wicket:id=\"header\"></div>").append("	<wicket:fragment wicket:id=\"header\">content</wicket:fragment>").append("</wicket:extend>").append("</body></html>").toString());
 		}
 	}
 }

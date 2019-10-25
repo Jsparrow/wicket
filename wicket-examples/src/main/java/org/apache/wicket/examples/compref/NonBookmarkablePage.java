@@ -46,6 +46,7 @@ public class NonBookmarkablePage extends WebPage
 		// constructor with the Page instance argument, because we already have
 		// a page instance at our disposal
 		add(new Link<Void>("navigateBackLink") {
+			@Override
 			public void onClick() {
 				setResponsePage(referer.getPage());
 			}

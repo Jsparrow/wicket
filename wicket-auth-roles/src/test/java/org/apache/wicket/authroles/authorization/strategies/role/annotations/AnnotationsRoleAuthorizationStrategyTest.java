@@ -244,7 +244,7 @@ class AnnotationsRoleAuthorizationStrategyTest
 		@Override
 		public void respond(Attributes attributes)
 		{
-			; // NOOP
+			// NOOP
 		}
 	}
 
@@ -253,7 +253,7 @@ class AnnotationsRoleAuthorizationStrategyTest
 		@Override
 		public void respond(Attributes attributes)
 		{
-			; // NOOP
+			// NOOP
 		}
 	}
 }

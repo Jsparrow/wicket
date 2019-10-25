@@ -42,14 +42,9 @@ public class AjaxApplication extends WicketExampleApplication
 
 		getRequestCycleSettings().addResponseFilter(new AjaxServerAndClientTimeFilter());
 
-		getComponentInitializationListeners().add(new IComponentInitializationListener()
-		{
-			@Override
-			public void onInitialize(Component component)
-			{
-				if (component instanceof WebPage) {
-					component.add(new AjaxNewWindowNotifyingBehavior());
-				}
+		getComponentInitializationListeners().add((Component component) -> {
+			if (component instanceof WebPage) {
+				component.add(new AjaxNewWindowNotifyingBehavior());
 			}
 		});
 

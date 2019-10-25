@@ -35,8 +35,8 @@ import org.junit.jupiter.api.Test;
  */
 class StatelessFormTest extends WicketTestCase
 {
-	private final Class<? extends Page> HOME = HomePage.class;
-	private final Class<? extends Page> LOGIN = LoginPage.class;
+	private final Class<? extends Page> home = HomePage.class;
+	private final Class<? extends Page> login = LoginPage.class;
 
 	@Override
 	protected WebApplication newApplication()
@@ -46,7 +46,7 @@ class StatelessFormTest extends WicketTestCase
 			@Override
 			public Class<? extends Page> getHomePage()
 			{
-				return HOME;
+				return home;
 			}
 		};
 	}
@@ -57,13 +57,13 @@ class StatelessFormTest extends WicketTestCase
 	@Test
 	void login()
 	{
-		tester.startPage(LOGIN);
-		tester.assertRenderedPage(LOGIN);
+		tester.startPage(login);
+		tester.assertRenderedPage(login);
 		FormTester form = tester.newFormTester("signInPanel:signInForm");
 		form.setValue("username", "test");
 		form.setValue("password", "test");
 		form.submit();
-		tester.assertRenderedPage(HOME);
+		tester.assertRenderedPage(home);
 	}
 
 	/**
@@ -76,8 +76,8 @@ class StatelessFormTest extends WicketTestCase
 		assertFalse(page.isPageInitialized());
 		assertFalse(page.isPanelInitialized());
 
-		tester.startPage(LOGIN);
-		tester.assertRenderedPage(LOGIN);
+		tester.startPage(login);
+		tester.assertRenderedPage(login);
 		page = (LoginPage)tester.getLastRenderedPage();
 		assertTrue(page.isPageInitialized());
 		assertTrue(page.isPanelInitialized());
@@ -87,7 +87,7 @@ class StatelessFormTest extends WicketTestCase
 		form.setValue("password", "invalid");
 		form.submit();
 
-		tester.assertRenderedPage(LOGIN);
+		tester.assertRenderedPage(login);
 		page = (LoginPage)tester.getLastRenderedPage();
 		assertTrue(page.isPageInitialized());
 		assertTrue(page.isPanelInitialized());

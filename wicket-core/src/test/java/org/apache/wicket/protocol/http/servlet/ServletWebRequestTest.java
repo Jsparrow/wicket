@@ -178,7 +178,7 @@ class ServletWebRequestTest
 	{
 		String filterPath = "filterPath";
 		MockHttpServletRequest httpRequest = new MockHttpServletRequest(null, null, null);
-		httpRequest.setURL(httpRequest.getContextPath() + '/' + filterPath + "/request/Path");
+		httpRequest.setURL(new StringBuilder().append(httpRequest.getContextPath()).append('/').append(filterPath).append("/request/Path").toString());
 		httpRequest.setParameter("some", "parameter");
 
 		ServletWebRequest webRequest = new ServletWebRequest(httpRequest, filterPath);
@@ -186,8 +186,7 @@ class ServletWebRequestTest
 		assertEquals("request/Path?some=parameter", clientUrl.toString());
 
 		// simulates a request that has errors metadata
-		httpRequest.setAttribute("javax.servlet.error.request_uri", httpRequest.getContextPath()
-			+ '/' + filterPath + "/any/source/of/error");
+		httpRequest.setAttribute("javax.servlet.error.request_uri", new StringBuilder().append(httpRequest.getContextPath()).append('/').append(filterPath).append("/any/source/of/error").toString());
 		ServletWebRequest errorWebRequest = new ServletWebRequest(httpRequest, filterPath);
 		Url errorClientUrl = errorWebRequest.getClientUrl();
 
@@ -203,8 +202,8 @@ class ServletWebRequestTest
 		String filterPath = "filterPath";
 		MockHttpServletRequest httpRequest = new MockHttpServletRequest(null, null, null);
 		String looksLikeFullUrl = "/foo://:/";
-		httpRequest.setURL("http://localhost" + '/' + httpRequest.getContextPath() + '/'
-			+ filterPath + looksLikeFullUrl);
+		httpRequest.setURL(new StringBuilder().append("http://localhost").append('/').append(httpRequest.getContextPath()).append('/').append(filterPath).append(looksLikeFullUrl)
+				.toString());
 
 		ServletWebRequest webRequest = new ServletWebRequest(httpRequest, filterPath);
 		assertEquals(looksLikeFullUrl, webRequest.getClientUrl().toString());

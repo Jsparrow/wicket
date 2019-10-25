@@ -70,6 +70,6 @@ public class ResourceUrl
 	@Override
 	public String toString()
 	{
-		return "Name: " + fileName + "\n\tParameters: " + parameters;
+		return new StringBuilder().append("Name: ").append(fileName).append("\n\tParameters: ").append(parameters).toString();
 	}
 }

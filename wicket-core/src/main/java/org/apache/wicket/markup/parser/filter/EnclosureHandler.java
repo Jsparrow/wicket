@@ -53,15 +53,7 @@ public final class EnclosureHandler extends AbstractMarkupFilter implements ICom
 {
 	private static final long serialVersionUID = 1L;
 
-	private static final IAutoComponentFactory FACTORY = new IAutoComponentFactory()
-	{
-		@Override
-		public Component newComponent(MarkupContainer container, ComponentTag tag)
-		{
-			return new Enclosure(tag.getId(), tag
-				.getAttribute(EnclosureHandler.CHILD_ATTRIBUTE));
-		}
-	};
+	private static final IAutoComponentFactory FACTORY = (MarkupContainer container, ComponentTag tag) -> new Enclosure(tag.getId(), tag.getAttribute(EnclosureHandler.CHILD_ATTRIBUTE));
 
 	/** */
 	public static final String ENCLOSURE = "enclosure";
@@ -158,8 +150,7 @@ public final class EnclosureHandler extends AbstractMarkupFilter implements ICom
 					// isVisible() to => Exception
 					if (childId != null)
 					{
-						throw new WicketParseException("Use <" + getWicketNamespace() +
-							":enclosure child='xxx'> to name the child component:", tag);
+						throw new WicketParseException(new StringBuilder().append("Use <").append(getWicketNamespace()).append(":enclosure child='xxx'> to name the child component:").toString(), tag);
 					}
 					// Remember the child id. The open tag will be updated
 					// once the close tag is found. See above.

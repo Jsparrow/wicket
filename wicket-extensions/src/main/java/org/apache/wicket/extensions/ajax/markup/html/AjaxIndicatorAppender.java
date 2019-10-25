@@ -45,14 +45,14 @@ import org.apache.wicket.request.resource.ResourceReference;
 public class AjaxIndicatorAppender extends Behavior
 {
 	/**
-	 * Component instance this behavior is bound to
-	 */
-	private Component component;
-
-	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+
+	/**
+	 * Component instance this behavior is bound to
+	 */
+	private Component component;
 
 	private final ResourceReference indicator;
 
@@ -63,7 +63,7 @@ public class AjaxIndicatorAppender extends Behavior
 	{
 		this(AbstractDefaultAjaxBehavior.INDICATOR);
 	}
-	
+
 	/**
 	 * Build a new instance specifing a custom busy indicator as {@link ResourceReference}.
 	 * 
@@ -81,13 +81,11 @@ public class AjaxIndicatorAppender extends Behavior
 		super.renderHead(component, response);
 
 		component.getRequestCycle().find(IPartialPageRequestHandler.class).ifPresent(target -> {
-			final String javascript = "var e = Wicket.$('" + getMarkupId() +
-				"'); if (e != null && typeof(e.parentNode) != 'undefined') e.parentNode.removeChild(e);";
+			final String javascript = new StringBuilder().append("var e = Wicket.$('").append(getMarkupId()).append("'); if (e != null && typeof(e.parentNode) != 'undefined') e.parentNode.removeChild(e);").toString();
 
 			target.prependJavaScript(javascript);
 		});
 	}
-
 
 	@Override
 	public void afterRender(final Component component)

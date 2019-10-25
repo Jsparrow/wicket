@@ -55,8 +55,7 @@ class FileSystemResourceReferenceTest extends WicketTestCase
 		try
 		{
 			URL resource = FileSystemResourceReferenceTest.class.getResource("FileSystemResourceReferenceTest.zip");
-			Path path = FileSystemResourceReference.getPath(URI.create("jar:" + resource.toURI() +
-				"!/folderInZip/FileSystemResourceReference.txt"));
+			Path path = FileSystemResourceReference.getPath(URI.create(new StringBuilder().append("jar:").append(resource.toURI()).append("!/folderInZip/FileSystemResourceReference.txt").toString()));
 			final FileSystemResource fileSystemResource = new FileSystemResource(path);
 			FileSystemResourceReference fileSystemResourceReference = new FileSystemResourceReference(
 				"test", path)
@@ -147,6 +146,7 @@ class FileSystemResourceReferenceTest extends WicketTestCase
 
 			private static final long serialVersionUID = 1L;
 
+			@Override
 			protected String getMimeType() throws IOException
 			{
 				return "test/mime1";
@@ -187,6 +187,7 @@ class FileSystemResourceReferenceTest extends WicketTestCase
 		{
 			private static final long serialVersionUID = 1L;
 
+			@Override
 			protected FileSystemResource getFileSystemResource()
 			{
 				return fileSystemResource;
@@ -199,6 +200,7 @@ class FileSystemResourceReferenceTest extends WicketTestCase
 		{
 			private static final long serialVersionUID = 1L;
 
+			@Override
 			protected String getMimeType() throws IOException
 			{
 				return "text/plain";

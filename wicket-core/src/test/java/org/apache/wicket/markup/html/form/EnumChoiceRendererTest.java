@@ -34,7 +34,7 @@ public class EnumChoiceRendererTest
 	@Test
 	void testResourceKeyGenerationForAnonymousEnums()
 	{
-		final EnumChoiceRenderer<TestEnum> renderer = new EnumChoiceRenderer<TestEnum>();
+		final EnumChoiceRenderer<TestEnum> renderer = new EnumChoiceRenderer<>();
 		assertEquals("TestEnum.ANONYMOUS", renderer.resourceKey(TestEnum.ANONYMOUS));
 	}
 

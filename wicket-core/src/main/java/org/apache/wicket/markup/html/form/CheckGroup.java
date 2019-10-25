@@ -112,19 +112,14 @@ public class CheckGroup<T> extends FormComponent<Collection<T>>
 
 		final Collection<T> ts = getModelObject();
 
-		visitChildren(Check.class, new IVisitor<Check<T>, Void>()
-		{
-			@Override
-			public void component(Check<T> check, IVisit<Void> visit)
+		visitChildren(Check.class, (Check<T> check, IVisit<Void> visit) -> {
+			if (ts.contains(check.getModelObject()))
 			{
-				if (ts.contains(check.getModelObject()))
+				if (builder.length() > 0)
 				{
-					if (builder.length() > 0)
-					{
-						builder.append(VALUE_SEPARATOR);
-					}
-					builder.append(check.getValue());
+					builder.append(VALUE_SEPARATOR);
 				}
+				builder.append(check.getValue());
 			}
 		});
 
@@ -132,7 +127,7 @@ public class CheckGroup<T> extends FormComponent<Collection<T>>
 	}
 
 	@Override
-	protected Collection<T> convertValue(String[] values) throws ConversionException
+	protected Collection<T> convertValue(String[] values)
 	{
 		List<T> collection = Generics.newArrayList();
 
@@ -148,28 +143,18 @@ public class CheckGroup<T> extends FormComponent<Collection<T>>
 				if (value != null)
 				{
 					Check<T> checkbox = visitChildren(Check.class,
-						new org.apache.wicket.util.visit.IVisitor<Check<T>, Check<T>>()
-						{
-							@Override
-							public void component(final Check<T> check, final IVisit<Check<T>> visit)
+						(final Check<T> check, final IVisit<Check<T>> visit) -> {
+							if (String.valueOf(check.getValue()).equals(value))
 							{
-								if (String.valueOf(check.getValue()).equals(value))
-								{
-									visit.stop(check);
-								}
+								visit.stop(check);
 							}
 						});
 
 					if (checkbox == null)
 					{
 						throw new WicketRuntimeException(
-							"submitted http post value [" +
-								Strings.join(",", values) +
-								"] for CheckGroup component [" +
-								getPath() +
-								"] contains an illegal value [" +
-								value +
-								"] which does not point to a Check component. Due to this the CheckGroup component cannot resolve the selected Check component pointed to by the illegal value. A possible reason is that component hierarchy changed between rendering and form submission.");
+							new StringBuilder().append("submitted http post value [").append(Strings.join(",", values)).append("] for CheckGroup component [").append(getPath()).append("] contains an illegal value [")
+									.append(value).append("] which does not point to a Check component. Due to this the CheckGroup component cannot resolve the selected Check component pointed to by the illegal value. A possible reason is that component hierarchy changed between rendering and form submission.").toString());
 					}
 
 					// assign the value of the group's model

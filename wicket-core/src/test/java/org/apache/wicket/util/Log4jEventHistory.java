@@ -28,7 +28,7 @@ import org.apache.log4j.spi.LoggingEvent;
  * */
 class Log4jEventHistory extends AppenderSkeleton
 {
-	private List<LoggingEvent> history = new ArrayList<LoggingEvent>();
+	private List<LoggingEvent> history = new ArrayList<>();
 
 	/**
 	 * @return log history
@@ -62,13 +62,6 @@ class Log4jEventHistory extends AppenderSkeleton
 	 */
 	public boolean contains(Level level, String msg)
 	{
-		for (LoggingEvent event : history)
-		{
-			if (msg.equals(event.getMessage()) && level.equals(event.getLevel()))
-			{
-				return true;
-			}
-		}
-		return false;
+		return history.stream().anyMatch(event -> msg.equals(event.getMessage()) && level.equals(event.getLevel()));
 	}
 }

@@ -23,6 +23,8 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import org.apache.wicket.util.tester.WicketTestCase;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Test for {@link DynamicWizardModel}.
@@ -30,6 +32,7 @@ import org.junit.jupiter.api.Test;
 public class DynamicWizardModelTest extends WicketTestCase
 {
 
+	private static final Logger logger = LoggerFactory.getLogger(DynamicWizardModelTest.class);
 	private IDynamicWizardStep step4;
 	
 	@Test
@@ -84,6 +87,7 @@ public class DynamicWizardModelTest extends WicketTestCase
 			model.next();
 			fail();
 		} catch (Exception expected) {
+			logger.error(expected.getMessage(), expected);
 		}
 	}
 }

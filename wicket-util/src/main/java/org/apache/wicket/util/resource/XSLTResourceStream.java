@@ -49,15 +49,6 @@ public class XSLTResourceStream extends AbstractResourceStream
 	private final transient ByteArrayOutputStream out;
 
 	/**
-	 * @return a {@link Map} of XSLT parameters, appropriate for passing information to the XSL
-	 *         stylesheet
-	 */
-	protected Map<Object, Object> getParameters()
-	{
-		return null;
-	}
-
-	/**
 	 * Construct.
 	 * 
 	 * @param xsltResource
@@ -83,10 +74,7 @@ public class XSLTResourceStream extends AbstractResourceStream
 			Map<Object, Object> parameters = getParameters();
 			if (parameters != null)
 			{
-				for (Entry<Object, Object> e : parameters.entrySet())
-				{
-					trans.setParameter(e.getKey().toString(), e.getValue().toString());
-				}
+				parameters.entrySet().forEach(e -> trans.setParameter(e.getKey().toString(), e.getValue().toString()));
 			}
 
 			trans.transform(xmlSource, result);
@@ -100,6 +88,15 @@ public class XSLTResourceStream extends AbstractResourceStream
 			IOUtils.closeQuietly(xmlResource);
 			IOUtils.closeQuietly(xsltResource);
 		}
+	}
+
+	/**
+	 * @return a {@link Map} of XSLT parameters, appropriate for passing information to the XSL
+	 *         stylesheet
+	 */
+	protected Map<Object, Object> getParameters()
+	{
+		return null;
 	}
 
 	/**

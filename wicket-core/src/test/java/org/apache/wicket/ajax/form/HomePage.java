@@ -51,11 +51,11 @@ public class HomePage extends WebPage
 		add(new Label("message",
 			"If you see this message wicket is properly configured and running"));
 
-		Form<Void> form = new Form<Void>("form");
+		Form<Void> form = new Form<>("form");
 		// WebMarkupContainer form = new WebMarkupContainer("form"); Both ways do not work
 		add(form);
 		DropDownChoice<Void> select;
-		form.add(select = new DropDownChoice<Void>("select", new Model(), Collections.EMPTY_LIST));
+		form.add(select = new DropDownChoice<>("select", new Model(), Collections.EMPTY_LIST));
 		select.add(new OnChangeAjaxBehavior()
 		{
 			@Override

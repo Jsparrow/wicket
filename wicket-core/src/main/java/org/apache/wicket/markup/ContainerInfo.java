@@ -74,8 +74,7 @@ public class ContainerInfo
 	public ContainerInfo(final Class<?> containerClass, final Locale locale, final String style,
 		final String variation, final MarkupType markupType)
 	{
-		super();
-		containerClassRef = new WeakReference<Class<?>>(containerClass);
+		containerClassRef = new WeakReference<>(containerClass);
 		this.locale = locale;
 		this.style = style;
 		this.variation = variation;
@@ -135,7 +134,7 @@ public class ContainerInfo
 	public String toString()
 	{
 		Class<?> classRef = containerClassRef.get();
-		return (classRef != null ? classRef.getName() : "null class") + ":" + locale + ":" + style +
-			":" + markupType;
+		return new StringBuilder().append(classRef != null ? classRef.getName() : "null class").append(":").append(locale).append(":").append(style)
+				.append(":").append(markupType).toString();
 	}
 }

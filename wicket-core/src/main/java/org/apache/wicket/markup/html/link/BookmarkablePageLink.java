@@ -54,19 +54,6 @@ public class BookmarkablePageLink<T> extends Link<T>
 	}
 
 	/**
-	 * @return page parameters
-	 */
-	public PageParameters getPageParameters()
-	{
-		if (parameters == null)
-		{
-			parameters = new PageParameters();
-		}
-		return parameters;
-	}
-
-
-	/**
 	 * Constructor.
 	 * 
 	 * @param <C>
@@ -95,6 +82,18 @@ public class BookmarkablePageLink<T> extends Link<T>
 				Page.class.getName());
 		}
 		pageClassName = pageClass.getName();
+	}
+
+	/**
+	 * @return page parameters
+	 */
+	public PageParameters getPageParameters()
+	{
+		if (parameters == null)
+		{
+			parameters = new PageParameters();
+		}
+		return parameters;
 	}
 
 	/**

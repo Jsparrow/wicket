@@ -87,19 +87,12 @@ public class RequestsPage extends DevUtilsPage
 			public ArrayList<RequestData> getObject()
 			{
 				List<RequestData> requests = getRequestLogger().getRequests();
-				if (sessionData != null)
-				{
-					ArrayList<RequestData> returnValues = new ArrayList<>();
-					for (RequestData data : requests)
-					{
-						if (sessionData.getSessionId().equals(data.getSessionId()))
-						{
-							returnValues.add(data);
-						}
-					}
-					return returnValues;
+				if (sessionData == null) {
+					return new ArrayList<>(requests);
 				}
-				return new ArrayList<>(requests);
+				ArrayList<RequestData> returnValues = new ArrayList<>();
+				requests.stream().filter(data -> sessionData.getSessionId().equals(data.getSessionId())).forEach(returnValues::add);
+				return returnValues;
 			}
 		};
 		PageableListView<RequestData> listView = new PageableListView<RequestData>("requests",
@@ -138,8 +131,9 @@ public class RequestsPage extends DevUtilsPage
 
 		IRequestLogger requestLogger = webApplication.getRequestLogger();
 
-		if (webApplication.getRequestLogger() == null)
+		if (webApplication.getRequestLogger() == null) {
 			requestLogger = new RequestLogger();
+		}
 		return requestLogger;
 	}
 }

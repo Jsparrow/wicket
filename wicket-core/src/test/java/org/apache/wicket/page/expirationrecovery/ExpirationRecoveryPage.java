@@ -36,14 +36,14 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
  */
 public class ExpirationRecoveryPage extends WebPage
 {
-	final IModel<String> textModel = Model.of("texttt");
-	final AtomicBoolean formSubmitted = new AtomicBoolean(false);
-	final AtomicBoolean submitLinkSubmitted = new AtomicBoolean(false);
 	// Execution of Ajax callbacks doesn't record the newly created page in
 	// org.apache.wicket.util.tester.BaseWicketTester.LastPageRecordingPageRendererProvider
 	// so we need to use static fields
 	static final AtomicBoolean ajaxSubmitLinkSubmitted = new AtomicBoolean(false);
 	static final AtomicBoolean ajaxLinkClicked = new AtomicBoolean(false);
+	final IModel<String> textModel = Model.of("texttt");
+	final AtomicBoolean formSubmitted = new AtomicBoolean(false);
+	final AtomicBoolean submitLinkSubmitted = new AtomicBoolean(false);
 	final AtomicBoolean linkClicked = new AtomicBoolean(false);
 
 	public ExpirationRecoveryPage(final PageParameters parameters)

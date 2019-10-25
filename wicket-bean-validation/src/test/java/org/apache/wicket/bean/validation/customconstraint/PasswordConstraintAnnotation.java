@@ -39,7 +39,7 @@ public @interface PasswordConstraintAnnotation
 	public static final String DEFAULT_BUNDLE_KEY = "default.bundle.key";
 	public static final String CUSTOM_BUNDLE_KEY = "custom.bundle.key";
 	
-	String message() default "{" + DEFAULT_BUNDLE_KEY +"}";
+	String message() default new StringBuilder().append("{").append(DEFAULT_BUNDLE_KEY).append("}").toString();
 
 	Class<?>[] groups() default { };
 

@@ -23,12 +23,16 @@ import java.lang.reflect.Field;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Tests for Spring injection with {@literal @javax.inject.Inject} annotation
  */
 public class JavaxInjectAnnotProxyFieldValueFactoryTest extends AnnotProxyFieldValueFactoryTest
 {
+	private static final Logger logger = LoggerFactory.getLogger(JavaxInjectAnnotProxyFieldValueFactoryTest.class);
+
 	/**
 	 * Construct.
 	 */
@@ -52,6 +56,7 @@ public class JavaxInjectAnnotProxyFieldValueFactoryTest extends AnnotProxyFieldV
 		}
 		catch (IllegalStateException isx)
 		{
+			logger.error(isx.getMessage(), isx);
 			// expected
 			assertTrue(true);
 		}

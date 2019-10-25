@@ -191,8 +191,13 @@ class FencedFeedbackPanelTest
 
     public static class TestPage extends WebPage implements IMarkupResourceStreamProvider
 	{
-		FencedFeedbackPanel externalFeedback, formFeedback, containerFeedback, containerFeedback2;
-		Component externalLabel, formInput, containerInput;
+		FencedFeedbackPanel externalFeedback;
+		FencedFeedbackPanel formFeedback;
+		FencedFeedbackPanel containerFeedback;
+		FencedFeedbackPanel containerFeedback2;
+		Component externalLabel;
+		Component formInput;
+		Component containerInput;
 
         public TestPage()
 		{
@@ -219,20 +224,21 @@ class FencedFeedbackPanelTest
 		public IResourceStream getMarkupResourceStream(MarkupContainer container,
 			Class<?> containerClass)
 		{
+			//
+			//
+			//
+			//
+			//
+			//
+			//
+			//
+			//
+			//
+			//
+			//
 			return new StringResourceStream(//
-				"    <body>" + //
-					"   <div wicket:id='feedback'/>" + //
-					"   <div wicket:id='externalLabel'/>" + //
-					"   <form wicket:id='form'>" + //
-					"       <div wicket:id='formFeedback'/>" + //
-					"       <input wicket:id='formInput' type='text'/>" + //
-					"       <div wicket:id='container'>" + //
-					"           <div wicket:id='containerFeedback'/>" + //
-					"           <input wicket:id='containerInput' type='text'/>" + //
-					"           <div wicket:id='containerFeedback2'/>" + //
-					"       </div>" + //
-					"    </form>" + //
-					"</body>");
+				new StringBuilder().append("    <body>").append("   <div wicket:id='feedback'/>").append("   <div wicket:id='externalLabel'/>").append("   <form wicket:id='form'>").append("       <div wicket:id='formFeedback'/>").append("       <input wicket:id='formInput' type='text'/>").append("       <div wicket:id='container'>")
+						.append("           <div wicket:id='containerFeedback'/>").append("           <input wicket:id='containerInput' type='text'/>").append("           <div wicket:id='containerFeedback2'/>").append("       </div>").append("    </form>").append("</body>").toString());
 		}
 	}
 }

@@ -112,7 +112,7 @@ public abstract class AbstractRequestWrapperFactory
 			}
 			catch (PatternSyntaxException e)
 			{
-				throw new IllegalArgumentException("Illegal pattern syntax '" + pattern + "'", e);
+				throw new IllegalArgumentException(new StringBuilder().append("Illegal pattern syntax '").append(pattern).append("'").toString(), e);
 			}
 		}
 		return patternsList.toArray(new Pattern[patternsList.size()]);

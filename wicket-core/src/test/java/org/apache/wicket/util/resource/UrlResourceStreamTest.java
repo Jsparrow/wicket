@@ -113,7 +113,9 @@ class UrlResourceStreamTest {
 	 * {@link URLStreamHandler} that counts the calls to {@link URL#openConnection()}
 	 */
 	private static final class CountingURLStreamHandler extends URLStreamHandler {
-		private final AtomicInteger connectCounter, streamCounter;
+		private final AtomicInteger connectCounter;
+
+		private final AtomicInteger streamCounter;
 
 		private final URL realURL;
 

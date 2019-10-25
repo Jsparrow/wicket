@@ -70,15 +70,16 @@ public abstract class ResetResponseException extends ReplaceHandlerException
 		{
 			delegate.detach(requestCycle);
 
-			if (logData == null)
-			{
-				ILogData delegateData;
-				if (delegate instanceof ILoggableRequestHandler)
-					delegateData = ((ILoggableRequestHandler)delegate).getLogData();
-				else
-					delegateData = new NoLogData();
-				logData = new DelegateLogData(delegateData);
+			if (logData != null) {
+				return;
 			}
+			ILogData delegateData;
+			if (delegate instanceof ILoggableRequestHandler) {
+				delegateData = ((ILoggableRequestHandler)delegate).getLogData();
+			} else {
+				delegateData = new NoLogData();
+			}
+			logData = new DelegateLogData(delegateData);
 		}
 
 		@Override

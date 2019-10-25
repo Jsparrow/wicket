@@ -31,22 +31,6 @@ public class PanelWithHeader extends Panel
 {
 	private static final long serialVersionUID = 1L;
 
-	private static class StringHeaderItemWithDependency extends StringHeaderItem
-	{
-		StringHeaderItemWithDependency(CharSequence string)
-		{
-			super(string);
-		}
-
-		@Override
-		public List<HeaderItem> getDependencies()
-		{
-			List<HeaderItem> dependencies = super.getDependencies();
-			dependencies.add(StringHeaderItem.forString("<title>PanelWithHeader-HeaderItem-Dependency</title>\n"));
-			return dependencies;
-		}
-	}
-
 	/**
 	 * Construct.
 	 * 
@@ -63,5 +47,21 @@ public class PanelWithHeader extends Panel
 		response.render(StringHeaderItem.forString("<title>PanelWithHeader-HeaderItem</title>\n"));
 		response.render(new PriorityHeaderItem(new StringHeaderItemWithDependency(
 			"<title>PanelWithHeader-PriorityHeaderItem</title>\n")));
+	}
+
+	private static class StringHeaderItemWithDependency extends StringHeaderItem
+	{
+		StringHeaderItemWithDependency(CharSequence string)
+		{
+			super(string);
+		}
+
+		@Override
+		public List<HeaderItem> getDependencies()
+		{
+			List<HeaderItem> dependencies = super.getDependencies();
+			dependencies.add(StringHeaderItem.forString("<title>PanelWithHeader-HeaderItem-Dependency</title>\n"));
+			return dependencies;
+		}
 	}
 }

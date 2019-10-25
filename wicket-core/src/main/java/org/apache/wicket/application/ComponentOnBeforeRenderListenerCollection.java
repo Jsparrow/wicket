@@ -32,14 +32,7 @@ public class ComponentOnBeforeRenderListenerCollection extends
 	@Override
 	public void onBeforeRender(final Component component)
 	{
-		notify(new INotifier<IComponentOnBeforeRenderListener>()
-		{
-			@Override
-			public void notify(IComponentOnBeforeRenderListener listener)
-			{
-				listener.onBeforeRender(component);
-			}
-		});
+		notify((IComponentOnBeforeRenderListener listener) -> listener.onBeforeRender(component));
 	}
 
 }

@@ -67,7 +67,7 @@ public class AjaxNewWindowNotifyingBehavior extends AbstractDefaultAjaxBehavior
 	{
 		super.updateAjaxAttributes(attributes);
 
-		String parameter = "return {'" + PARAM_WINDOW_NAME + "': window.name}";
+		String parameter = new StringBuilder().append("return {'").append(PARAM_WINDOW_NAME).append("': window.name}").toString();
 		attributes.getDynamicExtraParameters().add(parameter);
 
 		if (boundName != null)
@@ -93,7 +93,7 @@ public class AjaxNewWindowNotifyingBehavior extends AbstractDefaultAjaxBehavior
 		super.renderHead(component, response);
 
 		response.render(OnLoadHeaderItem
-			.forScript("setTimeout(function() {" + getCallbackScript().toString() + "}, 30);"));
+			.forScript(new StringBuilder().append("setTimeout(function() {").append(getCallbackScript().toString()).append("}, 30);").toString()));
 	}
 
 	@Override

@@ -308,12 +308,11 @@ public class Chunk extends ToString
 	{
 		if (chunk != null)
 		{
-			for (Object aChunk : chunk)
-			{
+			chunk.forEach(aChunk -> {
 				s.append(prefix);
 				s.append(aChunk);
 				s.append(postfix);
-			}
+			});
 		}
 		return s;
 	}

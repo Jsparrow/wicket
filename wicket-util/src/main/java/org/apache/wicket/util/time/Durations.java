@@ -32,34 +32,26 @@ public class Durations
 
 	public static String toString(final Duration duration, final Locale locale)
 	{
-		if (duration.toMillis() >= 0)
-		{
-			if (duration.toDays() >= 1.0)
-			{
-				return unitString(duration.toDays(), "day", locale);
-			}
-
-			if (duration.toHours() >= 1.0)
-			{
-				return unitString(duration.toHours(), "hour", locale);
-			}
-
-			if (duration.toMinutes() >= 1.0)
-			{
-				return unitString(duration.toMinutes(), "minute", locale);
-			}
-
-			if (duration.toSeconds() >= 1.0)
-			{
-				return unitString(duration.toSeconds(), "second", locale);
-			}
-
-			return unitString(duration.toMillis(), "millisecond", locale);
-		}
-		else
-		{
+		if (duration.toMillis() < 0) {
 			return "N/A";
 		}
+		if (duration.toDays() >= 1.0)
+		{
+			return unitString(duration.toDays(), "day", locale);
+		}
+		if (duration.toHours() >= 1.0)
+		{
+			return unitString(duration.toHours(), "hour", locale);
+		}
+		if (duration.toMinutes() >= 1.0)
+		{
+			return unitString(duration.toMinutes(), "minute", locale);
+		}
+		if (duration.toSeconds() >= 1.0)
+		{
+			return unitString(duration.toSeconds(), "second", locale);
+		}
+		return unitString(duration.toMillis(), "millisecond", locale);
 	}
 
 	/**
@@ -75,7 +67,7 @@ public class Durations
 	 */
 	private static String unitString(final double value, final String units, final Locale locale)
 	{
-		return StringValue.valueOf(value, locale) + " " + units + ((value > 1.0) ? "s" : "");
+		return new StringBuilder().append(StringValue.valueOf(value, locale)).append(" ").append(units).append((value > 1.0) ? "s" : "").toString();
 	}
 
 	/**

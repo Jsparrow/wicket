@@ -163,13 +163,8 @@ public class ErrorAttributes
 	@Override
 	public String toString()
 	{
-		return "ErrorAttributes{" +
-				"statusCode=" + statusCode +
-				", message='" + message + '\'' +
-				", requestUri='" + requestUri + '\'' +
-				", servletName='" + servletName + '\'' +
-				", exceptionType=" + exceptionType +
-				", exception=" + exception +
-				'}';
+		return new StringBuilder().append("ErrorAttributes{").append("statusCode=").append(statusCode).append(", message='").append(message).append('\'').append(", requestUri='")
+				.append(requestUri).append('\'').append(", servletName='").append(servletName).append('\'').append(", exceptionType=").append(exceptionType)
+				.append(", exception=").append(exception).append('}').toString();
 	}
 }

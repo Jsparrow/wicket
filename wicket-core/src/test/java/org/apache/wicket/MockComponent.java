@@ -50,7 +50,7 @@ public class MockComponent implements IRequestableComponent, IRequestListener
 		}
 		else
 		{
-			c.setPath(getPageRelativePath() + ":" + path);
+			c.setPath(new StringBuilder().append(getPageRelativePath()).append(":").append(path).toString());
 		}
 		c.setPage(getPage());
 		c.setId(Strings.lastPathComponent(path, ':'));

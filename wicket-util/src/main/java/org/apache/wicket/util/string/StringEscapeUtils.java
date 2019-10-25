@@ -67,7 +67,6 @@ class StringEscapeUtils
 	 */
 	public StringEscapeUtils()
 	{
-		super();
 	}
 
 	/**

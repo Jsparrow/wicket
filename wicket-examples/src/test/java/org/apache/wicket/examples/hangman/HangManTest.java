@@ -86,14 +86,7 @@ public class HangManTest
 
 	private Letter letter(Game hangman, char c)
 	{
-		for (Letter letter : hangman.getLetters())
-		{
-			if (letter.asString().equalsIgnoreCase(Character.toString(c)))
-			{
-				return letter;
-			}
-		}
-		return null;
+		return hangman.getLetters().stream().filter(letter -> letter.asString().equalsIgnoreCase(Character.toString(c))).findFirst().orElse(null);
 	}
 
 	private boolean guess(Game hangman, char c)
@@ -127,7 +120,7 @@ public class HangManTest
 
 	private void clickLetter(WicketTester tester, char ch)
 	{
-		tester.clickLink("letters:" + (ch - 'a') + ":letter");
+		tester.clickLink(new StringBuilder().append("letters:").append(ch - 'a').append(":letter").toString());
 	}
 
 	/**

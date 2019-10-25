@@ -39,6 +39,15 @@ import org.apache.wicket.util.lang.Args;
  */
 public final class StyleAndScriptIdentifier extends AbstractMarkupFilter
 {
+	// OES<!--OES
+	private static final Pattern HTML_START_COMMENT = Pattern.compile("^\\s*<!--\\s*.*", Pattern.DOTALL);
+
+	// OES<![CDATA[OES
+	private static final Pattern CDATA_START_COMMENT = Pattern.compile("^\\s*<!\\[CDATA\\[\\s*.*", Pattern.DOTALL);
+
+	// OES/*OES<![CDATA[OES*/OES
+	private static final Pattern JS_CDATA_START_COMMENT = Pattern.compile("^\\s*\\/\\*\\s*<!\\[CDATA\\[\\s*\\*\\/\\s*.*", Pattern.DOTALL);
+
 	/**
 	 * Constructor.
 	 */
@@ -84,25 +93,22 @@ public final class StyleAndScriptIdentifier extends AbstractMarkupFilter
 			{
 				ComponentTag open = (ComponentTag)elem;
 
-				if (shouldProcess(open))
-				{
-					if (open.isOpen() && ((i + 2) < markup.size()))
-					{
-						MarkupElement body = markup.get(i + 1);
-						MarkupElement tag2 = markup.get(i + 2);
+				boolean condition = shouldProcess(open) && open.isOpen() && ((i + 2) < markup.size());
+				if (condition) {
+					MarkupElement body = markup.get(i + 1);
+					MarkupElement tag2 = markup.get(i + 2);
 
-						if ((body instanceof RawMarkup) && (tag2 instanceof ComponentTag))
+					if ((body instanceof RawMarkup) && (tag2 instanceof ComponentTag))
+					{
+						ComponentTag close = (ComponentTag)tag2;
+						if (close.closes(open))
 						{
-							ComponentTag close = (ComponentTag)tag2;
-							if (close.closes(open))
+							String text = body.toString().trim();
+							if (shouldWrapInCdata(text))
 							{
-								String text = body.toString().trim();
-								if (shouldWrapInCdata(text))
-								{
-									text = JavaScriptUtils.SCRIPT_CONTENT_PREFIX + body.toString() +
-										JavaScriptUtils.SCRIPT_CONTENT_SUFFIX;
-									markup.replace(i + 1, new RawMarkup(text));
-								}
+								text = new StringBuilder().append(JavaScriptUtils.SCRIPT_CONTENT_PREFIX).append(body.toString()).append(JavaScriptUtils.SCRIPT_CONTENT_SUFFIX)
+										.toString();
+								markup.replace(i + 1, new RawMarkup(text));
 							}
 						}
 					}
@@ -110,17 +116,6 @@ public final class StyleAndScriptIdentifier extends AbstractMarkupFilter
 			}
 		}
 	}
-
-	// OES == optional empty space
-
-	// OES<!--OES
-	private static final Pattern HTML_START_COMMENT = Pattern.compile("^\\s*<!--\\s*.*", Pattern.DOTALL);
-
-	// OES<![CDATA[OES
-	private static final Pattern CDATA_START_COMMENT = Pattern.compile("^\\s*<!\\[CDATA\\[\\s*.*", Pattern.DOTALL);
-
-	// OES/*OES<![CDATA[OES*/OES
-	private static final Pattern JS_CDATA_START_COMMENT = Pattern.compile("^\\s*\\/\\*\\s*<!\\[CDATA\\[\\s*\\*\\/\\s*.*", Pattern.DOTALL);
 
 	boolean shouldWrapInCdata(final String elementBody)
 	{
@@ -154,4 +149,8 @@ public final class StyleAndScriptIdentifier extends AbstractMarkupFilter
 
 		return shouldProcess && openTag.getUserData("STYLE_OR_SCRIPT") != null;
 	}
+
+	// OES == optional empty space
+
+	
 }

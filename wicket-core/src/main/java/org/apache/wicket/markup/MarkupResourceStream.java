@@ -239,7 +239,7 @@ public class MarkupResourceStream implements IResourceStream, IFixedLocationReso
 	 * 
 	 * @return usually it is "wicket:id"
 	 */
-	final public String getWicketId()
+	public final String getWicketId()
 	{
 		return wicketId;
 	}
@@ -371,17 +371,17 @@ public class MarkupResourceStream implements IResourceStream, IFixedLocationReso
 	 */
 	public final void setDoctype(final CharSequence doctype)
 	{
-		if (Strings.isEmpty(doctype) == false)
-		{
-			String doc = doctype.toString().replaceAll("[\n\r]+", "");
-			doc = doc.replaceAll("\\s+", " ");
-			Matcher matcher = DOCTYPE_REGEX.matcher(doc);
-			if (matcher.matches() == false)
-			{
-				throw new MarkupException("Invalid DOCTYPE: '" + doctype + "'");
-			}
-			this.doctype = matcher.group(1).trim();
+		if (Strings.isEmpty(doctype) != false) {
+			return;
 		}
+		String doc = doctype.toString().replaceAll("[\n\r]+", "");
+		doc = doc.replaceAll("\\s+", " ");
+		Matcher matcher = DOCTYPE_REGEX.matcher(doc);
+		if (matcher.matches() == false)
+		{
+			throw new MarkupException(new StringBuilder().append("Invalid DOCTYPE: '").append(doctype).append("'").toString());
+		}
+		this.doctype = matcher.group(1).trim();
 	}
 
 	/**

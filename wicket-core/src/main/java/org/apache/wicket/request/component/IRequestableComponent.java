@@ -51,7 +51,7 @@ public interface IRequestableComponent
 	 * @throws WicketRuntimeException
 	 *             Thrown if component is not yet attached to a Page.
 	 */
-	IRequestablePage getPage() throws WicketRuntimeException;
+	IRequestablePage getPage();
 
 	/**
 	 * Gets the component at the given path.

@@ -52,29 +52,24 @@ public class HelloBrowser extends WicketExamplePage
 
 		add(new MultiLineLabel("clientinfo", properties.toString()));
 
-		IModel<String> clientTimeModel = new IModel<String>()
-		{
-			@Override
-			public String getObject()
+		IModel<String> clientTimeModel = () -> {
+			TimeZone timeZone = properties.getTimeZone();
+			if (timeZone != null)
 			{
-				TimeZone timeZone = properties.getTimeZone();
-				if (timeZone != null)
-				{
-					Calendar cal = Calendar.getInstance(timeZone);
-					Locale locale = getLocale();
-					DateFormat dateFormat = DateFormat.getTimeInstance(DateFormat.LONG, locale);
-					dateFormat.setTimeZone(timeZone);
-					String calAsString = dateFormat.format(cal.getTime());
-					StringBuilder b = new StringBuilder("Based on your settings, your time is: ");
-					b.append(calAsString);
-					b.append(" (and your time zone is ");
-					b.append(timeZone.getDisplayName(getLocale()));
-					b.append(')');
-					return b.toString();
-				}
-				return "Unfortunately, we were not able to figure out what your time zone is, so we have"
-					+ " no idea what your time is";
+				Calendar cal = Calendar.getInstance(timeZone);
+				Locale locale = getLocale();
+				DateFormat dateFormat = DateFormat.getTimeInstance(DateFormat.LONG, locale);
+				dateFormat.setTimeZone(timeZone);
+				String calAsString = dateFormat.format(cal.getTime());
+				StringBuilder b = new StringBuilder("Based on your settings, your time is: ");
+				b.append(calAsString);
+				b.append(" (and your time zone is ");
+				b.append(timeZone.getDisplayName(getLocale()));
+				b.append(')');
+				return b.toString();
 			}
+			return "Unfortunately, we were not able to figure out what your time zone is, so we have"
+				+ " no idea what your time is";
 		};
 		add(new Label("clienttime", clientTimeModel));
 	}

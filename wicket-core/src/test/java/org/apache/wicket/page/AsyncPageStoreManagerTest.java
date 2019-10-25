@@ -30,6 +30,8 @@ import org.apache.wicket.pageStore.SerializedPage;
 import org.apache.wicket.util.WicketTestTag;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * https://issues.apache.org/jira/browse/WICKET-6629
@@ -37,6 +39,7 @@ import org.junit.jupiter.api.Test;
 @Tag(WicketTestTag.SLOW)
 class AsyncPageStoreManagerTest
 {
+	private static final Logger logger = LoggerFactory.getLogger(AsyncPageStoreManagerTest.class);
 	private CountDownLatch added = new CountDownLatch(1);
 	private CountDownLatch allowAdd = new CountDownLatch(1);
 	
@@ -72,6 +75,7 @@ class AsyncPageStoreManagerTest
 				}
 				catch (InterruptedException interrupted)
 				{
+					logger.error(interrupted.getMessage(), interrupted);
 				}
 			}
 		};

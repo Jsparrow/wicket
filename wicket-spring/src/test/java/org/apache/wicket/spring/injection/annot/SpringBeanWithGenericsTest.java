@@ -241,30 +241,27 @@ class SpringBeanWithGenericsTest
 	{
 		@SpringBean
 		private List<String> stringsList;
+		@SpringBean
+		private ArrayList<String> arrayListStrings;
+		@SpringBean
+		private ArrayList<Integer> arrayListIntegers;
+		@SpringBean
+		private MyList<String> myList;
 
 		public List<String> getStringsList()
 		{
 			return stringsList;
 		}
 
-		@SpringBean
-		private ArrayList<String> arrayListStrings;
-
 		public ArrayList<String> getArrayListStrings()
 		{
 			return arrayListStrings;
 		}
 
-		@SpringBean
-		private ArrayList<Integer> arrayListIntegers;
-
 		public ArrayList<Integer> getArrayListIntegers()
 		{
 			return arrayListIntegers;
 		}
-
-		@SpringBean
-		private MyList<String> myList;
 
 		public MyList<String> getMyList()
 		{

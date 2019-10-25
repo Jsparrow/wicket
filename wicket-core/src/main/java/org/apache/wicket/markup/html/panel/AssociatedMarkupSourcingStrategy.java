@@ -74,8 +74,7 @@ public abstract class AssociatedMarkupSourcingStrategy extends AbstractMarkupSou
 	 */
 	protected final void renderAssociatedMarkup(final Component component)
 	{
-		((MarkupContainer)component).renderAssociatedMarkup(tagName, "Markup for a " + tagName +
-			" component must begin a tag like '<wicket:" + tagName + ">'");
+		((MarkupContainer)component).renderAssociatedMarkup(tagName, new StringBuilder().append("Markup for a ").append(tagName).append(" component must begin a tag like '<wicket:").append(tagName).append(">'").toString());
 	}
 
 	/**
@@ -95,16 +94,14 @@ public abstract class AssociatedMarkupSourcingStrategy extends AbstractMarkupSou
 		IMarkupFragment associatedMarkup = parent.getAssociatedMarkup();
 		if (associatedMarkup == null)
 		{
-			throw new MarkupNotFoundException("Failed to find markup file associated. " +
-				Classes.simpleName(parent.getClass()) + ": " + parent.toString());
+			throw new MarkupNotFoundException(new StringBuilder().append("Failed to find markup file associated. ").append(Classes.simpleName(parent.getClass())).append(": ").append(parent.toString()).toString());
 		}
 
 		// Find <wicket:panel>
 		IMarkupFragment markup = MarkupUtil.findStartTag(associatedMarkup, tagName);
 		if (markup == null)
 		{
-			throw new MarkupNotFoundException("Expected to find <wicket:" + tagName +
-				"> in associated markup file. Markup: " + associatedMarkup.toString());
+			throw new MarkupNotFoundException(new StringBuilder().append("Expected to find <wicket:").append(tagName).append("> in associated markup file. Markup: ").append(associatedMarkup.toString()).toString());
 		}
 		
 		// If child == null, than return the markup fragment starting with <wicket:panel>
@@ -241,17 +238,14 @@ public abstract class AssociatedMarkupSourcingStrategy extends AbstractMarkupSou
 			// Create a HeaderPartContainer and associate the markup
 			HeaderPartContainer headerPart = getHeaderPart(container, headerId,
 				markupStream.getMarkupFragment());
-			if (headerPart != null)
-			{
-				// A component's header section must only be added once,
-				// no matter how often the same Component has been added
-				// to the page or any other container in the hierarchy.
-				if (htmlContainer.okToRenderComponent(headerPart.getScope(), headerPart.getId()))
-				{
-					// make sure the Page is accessible
-					headerPart.setParent(htmlContainer);
-					headerPart.render();
-				}
+			boolean condition = headerPart != null && htmlContainer.okToRenderComponent(headerPart.getScope(), headerPart.getId());
+			// A component's header section must only be added once,
+			// no matter how often the same Component has been added
+			// to the page or any other container in the hierarchy.
+			if (condition) {
+				// make sure the Page is accessible
+				headerPart.setParent(htmlContainer);
+				headerPart.render();
 			}
 
 			// Position the stream after <wicket:head>

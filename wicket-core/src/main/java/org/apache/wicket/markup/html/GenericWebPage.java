@@ -37,7 +37,6 @@ public class GenericWebPage<T> extends WebPage implements IGenericComponent<T, G
 	 */
 	protected GenericWebPage()
 	{
-		super();
 	}
 
 	/**

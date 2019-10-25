@@ -35,6 +35,8 @@ import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.request.component.IRequestableComponent;
 import org.apache.wicket.util.tester.WicketTestCase;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Authorization tests.
@@ -43,6 +45,8 @@ import org.junit.jupiter.api.Test;
  */
 public class AuthorizationTest extends WicketTestCase
 {
+	private static final Logger logger = LoggerFactory.getLogger(AuthorizationTest.class);
+
 	/**
 	 * Tests that a component can be created when authorization is allowed.
 	 * 
@@ -81,6 +85,7 @@ public class AuthorizationTest extends WicketTestCase
 		}
 		catch (AuthorizationException e)
 		{
+			logger.error(e.getMessage(), e);
 			// this is good: authorization should have failed
 		}
 	}
@@ -177,7 +182,7 @@ public class AuthorizationTest extends WicketTestCase
 				public boolean isActionAuthorized(Component c, Action action)
 				{
 					if (action == Component.ENABLE && c instanceof TextField &&
-						c.getId().equals("stringInput"))
+						"stringInput".equals(c.getId()))
 					{
 						return false;
 					}
@@ -195,6 +200,7 @@ public class AuthorizationTest extends WicketTestCase
 		}
 		catch (WicketRuntimeException e)
 		{
+			logger.error(e.getMessage(), e);
 			// good
 		}
 	}

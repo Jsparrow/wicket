@@ -23,12 +23,16 @@ import java.time.LocalDateTime;
 import java.util.Locale;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Tests for {@link LocalDateTimeConverter}
  */
 public class LocalDateTimeConverterTest
 {
+	private static final Logger logger = LoggerFactory.getLogger(LocalDateTimeConverterTest.class);
+
 	@Test
 	public void convertToString() {
 		LocalDateTimeConverter converter = new LocalDateTimeConverter();
@@ -50,6 +54,7 @@ public class LocalDateTimeConverterTest
 		try {
 			converter.convertToObject("aaa", Locale.ENGLISH);
 		} catch (ConversionException expected) {
+			logger.error(expected.getMessage(), expected);
 		}
 	}
 }

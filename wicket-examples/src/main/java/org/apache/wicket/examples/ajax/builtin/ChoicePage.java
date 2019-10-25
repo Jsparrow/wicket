@@ -45,23 +45,6 @@ public class ChoicePage extends BasePage
 	private final Map<String, List<String>> modelsMap = new HashMap<>(); // map:company->model
 
 	/**
-	 * @return Currently selected make
-	 */
-	public String getSelectedMake()
-	{
-		return selectedMake;
-	}
-
-	/**
-	 * @param selectedMake
-	 *            The make that is currently selected
-	 */
-	public void setSelectedMake(String selectedMake)
-	{
-		this.selectedMake = selectedMake;
-	}
-
-	/**
 	 * Constructor.
 	 */
 	public ChoicePage()
@@ -103,7 +86,7 @@ public class ChoicePage extends BasePage
 			@Override
 			protected void onAfterSubmit(AjaxRequestTarget target)
 			{
-				info("You have selected: " + makes.getModelObject() + " " + models.getModelObject());
+				info(new StringBuilder().append("You have selected: ").append(makes.getModelObject()).append(" ").append(models.getModelObject()).toString());
 				target.add(feedback);
 			}
 		});
@@ -116,5 +99,22 @@ public class ChoicePage extends BasePage
 				target.add(models);
 			}
 		});
+	}
+
+	/**
+	 * @return Currently selected make
+	 */
+	public String getSelectedMake()
+	{
+		return selectedMake;
+	}
+
+	/**
+	 * @param selectedMake
+	 *            The make that is currently selected
+	 */
+	public void setSelectedMake(String selectedMake)
+	{
+		this.selectedMake = selectedMake;
 	}
 }

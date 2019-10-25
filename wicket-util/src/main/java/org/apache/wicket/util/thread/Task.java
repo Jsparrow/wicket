@@ -86,81 +86,76 @@ public final class Task
 	 * @throws IllegalStateException
 	 *             thrown if task is already running
 	 */
-	public synchronized final void run(final Duration frequency, final ICode code)
+	public final synchronized void run(final Duration frequency, final ICode code)
 	{
 		if (!isStarted)
 		{
-			final Runnable runnable = new Runnable()
-			{
-				@Override
-				public void run()
+			final Runnable runnable = () -> {
+				// Sleep until start time
+				Duration untilStart = Duration.between(startTime, Instant.now());
+
+				final Logger log = getLog();
+
+				if (!untilStart.isNegative())
 				{
-					// Sleep until start time
-					Duration untilStart = Duration.between(startTime, Instant.now());
-
-					final Logger log = getLog();
-
-					if (!untilStart.isNegative())
-					{
-						try
-						{
-							Thread.sleep(untilStart.toMillis());
-						}
-						catch (InterruptedException e)
-						{
-							log.error("An error occurred during sleeping phase.", e);
-						}
-					}
-
 					try
 					{
-						while (!stop)
+						Thread.sleep(untilStart.toMillis());
+					}
+					catch (InterruptedException e)
+					{
+						log.error("An error occurred during sleeping phase.", e);
+					}
+				}
+
+				try
+				{
+					while (!stop)
+					{
+						// Get the start of the current period
+						final Instant startOfPeriod = Instant.now();
+
+						if (log.isTraceEnabled())
 						{
-							// Get the start of the current period
-							final Instant startOfPeriod = Instant.now();
-
-							if (log.isTraceEnabled())
-							{
-								log.trace("Run the job: '{}'", code);
-							}
-
-							try
-							{
-								// Run the user's code
-								code.run(getLog());
-							}
-							catch (Exception e)
-							{
-								log.error(
-									"Unhandled exception thrown by user code in task " + name, e);
-							}
-
-							if (log.isTraceEnabled())
-							{
-								log.trace("Finished with job: '{}'", code);
-							}
-
-							// Sleep until the period is over (or not at all if it's
-							// already passed)
-							Instant nextExecution = startOfPeriod.plus(frequency);
-							
-							Duration timeToNextExecution = Duration.between(Instant.now(), nextExecution);
-		                    
-							if (!timeToNextExecution.isNegative())
-							{
-								Thread.sleep(timeToNextExecution.toMillis());
-							}
-							
+							log.trace("Run the job: '{}'", code);
 						}
+
+						try
+						{
+							// Run the user's code
+							code.run(getLog());
+						}
+						catch (Exception e)
+						{
+							log.error(
+								"Unhandled exception thrown by user code in task " + name, e);
+						}
+
+						if (log.isTraceEnabled())
+						{
+							log.trace("Finished with job: '{}'", code);
+						}
+
+						// Sleep until the period is over (or not at all if it's
+						// already passed)
+						Instant nextExecution = startOfPeriod.plus(frequency);
+						
+						Duration timeToNextExecution = Duration.between(Instant.now(), nextExecution);
+			            
+						if (!timeToNextExecution.isNegative())
+						{
+							Thread.sleep(timeToNextExecution.toMillis());
+						}
+						
 					}
-					catch (Exception x)
-					{
-						log.error("Task '{}' terminated", name, x);
-					}
-					finally
-					{
-						isStarted = false;
-					}
+				}
+				catch (Exception x)
+				{
+					log.error("Task '{}' terminated", name, x);
+				}
+				finally
+				{
+					isStarted = false;
 				}
 			};
 
@@ -237,8 +232,8 @@ public final class Task
 	@Override
 	public String toString()
 	{
-		return "[name=" + name + ", startTime=" + startTime + ", isDaemon=" + isDaemon +
-			", isStarted=" + isStarted + ", codeListener=" + log + "]";
+		return new StringBuilder().append("[name=").append(name).append(", startTime=").append(startTime).append(", isDaemon=").append(isDaemon).append(", isStarted=")
+				.append(isStarted).append(", codeListener=").append(log).append("]").toString();
 	}
 
 	/**

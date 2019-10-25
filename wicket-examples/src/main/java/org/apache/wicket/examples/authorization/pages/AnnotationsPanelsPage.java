@@ -37,6 +37,41 @@ import org.apache.wicket.markup.html.panel.Panel;
  */
 public class AnnotationsPanelsPage extends BasePage
 {
+	private WebMarkupContainer outer;
+
+	private boolean showDummy = true;
+
+	/**
+	 * Construct.
+	 */
+	public AnnotationsPanelsPage()
+	{
+		add(new ForAllUsers("forAllUsersPanel"));
+		add(new ForAdminsAndUsers("forAdminsAndUsersPanel"));
+		add(new ForAdmins("forAdminsPanel"));
+		add(outer = new WebMarkupContainer("outer"));
+		outer.setOutputMarkupId(true);
+
+		outer.add(new WebMarkupContainer("test").setOutputMarkupId(true));
+		add(new AjaxLink<Void>("link")
+		{
+			@Override
+			public void onClick(org.apache.wicket.ajax.AjaxRequestTarget target)
+			{
+				showDummy = !showDummy;
+				if (showDummy)
+				{
+					outer.replace(new WebMarkupContainer("test"));
+				}
+				else
+				{
+					outer.replace(new Test("test"));
+				}
+				target.add(outer);
+			}
+		});
+	}
+
 	@AuthorizeAction(action = Action.RENDER, roles = Roles.ADMIN)
 	private static class AdminLabel extends Label
 	{
@@ -141,40 +176,6 @@ public class AnnotationsPanelsPage extends BasePage
 		{
 			super(id, "label for users " + nbr);
 		}
-	}
-
-	private WebMarkupContainer outer;
-
-	private boolean showDummy = true;
-
-	/**
-	 * Construct.
-	 */
-	public AnnotationsPanelsPage()
-	{
-		add(new ForAllUsers("forAllUsersPanel"));
-		add(new ForAdminsAndUsers("forAdminsAndUsersPanel"));
-		add(new ForAdmins("forAdminsPanel"));
-		add(outer = new WebMarkupContainer("outer"));
-		outer.setOutputMarkupId(true);
-
-		outer.add(new WebMarkupContainer("test").setOutputMarkupId(true));
-		add(new AjaxLink<Void>("link")
-		{
-			public void onClick(org.apache.wicket.ajax.AjaxRequestTarget target)
-			{
-				showDummy = !showDummy;
-				if (showDummy)
-				{
-					outer.replace(new WebMarkupContainer("test"));
-				}
-				else
-				{
-					outer.replace(new Test("test"));
-				}
-				target.add(outer);
-			}
-		});
 	}
 
 }

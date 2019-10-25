@@ -28,6 +28,13 @@ public final class Classes
 {
 
 	/**
+	 * Instantiation not allowed
+	 */
+	private Classes()
+	{
+	}
+
+	/**
 	 * Gets the name of the given class or null if the class is null.
 	 * 
 	 * @param c
@@ -87,12 +94,5 @@ public final class Classes
 		throws ClassNotFoundException
 	{
 		return Class.forName(Packages.absolutePath(scope, path).replace('/', '.'));
-	}
-
-	/**
-	 * Instantiation not allowed
-	 */
-	private Classes()
-	{
 	}
 }

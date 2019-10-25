@@ -50,17 +50,6 @@ public class InjectorTest
 
 	};
 
-	private static class TestInjector extends Injector
-	{
-
-		@Override
-		public void inject(final Object object)
-		{
-			inject(object, factory);
-		}
-
-	}
-
 	/**
 	 * Test injection
 	 */
@@ -75,6 +64,17 @@ public class InjectorTest
 		assertEquals("dont-inject", testObject.getDependency2().getMessage());
 		assertEquals("dont-inject", testObject.getDependency3().getMessage());
 		assertEquals("inject", testObject.getDependency4().getMessage());
+	}
+
+	private static class TestInjector extends Injector
+	{
+
+		@Override
+		public void inject(final Object object)
+		{
+			inject(object, factory);
+		}
+
 	}
 
 

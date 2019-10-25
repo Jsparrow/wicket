@@ -41,12 +41,6 @@ import org.apache.wicket.request.cycle.RequestCycle;
  */
 public abstract class AbstractMarkupFilter implements IMarkupFilter
 {
-	/** The markup created by reading the markup file */
-	private final MarkupResourceStream markupResourceStream;
-
-	/** The next MarkupFilter in the chain */
-	private IMarkupFilter parent;
-
 	/**
 	 *  A key for a request-relative map of counters.
 	 *  As map keys we use the class name of the {@link org.apache.wicket.markup.MarkupResourceStream}'s owner 
@@ -54,10 +48,16 @@ public abstract class AbstractMarkupFilter implements IMarkupFilter
 	 *  meaning that each container has its own counter. 
 	 *  The counters are used by {@link #getRequestUniqueId()} to get unique ids for markup tags.
 	 * **/
-	protected final static MetaDataKey<Map<String, AtomicInteger>> REQUEST_COUNTER_KEY = new MetaDataKey<>()
+	protected static final MetaDataKey<Map<String, AtomicInteger>> REQUEST_COUNTER_KEY = new MetaDataKey<>()
 	{
 		private static final long serialVersionUID = 1L;
 	};
+
+	/** The markup created by reading the markup file */
+	private final MarkupResourceStream markupResourceStream;
+
+	/** The next MarkupFilter in the chain */
+	private IMarkupFilter parent;
 
 	/**
 	 * Construct.
@@ -71,7 +71,6 @@ public abstract class AbstractMarkupFilter implements IMarkupFilter
 	{
 		this.markupResourceStream = markupResourceStream;
 	}
-
 
 	/**
 	 * @return The next MarkupFilter in the chain
@@ -126,14 +125,6 @@ public abstract class AbstractMarkupFilter implements IMarkupFilter
 	 * @throws ParseException
 	 */
 	protected abstract MarkupElement onComponentTag(ComponentTag tag) throws ParseException;
-
-	/**
-	 * Invoked when a WicketTag was found.
-	 * 
-	 * @param tag
-	 * @return Usually the same as the tag attribute
-	 * @throws ParseException
-	 */
 
 	/**
 	 * Invoked when a tags (e.g. DOCTYPE, PROCESSING_INSTRUCTIION, etc. which have been identified
@@ -241,4 +232,14 @@ public abstract class AbstractMarkupFilter implements IMarkupFilter
  	    //using the same algorithm of String#hashCode() 
  	    return  cacheHash * 31 + counter.getAndIncrement();
 	}
+
+	/**
+	 * Invoked when a WicketTag was found.
+	 * 
+	 * @param tag
+	 * @return Usually the same as the tag attribute
+	 * @throws ParseException
+	 */
+
+	
 }

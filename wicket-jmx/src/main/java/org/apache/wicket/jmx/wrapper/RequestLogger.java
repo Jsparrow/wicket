@@ -131,12 +131,12 @@ public class RequestLogger implements RequestLoggerMBean
 	@Override
 	public void restart() throws IOException
 	{
-		if (webApplication != null)
-		{
-			webApplication.getRequestLoggerSettings().setRequestLoggerEnabled(false);
-			webApplication.getRequestLogger();
-			webApplication.getRequestLoggerSettings().setRequestLoggerEnabled(true);
+		if (webApplication == null) {
+			return;
 		}
+		webApplication.getRequestLoggerSettings().setRequestLoggerEnabled(false);
+		webApplication.getRequestLogger();
+		webApplication.getRequestLoggerSettings().setRequestLoggerEnabled(true);
 	}
 
 	/**

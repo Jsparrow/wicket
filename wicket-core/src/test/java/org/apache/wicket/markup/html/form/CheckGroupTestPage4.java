@@ -26,6 +26,8 @@ import java.util.Arrays;
  */
 public class CheckGroupTestPage4 extends AbstractCheckGroupTestPage
 {
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * Constructor
 	 */
@@ -34,8 +36,6 @@ public class CheckGroupTestPage4 extends AbstractCheckGroupTestPage
 		super(Arrays.asList("check1", "check2"));
 
 	}
-
-	private static final long serialVersionUID = 1L;
 
 
 }

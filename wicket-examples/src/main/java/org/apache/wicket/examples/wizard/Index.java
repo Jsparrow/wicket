@@ -29,6 +29,16 @@ import org.apache.wicket.markup.html.link.Link;
 public class Index extends WicketExamplePage
 {
 	/**
+	 * Construct.
+	 */
+	public Index()
+	{
+		add(new WizardLink("staticWizardLink", StaticWizard.class));
+		add(new WizardLink("staticWizardWithPanelsLink", StaticWizardWithPanels.class));
+		add(new WizardLink("newUserWizardLink", NewUserWizard.class));
+	}
+
+	/**
 	 * Link to the wizard. It's an internal link instead of a bookmarkable page to help us with
 	 * back button suppression. Wizards by default do not participate in versioning, which has the
 	 * effect that whenever a button is clicked in the wizard, it will never result in a change of
@@ -61,15 +71,5 @@ public class Index extends WicketExamplePage
 		{
 			setResponsePage(new WizardPage(wizardClass));
 		}
-	}
-
-	/**
-	 * Construct.
-	 */
-	public Index()
-	{
-		add(new WizardLink("staticWizardLink", StaticWizard.class));
-		add(new WizardLink("staticWizardWithPanelsLink", StaticWizardWithPanels.class));
-		add(new WizardLink("newUserWizardLink", NewUserWizard.class));
 	}
 }

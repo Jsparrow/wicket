@@ -89,9 +89,7 @@ public class SelectOption<T> extends WebMarkupContainer implements IGenericCompo
 		if (select == null)
 		{
 			throw new WicketRuntimeException(
-				"SelectOption component [" +
-					getPath() +
-					"] cannot find its parent Select. All SelectOption components must be a child of or below in the hierarchy of a Select component.");
+				new StringBuilder().append("SelectOption component [").append(getPath()).append("] cannot find its parent Select. All SelectOption components must be a child of or below in the hierarchy of a Select component.").toString());
 		}
 
 		final String uuid = getValue();

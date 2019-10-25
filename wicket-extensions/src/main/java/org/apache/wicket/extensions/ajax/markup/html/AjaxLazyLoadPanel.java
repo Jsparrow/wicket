@@ -107,7 +107,7 @@ public abstract class AjaxLazyLoadPanel<T extends Component> extends Panel
 		IRequestHandler handler = new ResourceReferenceRequestHandler(
 			AbstractDefaultAjaxBehavior.INDICATOR);
 		return new Label(id,
-			"<img alt=\"Loading...\" src=\"" + RequestCycle.get().urlFor(handler) + "\"/>")
+			new StringBuilder().append("<img alt=\"Loading...\" src=\"").append(RequestCycle.get().urlFor(handler)).append("\"/>").toString())
 				.setEscapeModelStrings(false);
 	}
 
@@ -157,15 +157,13 @@ public abstract class AjaxLazyLoadPanel<T extends Component> extends Panel
 	{
 		// when the timer is not yet installed add it
 		List<AjaxLazyLoadTimer> behaviors = getPage().getBehaviors(AjaxLazyLoadTimer.class);
-		if (behaviors.isEmpty()) {
-			AbstractAjaxTimerBehavior timer = new AjaxLazyLoadTimer();
-			getPage().add(timer);
-			
-			getRequestCycle().find(AjaxRequestTarget.class).ifPresent(target -> {
-				// the timer will not be rendered, so restart it immediately on the Ajax target
-				timer.restart(target);
-			});
+		if (!behaviors.isEmpty()) {
+			return;
 		}
+		AbstractAjaxTimerBehavior timer = new AjaxLazyLoadTimer();
+		getPage().add(timer);
+		// the timer will not be rendered, so restart it immediately on the Ajax target
+		getRequestCycle().find(AjaxRequestTarget.class).ifPresent(timer::restart);
 	}
 
 	@Override
@@ -201,27 +199,24 @@ public abstract class AjaxLazyLoadPanel<T extends Component> extends Panel
 	 * @see #isContentReady()
 	 */
 	protected final boolean isLoaded() {
-		if (loaded == false)
-		{
-			if (isContentReady())
-			{
-				loaded = true;
+		boolean condition = loaded == false && isContentReady();
+		if (condition) {
+			loaded = true;
 
-				// create the lazy load component
-				T content = getLazyLoadComponent(CONTENT_ID);
+			// create the lazy load component
+			T content = getLazyLoadComponent(CONTENT_ID);
 
-				// replace the loading component with the new component
-				AjaxLazyLoadPanel.this.replace(content);
+			// replace the loading component with the new component
+			AjaxLazyLoadPanel.this.replace(content);
 
-				Optional<AjaxRequestTarget> target = getRequestCycle().find(AjaxRequestTarget.class);
+			Optional<AjaxRequestTarget> target = getRequestCycle().find(AjaxRequestTarget.class);
 
-				// notify our subclasses of the updated component
-				onContentLoaded(content, target);
+			// notify our subclasses of the updated component
+			onContentLoaded(content, target);
 
-				// repaint our selves if there's an AJAX request in play, otherwise let the page
-				// redraw itself
-				target.ifPresent(t -> t.add(AjaxLazyLoadPanel.this));
-			}
+			// repaint our selves if there's an AJAX request in play, otherwise let the page
+			// redraw itself
+			target.ifPresent(t -> t.add(AjaxLazyLoadPanel.this));
 		}
 		
 		return loaded;
@@ -252,29 +247,23 @@ public abstract class AjaxLazyLoadPanel<T extends Component> extends Panel
 		{
 			setUpdateInterval(Duration.ofMillis(Long.MAX_VALUE));
 			
-			getComponent().getPage().visitChildren(AjaxLazyLoadPanel.class, new IVisitor<AjaxLazyLoadPanel<?>, Void>()
-			{
-				@Override
-				public void component(AjaxLazyLoadPanel<?> panel, IVisit<Void> visit)
-				{
-					if (panel.isVisibleInHierarchy() && panel.isLoaded() == false) {
-						Duration updateInterval = panel.getUpdateInterval();
-						if (getUpdateInterval() == null) {
-							throw new IllegalArgumentException("update interval must not ben null");
-						}
-						
-						setUpdateInterval(Comparators.min(getUpdateInterval(), updateInterval));
-					}						
-				}
+			getComponent().getPage().visitChildren(AjaxLazyLoadPanel.class, (AjaxLazyLoadPanel<?> panel, IVisit<Void> visit) -> {
+				if (panel.isVisibleInHierarchy() && panel.isLoaded() == false) {
+					Duration updateInterval = panel.getUpdateInterval();
+					if (getUpdateInterval() == null) {
+						throw new IllegalArgumentException("update interval must not ben null");
+					}
+					
+					setUpdateInterval(Comparators.min(getUpdateInterval(), updateInterval));
+				}						
 			});
 
 			// all panels have completed their replacements, we can stop the timer
-			if (Duration.ofMillis(Long.MAX_VALUE).equals(getUpdateInterval()))
-			{
-				stop(target);
-				
-				getComponent().remove(this);
+			if (!Duration.ofMillis(Long.MAX_VALUE).equals(getUpdateInterval())) {
+				return;
 			}
+			stop(target);
+			getComponent().remove(this);
 		}
 	}
 }

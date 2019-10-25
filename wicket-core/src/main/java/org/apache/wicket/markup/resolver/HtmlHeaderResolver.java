@@ -75,18 +75,13 @@ public class HtmlHeaderResolver implements IComponentResolver
 			// head first.
 			if (container instanceof WebPage)
 			{
-				HtmlHeaderContainer header = container.visitChildren(new IVisitor<Component, HtmlHeaderContainer>()
-				{
-					@Override
-					public void component(final Component component, final IVisit<HtmlHeaderContainer> visit)
+				HtmlHeaderContainer header = container.visitChildren((final Component component, final IVisit<HtmlHeaderContainer> visit) -> {
+					if (component instanceof HtmlHeaderContainer)
 					{
-						if (component instanceof HtmlHeaderContainer)
-						{
-							visit.stop((HtmlHeaderContainer) component);
-						} else if (component instanceof TransparentWebMarkupContainer == false)
-						{
-							visit.dontGoDeeper();
-						}
+						visit.stop((HtmlHeaderContainer) component);
+					} else if (component instanceof TransparentWebMarkupContainer == false)
+					{
+						visit.dontGoDeeper();
 					}
 				});
 
@@ -133,9 +128,7 @@ public class HtmlHeaderResolver implements IComponentResolver
 			final String streamName = (stream != null) ? stream.toString() : "unknown";
 
 			throw new MarkupException(
-				"Mis-placed <wicket:head>. <wicket:head> must be outside of <wicket:panel>, <wicket:border>, " +
-						"and <wicket:extend>. Error occurred while rendering page: " +
-					pageClassName + " using markup stream: " + streamName);
+				new StringBuilder().append("Mis-placed <wicket:head>. <wicket:head> must be outside of <wicket:panel>, <wicket:border>, ").append("and <wicket:extend>. Error occurred while rendering page: ").append(pageClassName).append(" using markup stream: ").append(streamName).toString());
 		}
 
 		// We were not able to handle the tag
@@ -190,11 +183,11 @@ public class HtmlHeaderResolver implements IComponentResolver
 		@Override
 		public void component(Component component, IVisit<WicketHeadContainer> visit)
 		{
-			if (component instanceof WicketHeadContainer)
-			{
-				WicketHeadContainer result = (WicketHeadContainer) component;
-				visit.stop(result);
+			if (!(component instanceof WicketHeadContainer)) {
+				return;
 			}
+			WicketHeadContainer result = (WicketHeadContainer) component;
+			visit.stop(result);
 		}	
 	}
 }

@@ -46,8 +46,9 @@ public class ModalContent1Page extends WebPage
 			@Override
 			public void onClick(AjaxRequestTarget target)
 			{
-				if (modalWindowPage != null)
+				if (modalWindowPage != null) {
 					((ModalWindowPage)modalWindowPage.getPage()).setResult("Modal window 1 - close link OK");
+				}
 				window.close(target);
 			}
 		});
@@ -59,8 +60,9 @@ public class ModalContent1Page extends WebPage
 			@Override
 			public void onClick(AjaxRequestTarget target)
 			{
-				if (modalWindowPage != null)
+				if (modalWindowPage != null) {
 					((ModalWindowPage)modalWindowPage.getPage()).setResult("Modal window 1 - close link Cancel");
+				}
 				window.close(target);
 			}
 		});

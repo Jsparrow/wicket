@@ -31,6 +31,7 @@ import org.apache.wicket.core.util.resource.locator.ResourceNameIterator;
 import org.apache.wicket.core.util.resource.locator.StyleAndVariationResourceNameIterator;
 import org.apache.wicket.util.tester.WicketTestCase;
 import org.junit.jupiter.api.Test;
+import java.util.Collections;
 
 /**
  * @author Pedro Santos
@@ -45,7 +46,7 @@ class ResourceNameIteratorTest extends WicketTestCase
 	{
 		Locale locale = new Locale("a", "b", "c");
 		LocaleResourceNameIterator iterator = new LocaleResourceNameIterator(locale, false);
-		HashSet<String> variations = new HashSet<String>();
+		HashSet<String> variations = new HashSet<>();
 		while (iterator.hasNext())
 		{
 			assertTrue(variations.add(iterator.next()));
@@ -58,7 +59,7 @@ class ResourceNameIteratorTest extends WicketTestCase
 
 		locale = new Locale("a", "b");
 		iterator = new LocaleResourceNameIterator(locale, false);
-		variations = new HashSet<String>();
+		variations = new HashSet<>();
 		while (iterator.hasNext())
 		{
 			assertTrue(variations.add(iterator.next()));
@@ -70,7 +71,7 @@ class ResourceNameIteratorTest extends WicketTestCase
 
 		locale = new Locale("a");
 		iterator = new LocaleResourceNameIterator(locale, false);
-		variations = new HashSet<String>();
+		variations = new HashSet<>();
 		while (iterator.hasNext())
 		{
 			assertTrue(variations.add(iterator.next()));
@@ -130,7 +131,7 @@ class ResourceNameIteratorTest extends WicketTestCase
 		assertEquals(null, iterator.next());
 		assertFalse(iterator.hasNext());
 
-		iterator = new ExtensionResourceNameIterator(Arrays.asList("txt"));
+		iterator = new ExtensionResourceNameIterator(Collections.singletonList("txt"));
 		assertTrue(iterator.hasNext());
 		assertEquals("txt", iterator.next());
 		assertFalse(iterator.hasNext());
@@ -158,7 +159,7 @@ class ResourceNameIteratorTest extends WicketTestCase
 		Iterable<String> extensions = null;
 		boolean strict = false;
 		Iterator<String> iterator = new ResourceNameIterator(path, style, var, locale, extensions, strict);
-		HashSet<String> variations = new HashSet<String>();
+		HashSet<String> variations = new HashSet<>();
 		while (iterator.hasNext())
 		{
 			assertTrue(variations.add(iterator.next()));

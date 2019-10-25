@@ -42,6 +42,8 @@ import org.apache.wicket.util.value.ValueMap;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Test cases for the <code>Localizer</code> class.
@@ -51,6 +53,7 @@ import org.junit.jupiter.api.Test;
 class LocalizerTest
 {
 
+	private static final Logger logger = LoggerFactory.getLogger(LocalizerTest.class);
 	Localizer localizer;
 	private WicketTester tester;
 	private ResourceSettings settings;
@@ -136,6 +139,7 @@ class LocalizerTest
 		}
 		catch (MissingResourceException e)
 		{
+			logger.error(e.getMessage(), e);
 			// Expected result
 		}
 	}
@@ -151,7 +155,7 @@ class LocalizerTest
 		ValueMap vm = new ValueMap();
 		vm.put("user", "John Doe");
 		vm.put("rating", 4.5);
-		IModel<ValueMap> model = new Model<ValueMap>(vm);
+		IModel<ValueMap> model = new Model<>(vm);
 		assertEquals("John Doe gives 4,5 stars",
 			localizer.getString("test.substitute", null, model, null),
 			"Property substitution should occur");
@@ -194,7 +198,7 @@ class LocalizerTest
 	{
 		Session.get().setLocale(Locale.GERMAN);
 
-		HashMap<String, Object> model = new HashMap<String, Object>();
+		HashMap<String, Object> model = new HashMap<>();
 		model.put("user", "juergen");
 		model.put("rating", 4.5);
 
@@ -269,12 +273,12 @@ class LocalizerTest
 		 */
 		MyMockPage()
 		{
-			final Form<Void> form = new Form<Void>("form");
+			final Form<Void> form = new Form<>("form");
 			add(form);
 
 			String[] choices = { "choice1", "choice2" };
-			drop1 = new DropDownChoice<String>("drop1", Arrays.asList(choices));
-			drop2 = new DropDownChoice<String>("drop2", Arrays.asList(choices));
+			drop1 = new DropDownChoice<>("drop1", Arrays.asList(choices));
+			drop2 = new DropDownChoice<>("drop2", Arrays.asList(choices));
 
 			form.add(drop1);
 			form.add(drop2);

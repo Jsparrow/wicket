@@ -72,10 +72,7 @@ public class FilterToolbar extends AbstractToolbar
 			public List<IColumn<T, S>> getObject() {
 				List<IColumn<T, S>> columnsModels = new LinkedList<>();
 
-				for (IColumn<T, S> column : table.getColumns())
-				{
-					columnsModels.add(column);
-				}
+				table.getColumns().forEach(columnsModels::add);
 				return columnsModels;
 			}
 		};
@@ -110,11 +107,8 @@ public class FilterToolbar extends AbstractToolbar
 					if (!filter.getId().equals(FILTER_ID))
 					{
 						throw new IllegalStateException(
-							"filter component returned  with an invalid component id. invalid component id [" +
-								filter.getId() +
-								"] required component id [" +
-								getId() +
-								"] generating column [" + col.toString() + "] ");
+							new StringBuilder().append("filter component returned  with an invalid component id. invalid component id [").append(filter.getId()).append("] required component id [").append(getId()).append("] generating column [")
+									.append(col.toString()).append("] ").toString());
 					}
 				}
 

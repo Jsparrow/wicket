@@ -44,7 +44,6 @@ public class AbstractUpgradeFilter extends WicketFilter
 {
 	public AbstractUpgradeFilter()
 	{
-		super();
 	}
 
 	public AbstractUpgradeFilter(WebApplication application)

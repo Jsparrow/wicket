@@ -31,31 +31,6 @@ import org.apache.wicket.util.lang.Args;
 public class UrlResourceReference extends ResourceReference
 {
 	/**
-	 * An Url that knows how to render itself, so it doesn't need re-calculating in UrlRenderer. It
-	 * should be rendered as is.
-	 */
-	private static class CalculatedUrl extends Url implements IUrlRenderer
-	{
-		private CalculatedUrl(Url original)
-		{
-			super(original);
-		}
-
-		@Override
-		public String renderFullUrl(Url url, Url baseUrl)
-		{
-			StringMode mode = getStringMode(url);
-			return url.toString(mode);
-		}
-
-		@Override
-		public String renderRelativeUrl(Url url, Url baseUrl)
-		{
-			return url.toString();
-		}
-	}
-
-	/**
 	 * The url to the resource.
 	 */
 	private final Url url;
@@ -132,8 +107,7 @@ public class UrlResourceReference extends ResourceReference
 	@Override
 	public String toString()
 	{
-		return "UrlResourceReference{" + "url=" + url.toString(getStringMode(url)) +
-			", contextRelative=" + contextRelative + '}';
+		return new StringBuilder().append("UrlResourceReference{").append("url=").append(url.toString(getStringMode(url))).append(", contextRelative=").append(contextRelative).append('}').toString();
 	}
 
 	private static Url.StringMode getStringMode(Url url)
@@ -148,5 +122,30 @@ public class UrlResourceReference extends ResourceReference
 			mode = Url.StringMode.LOCAL;
 		}
 		return mode;
+	}
+
+	/**
+	 * An Url that knows how to render itself, so it doesn't need re-calculating in UrlRenderer. It
+	 * should be rendered as is.
+	 */
+	private static class CalculatedUrl extends Url implements IUrlRenderer
+	{
+		private CalculatedUrl(Url original)
+		{
+			super(original);
+		}
+
+		@Override
+		public String renderFullUrl(Url url, Url baseUrl)
+		{
+			StringMode mode = getStringMode(url);
+			return url.toString(mode);
+		}
+
+		@Override
+		public String renderRelativeUrl(Url url, Url baseUrl)
+		{
+			return url.toString();
+		}
 	}
 }

@@ -42,16 +42,6 @@ public class EmailAddressValidator extends PatternValidator
 	private static final EmailAddressValidator INSTANCE = new EmailAddressValidator();
 
 	/**
-	 * Retrieves the singleton instance of <code>EmailAddressValidator</code>.
-	 * 
-	 * @return the singleton instance of <code>EmailAddressValidator</code>
-	 */
-	public static EmailAddressValidator getInstance()
-	{
-		return INSTANCE;
-	}
-
-	/**
 	 * Protected constructor to force use of static singleton accessor. Override this constructor to
 	 * implement resourceKey(Component).
 	 */
@@ -60,5 +50,15 @@ public class EmailAddressValidator extends PatternValidator
 		super(
 			"^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*((\\.[A-Za-z]{2,}){1}$)",
 			Pattern.CASE_INSENSITIVE);
+	}
+
+	/**
+	 * Retrieves the singleton instance of <code>EmailAddressValidator</code>.
+	 * 
+	 * @return the singleton instance of <code>EmailAddressValidator</code>
+	 */
+	public static EmailAddressValidator getInstance()
+	{
+		return INSTANCE;
 	}
 }

@@ -73,41 +73,6 @@ public class AjaxDownloadBehavior extends AbstractDefaultAjaxBehavior
 {
 	private static final long serialVersionUID = 1L;
 
-	public enum Location {
-		/**
-		 * The resource will be downloaded into a {@code blob}.
-		 * <p>
-		 * This is recommended for modern browsers.
-		 */
-		Blob,
-
-		/**
-		 * The resource will be downloaded via a temporary created iframe, the resource has to be a
-		 * {@link ContentDisposition#ATTACHMENT}.
-		 * <p>
-		 * This is recommended when there are resources in the DOM which will be
-		 * closed automatically on JavaScript <em>unload</em> event, like WebSockets.
-		 * Supports both <em>success</em> and <em>failure</em> callbacks!
-		 */
-		IFrame,
-
-		/**
-		 * The resource will be downloaded by changing the location of the current DOM document,
-		 * the resource has to be a {@link ContentDisposition#ATTACHMENT}.
-		 * <p>
-		 * Note: This will trigger JavaScript <em>unload</em> event on the page!
-		 * Does not support {@link AjaxDownloadBehavior#onDownloadFailed(IPartialPageRequestHandler)} callback,
-		 * i.e. it is not possible to detect when the download has failed!
-		 */
-		SameWindow,
-
-		/**
-		 * The resource will be downloaded in a new browser window by using JavaScript <code>window.open()</code> API,
-		 * the resource has to be a {@link ContentDisposition#INLINE}.
-		 */
-		NewWindow
-	}
-
 	/**
 	 * Name of parameter used to transfer the download identifier to the resource.
 	 *
@@ -319,6 +284,69 @@ public class AjaxDownloadBehavior extends AbstractDefaultAjaxBehavior
 	}
 
 	/**
+	 * Mark a resource as complete.
+	 * <p>
+	 * Has to be called from {@link IResource#respond(Attributes)} when downloaded via
+	 * {@link #AjaxDownloadBehavior(IResource)}.
+	 *
+	 * @param attributes
+	 *            resource attributes
+	 */
+	public static void markCompleted(IResource.Attributes attributes)
+	{
+		String cookieName = attributes.getParameters().get(RESOURCE_PARAMETER_NAME).toString();
+
+		((WebResponse)attributes.getResponse()).addCookie(cookie(cookieName));
+	}
+
+	private static Cookie cookie(String name)
+	{
+		Cookie cookie = new Cookie(name, "complete");
+
+		// has to be on root, otherwise JavaScript will not be able to access the
+		// cookie when it is set from a different path - which is the case when a
+		// ResourceReference is used
+		cookie.setPath("/");
+
+		return cookie;
+	}
+
+	public enum Location {
+		/**
+		 * The resource will be downloaded into a {@code blob}.
+		 * <p>
+		 * This is recommended for modern browsers.
+		 */
+		Blob,
+
+		/**
+		 * The resource will be downloaded via a temporary created iframe, the resource has to be a
+		 * {@link ContentDisposition#ATTACHMENT}.
+		 * <p>
+		 * This is recommended when there are resources in the DOM which will be
+		 * closed automatically on JavaScript <em>unload</em> event, like WebSockets.
+		 * Supports both <em>success</em> and <em>failure</em> callbacks!
+		 */
+		IFrame,
+
+		/**
+		 * The resource will be downloaded by changing the location of the current DOM document,
+		 * the resource has to be a {@link ContentDisposition#ATTACHMENT}.
+		 * <p>
+		 * Note: This will trigger JavaScript <em>unload</em> event on the page!
+		 * Does not support {@link AjaxDownloadBehavior#onDownloadFailed(IPartialPageRequestHandler)} callback,
+		 * i.e. it is not possible to detect when the download has failed!
+		 */
+		SameWindow,
+
+		/**
+		 * The resource will be downloaded in a new browser window by using JavaScript <code>window.open()</code> API,
+		 * the resource has to be a {@link ContentDisposition#INLINE}.
+		 */
+		NewWindow
+	}
+
+	/**
 	 * The behavior responding with the actual resource.
 	 */
 	private class ResourceBehavior extends Behavior implements IRequestListener
@@ -353,33 +381,5 @@ public class AjaxDownloadBehavior extends AbstractDefaultAjaxBehavior
 		{
 			return getComponent().urlForListener(this, null);
 		}
-	}
-
-	/**
-	 * Mark a resource as complete.
-	 * <p>
-	 * Has to be called from {@link IResource#respond(Attributes)} when downloaded via
-	 * {@link #AjaxDownloadBehavior(IResource)}.
-	 *
-	 * @param attributes
-	 *            resource attributes
-	 */
-	public static void markCompleted(IResource.Attributes attributes)
-	{
-		String cookieName = attributes.getParameters().get(RESOURCE_PARAMETER_NAME).toString();
-
-		((WebResponse)attributes.getResponse()).addCookie(cookie(cookieName));
-	}
-
-	private static Cookie cookie(String name)
-	{
-		Cookie cookie = new Cookie(name, "complete");
-
-		// has to be on root, otherwise JavaScript will not be able to access the
-		// cookie when it is set from a different path - which is the case when a
-		// ResourceReference is used
-		cookie.setPath("/");
-
-		return cookie;
 	}
 }

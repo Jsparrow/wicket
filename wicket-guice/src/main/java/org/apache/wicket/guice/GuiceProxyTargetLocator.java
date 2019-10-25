@@ -30,9 +30,13 @@ import org.apache.wicket.WicketRuntimeException;
 import org.apache.wicket.proxy.IProxyTargetLocator;
 import org.apache.wicket.core.util.lang.WicketObjects;
 import org.apache.wicket.util.lang.Objects;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class GuiceProxyTargetLocator implements IProxyTargetLocator
 {
+	private static final Logger logger = LoggerFactory.getLogger(GuiceProxyTargetLocator.class);
+
 	private static final long serialVersionUID = 1L;
 
 	private final Annotation bindingAnnotation;
@@ -76,6 +80,7 @@ class GuiceProxyTargetLocator implements IProxyTargetLocator
 			}
 			catch (RuntimeException e)
 			{
+				logger.error(e.getMessage(), e);
 				return null;
 			}
 		}
@@ -94,8 +99,7 @@ class GuiceProxyTargetLocator implements IProxyTargetLocator
 		}
 		catch (Exception e)
 		{
-			throw new WicketRuntimeException("Error accessing member: " + fieldName +
-				" of class: " + className, e);
+			throw new WicketRuntimeException(new StringBuilder().append("Error accessing member: ").append(fieldName).append(" of class: ").append(className).toString(), e);
 		}
 
 		// using TypeLiteral to retrieve the key gives us automatic support for
@@ -121,10 +125,11 @@ class GuiceProxyTargetLocator implements IProxyTargetLocator
 			catch (ConfigurationException ex)
 			{
 				// No binding, if optional can pretend this is null singleton
-				if (optional)
+				if (optional) {
 					isSingletonCache = true;
-				else
+				} else {
 					throw ex;
+				}
 			}
 		}
 		return isSingletonCache;
@@ -141,10 +146,12 @@ class GuiceProxyTargetLocator implements IProxyTargetLocator
 	@Override
 	public boolean equals(Object o)
 	{
-		if (this == o)
+		if (this == o) {
 			return true;
-		if (!(o instanceof GuiceProxyTargetLocator))
+		}
+		if (!(o instanceof GuiceProxyTargetLocator)) {
 			return false;
+		}
 		GuiceProxyTargetLocator that = (GuiceProxyTargetLocator) o;
 		return Objects.equal(optional, that.optional) &&
 				Objects.equal(bindingAnnotation, that.bindingAnnotation) &&

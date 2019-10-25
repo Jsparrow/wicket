@@ -79,7 +79,7 @@ class DomReadyOrderTest extends WicketTestCase
 		tester.assertRenderedPage(HomePage.class);
 
 		String doc = tester.getLastResponseAsString();
-		log.error("'" + doc + "'");
+		log.error(new StringBuilder().append("'").append(doc).append("'").toString());
 
 		// assert rendered row elements
 		tester.assertLabel("form:listViewContainer:listView:0:label", "0");

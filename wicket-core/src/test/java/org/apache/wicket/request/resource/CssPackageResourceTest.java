@@ -47,14 +47,7 @@ class CssPackageResourceTest extends WicketTestCase
 			{
 				super.init();
 
-				getResourceSettings().setCssCompressor(new ICssCompressor()
-				{
-					@Override
-					public String compress(String original)
-					{
-						return APP_COMPRESSED;
-					}
-				});
+				getResourceSettings().setCssCompressor((String original) -> APP_COMPRESSED);
 			}
 		};
 	}

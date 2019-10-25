@@ -79,26 +79,6 @@ import org.apache.wicket.util.visit.IVisitor;
  */
 public class DataTable<T, S> extends Panel implements IPageableItems
 {
-	static abstract class CssAttributeBehavior extends Behavior
-	{
-		private static final long serialVersionUID = 1L;
-
-		protected abstract String getCssClass();
-
-		/**
-		 * @see Behavior#onComponentTag(Component, ComponentTag)
-		 */
-		@Override
-		public void onComponentTag(final Component component, final ComponentTag tag)
-		{
-			String className = getCssClass();
-			if (!Strings.isEmpty(className))
-			{
-				tag.append("class", className, " ");
-			}
-		}
-	}
-
 	private static final long serialVersionUID = 1L;
 
 	private final DataGridView<T> datagrid;
@@ -325,7 +305,6 @@ public class DataTable<T, S> extends Panel implements IPageableItems
 		onPageChanged();
 	}
 
-
 	/**
 	 * Sets the item reuse strategy. This strategy controls the creation of {@link Item}s.
 	 * 
@@ -418,10 +397,7 @@ public class DataTable<T, S> extends Panel implements IPageableItems
 	{
 		super.onDetach();
 
-		for (IColumn<T, S> column : columns)
-		{
-			column.detach();
-		}
+		columns.forEach(IColumn::detach);
 	}
 
 	/**
@@ -446,6 +422,26 @@ public class DataTable<T, S> extends Panel implements IPageableItems
 	{
 		checkComponentTag(tag, "table");
 		super.onComponentTag(tag);
+	}
+
+	abstract static class CssAttributeBehavior extends Behavior
+	{
+		private static final long serialVersionUID = 1L;
+
+		protected abstract String getCssClass();
+
+		/**
+		 * @see Behavior#onComponentTag(Component, ComponentTag)
+		 */
+		@Override
+		public void onComponentTag(final Component component, final ComponentTag tag)
+		{
+			String className = getCssClass();
+			if (!Strings.isEmpty(className))
+			{
+				tag.append("class", className, " ");
+			}
+		}
 	}
 
 	/**
@@ -485,20 +481,15 @@ public class DataTable<T, S> extends Panel implements IPageableItems
 
 			toolbars.configure();
 
-			Boolean visible = toolbars.visitChildren(new IVisitor<Component, Boolean>()
-			{
-				@Override
-				public void component(Component object, IVisit<Boolean> visit)
+			Boolean visible = toolbars.visitChildren((Component object, IVisit<Boolean> visit) -> {
+				object.configure();
+				if (object.isVisible())
 				{
-					object.configure();
-					if (object.isVisible())
-					{
-						visit.stop(Boolean.TRUE);
-					}
-					else
-					{
-						visit.dontGoDeeper();
-					}
+					visit.stop(Boolean.TRUE);
+				}
+				else
+				{
+					visit.dontGoDeeper();
 				}
 			});
 			if (visible == null)

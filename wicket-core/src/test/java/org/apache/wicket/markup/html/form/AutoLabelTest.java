@@ -45,7 +45,7 @@ class AutoLabelTest extends WicketTestCase
 
 			MyTestPage(String labelMarkup)
 			{
-				super("<label wicket:for='t'>" + labelMarkup + "</label>");
+				super(new StringBuilder().append("<label wicket:for='t'>").append(labelMarkup).append("</label>").toString());
 				field.setLabel(Model.of("t"));
 			}
 		}
@@ -84,7 +84,7 @@ class AutoLabelTest extends WicketTestCase
 
 			MyTestPage(String labelMarkup)
 			{
-				super("<label wicket:for='t'>" + labelMarkup + "</label>");
+				super(new StringBuilder().append("<label wicket:for='t'>").append(labelMarkup).append("</label>").toString());
 			}
 		}
 
@@ -169,7 +169,7 @@ class AutoLabelTest extends WicketTestCase
 		String markup = tester.getLastResponse().getDocument();
 		markup = markup.replace("'", "\"");
 		assertTrue(markup.contains(markupFragment.replace("'", "\"")),
-			"fragment: [" + markupFragment + "] not found in generated markup: [" + markup + "]");
+			new StringBuilder().append("fragment: [").append(markupFragment).append("] not found in generated markup: [").append(markup).append("]").toString());
 	}
 
 	private void assertNotRendered(Page page, String markupFragment)
@@ -178,7 +178,7 @@ class AutoLabelTest extends WicketTestCase
 		String markup = tester.getLastResponse().getDocument();
 		markup = markup.replace("'", "\"");
 		assertFalse(markup.contains(markupFragment.replace("'", "\"")),
-			"fragment: [" + markupFragment + "] not found in generated markup: [" + markup + "]");
+			new StringBuilder().append("fragment: [").append(markupFragment).append("] not found in generated markup: [").append(markup).append("]").toString());
 	}
 
 	private static class TestPage extends WebPage
@@ -192,14 +192,13 @@ class AutoLabelTest extends WicketTestCase
 			this.labelMarkup = labelMarkup;
 			Form<?> form = new Form<Void>("f");
 			add(form);
-			form.add(field = new TextField<String>("t", Model.of("")));
+			form.add(field = new TextField<>("t", Model.of("")));
 		}
 
 		@Override
 		public IMarkupFragment getMarkup()
 		{
-			return Markup.of("<html><body><form wicket:id='f'>\n" + labelMarkup +
-				"\n<input type='text' wicket:id='t'/>\n</form></body></html>");
+			return Markup.of(new StringBuilder().append("<html><body><form wicket:id='f'>\n").append(labelMarkup).append("\n<input type='text' wicket:id='t'/>\n</form></body></html>").toString());
 		}
 	}
 }

@@ -134,7 +134,7 @@ public class CopyOnWriteValueMap implements IValueMap, Serializable
 	 * @see IValueMap#getBoolean(String)
 	 */
 	@Override
-	public boolean getBoolean(final String key) throws StringValueConversionException
+	public boolean getBoolean(final String key)
 	{
 		return wrapped.getBoolean(key);
 	}
@@ -152,7 +152,7 @@ public class CopyOnWriteValueMap implements IValueMap, Serializable
 	 * @see IValueMap#getDouble(String)
 	 */
 	@Override
-	public double getDouble(final String key) throws StringValueConversionException
+	public double getDouble(final String key)
 	{
 		return wrapped.getDouble(key);
 	}
@@ -170,7 +170,7 @@ public class CopyOnWriteValueMap implements IValueMap, Serializable
 	 * @see IValueMap#getDuration(String)
 	 */
 	@Override
-	public Duration getDuration(final String key) throws StringValueConversionException
+	public Duration getDuration(final String key)
 	{
 		return wrapped.getDuration(key);
 	}
@@ -188,7 +188,7 @@ public class CopyOnWriteValueMap implements IValueMap, Serializable
 	 * @see IValueMap#getInt(String)
 	 */
 	@Override
-	public int getInt(final String key) throws StringValueConversionException
+	public int getInt(final String key)
 	{
 		return wrapped.getInt(key);
 	}
@@ -215,7 +215,7 @@ public class CopyOnWriteValueMap implements IValueMap, Serializable
 	 * @see IValueMap#getLong(String)
 	 */
 	@Override
-	public long getLong(final String key) throws StringValueConversionException
+	public long getLong(final String key)
 	{
 		return wrapped.getLong(key);
 	}
@@ -260,7 +260,7 @@ public class CopyOnWriteValueMap implements IValueMap, Serializable
 	 * @see IValueMap#getInstant(String)
 	 */
 	@Override
-	public Instant getInstant(final String key) throws StringValueConversionException
+	public Instant getInstant(final String key)
 	{
 		return wrapped.getInstant(key);
 	}

@@ -91,7 +91,7 @@ public final class WicketNamespaceHandler extends AbstractMarkupFilter
 				final String xmlnsUrl = (String)entry.getValue();
 
 				// If Wicket relevant ...
-				if ((xmlnsUrl == null) || (xmlnsUrl.trim().length() == 0) ||
+				if ((xmlnsUrl == null) || (xmlnsUrl.trim().isEmpty()) ||
 					xmlnsUrl.startsWith(WICKET_URI))
 				{
 					// Set the Wicket namespace for wicket tags (e.g.

@@ -138,51 +138,6 @@ public abstract class Session implements IClusterable, IEventSink, IMetadataCont
 	private final Supplier<PageAccessSynchronizer> pageAccessSynchronizer;
 
 	/**
-	 * Checks existence of a <code>Session</code> associated with the current thread.
-	 * 
-	 * @return {@code true} if {@link Session#get()} can return the instance of session,
-	 *         {@code false} otherwise
-	 */
-	public static boolean exists()
-	{
-		Session session = ThreadContext.getSession();
-
-		if (session == null)
-		{
-			// no session is available via ThreadContext, so lookup in session store
-			RequestCycle requestCycle = RequestCycle.get();
-			if (requestCycle != null)
-			{
-				session = Application.get().getSessionStore().lookup(requestCycle.getRequest());
-				if (session != null)
-				{
-					ThreadContext.setSession(session);
-				}
-			}
-		}
-		return session != null;
-	}
-
-	/**
-	 * Returns session associated to current thread. Always returns a session during a request
-	 * cycle, even though the session might be temporary
-	 * 
-	 * @return session.
-	 */
-	public static Session get()
-	{
-		Session session = ThreadContext.getSession();
-		if (session != null)
-		{
-			return session;
-		}
-		else
-		{
-			return Application.get().fetchCreateAndSetSession(RequestCycle.get());
-		}
-	}
-
-	/**
 	 * Cached instance of agent info which is typically designated by calling
 	 * {@link Session#getClientInfo()}.
 	 */
@@ -243,6 +198,51 @@ public abstract class Session implements IClusterable, IEventSink, IMetadataCont
 	}
 
 	/**
+	 * Checks existence of a <code>Session</code> associated with the current thread.
+	 * 
+	 * @return {@code true} if {@link Session#get()} can return the instance of session,
+	 *         {@code false} otherwise
+	 */
+	public static boolean exists()
+	{
+		Session session = ThreadContext.getSession();
+
+		if (session == null)
+		{
+			// no session is available via ThreadContext, so lookup in session store
+			RequestCycle requestCycle = RequestCycle.get();
+			if (requestCycle != null)
+			{
+				session = Application.get().getSessionStore().lookup(requestCycle.getRequest());
+				if (session != null)
+				{
+					ThreadContext.setSession(session);
+				}
+			}
+		}
+		return session != null;
+	}
+
+	/**
+	 * Returns session associated to current thread. Always returns a session during a request
+	 * cycle, even though the session might be temporary
+	 * 
+	 * @return session.
+	 */
+	public static Session get()
+	{
+		Session session = ThreadContext.getSession();
+		if (session != null)
+		{
+			return session;
+		}
+		else
+		{
+			return Application.get().fetchCreateAndSetSession(RequestCycle.get());
+		}
+	}
+
+	/**
 	 * Force binding this session to the application's {@link ISessionStore session store} if not
 	 * already done so.
 	 * <p>
@@ -270,21 +270,17 @@ public abstract class Session implements IClusterable, IEventSink, IMetadataCont
 
 		ISessionStore store = getSessionStore();
 		Request request = RequestCycle.get().getRequest();
-		if (store.lookup(request) == null)
+		if (store.lookup(request) != null) {
+			return;
+		}
+		// explicitly create a session
+		id = store.getSessionId(request, true);
+		// bind it
+		store.bind(request, this);
+		if (temporarySessionAttributes != null)
 		{
-			// explicitly create a session
-			id = store.getSessionId(request, true);
-			// bind it
-			store.bind(request, this);
-
-			if (temporarySessionAttributes != null)
-			{
-				for (Map.Entry<String, Serializable> entry : temporarySessionAttributes.entrySet())
-				{
-					store.setAttribute(request, entry.getKey(), entry.getValue());
-				}
-				temporarySessionAttributes = null;
-			}
+			temporarySessionAttributes.entrySet().forEach(entry -> store.setAttribute(request, entry.getKey(), entry.getValue()));
+			temporarySessionAttributes = null;
 		}
 	}
 
@@ -432,7 +428,7 @@ public abstract class Session implements IClusterable, IEventSink, IMetadataCont
 	 * @see MetaDataKey
 	 */
 	@Override
-	public synchronized final <M extends Serializable> M getMetaData(final MetaDataKey<M> key)
+	public final synchronized <M extends Serializable> M getMetaData(final MetaDataKey<M> key)
 	{
 		return key.get(metaData);
 	}
@@ -503,16 +499,16 @@ public abstract class Session implements IClusterable, IEventSink, IMetadataCont
 	 */
 	private void destroy()
 	{
-		if (getSessionStore() != null)
-		{
-			sessionStore.invalidate(RequestCycle.get().getRequest());
-			sessionStore = null;
-			id = null;
-			RequestCycle.get().setMetaData(SESSION_INVALIDATED, false);
-			clientInfo = null;
-			dirty = false;
-			metaData = null;
+		if (getSessionStore() == null) {
+			return;
 		}
+		sessionStore.invalidate(RequestCycle.get().getRequest());
+		sessionStore = null;
+		id = null;
+		RequestCycle.get().setMetaData(SESSION_INVALIDATED, false);
+		clientInfo = null;
+		dirty = false;
+		metaData = null;
 	}
 
 	/**
@@ -951,7 +947,7 @@ public abstract class Session implements IClusterable, IEventSink, IMetadataCont
 	public void onInvalidate()
 	{
 	}
-	
+
 	/**
 	 * Change the id of the underlying (Web)Session if this last one is permanent.
 	 * <p>

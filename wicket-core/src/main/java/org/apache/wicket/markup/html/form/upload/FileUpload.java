@@ -71,16 +71,12 @@ public class FileUpload implements IClusterable
 	 */
 	public final void closeStreams()
 	{
-		if (inputStreamsToClose != null)
-		{
-			for (InputStream inputStream : inputStreamsToClose)
-			{
-				IOUtils.closeQuietly(inputStream);
-			}
-
-			// Reset the list
-			inputStreamsToClose = null;
+		if (inputStreamsToClose == null) {
+			return;
 		}
+		inputStreamsToClose.forEach(IOUtils::closeQuietly);
+		// Reset the list
+		inputStreamsToClose = null;
 	}
 
 	/**
@@ -135,8 +131,7 @@ public class FileUpload implements IClusterable
 			}
 			catch (IOException ex)
 			{
-				throw new WicketRuntimeException("Error while reading input data for " + algorithm +
-					" checksum", ex);
+				throw new WicketRuntimeException(new StringBuilder().append("Error while reading input data for ").append(algorithm).append(" checksum").toString(), ex);
 			}
 			finally
 			{
@@ -205,7 +200,7 @@ public class FileUpload implements IClusterable
 	{
 		if (inputStreamsToClose == null)
 		{
-			inputStreamsToClose = new ArrayList<InputStream>();
+			inputStreamsToClose = new ArrayList<>();
 		}
 
 		InputStream is = item.getInputStream();
@@ -250,7 +245,7 @@ public class FileUpload implements IClusterable
 	public final File writeToTempFile() throws Exception
 	{
 		String sessionId = Session.exists() ? Session.get().getId() : "";
-		String tempFileName = sessionId + "_" + RequestCycle.get().getStartTime();
+		String tempFileName = new StringBuilder().append(sessionId).append("_").append(RequestCycle.get().getStartTime()).toString();
 		File temp = File.createTempFile(tempFileName, Files.cleanupFilename(item.getFieldName()));
 		writeTo(temp);
 		return temp;

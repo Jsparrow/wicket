@@ -181,23 +181,13 @@ public class AjaxEditableMultiLineLabel<T> extends AjaxEditableLabel<T>
 				attributes.setMethod(Method.POST);
 				attributes.setEventNames("blur", "keyup");
 				CharSequence dynamicExtraParameters = 
-						"var result = [], " +
-								"kc=Wicket.Event.keyCode(attrs.event)," +
-								"evtType=attrs.event.type;" +
-								"if (evtType === 'keyup') {" +
-									// ESCAPE key
-									"if (kc===27) { result.push( { name: 'save', value: false } ); }" +
-								"}" +
-								"else if (evtType==='blur') { result = Wicket.Form.serializeElement(attrs.c); result.push( { name: 'save', value: true } ); }" +
-								"return result;";
+						new StringBuilder().append("var result = [], ").append("kc=Wicket.Event.keyCode(attrs.event),").append("evtType=attrs.event.type;").append("if (evtType === 'keyup') {").append(// ESCAPE key
+				"if (kc===27) { result.push( { name: 'save', value: false } ); }").append("}").append("else if (evtType==='blur') { result = Wicket.Form.serializeElement(attrs.c); result.push( { name: 'save', value: true } ); }")
+						.append("return result;").toString();
 				attributes.getDynamicExtraParameters().add(dynamicExtraParameters);
 
 				CharSequence precondition =
-						"var kc=Wicket.Event.keyCode(attrs.event),"+
-								"evtType=attrs.event.type,"+
-								"ret=false;"+
-								"if(evtType==='blur' || (evtType==='keyup' && (kc===27))) ret = true;"+
-								"return ret;";
+						new StringBuilder().append("var kc=Wicket.Event.keyCode(attrs.event),").append("evtType=attrs.event.type,").append("ret=false;").append("if(evtType==='blur' || (evtType==='keyup' && (kc===27))) ret = true;").append("return ret;").toString();
 				AjaxCallListener ajaxCallListener = new AjaxCallListener();
 				ajaxCallListener.onPrecondition(precondition);
 				attributes.getAjaxCallListeners().add(ajaxCallListener);

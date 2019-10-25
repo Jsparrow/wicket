@@ -113,7 +113,7 @@ public class AppendingStringBufferTest
 		assertEquals("123451236789", asb.toString());
 
 		asb = new AppendingStringBuffer("123456789");
-		asb.insert(5, new String("123"));
+		asb.insert(5, "123");
 		assertEquals("123451236789", asb.toString());
 
 		asb = new AppendingStringBuffer("123456789");

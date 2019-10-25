@@ -89,32 +89,27 @@ public abstract class AutoCompleteBehavior<T> extends AbstractAutoCompleteBehavi
 	@Override
 	protected final void onRequest(final String val, final RequestCycle requestCycle)
 	{
-		IRequestHandler target = new IRequestHandler()
-		{
-			@Override
-			public void respond(final IRequestCycle requestCycle)
+		IRequestHandler target = (final IRequestCycle requestCycle1) -> {
+			WebResponse r = (WebResponse)requestCycle1.getResponse();
+
+			// Determine encoding
+			final String encoding = Application.get()
+				.getRequestCycleSettings()
+				.getResponseRequestEncoding();
+
+			r.setContentType("text/xml; charset=" + encoding);
+			r.disableCaching();
+
+			Iterator<T> comps = getChoices(val);
+			int count = 0;
+			renderer.renderHeader(r);
+			while (comps.hasNext())
 			{
-				WebResponse r = (WebResponse)requestCycle.getResponse();
-
-				// Determine encoding
-				final String encoding = Application.get()
-					.getRequestCycleSettings()
-					.getResponseRequestEncoding();
-
-				r.setContentType("text/xml; charset=" + encoding);
-				r.disableCaching();
-
-				Iterator<T> comps = getChoices(val);
-				int count = 0;
-				renderer.renderHeader(r);
-				while (comps.hasNext())
-				{
-					final T comp = comps.next();
-					renderer.render(comp, r, val);
-					count += 1;
-				}
-				renderer.renderFooter(r, count);
+				final T comp = comps.next();
+				renderer.render(comp, r, val);
+				count += 1;
 			}
+			renderer.renderFooter(r, count);
 		};
 
 		requestCycle.scheduleRequestHandlerAfterCurrent(target);

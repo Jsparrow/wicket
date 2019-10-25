@@ -73,8 +73,9 @@ public class BookmarkablePageRequestHandler
 	@Override
 	public void detach(IRequestCycle requestCycle)
 	{
-		if (logData == null)
+		if (logData == null) {
 			logData = new PageLogData(pageProvider);
+		}
 	}
 
 	@Override
@@ -86,8 +87,6 @@ public class BookmarkablePageRequestHandler
 	@Override
 	public String toString()
 	{
-		return "BookmarkablePageRequestHandler{" +
-				"pageProvider=" + pageProvider +
-				'}';
+		return new StringBuilder().append("BookmarkablePageRequestHandler{").append("pageProvider=").append(pageProvider).append('}').toString();
 	}
 }

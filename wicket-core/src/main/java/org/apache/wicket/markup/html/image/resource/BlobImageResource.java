@@ -73,11 +73,7 @@ public abstract class BlobImageResource extends DynamicImageResource
 			}
 			return new byte[0];
 		}
-		catch (SQLException e)
-		{
-			throw new WicketRuntimeException("Error while reading image data", e);
-		}
-		catch (IOException e)
+		catch (IOException | SQLException e)
 		{
 			throw new WicketRuntimeException("Error while reading image data", e);
 		}

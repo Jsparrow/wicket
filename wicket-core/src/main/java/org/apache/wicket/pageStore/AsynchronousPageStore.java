@@ -108,187 +108,7 @@ public class AsynchronousPageStore extends DelegatingPageStore
 	 */
 	private static String getKey(final String sessionId, final int pageId)
 	{
-		return pageId + ":::" + sessionId;
-	}
-
-	/**
-	 * An add of a page that is pending its asynchronous execution.
-	 * <p>
-	 * Used as an isolating {@link IPageContext} for the delegation to 
-	 * {@link IPageStore#addPage(IPageContext, IManageablePage)}.
-	 */
-	private static class PendingAdd implements IPageContext
-	{
-		private final IPageContext context;
-		
-		private final IManageablePage page;
-
-		private final String sessionId;
-
-		/**
-		 * Is this context passed to an asynchronously called {@link IPageStore#addPage(IPageContext, IManageablePage)}.
-		 */
-		private boolean asynchronous = false;
-
-		/**
-		 * Cache of session attributes which may filled in {@link IPageStore#canBeAsynchronous(IPageContext)},
-		 * so these are available asynchronously later on.
-		 */
-		private final Map<String, Serializable> attributeCache = new HashMap<>();
-
-		public PendingAdd(final IPageContext context, final IManageablePage page)
-		{
-			this.context = Args.notNull(context, "context");
-			this.page = Args.notNull(page, "page");
-			
-			this.sessionId = context.getSessionId(true);
-		}
-
-		/**
-		 * 
-		 * @param entry
-		 * @return generated key
-		 */
-		private String getKey()
-		{
-			return AsynchronousPageStore.getKey(sessionId, page.getPageId());
-		}
-
-		@Override
-		public String toString()
-		{
-			return "PendingAdd [sessionId=" + sessionId + ", pageId=" + page.getPageId() + "]";
-		}
-
-		/**
-		 * Prevents access to request when called asynchronously.
-		 */
-		@Override
-		public <T> T getRequestData(MetaDataKey<T> key, Supplier<T> value)
-		{
-			if (asynchronous)
-			{
-				throw new WicketRuntimeException("request data not available asynchronuously");
-			}
-			
-			return context.getRequestData(key, value);
-		}
-
-		/**
-		 * Prevents changing of session attributes when called asynchronously.
-		 * <p>
-		 * All values accessed from {@link IPageStore#canBeAsynchronous(IPageContext)} are still
-		 * available.
-		 */
-		@SuppressWarnings("unchecked")
-		@Override
-		public <T extends Serializable> T getSessionAttribute(String key, Supplier<T> defaultValue)
-		{
-			T value;
-			
-			if (asynchronous)
-			{
-				value = (T)attributeCache.get(key);
-				if (value == null )
-				{
-					if (defaultValue.get() != null)
-					{
-						throw new WicketRuntimeException("session attribute can not be changed asynchronuously");
-					}
-				}
-			} else {
-				value = context.getSessionAttribute(key, defaultValue);
-				if (value != null)
-				{
-					attributeCache.put(key, value);
-				}
-			}
-			
-			return value;
-		}
-		
-		/**
-		 * Prevents changing of session data when called asynchronously.
-		 */
-		@Override
-		public <T extends Serializable> T getSessionData(MetaDataKey<T> key, Supplier<T> defaultValue)
-		{
-			T value;
-			
-			if (asynchronous)
-			{
-				value = context.getSessionData(key, () -> null);
-				if (value == null )
-				{
-					if (defaultValue.get() != null)
-					{
-						throw new WicketRuntimeException("session data can not be changed asynchronuously");
-					}
-				}
-			}
-			else
-			{
-				value = context.getSessionData(key, defaultValue);
-			}
-			
-			return value;
-		}
-
-		/**
-		 * Returns id of session.
-		 */
-		@Override
-		public String getSessionId(boolean bind)
-		{
-			return sessionId;
-		}
-	}
-
-	/**
-	 * The consumer of {@link PendingAdd}s.
-	 */
-	private static class PageAddingRunnable implements Runnable
-	{
-		private static final Logger log = LoggerFactory.getLogger(PageAddingRunnable.class);
-
-		private final BlockingQueue<PendingAdd> entries;
-
-		private final ConcurrentMap<String, PendingAdd> addQueue;
-
-		private final IPageStore delegate;
-
-		private PageAddingRunnable(IPageStore delegate, BlockingQueue<PendingAdd> entries,
-		                           ConcurrentMap<String, PendingAdd> entryMap)
-		{
-			this.delegate = delegate;
-			this.entries = entries;
-			this.addQueue = entryMap;
-		}
-
-		@Override
-		public void run()
-		{
-			while (!Thread.interrupted())
-			{
-				PendingAdd add = null;
-				try
-				{
-					add = entries.poll(POLL_WAIT, TimeUnit.MILLISECONDS);
-				}
-				catch (InterruptedException e)
-				{
-					Thread.currentThread().interrupt();
-				}
-
-				if (add != null)
-				{
-					log.debug("Saving asynchronously: {}...", add);
-					add.asynchronous = true;					
-					delegate.addPage(add, add.page);
-					addQueue.remove(add.getKey());
-				}
-			}
-		}
+		return new StringBuilder().append(pageId).append(":::").append(sessionId).toString();
 	}
 
 	@Override
@@ -407,5 +227,180 @@ public class AsynchronousPageStore extends DelegatingPageStore
 		}
 		
 		getDelegate().removeAllPages(context);
+	}
+
+	/**
+	 * An add of a page that is pending its asynchronous execution.
+	 * <p>
+	 * Used as an isolating {@link IPageContext} for the delegation to 
+	 * {@link IPageStore#addPage(IPageContext, IManageablePage)}.
+	 */
+	private static class PendingAdd implements IPageContext
+	{
+		private final IPageContext context;
+		
+		private final IManageablePage page;
+
+		private final String sessionId;
+
+		/**
+		 * Is this context passed to an asynchronously called {@link IPageStore#addPage(IPageContext, IManageablePage)}.
+		 */
+		private boolean asynchronous = false;
+
+		/**
+		 * Cache of session attributes which may filled in {@link IPageStore#canBeAsynchronous(IPageContext)},
+		 * so these are available asynchronously later on.
+		 */
+		private final Map<String, Serializable> attributeCache = new HashMap<>();
+
+		public PendingAdd(final IPageContext context, final IManageablePage page)
+		{
+			this.context = Args.notNull(context, "context");
+			this.page = Args.notNull(page, "page");
+			
+			this.sessionId = context.getSessionId(true);
+		}
+
+		/**
+		 * 
+		 * @param entry
+		 * @return generated key
+		 */
+		private String getKey()
+		{
+			return AsynchronousPageStore.getKey(sessionId, page.getPageId());
+		}
+
+		@Override
+		public String toString()
+		{
+			return new StringBuilder().append("PendingAdd [sessionId=").append(sessionId).append(", pageId=").append(page.getPageId()).append("]").toString();
+		}
+
+		/**
+		 * Prevents access to request when called asynchronously.
+		 */
+		@Override
+		public <T> T getRequestData(MetaDataKey<T> key, Supplier<T> value)
+		{
+			if (asynchronous)
+			{
+				throw new WicketRuntimeException("request data not available asynchronuously");
+			}
+			
+			return context.getRequestData(key, value);
+		}
+
+		/**
+		 * Prevents changing of session attributes when called asynchronously.
+		 * <p>
+		 * All values accessed from {@link IPageStore#canBeAsynchronous(IPageContext)} are still
+		 * available.
+		 */
+		@SuppressWarnings("unchecked")
+		@Override
+		public <T extends Serializable> T getSessionAttribute(String key, Supplier<T> defaultValue)
+		{
+			T value;
+			
+			if (asynchronous)
+			{
+				value = (T)attributeCache.get(key);
+				boolean condition = value == null && defaultValue.get() != null;
+				if (condition ) {
+					throw new WicketRuntimeException("session attribute can not be changed asynchronuously");
+				}
+			} else {
+				value = context.getSessionAttribute(key, defaultValue);
+				if (value != null)
+				{
+					attributeCache.put(key, value);
+				}
+			}
+			
+			return value;
+		}
+		
+		/**
+		 * Prevents changing of session data when called asynchronously.
+		 */
+		@Override
+		public <T extends Serializable> T getSessionData(MetaDataKey<T> key, Supplier<T> defaultValue)
+		{
+			T value;
+			
+			if (asynchronous)
+			{
+				value = context.getSessionData(key, () -> null);
+				boolean condition = value == null && defaultValue.get() != null;
+				if (condition ) {
+					throw new WicketRuntimeException("session data can not be changed asynchronuously");
+				}
+			}
+			else
+			{
+				value = context.getSessionData(key, defaultValue);
+			}
+			
+			return value;
+		}
+
+		/**
+		 * Returns id of session.
+		 */
+		@Override
+		public String getSessionId(boolean bind)
+		{
+			return sessionId;
+		}
+	}
+
+	/**
+	 * The consumer of {@link PendingAdd}s.
+	 */
+	private static class PageAddingRunnable implements Runnable
+	{
+		private static final Logger log = LoggerFactory.getLogger(PageAddingRunnable.class);
+
+		private final BlockingQueue<PendingAdd> entries;
+
+		private final ConcurrentMap<String, PendingAdd> addQueue;
+
+		private final IPageStore delegate;
+
+		private PageAddingRunnable(IPageStore delegate, BlockingQueue<PendingAdd> entries,
+		                           ConcurrentMap<String, PendingAdd> entryMap)
+		{
+			this.delegate = delegate;
+			this.entries = entries;
+			this.addQueue = entryMap;
+		}
+
+		@Override
+		public void run()
+		{
+			while (!Thread.interrupted())
+			{
+				PendingAdd add = null;
+				try
+				{
+					add = entries.poll(POLL_WAIT, TimeUnit.MILLISECONDS);
+				}
+				catch (InterruptedException e)
+				{
+					log.error(e.getMessage(), e);
+					Thread.currentThread().interrupt();
+				}
+
+				if (add != null)
+				{
+					log.debug("Saving asynchronously: {}...", add);
+					add.asynchronous = true;					
+					delegate.addPage(add, add.page);
+					addQueue.remove(add.getKey());
+				}
+			}
+		}
 	}
 }

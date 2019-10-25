@@ -38,7 +38,6 @@ public final class AttributeMap extends ValueMap
 	 */
 	public AttributeMap()
 	{
-		super();
 	}
 
 	/**
@@ -100,6 +99,7 @@ public final class AttributeMap extends ValueMap
 	 * 
 	 * @see Strings#escapeMarkup(CharSequence)
 	 */
+	@Override
 	public String toString()
 	{
 		return toCharSequence().toString();
@@ -114,20 +114,17 @@ public final class AttributeMap extends ValueMap
 	{
 		final AppendingStringBuffer buffer = new AppendingStringBuffer();
 
-		for (String key : keySet())
-		{
-			if (key != null) {
-				buffer.append(' ');
-				buffer.append(Strings.escapeMarkup(key));
-				
-				CharSequence value = getCharSequence(key);
-				if (value != null) {
-					buffer.append("=\"");
-					buffer.append(Strings.escapeMarkup(value));
-					buffer.append('"');
-				}
+		keySet().stream().filter(key -> key != null).map(key -> {
+			buffer.append(' ');
+			buffer.append(Strings.escapeMarkup(key));
+			return getCharSequence(key);
+		}).forEach(value -> {
+			if (value != null) {
+				buffer.append("=\"");
+				buffer.append(Strings.escapeMarkup(value));
+				buffer.append('"');
 			}
-		}
+		});
 
 		return buffer;
 	}

@@ -75,22 +75,9 @@ public class SubmitLinkPage extends WicketExamplePage
 	@Override
 	protected void explain()
 	{
-		String html = "<form wicket:id=\"form\">\n"
-			+ "<a wicket:id=\"internal\">Internal SubmitLink</a>\n" + "</form>\n"
-			+ "<a wicket:id=\"external\">External SubmitLink</a>\n";
-		String code = "&nbsp;&nbsp;&nbsp;&nbsp;public SubmitLinkPage() {\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// Add a FeedbackPanel for displaying our messages\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FeedbackPanel feedbackPanel = new FeedbackPanel(\"feedback\");\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;add(feedbackPanel);\n"
-			+ "\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// Add a form with 2 SubmitLinks that can be called\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Form form = new Form(\"form\");\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;add(form);\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SubmitLink internal = new SubmitLink(\"internal\");\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;form.add(internal);\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SubmitLink external = new SubmitLink(\"external\", form);\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;add(external);\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;});\n" + "&nbsp;&nbsp;&nbsp;&nbsp;}";
+		String html = new StringBuilder().append("<form wicket:id=\"form\">\n").append("<a wicket:id=\"internal\">Internal SubmitLink</a>\n").append("</form>\n").append("<a wicket:id=\"external\">External SubmitLink</a>\n").toString();
+		String code = new StringBuilder().append("&nbsp;&nbsp;&nbsp;&nbsp;public SubmitLinkPage() {\n").append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// Add a FeedbackPanel for displaying our messages\n").append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FeedbackPanel feedbackPanel = new FeedbackPanel(\"feedback\");\n").append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;add(feedbackPanel);\n").append("\n").append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// Add a form with 2 SubmitLinks that can be called\n").append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Form form = new Form(\"form\");\n").append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;add(form);\n")
+				.append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SubmitLink internal = new SubmitLink(\"internal\");\n").append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;form.add(internal);\n").append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SubmitLink external = new SubmitLink(\"external\", form);\n").append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;add(external);\n").append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;});\n").append("&nbsp;&nbsp;&nbsp;&nbsp;}").toString();
 		add(new ExplainPanel(html, code));
 
 	}

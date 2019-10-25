@@ -30,11 +30,6 @@ public class DetachableContactModel extends LoadableDetachableModel<Contact>
 
 	private final long id;
 
-	protected ContactsDatabase getContactsDB()
-	{
-		return DatabaseLocator.getDatabase();
-	}
-
 	/**
 	 * @param c
 	 */
@@ -53,6 +48,11 @@ public class DetachableContactModel extends LoadableDetachableModel<Contact>
 			throw new IllegalArgumentException();
 		}
 		this.id = id;
+	}
+
+	protected ContactsDatabase getContactsDB()
+	{
+		return DatabaseLocator.getDatabase();
 	}
 
 	/**

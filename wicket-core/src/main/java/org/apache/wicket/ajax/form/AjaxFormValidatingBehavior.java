@@ -110,12 +110,11 @@ public class AjaxFormValidatingBehavior extends Behavior
 	{
 		super.onConfigure(component);
 
-		if (hasBeenRendered == false)
-		{
-			hasBeenRendered = true;
-
-			form.visitChildren(FormComponent.class, new FormValidateVisitor());
+		if (hasBeenRendered != false) {
+			return;
 		}
+		hasBeenRendered = true;
+		form.visitChildren(FormComponent.class, new FormValidateVisitor());
 	}
 
 	protected void onSubmit(final AjaxRequestTarget target)
@@ -139,20 +138,15 @@ public class AjaxFormValidatingBehavior extends Behavior
 	 */
 	protected final void addFeedbackPanels(final AjaxRequestTarget target)
 	{
-		form.getPage().visitChildren(IFeedback.class, new IVisitor<Component, Void>()
-		{
-			@Override
-			public void component(final Component component, final IVisit<Void> visit)
+		form.getPage().visitChildren(IFeedback.class, (final Component component, final IVisit<Void> visit) -> {
+			component.configure(); // feedback component might change its visibility
+			if (component.isVisibleInHierarchy())
 			{
-				component.configure(); // feedback component might change its visibility
-				if (component.isVisibleInHierarchy())
-				{
-					target.add(component);
-				}
-				else
-				{
-					visit.dontGoDeeper();
-				}
+				target.add(component);
+			}
+			else
+			{
+				visit.dontGoDeeper();
 			}
 		});
 	}

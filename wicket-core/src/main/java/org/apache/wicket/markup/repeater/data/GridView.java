@@ -167,42 +167,40 @@ public abstract class GridView<T> extends DataViewBase<T>
 	@Override
 	protected void addItems(Iterator<Item<T>> items)
 	{
-		if (items.hasNext())
-		{
-			final int cols = getColumns();
-
-			int row = 0;
-
-			do
-			{
-				// Build a row
-				Item<?> rowItem = newRowItem(newChildId(), row);
-				RepeatingView rowView = new RepeatingView("cols");
-				rowItem.add(rowView);
-				add(rowItem);
-
-				// Populate the row
-				for (int index = 0; index < cols; index++)
-				{
-					final Item<T> cellItem;
-					if (items.hasNext())
-					{
-						cellItem = items.next();
-					}
-					else
-					{
-						cellItem = newEmptyItem(newChildId(), index);
-						populateEmptyItem(cellItem);
-					}
-					rowView.add(cellItem);
-				}
-
-				// increase row
-				row++;
-
-			}
-			while (items.hasNext());
+		if (!items.hasNext()) {
+			return;
 		}
+		final int cols = getColumns();
+		int row = 0;
+		do
+		{
+			// Build a row
+			Item<?> rowItem = newRowItem(newChildId(), row);
+			RepeatingView rowView = new RepeatingView("cols");
+			rowItem.add(rowView);
+			add(rowItem);
+
+			// Populate the row
+			for (int index = 0; index < cols; index++)
+			{
+				final Item<T> cellItem;
+				if (items.hasNext())
+				{
+					cellItem = items.next();
+				}
+				else
+				{
+					cellItem = newEmptyItem(newChildId(), index);
+					populateEmptyItem(cellItem);
+				}
+				rowView.add(cellItem);
+			}
+
+			// increase row
+			row++;
+
+		}
+		while (items.hasNext());
 
 	}
 
@@ -230,7 +228,7 @@ public abstract class GridView<T> extends DataViewBase<T>
 	 * @param item
 	 *            Item object
 	 */
-	abstract protected void populateEmptyItem(Item<T> item);
+	protected abstract void populateEmptyItem(Item<T> item);
 
 	/**
 	 * Create a Item which represents an empty cell (there is no model for it in the DataProvider)
@@ -241,7 +239,7 @@ public abstract class GridView<T> extends DataViewBase<T>
 	 */
 	protected Item<T> newEmptyItem(String id, int index)
 	{
-		return new Item<T>(id, index, null);
+		return new Item<>(id, index, null);
 	}
 
 	/**

@@ -113,13 +113,11 @@ public class TransparentWebMarkupContainer extends WebMarkupContainer implements
 	{
 		Request request = RequestCycle.get().getRequest();
 
-		if (request instanceof WebRequest)
-		{
-			WebRequest webRequest = (WebRequest)request;
-			return webRequest.isAjax();
+		if (!(request instanceof WebRequest)) {
+			return false;
 		}
-
-		return false;
+		WebRequest webRequest = (WebRequest)request;
+		return webRequest.isAjax();
 	}
 
 	/**

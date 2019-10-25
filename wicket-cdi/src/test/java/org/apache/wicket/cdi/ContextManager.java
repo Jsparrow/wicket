@@ -28,6 +28,8 @@ import org.jboss.weld.module.web.servlet.HttpContextLifecycle;
 import org.jboss.weld.servlet.spi.helpers.AcceptingHttpContextActivationFilter;
 import org.jglue.cdiunit.internal.CdiUnitInitialListenerImpl;
 import org.jglue.cdiunit.internal.servlet.LifecycleAwareRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jsarman
@@ -35,6 +37,8 @@ import org.jglue.cdiunit.internal.servlet.LifecycleAwareRequest;
 @ApplicationScoped
 public class ContextManager
 {
+	private static final Logger logger = LoggerFactory.getLogger(ContextManager.class);
+
 	private HttpServletRequest currentRequest;
 
 	@Inject
@@ -54,6 +58,7 @@ public class ContextManager
 		}
 		catch (NoSuchMethodError e)
 		{
+			logger.error(e.getMessage(), e);
 			try
 			{
 				lifecycle = HttpContextLifecycle.class.getConstructor(BeanManager.class,
@@ -71,8 +76,9 @@ public class ContextManager
 
 	public void activateContexts(HttpServletRequest request)
 	{
-		if (currentRequest != null)
+		if (currentRequest != null) {
 			return;
+		}
 
 		currentRequest = new LifecycleAwareRequest(new CdiUnitInitialListenerImpl(), request);
 		lifecycle.requestInitialized(currentRequest, null);
@@ -92,11 +98,11 @@ public class ContextManager
 			currentSession = currentRequest.getSession(false);
 		}
 
-		if (currentSession != null)
-		{
-			lifecycle.sessionDestroyed(currentSession);
-			currentSession = null;
+		if (currentSession == null) {
+			return;
 		}
+		lifecycle.sessionDestroyed(currentSession);
+		currentSession = null;
 	}
 
 	public boolean isRequestActive()

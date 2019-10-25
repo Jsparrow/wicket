@@ -39,11 +39,11 @@ public class VideosApplication extends WicketExampleApplication
 	protected void init()
 	{
 		IPackageResourceGuard packageResourceGuard = getResourceSettings().getPackageResourceGuard();
-		if (packageResourceGuard instanceof SecurePackageResourceGuard)
-		{
-			SecurePackageResourceGuard guard = (SecurePackageResourceGuard)packageResourceGuard;
-			guard.addPattern("+*.mp4");
+		if (!(packageResourceGuard instanceof SecurePackageResourceGuard)) {
+			return;
 		}
+		SecurePackageResourceGuard guard = (SecurePackageResourceGuard)packageResourceGuard;
+		guard.addPattern("+*.mp4");
 	}
 
 }

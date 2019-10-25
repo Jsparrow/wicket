@@ -69,10 +69,7 @@ public class HeadersToolbar<S> extends AbstractToolbar
 			{
 				List<IModel<IColumn<T, S>>> columnsModels = new LinkedList<>();
 
-				for (IColumn<T, S> column : table.getColumns())
-				{
-					columnsModels.add(Model.of(column));
-				}
+				table.getColumns().forEach(column -> columnsModels.add(Model.of(column)));
 
 				return columnsModels.iterator();
 			}

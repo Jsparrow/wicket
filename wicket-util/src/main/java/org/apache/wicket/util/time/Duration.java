@@ -24,6 +24,7 @@ import org.apache.wicket.util.string.StringValue;
 import org.apache.wicket.util.string.StringValueConversionException;
 import org.apache.wicket.util.thread.ICode;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -92,6 +93,8 @@ import org.slf4j.Logger;
 @Deprecated
 public class Duration extends AbstractTimeValue
 {
+	private static final Logger logger = LoggerFactory.getLogger(Duration.class);
+
 	private static final long serialVersionUID = 1L;
 
 	/** Constant for maximum duration. */
@@ -118,6 +121,17 @@ public class Duration extends AbstractTimeValue
 	/** pattern to match strings */
 	private static final Pattern pattern = Pattern.compile(
 		"([0-9]+([.,][0-9]+)?)\\s+(millisecond|second|minute|hour|day)s?", Pattern.CASE_INSENSITIVE);
+
+	/**
+	 * Private constructor forces use of static factory methods.
+	 * 
+	 * @param milliseconds
+	 *            number of milliseconds in this <code>Duration</code>
+	 */
+	protected Duration(final long milliseconds)
+	{
+		super(milliseconds);
+	}
 
 	/**
 	 * Benchmark the given command.
@@ -315,7 +329,7 @@ public class Duration extends AbstractTimeValue
 	 * @return the <code>Duration</code> value of the given <code>String</code>
 	 * @throws StringValueConversionException
 	 */
-	public static Duration valueOf(final String string) throws StringValueConversionException
+	public static Duration valueOf(final String string)
 	{
 		return valueOf(string, Locale.getDefault(Locale.Category.FORMAT));
 	}
@@ -333,7 +347,6 @@ public class Duration extends AbstractTimeValue
 	 * @throws StringValueConversionException
 	 */
 	public static Duration valueOf(final String string, final Locale locale)
-		throws StringValueConversionException
 	{
 		final Matcher matcher = pattern.matcher(string);
 
@@ -342,23 +355,23 @@ public class Duration extends AbstractTimeValue
 			final double value = StringValue.valueOf(matcher.group(1), locale).toDouble();
 			final String units = matcher.group(3);
 
-			if (units.equalsIgnoreCase("millisecond"))
+			if ("millisecond".equalsIgnoreCase(units))
 			{
 				return milliseconds(value);
 			}
-			else if (units.equalsIgnoreCase("second"))
+			else if ("second".equalsIgnoreCase(units))
 			{
 				return seconds(value);
 			}
-			else if (units.equalsIgnoreCase("minute"))
+			else if ("minute".equalsIgnoreCase(units))
 			{
 				return minutes(value);
 			}
-			else if (units.equalsIgnoreCase("hour"))
+			else if ("hour".equalsIgnoreCase(units))
 			{
 				return hours(value);
 			}
-			else if (units.equalsIgnoreCase("day"))
+			else if ("day".equalsIgnoreCase(units))
 			{
 				return days(value);
 			}
@@ -371,17 +384,6 @@ public class Duration extends AbstractTimeValue
 		{
 			throw new StringValueConversionException("Unable to parse duration: " + string);
 		}
-	}
-
-	/**
-	 * Private constructor forces use of static factory methods.
-	 * 
-	 * @param milliseconds
-	 *            number of milliseconds in this <code>Duration</code>
-	 */
-	protected Duration(final long milliseconds)
-	{
-		super(milliseconds);
 	}
 
 	/**
@@ -449,6 +451,7 @@ public class Duration extends AbstractTimeValue
 			}
 			catch (InterruptedException e)
 			{
+				logger.error(e.getMessage(), e);
 				// Ignored
 			}
 		}
@@ -507,34 +510,26 @@ public class Duration extends AbstractTimeValue
 	 */
 	public String toString(final Locale locale)
 	{
-		if (getMilliseconds() >= 0)
-		{
-			if (days() >= 1.0)
-			{
-				return unitString(days(), "day", locale);
-			}
-
-			if (hours() >= 1.0)
-			{
-				return unitString(hours(), "hour", locale);
-			}
-
-			if (minutes() >= 1.0)
-			{
-				return unitString(minutes(), "minute", locale);
-			}
-
-			if (seconds() >= 1.0)
-			{
-				return unitString(seconds(), "second", locale);
-			}
-
-			return unitString(getMilliseconds(), "millisecond", locale);
-		}
-		else
-		{
+		if (getMilliseconds() < 0) {
 			return "N/A";
 		}
+		if (days() >= 1.0)
+		{
+			return unitString(days(), "day", locale);
+		}
+		if (hours() >= 1.0)
+		{
+			return unitString(hours(), "hour", locale);
+		}
+		if (minutes() >= 1.0)
+		{
+			return unitString(minutes(), "minute", locale);
+		}
+		if (seconds() >= 1.0)
+		{
+			return unitString(seconds(), "second", locale);
+		}
+		return unitString(getMilliseconds(), "millisecond", locale);
 	}
 
 	/**
@@ -560,6 +555,6 @@ public class Duration extends AbstractTimeValue
 	 */
 	private String unitString(final double value, final String units, final Locale locale)
 	{
-		return StringValue.valueOf(value, locale) + " " + units + ((value > 1.0) ? "s" : "");
+		return new StringBuilder().append(StringValue.valueOf(value, locale)).append(" ").append(units).append((value > 1.0) ? "s" : "").toString();
 	}
 }

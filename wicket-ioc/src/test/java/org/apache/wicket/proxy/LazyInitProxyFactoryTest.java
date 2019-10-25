@@ -69,7 +69,7 @@ public class LazyInitProxyFactoryTest
 		}
 	};
 
-	private final static IProxyTargetLocator PACKAGE_PRIVATE_CONCRETE_OBJECT_LOCATOR = new IProxyTargetLocator()
+	private static final IProxyTargetLocator PACKAGE_PRIVATE_CONCRETE_OBJECT_LOCATOR = new IProxyTargetLocator()
 	{
 		private static final long serialVersionUID = 1L;
 

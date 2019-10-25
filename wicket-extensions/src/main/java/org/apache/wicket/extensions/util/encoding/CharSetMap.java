@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class maintains a set of mappers defining mappings between locales and the corresponding
@@ -41,6 +43,8 @@ import java.util.Properties;
  */
 public final class CharSetMap
 {
+	private static final Logger logger = LoggerFactory.getLogger(CharSetMap.class);
+
 	/**
 	 * The default charset when nothing else is applicable.
 	 */
@@ -121,92 +125,6 @@ public final class CharSetMap
 	}
 
 	/**
-	 * Loads mappings from a stream.
-	 * 
-	 * @param input
-	 *            an input stream.
-	 * @return the mappings.
-	 * @throws IOException
-	 *             for an incorrect stream.
-	 */
-	protected static Map<String, String> loadStream(final InputStream input)
-		throws IOException
-	{
-		return createMap(input);
-	}
-
-	private static Map<String, String> createMap(final InputStream input) throws IOException
-	{
-		final Properties props = new Properties();
-		props.load(input);
-		return createMap(props);
-	}
-
-	private static Map<String, String> createMap(final Properties props)
-	{
-		HashMap<String, String> map = new HashMap<>();
-		for (Object key : props.keySet())
-		{
-			String keyString = (String)key;
-			map.put(keyString, props.getProperty(keyString));
-		}
-		return map;
-	}
-
-	/**
-	 * Loads mappings from a file.
-	 * 
-	 * @param file
-	 *            a file.
-	 * @return the mappings.
-	 * @throws IOException
-	 *             for an incorrect file.
-	 */
-	protected static Map<String, String> loadFile(final File file) throws IOException
-	{
-		return loadStream(new FileInputStream(file));
-	}
-
-	/**
-	 * Loads mappings from a file path.
-	 * 
-	 * @param path
-	 *            a file path.
-	 * @return the mappings.
-	 * @throws IOException
-	 *             for an incorrect file.
-	 */
-	protected static Map<String, String> loadPath(final String path) throws IOException
-	{
-		return loadFile(new File(path));
-	}
-
-	/**
-	 * Loads mappings from a resource.
-	 * 
-	 * @param name
-	 *            a resource name.
-	 * @return the mappings.
-	 */
-	protected static Map<String, String> loadResource(final String name)
-	{
-		final InputStream input = CharSetMap.class.getResourceAsStream(name);
-		if (input != null)
-		{
-			try
-			{
-				return loadStream(input);
-			}
-			catch (IOException ex)
-			{
-				return null;
-			}
-		}
-
-		return null;
-	}
-
-	/**
 	 * Constructs a new charset map with default mappers.
 	 */
 	public CharSetMap()
@@ -218,25 +136,27 @@ public final class CharSetMap
 			path = System.getProperty("user.home");
 			if (path != null)
 			{
-				path = path + File.separator + CHARSET_RESOURCE;
+				path = new StringBuilder().append(path).append(File.separator).append(CHARSET_RESOURCE).toString();
 				mappers.add(MAP_HOME, loadPath(path));
 			}
 		}
 		catch (Exception ex)
 		{
+			logger.error(ex.getMessage(), ex);
 			// ignore
 		}
 
 		try
 		{
 			// Check whether the system directory contains mappings.
-			path = System.getProperty("java.home") + File.separator + "lib" + File.separator +
-				CHARSET_RESOURCE;
+			path = new StringBuilder().append(System.getProperty("java.home")).append(File.separator).append("lib").append(File.separator)
+					.append(CHARSET_RESOURCE).toString();
 
 			mappers.add(MAP_SYS, loadPath(path));
 		}
 		catch (Exception ex)
 		{
+			logger.error(ex.getMessage(), ex);
 			// ignore
 		}
 
@@ -247,7 +167,7 @@ public final class CharSetMap
 		mappers.add(MAP_COM, commonMapper);
 
 		// Set the cache mapper to have the highest priority.
-		mappers.add(MAP_CACHE, new Hashtable<String, String>());
+		mappers.add(MAP_CACHE, new Hashtable<>());
 	}
 
 	/**
@@ -305,6 +225,89 @@ public final class CharSetMap
 	}
 
 	/**
+	 * Loads mappings from a stream.
+	 * 
+	 * @param input
+	 *            an input stream.
+	 * @return the mappings.
+	 * @throws IOException
+	 *             for an incorrect stream.
+	 */
+	protected static Map<String, String> loadStream(final InputStream input)
+		throws IOException
+	{
+		return createMap(input);
+	}
+
+	private static Map<String, String> createMap(final InputStream input) throws IOException
+	{
+		final Properties props = new Properties();
+		props.load(input);
+		return createMap(props);
+	}
+
+	private static Map<String, String> createMap(final Properties props)
+	{
+		HashMap<String, String> map = new HashMap<>();
+		props.keySet().stream().map(key -> (String)key).forEach(keyString -> map.put(keyString, props.getProperty(keyString)));
+		return map;
+	}
+
+	/**
+	 * Loads mappings from a file.
+	 * 
+	 * @param file
+	 *            a file.
+	 * @return the mappings.
+	 * @throws IOException
+	 *             for an incorrect file.
+	 */
+	protected static Map<String, String> loadFile(final File file) throws IOException
+	{
+		return loadStream(new FileInputStream(file));
+	}
+
+	/**
+	 * Loads mappings from a file path.
+	 * 
+	 * @param path
+	 *            a file path.
+	 * @return the mappings.
+	 * @throws IOException
+	 *             for an incorrect file.
+	 */
+	protected static Map<String, String> loadPath(final String path) throws IOException
+	{
+		return loadFile(new File(path));
+	}
+
+	/**
+	 * Loads mappings from a resource.
+	 * 
+	 * @param name
+	 *            a resource name.
+	 * @return the mappings.
+	 */
+	protected static Map<String, String> loadResource(final String name)
+	{
+		final InputStream input = CharSetMap.class.getResourceAsStream(name);
+		if (input != null)
+		{
+			try
+			{
+				return loadStream(input);
+			}
+			catch (IOException ex)
+			{
+				logger.error(ex.getMessage(), ex);
+				return null;
+			}
+		}
+
+		return null;
+	}
+
+	/**
 	 * Sets a locale-charset mapping.
 	 * 
 	 * @param key
@@ -342,7 +345,7 @@ public final class CharSetMap
 	{
 		// Check the cache first.
 		String key = locale.toString();
-		if (key.length() == 0)
+		if (key.isEmpty())
 		{
 			key = "__" + locale.getVariant();
 			if (key.length() == 2)
@@ -352,7 +355,7 @@ public final class CharSetMap
 		}
 
 		String charset = searchCharSet(key);
-		if (charset.length() == 0)
+		if (charset.isEmpty())
 		{
 			// Not found, perform a full search and update the cache.
 			String[] items = new String[3];
@@ -361,7 +364,7 @@ public final class CharSetMap
 			items[0] = locale.getLanguage();
 
 			charset = searchCharSet(items);
-			if (charset.length() == 0)
+			if (charset.isEmpty())
 			{
 				charset = DEFAULT_CHARSET;
 			}
@@ -388,53 +391,49 @@ public final class CharSetMap
 	public final String getCharSet(final Locale locale, final String variant)
 	{
 		// Check the cache first.
-		if ((variant != null) && (variant.length() > 0))
+		if (!((variant != null) && (variant.length() > 0))) {
+			return getCharSet(locale);
+		}
+		String key = locale.toString();
+		if (key.isEmpty())
 		{
-			String key = locale.toString();
-			if (key.length() == 0)
-			{
-				key = "__" + locale.getVariant();
-				if (key.length() > 2)
-				{
-					key += '_' + variant;
-				}
-				else
-				{
-					key += variant;
-				}
-			}
-			else if (locale.getCountry().length() == 0)
-			{
-				key += "__" + variant;
-			}
-			else
+			key = "__" + locale.getVariant();
+			if (key.length() > 2)
 			{
 				key += '_' + variant;
 			}
-
-			String charset = searchCharSet(key);
-			if (charset.length() == 0)
+			else
 			{
-				// Not found, perform a full search and update the cache.
-				String[] items = new String[4];
-				items[3] = variant;
-				items[2] = locale.getVariant();
-				items[1] = locale.getCountry();
-				items[0] = locale.getLanguage();
+				key += variant;
+			}
+		}
+		else if (locale.getCountry().isEmpty())
+		{
+			key += "__" + variant;
+		}
+		else
+		{
+			key += '_' + variant;
+		}
+		String charset = searchCharSet(key);
+		if (charset.isEmpty())
+		{
+			// Not found, perform a full search and update the cache.
+			String[] items = new String[4];
+			items[3] = variant;
+			items[2] = locale.getVariant();
+			items[1] = locale.getCountry();
+			items[0] = locale.getLanguage();
 
-				charset = searchCharSet(items);
-				if (charset.length() == 0)
-				{
-					charset = DEFAULT_CHARSET;
-				}
-
-				mappers.get(MAP_CACHE).put(key, charset);
+			charset = searchCharSet(items);
+			if (charset.isEmpty())
+			{
+				charset = DEFAULT_CHARSET;
 			}
 
-			return charset;
+			mappers.get(MAP_CACHE).put(key, charset);
 		}
-
-		return getCharSet(locale);
+		return charset;
 	}
 
 	/**
@@ -503,33 +502,29 @@ public final class CharSetMap
 	 */
 	private final String searchCharSet(final String[] items, final StringBuilder base, int count)
 	{
-		if ((--count >= 0) && (items[count] != null) && (items[count].length() > 0))
+		if (!((--count >= 0) && (items[count] != null) && (items[count].length() > 0))) {
+			return "";
+		}
+		String charset;
+		base.insert(0, items[count]);
+		int length = base.length();
+		for (int i = count; i > 0; i--)
 		{
-			String charset;
-			base.insert(0, items[count]);
-			int length = base.length();
-
-			for (int i = count; i > 0; i--)
+			if ((i == count) || (i <= 1))
 			{
-				if ((i == count) || (i <= 1))
-				{
-					base.insert(0, '_');
-					length++;
-				}
-
-				charset = searchCharSet(items, base, i);
-				if (charset.length() > 0)
-				{
-					return charset;
-				}
-
-				base.delete(0, base.length() - length);
+				base.insert(0, '_');
+				length++;
 			}
 
-			return searchCharSet(base.toString());
-		}
+			charset = searchCharSet(items, base, i);
+			if (charset.length() > 0)
+			{
+				return charset;
+			}
 
-		return "";
+			base.delete(0, base.length() - length);
+		}
+		return searchCharSet(base.toString());
 	}
 
 	/**

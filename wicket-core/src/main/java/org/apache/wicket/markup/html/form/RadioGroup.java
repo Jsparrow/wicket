@@ -74,15 +74,10 @@ public class RadioGroup<T> extends FormComponent<T>
 	@Override
 	protected String getModelValue()
 	{
-		String radioValue = visitChildren(Radio.class, new IVisitor<Radio<T>, String>()
-		{
-			@Override
-			public void component(Radio<T> radio, IVisit<String> visit)
+		String radioValue = visitChildren(Radio.class, (Radio<T> radio, IVisit<String> visit) -> {
+			if (getModelComparator().compare(RadioGroup.this, radio.getDefaultModelObject()))
 			{
-				if (getModelComparator().compare(RadioGroup.this, radio.getDefaultModelObject()))
-				{
-					visit.stop(radio.getValue());
-				}
+				visit.stop(radio.getValue());
 			}
 		});
 
@@ -93,44 +88,28 @@ public class RadioGroup<T> extends FormComponent<T>
 	 * @see org.apache.wicket.markup.html.form.FormComponent#convertValue(String[])
 	 */
 	@Override
-	protected T convertValue(String[] input) throws ConversionException
+	protected T convertValue(String[] input)
 	{
-		if (input != null && input.length > 0)
-		{
-			final String value = input[0];
-
-			// retrieve the selected single radio choice component
-			Radio<T> choice = visitChildren(Radio.class,
-				new org.apache.wicket.util.visit.IVisitor<Radio<T>, Radio<T>>()
-				{
-
-					@Override
-					public void component(final Radio<T> radio, final IVisit<Radio<T>> visit)
-					{
-						if (radio.getValue().equals(value))
-						{
-							visit.stop(radio);
-						}
-					}
-
-				});
-
-			if (choice == null)
-			{
-				throw new WicketRuntimeException(
-					"submitted http post value [" +
-						value +
-						"] for RadioGroup component [" +
-						getPath() +
-						"] is illegal because it does not point to a Radio component. " +
-						"Due to this the RadioGroup component cannot resolve the selected Radio component pointed to by the illegal value. A possible reason is that component hierarchy changed between rendering and form submission.");
-			}
-
-
-			// assign the value of the group's model
-			return choice.getModelObject();
+		if (!(input != null && input.length > 0)) {
+			return null;
 		}
-		return null;
+		final String value = input[0];
+		// retrieve the selected single radio choice component
+		Radio<T> choice = visitChildren(Radio.class,
+			(final Radio<T> radio, final IVisit<Radio<T>> visit) -> {
+				if (radio.getValue().equals(value))
+				{
+					visit.stop(radio);
+				}
+			});
+		if (choice == null)
+		{
+			throw new WicketRuntimeException(
+				new StringBuilder().append("submitted http post value [").append(value).append("] for RadioGroup component [").append(getPath()).append("] is illegal because it does not point to a Radio component. ").append("Due to this the RadioGroup component cannot resolve the selected Radio component pointed to by the illegal value. A possible reason is that component hierarchy changed between rendering and form submission.")
+						.toString());
+		}
+		// assign the value of the group's model
+		return choice.getModelObject();
 	}
 
 	/**

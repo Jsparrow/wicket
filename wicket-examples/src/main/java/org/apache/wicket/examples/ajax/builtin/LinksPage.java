@@ -32,6 +32,8 @@ import org.apache.wicket.extensions.ajax.markup.html.IndicatingAjaxLink;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.settings.ExceptionSettings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -41,33 +43,10 @@ import org.apache.wicket.settings.ExceptionSettings;
  */
 public class LinksPage extends BasePage
 {
+	private static final Logger logger = LoggerFactory.getLogger(LinksPage.class);
 	private int counter1 = 0;
 	private int counter2 = 0;
 	private int counter3 = 0;
-
-	/**
-	 * @return Value of counter1
-	 */
-	public int getCounter1()
-	{
-		return counter1;
-	}
-
-	/**
-	 * @return Value for counter2
-	 */
-	public int getCounter2()
-	{
-		return counter2;
-	}
-
-	/**
-	 * @return Value of counter3
-	 */
-	public int getCounter3()
-	{
-		return counter3;
-	}
 
 	/**
 	 * Constructor
@@ -120,6 +99,7 @@ public class LinksPage extends BasePage
 			}
 			catch (InterruptedException e)
 			{
+				logger.error(e.getMessage(), e);
 				// noop
 			}
 		}));
@@ -224,5 +204,29 @@ public class LinksPage extends BasePage
 				throw new RuntimeException("test whether the exception handling works");
 			}
 		});
+	}
+
+	/**
+	 * @return Value of counter1
+	 */
+	public int getCounter1()
+	{
+		return counter1;
+	}
+
+	/**
+	 * @return Value for counter2
+	 */
+	public int getCounter2()
+	{
+		return counter2;
+	}
+
+	/**
+	 * @return Value of counter3
+	 */
+	public int getCounter3()
+	{
+		return counter3;
 	}
 }

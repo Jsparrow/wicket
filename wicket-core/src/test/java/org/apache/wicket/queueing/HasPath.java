@@ -31,6 +31,7 @@ class HasPath extends TypeSafeMatcher<Component>
 		this.path = path;
 	}
 
+	@Override
 	public void describeTo(Description description)
 	{
 		description.appendText("path ").appendText(toString(path, 0, path.size()));
@@ -85,13 +86,12 @@ class HasPath extends TypeSafeMatcher<Component>
 			cursor = ((MarkupContainer)cursor).get(path.get(i).getId());
 			if (cursor == null)
 			{
-				error = "next child with id: '" + path.get(i).getId() + "' not found";
+				error = new StringBuilder().append("next child with id: '").append(path.get(i).getId()).append("' not found").toString();
 				break;
 			}
 			if (!path.get(i).getType().isAssignableFrom(cursor.getClass()))
 			{
-				error = "expected next child of type: " + path.get(i).getType().getSimpleName() +
-					", but found: " + toString(cursor);
+				error = new StringBuilder().append("expected next child of type: ").append(path.get(i).getType().getSimpleName()).append(", but found: ").append(toString(cursor)).toString();
 				break;
 			}
 		}
@@ -108,7 +108,7 @@ class HasPath extends TypeSafeMatcher<Component>
 
 	private static String toString(Class<?> type, String id)
 	{
-		return type.getSimpleName() + "('" + id + "')";
+		return new StringBuilder().append(type.getSimpleName()).append("('").append(id).append("')").toString();
 	}
 
 	private static String toString(Path path, int start, int end)

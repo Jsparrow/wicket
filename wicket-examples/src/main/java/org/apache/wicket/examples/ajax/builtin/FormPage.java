@@ -130,7 +130,8 @@ public class FormPage extends BasePage
 	/** simple java bean. */
 	public static class Bean implements IClusterable
 	{
-		private String name, email;
+		private String name;
+		private String email;
 
 		/**
 		 * Gets email.

@@ -39,7 +39,7 @@ public class CompoundClassResolver implements IClassResolver
 {
 	private static final Logger logger = LoggerFactory.getLogger(CompoundClassResolver.class);
 
-	private final List<IClassResolver> resolvers = new CopyOnWriteArrayList<IClassResolver>();
+	private final List<IClassResolver> resolvers = new CopyOnWriteArrayList<>();
 
 	/**
 	 * {@inheritDoc}
@@ -66,6 +66,7 @@ public class CompoundClassResolver implements IClassResolver
 			}
 			catch (ClassNotFoundException cnfx)
 			{
+				logger.error(cnfx.getMessage(), cnfx);
 				if (debugEnabled)
 				{
 					logger.debug("ClassResolver '{}' cannot find class: '{}'", resolver.getClass()
@@ -93,17 +94,15 @@ public class CompoundClassResolver implements IClassResolver
 	{
 		Args.notNull(name, "name");
 
-		Set<URL> urls = new TreeSet<URL>(new UrlExternalFormComparator());
+		Set<URL> urls = new TreeSet<>(new UrlExternalFormComparator());
 
-		for (IClassResolver resolver : resolvers)
-		{
-			Iterator<URL> it = resolver.getResources(name);
+		resolvers.stream().map(resolver -> resolver.getResources(name)).forEach(it -> {
 			while (it.hasNext())
 			{
 				URL url = it.next();
 				urls.add(url);
 			}
-		}
+		});
 
 		return urls.iterator();
 	}

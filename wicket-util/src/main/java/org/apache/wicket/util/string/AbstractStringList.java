@@ -196,6 +196,6 @@ public abstract class AbstractStringList implements IStringSequence, Serializabl
 	@Override
 	public String toString()
 	{
-		return "[" + join() + "]";
+		return new StringBuilder().append("[").append(join()).append("]").toString();
 	}
 }

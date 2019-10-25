@@ -114,16 +114,6 @@ public class WebSocketPushBroadcaster
 	{
 		WebSocketSettings webSocketSettings = WebSocketSettings.Holder.get(application);
 		Executor executor = webSocketSettings.getWebSocketPushMessageExecutor();
-		for (final IWebSocketConnection wsConnection : wsConnections)
-		{
-			executor.run(new Runnable()
-			{
-				@Override
-				public void run()
-				{
-					wsConnection.sendMessage(message);
-				}
-			});
-		}
+		wsConnections.forEach((final IWebSocketConnection wsConnection) -> executor.run(() -> wsConnection.sendMessage(message)));
 	}
 }

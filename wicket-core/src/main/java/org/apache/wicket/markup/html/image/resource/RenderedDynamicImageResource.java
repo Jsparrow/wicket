@@ -161,7 +161,7 @@ public abstract class RenderedDynamicImageResource extends DynamicImageResource
 		if (data == null)
 		{
 			data = render(attributes);
-			imageData = new SoftReference<byte[]>(data);
+			imageData = new SoftReference<>(data);
 			setLastModifiedTime(Instant.now());
 		}
 		return data;

@@ -77,7 +77,7 @@ public class CompoundPropertyModel<T> extends ChainingModel<T> implements ICompo
 	@Override
 	public <C> IWrapModel<C> wrapOnInheritance(Component component)
 	{
-		return new AttachedCompoundPropertyModel<C>(component);
+		return new AttachedCompoundPropertyModel<>(component);
 	}
 
 	/**
@@ -94,6 +94,34 @@ public class CompoundPropertyModel<T> extends ChainingModel<T> implements ICompo
 	public <S> IModel<S> bind(String property)
 	{
 		return new PropertyModel<>(this, property);
+	}
+
+	/**
+	 * Type-infering factory method
+	 * 
+	 * @param <Z>
+	 *     the type of the model's object
+	 * @param model
+	 *            model
+	 * @return {@link CompoundPropertyModel} instance
+	 */
+	public static <Z> CompoundPropertyModel<Z> of(IModel<Z> model)
+	{
+		return new CompoundPropertyModel<>(model);
+	}
+
+	/**
+	 * Type-infering factory method
+	 * 
+	 * @param <Z>
+	 *     the type of the model's object
+	 * @param object
+	 *            model object
+	 * @return {@link CompoundPropertyModel} instance
+	 */
+	public static <Z extends Serializable> CompoundPropertyModel<Z> of(Z object)
+	{
+		return new CompoundPropertyModel<>(object);
 	}
 
 	/**
@@ -142,33 +170,5 @@ public class CompoundPropertyModel<T> extends ChainingModel<T> implements ICompo
 			super.detach();
 			CompoundPropertyModel.this.detach();
 		}
-	}
-
-	/**
-	 * Type-infering factory method
-	 * 
-	 * @param <Z>
-	 *     the type of the model's object
-	 * @param model
-	 *            model
-	 * @return {@link CompoundPropertyModel} instance
-	 */
-	public static <Z> CompoundPropertyModel<Z> of(IModel<Z> model)
-	{
-		return new CompoundPropertyModel<>(model);
-	}
-
-	/**
-	 * Type-infering factory method
-	 * 
-	 * @param <Z>
-	 *     the type of the model's object
-	 * @param object
-	 *            model object
-	 * @return {@link CompoundPropertyModel} instance
-	 */
-	public static <Z extends Serializable> CompoundPropertyModel<Z> of(Z object)
-	{
-		return new CompoundPropertyModel<>(object);
 	}
 }

@@ -188,7 +188,7 @@ public class MockHttpSession implements HttpSession, Serializable
 	@Override
 	public void invalidate()
 	{
-		Session session = (Session) attributes.get("wicket:" + BaseWicketTester.TestFilterConfig.class.getName() + ":session");
+		Session session = (Session) attributes.get(new StringBuilder().append("wicket:").append(BaseWicketTester.TestFilterConfig.class.getName()).append(":session").toString());
 		if (session != null)
 		{
 			session.onInvalidate();

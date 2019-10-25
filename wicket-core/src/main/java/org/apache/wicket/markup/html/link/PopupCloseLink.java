@@ -31,14 +31,6 @@ public class PopupCloseLink<T> extends Link<T>
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * ClosePopupPage closes the popup window.
-	 */
-	public static final class ClosePopupPage extends WebPage
-	{
-		private static final long serialVersionUID = 1L;
-	}
-
-	/**
 	 * Constructor
 	 * 
 	 * @param id
@@ -67,5 +59,13 @@ public class PopupCloseLink<T> extends Link<T>
 	{
 		// Web page closes window using javascript code in PopupCloseLink$ClosePopupPage.html
 		setResponsePage(ClosePopupPage.class);
+	}
+
+	/**
+	 * ClosePopupPage closes the popup window.
+	 */
+	public static final class ClosePopupPage extends WebPage
+	{
+		private static final long serialVersionUID = 1L;
 	}
 }

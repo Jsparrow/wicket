@@ -33,30 +33,6 @@ import org.junit.jupiter.api.Test;
  */
 class ResourceAuthorizationTest extends WicketTestCase
 {
-	private static class RejectingAuthorizationStrategy extends IAuthorizationStrategy.AllowAllAuthorizationStrategy
-	{
-		@Override
-		public boolean isResourceAuthorized(IResource resource, PageParameters pageParameters)
-		{
-			return false;
-		}
-	}
-
-	private static class TestResource extends AbstractResource
-	{
-		@Override
-		protected ResourceResponse newResourceResponse(Attributes attributes)
-		{
-			return null;
-		}
-
-		@Override
-		public String toString()
-		{
-			return "TestResource";
-		}
-	}
-
 	/**
 	 * https://issues.apache.org/jira/browse/WICKET-5012
 	 */
@@ -85,10 +61,32 @@ class ResourceAuthorizationTest extends WicketTestCase
 
 		TestResource resource = new TestResource();
 
-		Exception e = assertThrows(RuntimeException.class, () -> {
-			tester.startResource(resource);
-		});
+		Exception e = assertThrows(RuntimeException.class, () -> tester.startResource(resource));
 
 		assertEquals("Not authorized to request: " + resource, e.getMessage());
+	}
+
+	private static class RejectingAuthorizationStrategy extends IAuthorizationStrategy.AllowAllAuthorizationStrategy
+	{
+		@Override
+		public boolean isResourceAuthorized(IResource resource, PageParameters pageParameters)
+		{
+			return false;
+		}
+	}
+
+	private static class TestResource extends AbstractResource
+	{
+		@Override
+		protected ResourceResponse newResourceResponse(Attributes attributes)
+		{
+			return null;
+		}
+
+		@Override
+		public String toString()
+		{
+			return "TestResource";
+		}
 	}
 }

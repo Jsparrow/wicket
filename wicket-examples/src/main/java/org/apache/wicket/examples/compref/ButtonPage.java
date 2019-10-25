@@ -78,34 +78,10 @@ public class ButtonPage extends WicketExamplePage
 	@Override
 	protected void explain()
 	{
-		String html = " <form wicket:id=\"form\">\n"
-			+ "  <input type=\"submit\" value=\"non wicket submit button\" />\n"
-			+ "  <input wicket:id=\"button1\" type=\"submit\" value=\"default wicket button\" />\n"
-			+ "  <input wicket:id=\"button2\" type=\"submit\" value=\"wicket button with setDefaultFormProcessing(false)\" />\n"
-			+ " </form>";
-		String code = "&nbsp;&nbsp;&nbsp;&nbsp;// Add a form with an onSubmit implementation that sets a message\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;Form form = new Form(\"form\") {\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;protected void onSubmit() {\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;info(\"Form.onSubmit executed\");\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;};\n"
-			+ "\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;Button button1 = new Button(\"button1\") {\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;protected void onSubmit() {\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;info(\"button1.onSubmit executed\");\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;};\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;form.add(button1);\n"
-			+ "\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;Button button2 = new Button(\"button2\") {\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;protected void onSubmit() {\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;info(\"button2.onSubmit executed\");\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;};\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;button2.setDefaultFormProcessing(false);\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;form.add(button2);\n"
-			+ "\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;add(form);";
+		String html = new StringBuilder().append(" <form wicket:id=\"form\">\n").append("  <input type=\"submit\" value=\"non wicket submit button\" />\n").append("  <input wicket:id=\"button1\" type=\"submit\" value=\"default wicket button\" />\n").append("  <input wicket:id=\"button2\" type=\"submit\" value=\"wicket button with setDefaultFormProcessing(false)\" />\n").append(" </form>").toString();
+		String code = new StringBuilder().append("&nbsp;&nbsp;&nbsp;&nbsp;// Add a form with an onSubmit implementation that sets a message\n").append("&nbsp;&nbsp;&nbsp;&nbsp;Form form = new Form(\"form\") {\n").append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;protected void onSubmit() {\n").append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;info(\"Form.onSubmit executed\");\n").append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}\n").append("&nbsp;&nbsp;&nbsp;&nbsp;};\n").append("\n").append("&nbsp;&nbsp;&nbsp;&nbsp;Button button1 = new Button(\"button1\") {\n")
+				.append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;protected void onSubmit() {\n").append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;info(\"button1.onSubmit executed\");\n").append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}\n").append("&nbsp;&nbsp;&nbsp;&nbsp;};\n").append("&nbsp;&nbsp;&nbsp;&nbsp;form.add(button1);\n").append("\n").append("&nbsp;&nbsp;&nbsp;&nbsp;Button button2 = new Button(\"button2\") {\n").append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;protected void onSubmit() {\n").append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;info(\"button2.onSubmit executed\");\n")
+				.append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}\n").append("&nbsp;&nbsp;&nbsp;&nbsp;};\n").append("&nbsp;&nbsp;&nbsp;&nbsp;button2.setDefaultFormProcessing(false);\n").append("&nbsp;&nbsp;&nbsp;&nbsp;form.add(button2);\n").append("\n").append("&nbsp;&nbsp;&nbsp;&nbsp;add(form);").toString();
 		add(new ExplainPanel(html, code));
 
 	}

@@ -105,28 +105,25 @@ public class SelectOptions<T> extends RepeatingView
 	@Override
 	protected final void onPopulate()
 	{
-		if ((size() == 0) || recreateChoices)
+		if (!((size() == 0) || recreateChoices)) {
+			return;
+		}
+		// populate this repeating view with SelectOption components
+		removeAll();
+		Collection<? extends T> modelObject = (Collection<? extends T>)getDefaultModelObject();
+		if (modelObject != null)
 		{
-			// populate this repeating view with SelectOption components
-			removeAll();
+			modelObject.forEach(value -> {
+				// we need a container to represent a row in repeater
+				WebMarkupContainer row = new WebMarkupContainer(newChildId());
+				row.setRenderBodyOnly(true);
+				add(row);
 
-			Collection<? extends T> modelObject = (Collection<? extends T>)getDefaultModelObject();
-
-			if (modelObject != null)
-			{
-				for (T value : modelObject)
-				{
-					// we need a container to represent a row in repeater
-					WebMarkupContainer row = new WebMarkupContainer(newChildId());
-					row.setRenderBodyOnly(true);
-					add(row);
-
-					// we add our actual SelectOption component to the row
-					String text = renderer.getDisplayValue(value);
-					IModel<T> model = renderer.getModel(value);
-					row.add(newOption(text, model));
-				}
-			}
+				// we add our actual SelectOption component to the row
+				String text = renderer.getDisplayValue(value);
+				IModel<T> model = renderer.getModel(value);
+				row.add(newOption(text, model));
+			});
 		}
 	}
 
@@ -143,6 +140,14 @@ public class SelectOptions<T> extends RepeatingView
 		SimpleSelectOption<T> option = new SimpleSelectOption<>("option", model, text);
 		option.setEscapeModelStrings(this.getEscapeModelStrings());
 		return option;
+	}
+
+	@Override
+	protected void onDetach()
+	{
+		renderer.detach();
+		
+		super.onDetach();
 	}
 
 	/**
@@ -192,13 +197,5 @@ public class SelectOptions<T> extends RepeatingView
 			// render
 			tag.setType(TagType.OPEN);
 		}
-	}
-	
-	@Override
-	protected void onDetach()
-	{
-		renderer.detach();
-		
-		super.onDetach();
 	}
 }

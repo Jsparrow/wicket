@@ -108,7 +108,7 @@ public class ClassPathResourceFinder implements IResourceFinder
 		}
 		else
 		{
-			return "[classpath: " + prefix + "]";
+			return new StringBuilder().append("[classpath: ").append(prefix).append("]").toString();
 		}
 	}
 }

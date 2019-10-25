@@ -59,10 +59,7 @@ public class BookmarkablePageLinkPage extends WicketExamplePage
 	protected void explain()
 	{
 		String html = "<a wicket:id=\"pageLinkWithArgs\">go to our bookmarkable page passing a message argument</a>";
-		String code = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// Note that any arguments are passed as request parameters, and should thus be strings\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PageParameters parameters = new PageParameters();\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;parameters.put(\"message\", \"This message was passed as a page parameter argument\");\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;add(new BookmarkablePageLink<>(\"pageLinkWithArgs\", BookmarkablePage.class, parameters));";
+		String code = new StringBuilder().append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// Note that any arguments are passed as request parameters, and should thus be strings\n").append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PageParameters parameters = new PageParameters();\n").append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;parameters.put(\"message\", \"This message was passed as a page parameter argument\");\n").append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;add(new BookmarkablePageLink<>(\"pageLinkWithArgs\", BookmarkablePage.class, parameters));").toString();
 		add(new ExplainPanel(html, code));
 
 	}

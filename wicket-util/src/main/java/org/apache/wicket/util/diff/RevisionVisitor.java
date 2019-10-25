@@ -66,20 +66,20 @@ public interface RevisionVisitor
 	/**
 	 * @param revision
 	 */
-	public void visit(Revision revision);
+	void visit(Revision revision);
 
 	/**
 	 * @param delta
 	 */
-	public void visit(DeleteDelta delta);
+	void visit(DeleteDelta delta);
 
 	/**
 	 * @param delta
 	 */
-	public void visit(ChangeDelta delta);
+	void visit(ChangeDelta delta);
 
 	/**
 	 * @param delta
 	 */
-	public void visit(AddDelta delta);
+	void visit(AddDelta delta);
 }

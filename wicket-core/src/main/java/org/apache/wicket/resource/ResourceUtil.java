@@ -37,6 +37,11 @@ import org.apache.wicket.util.string.Strings;
  */
 public class ResourceUtil
 {
+	private ResourceUtil()
+	{
+		// no-op
+	}
+
 	/**
 	 * Reads resource reference attributes (style, locale, variation) encoded in the given string.
 	 * 
@@ -68,7 +73,7 @@ public class ResourceUtil
 		}
 		return new ResourceReference.UrlAttributes(locale, style, variation);
 	}
-	
+
 	/**
 	 * Reads resource reference attributes (style, locale, variation) encoded in the given URL. 
 	 * 
@@ -275,10 +280,5 @@ public class ResourceUtil
 	{
 		String tmp = attribute.replaceAll("(\\w)~(\\w)", "$1-$2");
 		return Strings.replaceAll(tmp, "~~", "~").toString();
-	}
-
-	private ResourceUtil()
-	{
-		// no-op
 	}
 }

@@ -49,6 +49,19 @@ public class TestMapperContext implements IMapperContext
 	IPageManager pageManager;
 	private String appName;
 	private boolean createMockPageIfInstanceNotFound = true;
+	private final ResourceReferenceRegistry registry = new ResourceReferenceRegistry()
+	{
+		@Override
+		protected ResourceReference createDefaultResourceReference(Key key)
+		{
+			// Do not create package resource here because it requires "real" application
+			return null;
+		}
+	};
+	private boolean bookmarkable = true;
+	private boolean createdBookmarkable = true;
+	private int nextPageRenderCount = 0;
+	int idCounter = 0;
 
 	/**
 	 * Construct.
@@ -120,18 +133,6 @@ public class TestMapperContext implements IMapperContext
 		return registry;
 	}
 
-	private final ResourceReferenceRegistry registry = new ResourceReferenceRegistry()
-	{
-		@Override
-		protected ResourceReference createDefaultResourceReference(Key key)
-		{
-			// Do not create package resource here because it requires "real" application
-			return null;
-		}
-	};
-
-	private boolean bookmarkable = true;
-
 	/**
 	 * Determines whether the newly created page will have bookmarkable flag set
 	 *
@@ -142,8 +143,6 @@ public class TestMapperContext implements IMapperContext
 		this.bookmarkable = bookmarkable;
 	}
 
-	private boolean createdBookmarkable = true;
-
 	/**
 	 * Determines whether the newly created page will have createdBookmarkable flag set
 	 *
@@ -153,8 +152,6 @@ public class TestMapperContext implements IMapperContext
 	{
 		this.createdBookmarkable = createdBookmarkable;
 	}
-
-	private int nextPageRenderCount = 0;
 
 	/**
 	 *
@@ -182,8 +179,6 @@ public class TestMapperContext implements IMapperContext
 		return requestablePage;
 
 	}
-
-	int idCounter = 0;
 
 	@Override
 	public IRequestablePage newPageInstance(Class<? extends IRequestablePage> pageClass,

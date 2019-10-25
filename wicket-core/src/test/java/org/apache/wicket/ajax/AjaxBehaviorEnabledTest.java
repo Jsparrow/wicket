@@ -35,29 +35,6 @@ import org.junit.jupiter.api.Test;
 class AjaxBehaviorEnabledTest extends WicketTestCase
 {
 	/**
-	 * Custom security strategy to disable all components where the id ends with "disable".
-	 * 
-	 * @author marrink
-	 */
-	private static final class CustomStrategy extends IAuthorizationStrategy.AllowAllAuthorizationStrategy
-	{
-		/**
-		 * 
-		 * @see org.apache.wicket.authorization.IAuthorizationStrategy#isActionAuthorized(org.apache.wicket.Component,
-		 *      org.apache.wicket.authorization.Action)
-		 */
-		@Override
-		public boolean isActionAuthorized(Component component, Action action)
-		{
-			if (action == Component.ENABLE && component.getId().endsWith("disabled"))
-			{
-				return false;
-			}
-			return true;
-		}
-	}
-
-	/**
 	 * 
 	 */
 	@BeforeEach
@@ -92,6 +69,29 @@ class AjaxBehaviorEnabledTest extends WicketTestCase
     void disabledBehavior() throws Exception
 	{
 		executeTest(AjaxBehaviorEnabledPage.class, "AjaxBehaviorEnabled_expected.html");
+	}
+
+	/**
+	 * Custom security strategy to disable all components where the id ends with "disable".
+	 * 
+	 * @author marrink
+	 */
+	private static final class CustomStrategy extends IAuthorizationStrategy.AllowAllAuthorizationStrategy
+	{
+		/**
+		 * 
+		 * @see org.apache.wicket.authorization.IAuthorizationStrategy#isActionAuthorized(org.apache.wicket.Component,
+		 *      org.apache.wicket.authorization.Action)
+		 */
+		@Override
+		public boolean isActionAuthorized(Component component, Action action)
+		{
+			if (action == Component.ENABLE && component.getId().endsWith("disabled"))
+			{
+				return false;
+			}
+			return true;
+		}
 	}
 
 }

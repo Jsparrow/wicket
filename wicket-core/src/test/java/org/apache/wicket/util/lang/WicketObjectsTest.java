@@ -29,6 +29,8 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.util.tester.WicketTestCase;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Tests the WicketObjects class.
@@ -37,6 +39,8 @@ import org.junit.jupiter.api.Test;
  */
 class WicketObjectsTest extends WicketTestCase
 {
+	private static final Logger logger = LoggerFactory.getLogger(WicketObjectsTest.class);
+
 	/**
 	 * Test method for WicketObjects.cloneModel(null)
 	 */
@@ -98,6 +102,7 @@ class WicketObjectsTest extends WicketTestCase
 		}
 		catch (RuntimeException e)
 		{
+			logger.error(e.getMessage(), e);
 			assertTrue(true);
 		}
 	}
@@ -117,6 +122,7 @@ class WicketObjectsTest extends WicketTestCase
 		}
 		catch (RuntimeException e)
 		{
+			logger.error(e.getMessage(), e);
 			assertTrue(true);
 		}
 	}

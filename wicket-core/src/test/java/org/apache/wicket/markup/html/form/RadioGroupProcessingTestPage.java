@@ -42,11 +42,11 @@ public class RadioGroupProcessingTestPage extends WebPage
 	 */
 	public RadioGroupProcessingTestPage(IModel<String> model)
 	{
-		form = new Form<Void>("form");
-		group = new RadioGroup<String>("group", model);
+		form = new Form<>("form");
+		group = new RadioGroup<>("group", model);
 		WebMarkupContainer container = new WebMarkupContainer("container");
-		radio1 = new Radio<String>("radio1", new Model<String>("radio1"));
-		radio2 = new Radio<String>("radio2", new Model<String>("radio2"));
+		radio1 = new Radio<>("radio1", new Model<String>("radio1"));
+		radio2 = new Radio<>("radio2", new Model<String>("radio2"));
 
 
 		add(form);

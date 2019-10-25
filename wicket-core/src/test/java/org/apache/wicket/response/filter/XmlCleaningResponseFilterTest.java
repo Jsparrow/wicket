@@ -69,7 +69,7 @@ class XmlCleaningResponseFilterTest {
 			.append(END_ROOT_ELEMENT);
 
 		AppendingStringBuffer filtered = filter.filter(new AppendingStringBuffer(text));
-		assertEquals(START_ROOT_ELEMENT+"ab"+END_ROOT_ELEMENT, filtered.toString());
+		assertEquals(new StringBuilder().append(START_ROOT_ELEMENT).append("ab").append(END_ROOT_ELEMENT).toString(), filtered.toString());
 	}
 
 	/**

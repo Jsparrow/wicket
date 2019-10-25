@@ -37,33 +37,21 @@ public abstract class DontStoreNotRenderedPageTestCase extends WicketTestCase
 	@Override
 	protected WicketTester newWicketTester(WebApplication app)
 	{
-		app.getComponentInstantiationListeners().add(new IComponentInstantiationListener()
-		{
-			@Override
-			public void onInstantiation(Component component)
-			{
-				// WICKET-5546 behavior added before Page#init()
-				component.add(new Behavior()
-				{
-				});
-			}
-		});
+		// WICKET-5546 behavior added before Page#init()
+		app.getComponentInstantiationListeners().add((Component component) -> component.add(new Behavior() {
+		}));
 
 		return new WicketTester(app)
 		{
 			@Override
 			protected IPageManagerProvider newTestPageManagerProvider()
 			{
-				return () -> {
-					return new MockPageManager()
-					{
-						@Override
-						public void touchPage(IManageablePage page)
-						{
-							assertFalse(page instanceof PageB, "PageB should not be touched!");
-							super.touchPage(page);
-						}
-					};
+				return () -> new MockPageManager() {
+					@Override
+					public void touchPage(IManageablePage page) {
+						assertFalse(page instanceof PageB, "PageB should not be touched!");
+						super.touchPage(page);
+					}
 				};
 			}
 		};

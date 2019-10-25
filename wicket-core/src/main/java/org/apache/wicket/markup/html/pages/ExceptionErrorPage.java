@@ -117,44 +117,39 @@ public class ExceptionErrorPage extends AbstractErrorPage
 	 */
 	public String getErrorMessage(final Throwable throwable)
 	{
-		if (throwable != null)
-		{
-			StringBuilder sb = new StringBuilder(256);
-
-			// first print the last cause
-			List<Throwable> al = convertToList(throwable);
-			int length = al.size() - 1;
-			Throwable cause = al.get(length);
-			sb.append("Last cause: ").append(cause.getMessage()).append('\n');
-			if (throwable instanceof WicketRuntimeException)
-			{
-				String msg = throwable.getMessage();
-				if ((msg != null) && (msg.equals(cause.getMessage()) == false))
-				{
-					if (throwable instanceof MarkupException)
-					{
-						MarkupStream stream = ((MarkupException)throwable).getMarkupStream();
-						if (stream != null)
-						{
-							String text = "\n" + stream.toString();
-							if (msg.endsWith(text))
-							{
-								msg = msg.substring(0, msg.length() - text.length());
-							}
-						}
-					}
-
-					sb.append("WicketMessage: ");
-					sb.append(msg);
-					sb.append("\n\n");
-				}
-			}
-			return sb.toString();
-		}
-		else
-		{
+		if (throwable == null) {
 			return "[Unknown]";
 		}
+		StringBuilder sb = new StringBuilder(256);
+		// first print the last cause
+		List<Throwable> al = convertToList(throwable);
+		int length = al.size() - 1;
+		Throwable cause = al.get(length);
+		sb.append("Last cause: ").append(cause.getMessage()).append('\n');
+		if (throwable instanceof WicketRuntimeException)
+		{
+			String msg = throwable.getMessage();
+			if ((msg != null) && (msg.equals(cause.getMessage()) == false))
+			{
+				if (throwable instanceof MarkupException)
+				{
+					MarkupStream stream = ((MarkupException)throwable).getMarkupStream();
+					if (stream != null)
+					{
+						String text = "\n" + stream.toString();
+						if (msg.endsWith(text))
+						{
+							msg = msg.substring(0, msg.length() - text.length());
+						}
+					}
+				}
+
+				sb.append("WicketMessage: ");
+				sb.append(msg);
+				sb.append("\n\n");
+			}
+		}
+		return sb.toString();
 	}
 
 	/**
@@ -166,34 +161,26 @@ public class ExceptionErrorPage extends AbstractErrorPage
 	 */
 	public String getStackTrace(final Throwable throwable)
 	{
-		if (throwable != null)
-		{
-			List<Throwable> al = convertToList(throwable);
-
-			StringBuilder sb = new StringBuilder(256);
-
-			// first print the last cause
-			int length = al.size() - 1;
-			Throwable cause = al.get(length);
-
-			sb.append("Root cause:\n\n");
-			outputThrowable(cause, sb, false);
-
-			if (length > 0)
-			{
-				sb.append("\n\nComplete stack:\n\n");
-				for (int i = 0; i < length; i++)
-				{
-					outputThrowable(al.get(i), sb, true);
-					sb.append("\n");
-				}
-			}
-			return sb.toString();
-		}
-		else
-		{
+		if (throwable == null) {
 			return "<Null Throwable>";
 		}
+		List<Throwable> al = convertToList(throwable);
+		StringBuilder sb = new StringBuilder(256);
+		// first print the last cause
+		int length = al.size() - 1;
+		Throwable cause = al.get(length);
+		sb.append("Root cause:\n\n");
+		outputThrowable(cause, sb, false);
+		if (length > 0)
+		{
+			sb.append("\n\nComplete stack:\n\n");
+			for (int i = 0; i < length; i++)
+			{
+				outputThrowable(al.get(i), sb, true);
+				sb.append("\n");
+			}
+		}
+		return sb.toString();
 	}
 
 	/**

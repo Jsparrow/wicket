@@ -35,13 +35,14 @@ public class RequestLoggerRequestCycleListener implements IRequestCycleListener
 	 * request cycle, register a {@code ThreadLocal} that gets cleared out at the
 	 * {@link #onEndRequest(RequestCycle) end of the request}
 	 */
-	private static final ThreadLocal<IRequestHandler> first = new ThreadLocal<IRequestHandler>();
+	private static final ThreadLocal<IRequestHandler> first = new ThreadLocal<>();
 
 	@Override
 	public void onBeginRequest(RequestCycle cycle)
 	{
-		if (!isRequestLoggingEnabled())
+		if (!isRequestLoggingEnabled()) {
 			return;
+		}
 
 		registerRequestedUrl(cycle);
 	}
@@ -49,8 +50,9 @@ public class RequestLoggerRequestCycleListener implements IRequestCycleListener
 	@Override
 	public void onRequestHandlerScheduled(RequestCycle cycle, IRequestHandler handler)
 	{
-		if (!isRequestLoggingEnabled())
+		if (!isRequestLoggingEnabled()) {
 			return;
+		}
 
 		registerHandler(handler);
 	}
@@ -58,8 +60,9 @@ public class RequestLoggerRequestCycleListener implements IRequestCycleListener
 	@Override
 	public void onRequestHandlerResolved(RequestCycle cycle, IRequestHandler handler)
 	{
-		if (!isRequestLoggingEnabled())
+		if (!isRequestLoggingEnabled()) {
 			return;
+		}
 
 		registerHandler(handler);
 	}
@@ -68,8 +71,9 @@ public class RequestLoggerRequestCycleListener implements IRequestCycleListener
 	public void onExceptionRequestHandlerResolved(RequestCycle cycle, IRequestHandler handler,
 		Exception exception)
 	{
-		if (!isRequestLoggingEnabled())
+		if (!isRequestLoggingEnabled()) {
 			return;
+		}
 
 		registerHandler(handler);
 	}
@@ -100,17 +104,16 @@ public class RequestLoggerRequestCycleListener implements IRequestCycleListener
 	private void registerRequestedUrl(RequestCycle cycle)
 	{
 		IRequestLogger requestLogger = Application.get().getRequestLogger();
-		if (cycle.getRequest().getContainerRequest() instanceof HttpServletRequest)
-		{
-			HttpServletRequest containerRequest = (HttpServletRequest)cycle.getRequest()
-				.getContainerRequest();
-
-			AppendingStringBuffer url = new AppendingStringBuffer(containerRequest.getRequestURL());
-			if (containerRequest.getQueryString() != null)
-				url.append("?").append(containerRequest.getQueryString());
-
-			requestLogger.logRequestedUrl(url.toString());
+		if (!(cycle.getRequest().getContainerRequest() instanceof HttpServletRequest)) {
+			return;
 		}
+		HttpServletRequest containerRequest = (HttpServletRequest)cycle.getRequest()
+			.getContainerRequest();
+		AppendingStringBuffer url = new AppendingStringBuffer(containerRequest.getRequestURL());
+		if (containerRequest.getQueryString() != null) {
+			url.append("?").append(containerRequest.getQueryString());
+		}
+		requestLogger.logRequestedUrl(url.toString());
 	}
 
 	/**

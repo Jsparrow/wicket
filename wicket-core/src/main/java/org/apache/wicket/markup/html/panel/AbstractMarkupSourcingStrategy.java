@@ -74,14 +74,7 @@ public abstract class AbstractMarkupSourcingStrategy implements IMarkupSourcingS
 		final List<MarkupContainer> componentResolvers = new ArrayList<>();
 		
 		//collect all "transparent" (i.e. component resolvers) children
-		container.visitChildren(IComponentResolver.class, new IVisitor<MarkupContainer, Void>()
-		{
-			@Override
-			public void component(MarkupContainer child, IVisit<Void> visit)
-			{
-				componentResolvers.add(child);
-			}
-		});
+		container.visitChildren(IComponentResolver.class, (MarkupContainer child1, IVisit<Void> visit) -> componentResolvers.add(child1));
 				
 		while (childrenIterator.hasNext() && childMarkupFound == null)
 		{
@@ -199,20 +192,16 @@ public abstract class AbstractMarkupSourcingStrategy implements IMarkupSourcingS
 		final ComponentTag openTag)
 	{
 		// Skip the components body. It will be replaced by the associated markup or fragment
-		if (markupStream.getPreviousTag().isOpen())
+		if (!markupStream.getPreviousTag().isOpen()) {
+			return;
+		}
+		markupStream.skipRawMarkup();
+		if (markupStream.get().closes(openTag) == false)
 		{
-			markupStream.skipRawMarkup();
-			if (markupStream.get().closes(openTag) == false)
-			{
-				throw new MarkupException(
-					markupStream,
-					"Close tag not found for tag: " +
-						openTag.toString() +
-						". For " +
-							Classes.simpleName(component.getClass()) +
-								" Components only raw markup is allow in between the tags but not other Wicket Component." +
-								". Component: " + component.toString());
-			}
+			throw new MarkupException(
+				markupStream,
+				new StringBuilder().append("Close tag not found for tag: ").append(openTag.toString()).append(". For ").append(Classes.simpleName(component.getClass())).append(" Components only raw markup is allow in between the tags but not other Wicket Component.").append(". Component: ")
+						.append(component.toString()).toString());
 		}
 	}
 

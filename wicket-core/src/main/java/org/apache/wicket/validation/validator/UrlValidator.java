@@ -26,6 +26,8 @@ import org.apache.wicket.validation.IValidatable;
 import org.apache.wicket.validation.IValidationError;
 import org.apache.wicket.validation.IValidator;
 import org.apache.wicket.validation.ValidationError;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Validator for checking URLs. The default schemes allowed are <code>http://</code>,
@@ -57,6 +59,8 @@ import org.apache.wicket.validation.ValidationError;
  */
 public class UrlValidator implements IValidator<String>
 {
+	private static final Logger logger = LoggerFactory.getLogger(UrlValidator.class);
+
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -81,7 +85,7 @@ public class UrlValidator implements IValidator<String>
 
 	private static final String SPECIAL_CHARS = ";/@&=,.?:+$";
 
-	private static final String VALID_CHARS = "[^\\s" + SPECIAL_CHARS + "]";
+	private static final String VALID_CHARS = new StringBuilder().append("[^\\s").append(SPECIAL_CHARS).append("]").toString();
 
 	private static final String SCHEME_CHARS = ALPHA_CHARS;
 
@@ -107,10 +111,9 @@ public class UrlValidator implements IValidator<String>
 	/**
 	 * Protocol (<code>http:</code>, <code>ftp:</code>, or <code>https:</code>).
 	 */
-	private static final String SCHEME_PATTERN = "^[" + SCHEME_CHARS + "].*$";
+	private static final String SCHEME_PATTERN = new StringBuilder().append("^[").append(SCHEME_CHARS).append("].*$").toString();
 
-	private static final String AUTHORITY_PATTERN = "^(.+(:.*)?@)?([" + AUTHORITY_CHARS +
-		"]*)(:\\d*)?(.*)?";
+	private static final String AUTHORITY_PATTERN = new StringBuilder().append("^(.+(:.*)?@)?([").append(AUTHORITY_CHARS).append("]*)(:\\d*)?(.*)?").toString();
 
 	private static final int PARSE_AUTHORITY_HOST_IP = 3;
 	private static final int PARSE_AUTHORITY_PORT = 4;
@@ -124,13 +127,13 @@ public class UrlValidator implements IValidator<String>
 
 	private static final String IP_V4_DOMAIN_PATTERN = "^(\\d{1,3})[.](\\d{1,3})[.](\\d{1,3})[.](\\d{1,3})$";
 
-	private static final String DOMAIN_PATTERN = "^" + ATOM + "(\\." + ATOM + ")*$";
+	private static final String DOMAIN_PATTERN = new StringBuilder().append("^").append(ATOM).append("(\\.").append(ATOM).append(")*$").toString();
 
 	private static final String PORT_PATTERN = "^:(\\d{1,5})$";
 
-	private static final String ATOM_PATTERN = "(" + ATOM + ")";
+	private static final String ATOM_PATTERN = new StringBuilder().append("(").append(ATOM).append(")").toString();
 
-	private static final String ALPHA_PATTERN = "^[" + ALPHA_CHARS + "]";
+	private static final String ALPHA_PATTERN = new StringBuilder().append("^[").append(ALPHA_CHARS).append("]").toString();
 
 	/**
 	 * Holds the set of current validation options.
@@ -140,7 +143,7 @@ public class UrlValidator implements IValidator<String>
 	/**
 	 * The set of schemes that are allowed to be in a URL.
 	 */
-	private final Set<String> allowedSchemes = new HashSet<String>();
+	private final Set<String> allowedSchemes = new HashSet<>();
 
 	/**
 	 * If no schemes are provided, default to this set of protocols.
@@ -319,13 +322,9 @@ public class UrlValidator implements IValidator<String>
 			return false;
 		}
 
-		if (isOff(ALLOW_ALL_SCHEMES))
-		{
-
-			if (!allowedSchemes.contains(scheme))
-			{
-				return false;
-			}
+		boolean condition = isOff(ALLOW_ALL_SCHEMES) && !allowedSchemes.contains(scheme);
+		if (condition) {
+			return false;
 		}
 
 		return true;
@@ -379,6 +378,7 @@ public class UrlValidator implements IValidator<String>
 				}
 				catch (NumberFormatException e)
 				{
+					logger.error(e.getMessage(), e);
 					return false;
 				}
 
@@ -497,12 +497,9 @@ public class UrlValidator implements IValidator<String>
 
 		int slashCount = countToken("/", path);
 		int dot2Count = countToken("/..", path);
-		if (dot2Count > 0)
-		{
-			if ((slashCount - slash2Count - 1) <= dot2Count)
-			{
-				return false;
-			}
+		boolean condition = dot2Count > 0 && (slashCount - slash2Count - 1) <= dot2Count;
+		if (condition) {
+			return false;
 		}
 
 		return true;
@@ -580,7 +577,7 @@ public class UrlValidator implements IValidator<String>
 	 */
 	public static boolean isBlankOrNull(String value)
 	{
-		return ((value == null) || (value.trim().length() == 0));
+		return ((value == null) || (value.trim().isEmpty()));
 	}
 
 	// Flag Management

@@ -31,7 +31,7 @@ public class XmlPage_2 extends XmlBasePage
 	 */
 	public XmlPage_2()
 	{
-		if (getString("test").equals("value") == false)
+		if ("value".equals(getString("test")) == false)
 		{
 			throw new RuntimeException("Expected 'test'");
 		}

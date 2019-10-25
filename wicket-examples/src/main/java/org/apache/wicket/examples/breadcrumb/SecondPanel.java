@@ -34,6 +34,28 @@ import org.apache.wicket.model.Model;
  */
 public class SecondPanel extends BreadCrumbPanel
 {
+	/**
+	 * Construct.
+	 * 
+	 * @param id
+	 * @param breadCrumbModel
+	 */
+	public SecondPanel(final String id, final IBreadCrumbModel breadCrumbModel)
+	{
+		super(id, breadCrumbModel);
+
+		add(new BreadCrumbPanelLink("linkToThird", this, ThirdPanel.class));
+		add(new BreadCrumbPanelLink("linkToFourth", this, FourthPanel.class));
+
+		add(new InputForm("form"));
+	}
+
+	@Override
+	public IModel<String> getTitle()
+	{
+		return Model.of("second");
+	}
+
 	/** Test form. */
 	private final class InputForm extends Form<InputForm>
 	{
@@ -83,27 +105,5 @@ public class SecondPanel extends BreadCrumbPanel
 		{
 			this.input = input;
 		}
-	}
-
-	/**
-	 * Construct.
-	 * 
-	 * @param id
-	 * @param breadCrumbModel
-	 */
-	public SecondPanel(final String id, final IBreadCrumbModel breadCrumbModel)
-	{
-		super(id, breadCrumbModel);
-
-		add(new BreadCrumbPanelLink("linkToThird", this, ThirdPanel.class));
-		add(new BreadCrumbPanelLink("linkToFourth", this, FourthPanel.class));
-
-		add(new InputForm("form"));
-	}
-
-	@Override
-	public IModel<String> getTitle()
-	{
-		return Model.of("second");
 	}
 }

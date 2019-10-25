@@ -44,15 +44,8 @@ public class BorderPage extends WicketExamplePage
 	@Override
 	protected void explain()
 	{
-		String html = "<span wicket:id=\"border\" class=\"mark\">\n"
-			+ "<span wicket:id=\"label\" class=\"mark\">label contents here</span>\n" + "</span>";
-		String code = "&nbsp;&nbsp;&nbsp;&nbsp;public BorderPage()\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;{\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Label label = new Label(\"label\", \"I am the label\");\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MyBorder border = new MyBorder(\"border\");\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;border.add(label);\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;add(border);\n"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;}";
+		String html = new StringBuilder().append("<span wicket:id=\"border\" class=\"mark\">\n").append("<span wicket:id=\"label\" class=\"mark\">label contents here</span>\n").append("</span>").toString();
+		String code = new StringBuilder().append("&nbsp;&nbsp;&nbsp;&nbsp;public BorderPage()\n").append("&nbsp;&nbsp;&nbsp;&nbsp;{\n").append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Label label = new Label(\"label\", \"I am the label\");\n").append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MyBorder border = new MyBorder(\"border\");\n").append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;border.add(label);\n").append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;add(border);\n").append("&nbsp;&nbsp;&nbsp;&nbsp;}").toString();
 		add(new ExplainPanel(html, code));
 	}
 }

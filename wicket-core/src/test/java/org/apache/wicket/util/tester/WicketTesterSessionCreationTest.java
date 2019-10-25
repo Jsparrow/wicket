@@ -28,7 +28,7 @@ import org.junit.jupiter.api.Test;
 class WicketTesterSessionCreationTest extends WicketTestCase
 {
 
-	private static Locale EXPECTED = Locale.FRENCH;
+	private static Locale expected = Locale.FRENCH;
 
 	/**
 	 * WicketTester recreates session after setting attributes on it
@@ -36,9 +36,9 @@ class WicketTesterSessionCreationTest extends WicketTestCase
 	@Test
 	void wicket1215()
 	{
-		tester.getSession().setLocale(EXPECTED);
+		tester.getSession().setLocale(expected);
 		tester.startPage(LocalePage.class);
-		assertEquals(EXPECTED, tester.getSession().getLocale());
+		assertEquals(expected, tester.getSession().getLocale());
 	}
 
 	/***/
@@ -49,7 +49,7 @@ class WicketTesterSessionCreationTest extends WicketTestCase
 		/***/
         public LocalePage()
 		{
-			assertEquals(EXPECTED, getSession().getLocale());
+			assertEquals(expected, getSession().getLocale());
 		}
 	}
 }

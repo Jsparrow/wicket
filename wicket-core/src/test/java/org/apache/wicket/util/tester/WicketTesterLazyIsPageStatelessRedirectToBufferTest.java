@@ -69,7 +69,6 @@ public class WicketTesterLazyIsPageStatelessRedirectToBufferTest extends WicketT
 	{
 		public StatelessListenerPage()
 	    {
-		super();
 		add(new StatelessForm("statelessForm")
 		{
 			@Override
@@ -81,13 +80,7 @@ public class WicketTesterLazyIsPageStatelessRedirectToBufferTest extends WicketT
 	    @Override
 	    public IResourceStream getMarkupResourceStream(MarkupContainer container, Class<?> containerClass)
 	    {
-		return new StringResourceStream("<html>\n" +
-					"<body>\n" +
-						"\t<a wicket:id=\"link\" />\n" +
-						"\t<form wicket:id=\"statelessForm\"></form>\n" +
-						"\t<div wicket:id=\"isPageStateless\" />\n" +
-					"</body>\n" +
-				"</html>");
+		return new StringResourceStream(new StringBuilder().append("<html>\n").append("<body>\n").append("\t<a wicket:id=\"link\" />\n").append("\t<form wicket:id=\"statelessForm\"></form>\n").append("\t<div wicket:id=\"isPageStateless\" />\n").append("</body>\n").append("</html>").toString());
 	    }
 	}
 	
@@ -102,10 +95,7 @@ public class WicketTesterLazyIsPageStatelessRedirectToBufferTest extends WicketT
 		public IResourceStream getMarkupResourceStream(MarkupContainer container,
 			Class<?> containerClass)
 		{
-			String pageMarkup = "<html><head></head><body>" +
-								"<div>" +
-								"</div>" +
-								"</body></html>";
+			String pageMarkup = new StringBuilder().append("<html><head></head><body>").append("<div>").append("</div>").append("</body></html>").toString();
 			return new StringResourceStream(pageMarkup);
 		}
 		

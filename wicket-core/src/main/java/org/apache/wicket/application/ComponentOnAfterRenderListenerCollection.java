@@ -30,13 +30,6 @@ public class ComponentOnAfterRenderListenerCollection extends
 	@Override
 	public void onAfterRender(final Component component)
 	{
-		notify(new INotifier<IComponentOnAfterRenderListener>()
-		{
-			@Override
-			public void notify(IComponentOnAfterRenderListener listener)
-			{
-				listener.onAfterRender(component);
-			}
-		});
+		notify((IComponentOnAfterRenderListener listener) -> listener.onAfterRender(component));
 	}
 }

@@ -245,13 +245,13 @@ public interface IModel<T> extends IDetachable
 			public void setObject(R object)
 			{
 				T modelObject = IModel.this.getObject();
-				if (modelObject != null)
+				if (modelObject == null) {
+					return;
+				}
+				IModel<R> model = mapper.apply(modelObject);
+				if (model != null)
 				{
-					IModel<R> model = mapper.apply(modelObject);
-					if (model != null)
-					{
-						model.setObject(object);
-					}
+					model.setObject(object);
 				}
 			}
 
@@ -260,13 +260,13 @@ public interface IModel<T> extends IDetachable
 			{
 				T object = IModel.this.getObject();
 				IModel.this.detach();
-				if (object != null)
+				if (object == null) {
+					return;
+				}
+				IModel<R> model = mapper.apply(object);
+				if (model != null)
 				{
-					IModel<R> model = mapper.apply(object);
-					if (model != null)
-					{
-						model.detach();
-					}
+					model.detach();
 				}
 			}
 		};

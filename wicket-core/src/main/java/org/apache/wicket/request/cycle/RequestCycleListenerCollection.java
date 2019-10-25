@@ -57,14 +57,7 @@ public class RequestCycleListenerCollection extends ListenerCollection<IRequestC
 	@Override
 	public void onBeginRequest(final RequestCycle cycle)
 	{
-		notify(new INotifier<IRequestCycleListener>()
-		{
-			@Override
-			public void notify(IRequestCycleListener listener)
-			{
-				listener.onBeginRequest(cycle);
-			}
-		});
+		notify((IRequestCycleListener listener) -> listener.onBeginRequest(cycle));
 	}
 
 	/**
@@ -77,14 +70,7 @@ public class RequestCycleListenerCollection extends ListenerCollection<IRequestC
 	@Override
 	public void onEndRequest(final RequestCycle cycle)
 	{
-		reversedNotify(new INotifier<IRequestCycleListener>()
-		{
-			@Override
-			public void notify(IRequestCycleListener listener)
-			{
-				listener.onEndRequest(cycle);
-			}
-		});
+		reversedNotify((IRequestCycleListener listener) -> listener.onEndRequest(cycle));
 	}
 
 	/**
@@ -97,14 +83,7 @@ public class RequestCycleListenerCollection extends ListenerCollection<IRequestC
 	@Override
 	public void onDetach(final RequestCycle cycle)
 	{
-		reversedNotifyIgnoringExceptions(new INotifier<IRequestCycleListener>()
-		{
-			@Override
-			public void notify(IRequestCycleListener listener)
-			{
-				listener.onDetach(cycle);
-			}
-		});
+		reversedNotifyIgnoringExceptions((IRequestCycleListener listener) -> listener.onDetach(cycle));
 	}
 
 	/**
@@ -116,18 +95,13 @@ public class RequestCycleListenerCollection extends ListenerCollection<IRequestC
 	@Override
 	public IRequestHandler onException(final RequestCycle cycle, final Exception ex)
 	{
-		final List<IRequestHandler> handlers = new ArrayList<IRequestHandler>();
+		final List<IRequestHandler> handlers = new ArrayList<>();
 
-		notify(new INotifier<IRequestCycleListener>()
-		{
-			@Override
-			public void notify(IRequestCycleListener listener)
+		notify((IRequestCycleListener listener) -> {
+			IRequestHandler handler = listener.onException(cycle, ex);
+			if (handler != null)
 			{
-				IRequestHandler handler = listener.onException(cycle, ex);
-				if (handler != null)
-				{
-					handlers.add(handler);
-				}
+				handlers.add(handler);
 			}
 		});
 
@@ -147,67 +121,32 @@ public class RequestCycleListenerCollection extends ListenerCollection<IRequestC
 	@Override
 	public void onRequestHandlerResolved(final RequestCycle cycle, final IRequestHandler handler)
 	{
-		notify(new INotifier<IRequestCycleListener>()
-		{
-			@Override
-			public void notify(IRequestCycleListener listener)
-			{
-				listener.onRequestHandlerResolved(cycle, handler);
-			}
-		});
+		notify((IRequestCycleListener listener) -> listener.onRequestHandlerResolved(cycle, handler));
 	}
 
 	@Override
 	public void onExceptionRequestHandlerResolved(final RequestCycle cycle,
 		final IRequestHandler handler, final Exception exception)
 	{
-		notify(new INotifier<IRequestCycleListener>()
-		{
-			@Override
-			public void notify(IRequestCycleListener listener)
-			{
-				listener.onExceptionRequestHandlerResolved(cycle, handler, exception);
-			}
-		});
+		notify((IRequestCycleListener listener) -> listener.onExceptionRequestHandlerResolved(cycle, handler, exception));
 	}
 
 	@Override
 	public void onRequestHandlerScheduled(final RequestCycle cycle, final IRequestHandler handler)
 	{
-		notify(new INotifier<IRequestCycleListener>()
-		{
-			@Override
-			public void notify(IRequestCycleListener listener)
-			{
-				listener.onRequestHandlerScheduled(cycle, handler);
-			}
-		});
+		notify((IRequestCycleListener listener) -> listener.onRequestHandlerScheduled(cycle, handler));
 	}
 
 	@Override
 	public void onRequestHandlerExecuted(final RequestCycle cycle, final IRequestHandler handler)
 	{
-		notify(new INotifier<IRequestCycleListener>()
-		{
-			@Override
-			public void notify(IRequestCycleListener listener)
-			{
-				listener.onRequestHandlerExecuted(cycle, handler);
-			}
-		});
+		notify((IRequestCycleListener listener) -> listener.onRequestHandlerExecuted(cycle, handler));
 	}
 
 	@Override
 	public void onUrlMapped(final RequestCycle cycle, final IRequestHandler handler, final Url url)
 	{
-		notify(new INotifier<IRequestCycleListener>()
-		{
-			@Override
-			public void notify(IRequestCycleListener listener)
-			{
-				listener.onUrlMapped(cycle, handler, url);
-			}
-		});
+		notify((IRequestCycleListener listener) -> listener.onUrlMapped(cycle, handler, url));
 
 	}
 }

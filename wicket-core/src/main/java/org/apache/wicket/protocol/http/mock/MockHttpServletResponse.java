@@ -57,11 +57,17 @@ public class MockHttpServletResponse implements HttpServletResponse, IMetaDataBu
 
 	private static final int MODE_TEXT = 2;
 
+	/* BEGIN: This code comes from Jetty 6.1.1 */
+	private static String[] days = { "Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
+
+	private static String[] months = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug",
+			"Sep", "Oct", "Nov", "Dec", "Jan" };
+
 	private ByteArrayOutputStream byteStream;
 
 	private String characterEncoding = "UTF-8";
 
-	private final List<Cookie> cookies = new ArrayList<Cookie>();
+	private final List<Cookie> cookies = new ArrayList<>();
 
 	private String errorMessage = null;
 
@@ -144,7 +150,7 @@ public class MockHttpServletResponse implements HttpServletResponse, IMetaDataBu
 		List<String> list = (List<String>)headers.get(name);
 		if (list == null)
 		{
-			list = new ArrayList<String>(1);
+			list = new ArrayList<>(1);
 			headers.put(name, list);
 		}
 		list.add(value);
@@ -161,7 +167,7 @@ public class MockHttpServletResponse implements HttpServletResponse, IMetaDataBu
 	@Override
 	public void addIntHeader(final String name, final int i)
 	{
-		addHeader(name, "" + i);
+		addHeader(name, Integer.toString(i));
 	}
 
 	/**
@@ -284,7 +290,6 @@ public class MockHttpServletResponse implements HttpServletResponse, IMetaDataBu
 		return characterEncoding;
 	}
 
-
 	/**
 	 * Get all of the cookies that have been added to the response.
 	 * 
@@ -292,11 +297,8 @@ public class MockHttpServletResponse implements HttpServletResponse, IMetaDataBu
 	 */
 	public List<Cookie> getCookies()
 	{
-		List<Cookie> copies = new ArrayList<Cookie>();
-		for (Cookie cookie : cookies)
-		{
-			copies.add(Cookies.copyOf(cookie));
-		}
+		List<Cookie> copies = new ArrayList<>();
+		cookies.forEach(cookie -> copies.add(Cookies.copyOf(cookie)));
 		return copies;
 	}
 
@@ -670,11 +672,6 @@ public class MockHttpServletResponse implements HttpServletResponse, IMetaDataBu
 		return _dateBuffer.toString();
 	}
 
-	/* BEGIN: This code comes from Jetty 6.1.1 */
-	private static String[] DAYS = { "Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
-	private static String[] MONTHS = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug",
-			"Sep", "Oct", "Nov", "Dec", "Jan" };
-
 	/**
 	 * Format HTTP date "EEE, dd MMM yyyy HH:mm:ss 'GMT'" or "EEE, dd-MMM-yy HH:mm:ss 'GMT'"for
 	 * cookies
@@ -697,11 +694,11 @@ public class MockHttpServletResponse implements HttpServletResponse, IMetaDataBu
 
 		int epoch = (int)((calendar.getTimeInMillis() / 1000) % (60 * 60 * 24));
 		int seconds = epoch % 60;
-		epoch = epoch / 60;
+		epoch /= 60;
 		int minutes = epoch % 60;
 		int hours = epoch / 60;
 
-		buf.append(DAYS[day_of_week]);
+		buf.append(days[day_of_week]);
 		buf.append(',');
 		buf.append(' ');
 		append2digits(buf, day_of_month);
@@ -709,14 +706,14 @@ public class MockHttpServletResponse implements HttpServletResponse, IMetaDataBu
 		if (cookie)
 		{
 			buf.append('-');
-			buf.append(MONTHS[month]);
+			buf.append(months[month]);
 			buf.append('-');
 			append2digits(buf, year);
 		}
 		else
 		{
 			buf.append(' ');
-			buf.append(MONTHS[month]);
+			buf.append(months[month]);
 			buf.append(' ');
 			append2digits(buf, century);
 			append2digits(buf, year);
@@ -736,11 +733,11 @@ public class MockHttpServletResponse implements HttpServletResponse, IMetaDataBu
 	 */
 	public static void append2digits(StringBuilder buf, int i)
 	{
-		if (i < 100)
-		{
-			buf.append((char)(i / 10 + '0'));
-			buf.append((char)(i % 10 + '0'));
+		if (i >= 100) {
+			return;
 		}
+		buf.append((char)(i / 10 + '0'));
+		buf.append((char)(i % 10 + '0'));
 	}
 
 	/* END: This code comes from Jetty 6.1.1 */
@@ -756,7 +753,7 @@ public class MockHttpServletResponse implements HttpServletResponse, IMetaDataBu
 	@Override
 	public void setHeader(final String name, final String value)
 	{
-		List<String> l = new ArrayList<String>(1);
+		List<String> l = new ArrayList<>(1);
 		l.add(value);
 		headers.put(name, l);
 	}
@@ -772,7 +769,7 @@ public class MockHttpServletResponse implements HttpServletResponse, IMetaDataBu
 	@Override
 	public void setIntHeader(final String name, final int i)
 	{
-		setHeader(name, "" + i);
+		setHeader(name, Integer.toString(i));
 	}
 
 	/**
@@ -844,14 +841,8 @@ public class MockHttpServletResponse implements HttpServletResponse, IMetaDataBu
 	@Override
 	public void writeMetaData(WebResponse webResponse)
 	{
-		for (Cookie cookie : cookies)
-		{
-			webResponse.addCookie(cookie);
-		}
-		for (String name : headers.keySet())
-		{
-			webResponse.setHeader(name, headers.get(name).toString());
-		}
+		cookies.forEach(webResponse::addCookie);
+		headers.keySet().forEach(name -> webResponse.setHeader(name, headers.get(name).toString()));
 		webResponse.setStatus(status);
 	}
 }

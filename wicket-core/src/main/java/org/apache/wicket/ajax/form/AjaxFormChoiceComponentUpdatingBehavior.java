@@ -96,8 +96,7 @@ public abstract class AjaxFormChoiceComponentUpdatingBehavior extends
 	{
 		if (!AjaxFormChoiceComponentUpdatingBehavior.appliesTo(getComponent()))
 		{
-			throw new WicketRuntimeException("Behavior " + getClass().getName() +
-				" can only be added to an instance of a RadioChoice/CheckboxChoice/RadioGroup/CheckGroup");
+			throw new WicketRuntimeException(new StringBuilder().append("Behavior ").append(getClass().getName()).append(" can only be added to an instance of a RadioChoice/CheckboxChoice/RadioGroup/CheckGroup").toString());
 		}
 	}
 

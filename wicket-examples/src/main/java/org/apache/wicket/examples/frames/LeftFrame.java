@@ -36,6 +36,31 @@ public class LeftFrame extends WebPage
 	private static final long serialVersionUID = 1L;
 
 	/**
+	 * Constructor
+	 * 
+	 * @param index
+	 *            parent frame class
+	 */
+	public LeftFrame(BodyFrame index)
+	{
+		add(new ChangeFramePageLink("linkToPage1", index, Page1.class));
+		add(new ChangeFramePageLink("linkToPage2", index, Page2.class));
+		BookmarkablePageLink<?> link = new BookmarkablePageLink<>("directLink", Home.class);
+		add(link);
+	}
+
+	/**
+	 * No need for versioning this frame.
+	 * 
+	 * @see org.apache.wicket.Component#isVersioned()
+	 */
+	@Override
+	public boolean isVersioned()
+	{
+		return false;
+	}
+
+	/**
 	 * Link that, when clicked, changes the frame target's frame class (and as that is a shared
 	 * model which is also being used by the 'master page' {@link BodyFrame}, changes are
 	 * immediately reflected) and set the response page to the top level page {@link BodyFrame}.
@@ -81,30 +106,5 @@ public class LeftFrame extends WebPage
 			// trigger re-rendering of the page
 			setResponsePage(bodyFrame);
 		}
-	}
-
-	/**
-	 * Constructor
-	 * 
-	 * @param index
-	 *            parent frame class
-	 */
-	public LeftFrame(BodyFrame index)
-	{
-		add(new ChangeFramePageLink("linkToPage1", index, Page1.class));
-		add(new ChangeFramePageLink("linkToPage2", index, Page2.class));
-		BookmarkablePageLink<?> link = new BookmarkablePageLink<>("directLink", Home.class);
-		add(link);
-	}
-
-	/**
-	 * No need for versioning this frame.
-	 * 
-	 * @see org.apache.wicket.Component#isVersioned()
-	 */
-	@Override
-	public boolean isVersioned()
-	{
-		return false;
 	}
 }

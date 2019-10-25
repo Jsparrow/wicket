@@ -33,7 +33,7 @@ public class MarkupType implements Serializable
 	public static final String HTML_MIME = "text/html";
 
 	/** A HTML markup type for web pages */
-	public final static MarkupType HTML_MARKUP_TYPE = new MarkupType("html", HTML_MIME);
+	public static final MarkupType HTML_MARKUP_TYPE = new MarkupType("html", HTML_MIME);
 
 	private final String extension;
 
@@ -75,6 +75,6 @@ public class MarkupType implements Serializable
 	@Override
 	public String toString()
 	{
-		return "MarkupType [extension=" + extension + ", mimeType=" + mimeType + "]";
+		return new StringBuilder().append("MarkupType [extension=").append(extension).append(", mimeType=").append(mimeType).append("]").toString();
 	}
 }

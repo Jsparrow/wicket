@@ -156,10 +156,7 @@ public class FrameworkSettings implements IEventDispatcher
 		{
 			return;
 		}
-		for (IEventDispatcher dispatcher : eventDispatchers)
-		{
-			dispatcher.dispatchEvent(sink, event, component);
-		}
+		eventDispatchers.forEach(dispatcher -> dispatcher.dispatchEvent(sink, event, component));
 	}
 
 	/**

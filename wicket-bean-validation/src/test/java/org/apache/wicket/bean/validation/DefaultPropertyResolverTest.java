@@ -174,8 +174,7 @@ public class DefaultPropertyResolverTest
 	{
 		List<String> keys = error.getKeys();
 
-		assertEquals(expectedKeys.length, keys.size(), "The expected number for bundle keys is '" +
-			expectedKeys.length + "' but we have '" + keys.size() + "'");
+		assertEquals(expectedKeys.length, keys.size(), new StringBuilder().append("The expected number for bundle keys is '").append(expectedKeys.length).append("' but we have '").append(keys.size()).append("'").toString());
 
 		for (int i = 0; i < expectedKeys.length; i++)
 		{

@@ -30,6 +30,7 @@ import org.apache.wicket.model.PropertyModel;
 public class ModalWindowPage extends BasePage
 {
 	private static final long serialVersionUID = 1L;
+	private String result;
 
 	public ModalWindowPage()
 	{
@@ -110,7 +111,5 @@ public class ModalWindowPage extends BasePage
 	{
 		this.result = result;
 	}
-
-	private String result;
 
 }

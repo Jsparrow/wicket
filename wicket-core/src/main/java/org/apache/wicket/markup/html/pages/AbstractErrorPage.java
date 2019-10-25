@@ -30,7 +30,6 @@ public abstract class AbstractErrorPage extends WebPage
 
 	protected AbstractErrorPage()
 	{
-		super();
 	}
 
 	protected AbstractErrorPage(final IModel<?> model)

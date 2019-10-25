@@ -49,6 +49,6 @@ public class ClosedMessage extends AbstractClientMessage
 	@Override
 	public final String toString()
 	{
-		return "The client closed its connection with code '" + closeCode + "' and message: '" + message + "'";
+		return new StringBuilder().append("The client closed its connection with code '").append(closeCode).append("' and message: '").append(message).append("'").toString();
 	}
 }

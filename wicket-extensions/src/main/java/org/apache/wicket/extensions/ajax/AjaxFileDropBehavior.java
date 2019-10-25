@@ -129,10 +129,7 @@ public class AjaxFileDropBehavior extends AjaxEventBehavior
 
 			if (fileItems != null)
 			{
-				for (FileItem item : fileItems)
-				{
-					fileUploads.add(new FileUpload(item));
-				}
+				fileItems.forEach(item -> fileUploads.add(new FileUpload(item)));
 			}
 
 			onFileUpload(target, fileUploads);

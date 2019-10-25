@@ -51,7 +51,7 @@ public class CharacterConverter extends AbstractConverter<Character>
 		{
 			return value.charAt(0);
 		}
-		throw newConversionException("Cannot convert '" + value + "' to Character", value, locale);
+		throw newConversionException(new StringBuilder().append("Cannot convert '").append(value).append("' to Character").toString(), value, locale);
 	}
 
 	/**

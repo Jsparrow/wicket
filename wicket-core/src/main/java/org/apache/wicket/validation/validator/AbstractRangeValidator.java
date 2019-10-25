@@ -109,24 +109,24 @@ public abstract class AbstractRangeValidator<R extends Comparable<? super R> & S
 		R value = getValue(validatable);
 		final R min = getMinimum();
 		final R max = getMaximum();
-		if ((min != null && value.compareTo(min) < 0) || (max != null && value.compareTo(max) > 0))
-		{
-			Mode mode = getMode();
-			ValidationError error = new ValidationError(this, mode.getVariation());
-			if (min != null)
-			{
-				error.setVariable("minimum", min);
-			}
-			if (max != null)
-			{
-				error.setVariable("maximum", max);
-			}
-			if (mode == Mode.EXACT)
-			{
-				error.setVariable("exact", max);
-			}
-			validatable.error(decorate(error, validatable));
+		if (!((min != null && value.compareTo(min) < 0) || (max != null && value.compareTo(max) > 0))) {
+			return;
 		}
+		Mode mode = getMode();
+		ValidationError error = new ValidationError(this, mode.getVariation());
+		if (min != null)
+		{
+			error.setVariable("minimum", min);
+		}
+		if (max != null)
+		{
+			error.setVariable("maximum", max);
+		}
+		if (mode == Mode.EXACT)
+		{
+			error.setVariable("exact", max);
+		}
+		validatable.error(decorate(error, validatable));
 	}
 
 	/**

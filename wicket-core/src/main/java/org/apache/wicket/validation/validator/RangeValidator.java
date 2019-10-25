@@ -58,6 +58,27 @@ public class RangeValidator<Z extends Comparable<? super Z> & Serializable> exte
 	private static final long serialVersionUID = 1L;
 
 	/**
+	 * Constructor that sets the minimum and maximum values.
+	 * 
+	 * @param minimum
+	 *            the minimum value
+	 * @param maximum
+	 *            the maximum value
+	 */
+	public RangeValidator(Z minimum, Z maximum)
+	{
+		setRange(minimum, maximum);
+	}
+
+	/**
+	 * Constructor used for subclasses who want to set the range using
+	 * {@link #setRange(Comparable, Comparable)}
+	 */
+	protected RangeValidator()
+	{
+	}
+
+	/**
 	 * @param minimum
 	 * @param maximum
 	 * @return a {@link RangeValidator} that validates if a value falls within a range
@@ -84,27 +105,6 @@ public class RangeValidator<Z extends Comparable<? super Z> & Serializable> exte
 	public static <T extends Comparable<? super T> & Serializable> RangeValidator<T> maximum(T maximum)
 	{
 		return new RangeValidator<>(null, maximum);
-	}
-
-	/**
-	 * Constructor that sets the minimum and maximum values.
-	 * 
-	 * @param minimum
-	 *            the minimum value
-	 * @param maximum
-	 *            the maximum value
-	 */
-	public RangeValidator(Z minimum, Z maximum)
-	{
-		setRange(minimum, maximum);
-	}
-
-	/**
-	 * Constructor used for subclasses who want to set the range using
-	 * {@link #setRange(Comparable, Comparable)}
-	 */
-	protected RangeValidator()
-	{
 	}
 
 	@Override

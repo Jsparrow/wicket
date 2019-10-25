@@ -46,8 +46,7 @@ class ObjenesisProxyReplacement implements IClusterable
 		Class<?> clazz = WicketObjects.resolveClass(type);
 		if (clazz == null) {
 			ClassNotFoundException cause = new ClassNotFoundException(
-					"Could not resolve type [" + type +
-							"] with the currently configured org.apache.wicket.application.IClassResolver");
+					new StringBuilder().append("Could not resolve type [").append(type).append("] with the currently configured org.apache.wicket.application.IClassResolver").toString());
 			throw new WicketRuntimeException(cause);
 		}
 		return ObjenesisProxyFactory.createProxy(clazz, locator, LazyInitProxyFactory.WicketNamingPolicy.INSTANCE);

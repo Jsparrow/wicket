@@ -409,8 +409,9 @@ public interface IRequestLogger
 		 */
 		public ILogData getEventTargetLog()
 		{
-			if (eventTarget instanceof ILoggableRequestHandler)
+			if (eventTarget instanceof ILoggableRequestHandler) {
 				return ((ILoggableRequestHandler)eventTarget).getLogData();
+			}
 			return new NoLogData();
 		}
 
@@ -436,8 +437,9 @@ public interface IRequestLogger
 		 */
 		public ILogData getResponseTargetLog()
 		{
-			if (responseTarget instanceof ILoggableRequestHandler)
+			if (responseTarget instanceof ILoggableRequestHandler) {
 				return ((ILoggableRequestHandler)responseTarget).getLogData();
+			}
 			return new NoLogData();
 		}
 
@@ -547,10 +549,9 @@ public interface IRequestLogger
 		@Override
 		public String toString()
 		{
-			return "Request[timetaken=" + getTimeTaken() + ",sessioninfo=" + sessionInfo +
-				",sessionid=" + sessionId + ",sessionsize=" + totalSessionSize + ",request=" +
-				eventTarget + ",response=" + responseTarget + ",alteredobjects=" +
-				getAlteredObjects() + ",activerequest=" + activeRequest + "]";
+			return new StringBuilder().append("Request[timetaken=").append(getTimeTaken()).append(",sessioninfo=").append(sessionInfo).append(",sessionid=").append(sessionId)
+					.append(",sessionsize=").append(totalSessionSize).append(",request=").append(eventTarget).append(",response=").append(responseTarget).append(",alteredobjects=")
+					.append(getAlteredObjects()).append(",activerequest=").append(activeRequest).append("]").toString();
 		}
 	}
 

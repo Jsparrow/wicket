@@ -102,6 +102,7 @@ public class DateTimePage extends WicketExamplePage
 		{
 			private static final long serialVersionUID = 1L;
 
+			@Override
 			public void onClick()
 			{
 				WebRequest request = (WebRequest)getRequest();
@@ -267,12 +268,12 @@ public class DateTimePage extends WicketExamplePage
 				@Override
 				public List<ZoneId> getObject()
 				{
-					return ZoneId.getAvailableZoneIds().stream().map(id -> ZoneId.of(id))
+					return ZoneId.getAvailableZoneIds().stream().map(ZoneId::of)
 						.collect(Collectors.toList());
 				}
 			});
 
-			setModel(new PropertyModel<ZoneId>(DateTimePage.this, "clientZone"));
+			setModel(new PropertyModel<>(DateTimePage.this, "clientZone"));
 
 			setChoiceRenderer(new IChoiceRenderer<ZoneId>()
 			{
@@ -305,6 +306,7 @@ public class DateTimePage extends WicketExamplePage
 			{
 				private static final long serialVersionUID = 1L;
 
+				@Override
 				protected void onUpdate()
 				{
 					// clear raw input of all inputs so that values are reformatted

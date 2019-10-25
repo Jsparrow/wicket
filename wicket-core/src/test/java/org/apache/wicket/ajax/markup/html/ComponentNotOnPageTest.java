@@ -61,9 +61,7 @@ class ComponentNotOnPageTest extends WicketTestCase
 		ComponentNotOnPage page = tester.startPage(new ComponentNotOnPage(notOnPage));
 		tester.startPage(page);
 
-                assertThrows(IllegalArgumentException.class, () -> {
-                        tester.clickLink("refresher", true);
-                });
+                assertThrows(IllegalArgumentException.class, () -> tester.clickLink("refresher", true));
 	}
 }
 

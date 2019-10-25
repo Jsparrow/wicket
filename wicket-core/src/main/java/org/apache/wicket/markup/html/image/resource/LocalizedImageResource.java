@@ -100,64 +100,6 @@ public final class LocalizedImageResource implements IClusterable
 	private String variation;
 
 	/**
-	 * Parses image value specifications of the form "[factoryName]:
-	 * [shared-image-name]?:[specification]"
-	 * 
-	 * @author Jonathan Locke
-	 */
-	private static final class ImageValueParser extends MetaPatternParser
-	{
-		/** Factory name */
-		private static final Group factoryName = new Group(MetaPattern.VARIABLE_NAME);
-
-		/** Image reference name */
-		private static final Group imageReferenceName = new Group(MetaPattern.VARIABLE_NAME);
-
-		/** Factory specification string */
-		private static final Group specification = new Group(MetaPattern.ANYTHING_NON_EMPTY);
-
-		/** Meta pattern. */
-		private static final MetaPattern pattern = new MetaPattern(factoryName, MetaPattern.COLON,
-			new OptionalMetaPattern(new MetaPattern[] { imageReferenceName }), MetaPattern.COLON,
-			specification);
-
-		/**
-		 * Construct.
-		 * 
-		 * @param input
-		 *            to parse
-		 */
-		private ImageValueParser(final CharSequence input)
-		{
-			super(pattern, input);
-		}
-
-		/**
-		 * @return The factory name
-		 */
-		private String getFactoryName()
-		{
-			return factoryName.get(matcher());
-		}
-
-		/**
-		 * @return Returns the imageReferenceName.
-		 */
-		private String getImageReferenceName()
-		{
-			return imageReferenceName.get(matcher());
-		}
-
-		/**
-		 * @return Returns the specification.
-		 */
-		private String getSpecification()
-		{
-			return specification.get(matcher());
-		}
-	}
-
-	/**
 	 * Constructor
 	 * 
 	 * @param component
@@ -206,11 +148,11 @@ public final class LocalizedImageResource implements IClusterable
 	 */
 	public final void setResource(final IResource resource)
 	{
-		if (this.resource != resource)
-		{
-			resourceKind = Boolean.TRUE;
-			this.resource = resource;
+		if (this.resource == resource) {
+			return;
 		}
+		resourceKind = Boolean.TRUE;
+		this.resource = resource;
 	}
 
 	/**
@@ -363,28 +305,6 @@ public final class LocalizedImageResource implements IClusterable
 		return factory;
 	}
 
-
-	static class SimpleStaticResourceReference extends ResourceReference
-	{
-		final IResource resource;
-
-		public SimpleStaticResourceReference(Class<?> scope, String name, Locale locale,
-			String style, String variation, IResource resource)
-		{
-			super(scope, name, locale, style, variation);
-			this.resource = resource;
-		}
-
-		private static final long serialVersionUID = 1L;
-
-		@Override
-		public IResource getResource()
-		{
-			return resource;
-		}
-
-	}
-
 	/**
 	 * Tries to load static image at the given path and throws an exception if the image cannot be
 	 * located.
@@ -456,9 +376,7 @@ public final class LocalizedImageResource implements IClusterable
 		else
 		{
 			throw new WicketRuntimeException(
-				"Could not generate image for value attribute '" +
-					value +
-					"'.  Was expecting a value attribute of the form \"[resourceFactoryName]:[resourceReferenceName]?:[factorySpecification]\".");
+				new StringBuilder().append("Could not generate image for value attribute '").append(value).append("'.  Was expecting a value attribute of the form \"[resourceFactoryName]:[resourceReferenceName]?:[factorySpecification]\".").toString());
 		}
 	}
 
@@ -480,5 +398,84 @@ public final class LocalizedImageResource implements IClusterable
 	public final ResourceReference getResourceReference()
 	{
 		return resourceReference;
+	}
+
+
+	/**
+	 * Parses image value specifications of the form "[factoryName]:
+	 * [shared-image-name]?:[specification]"
+	 * 
+	 * @author Jonathan Locke
+	 */
+	private static final class ImageValueParser extends MetaPatternParser
+	{
+		/** Factory name */
+		private static final Group factoryName = new Group(MetaPattern.VARIABLE_NAME);
+
+		/** Image reference name */
+		private static final Group imageReferenceName = new Group(MetaPattern.VARIABLE_NAME);
+
+		/** Factory specification string */
+		private static final Group specification = new Group(MetaPattern.ANYTHING_NON_EMPTY);
+
+		/** Meta pattern. */
+		private static final MetaPattern pattern = new MetaPattern(factoryName, MetaPattern.COLON,
+			new OptionalMetaPattern(new MetaPattern[] { imageReferenceName }), MetaPattern.COLON,
+			specification);
+
+		/**
+		 * Construct.
+		 * 
+		 * @param input
+		 *            to parse
+		 */
+		private ImageValueParser(final CharSequence input)
+		{
+			super(pattern, input);
+		}
+
+		/**
+		 * @return The factory name
+		 */
+		private String getFactoryName()
+		{
+			return factoryName.get(matcher());
+		}
+
+		/**
+		 * @return Returns the imageReferenceName.
+		 */
+		private String getImageReferenceName()
+		{
+			return imageReferenceName.get(matcher());
+		}
+
+		/**
+		 * @return Returns the specification.
+		 */
+		private String getSpecification()
+		{
+			return specification.get(matcher());
+		}
+	}
+
+	static class SimpleStaticResourceReference extends ResourceReference
+	{
+		private static final long serialVersionUID = 1L;
+		final IResource resource;
+
+		public SimpleStaticResourceReference(Class<?> scope, String name, Locale locale,
+			String style, String variation, IResource resource)
+		{
+			super(scope, name, locale, style, variation);
+			this.resource = resource;
+		}
+
+		@Override
+		public IResource getResource()
+		{
+			return resource;
+		}
+
 	}
 }

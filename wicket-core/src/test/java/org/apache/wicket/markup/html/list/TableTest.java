@@ -43,7 +43,7 @@ class TableTest extends WicketTestCase
 	 */
 	private PageableListView<Integer> createTable(final int modelListSize, final int pageSize)
 	{
-		List<Integer> modelList = new ArrayList<Integer>();
+		List<Integer> modelList = new ArrayList<>();
 		for (int i = 0; i < modelListSize; i++)
 		{
 			modelList.add(i);

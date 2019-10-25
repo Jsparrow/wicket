@@ -38,8 +38,6 @@ public class AjaxPage2 extends WebPage
 	 */
 	public AjaxPage2()
 	{
-		super();
-
 		myBorder = new BaseBorder("pageLayout");
 		add(myBorder);
 

@@ -65,19 +65,8 @@ import org.apache.wicket.util.value.IValueMap;
  * @author Martijn Dashorst
  * @author Ralf Ebert
  */
-public class AttributeModifier extends Behavior implements IClusterable
+public class AttributeModifier extends Behavior
 {
-	/**
-	 * Special attribute value markers.
-	 */
-	public enum MarkerValue {
-		/** Marker value to have an attribute without a value added. */
-		VALUELESS_ATTRIBUTE_ADD,
-
-		/** Marker value to have an attribute without a value removed. */
-		VALUELESS_ATTRIBUTE_REMOVE
-	}
-
 	/** Marker value to have an attribute without a value added. */
 	public static final MarkerValue VALUELESS_ATTRIBUTE_ADD = MarkerValue.VALUELESS_ATTRIBUTE_ADD;
 
@@ -136,8 +125,9 @@ public class AttributeModifier extends Behavior implements IClusterable
 	@Override
 	public final void detach(Component component)
 	{
-		if (replaceModel != null)
+		if (replaceModel != null) {
 			replaceModel.detach();
+		}
 	}
 
 	/**
@@ -151,8 +141,9 @@ public class AttributeModifier extends Behavior implements IClusterable
 	@Override
 	public final void onComponentTag(Component component, ComponentTag tag)
 	{
-		if (tag.getType() != TagType.CLOSE)
+		if (tag.getType() != TagType.CLOSE) {
 			replaceAttributeValue(component, tag);
+		}
 	}
 
 	/**
@@ -167,31 +158,30 @@ public class AttributeModifier extends Behavior implements IClusterable
 	 */
 	public final void replaceAttributeValue(final Component component, final ComponentTag tag)
 	{
-		if (isEnabled(component))
+		if (!isEnabled(component)) {
+			return;
+		}
+		final IValueMap attributes = tag.getAttributes();
+		final Object replacementValue = getReplacementOrNull(component);
+		if (VALUELESS_ATTRIBUTE_ADD == replacementValue)
 		{
-			final IValueMap attributes = tag.getAttributes();
-			final Object replacementValue = getReplacementOrNull(component);
-
-			if (VALUELESS_ATTRIBUTE_ADD == replacementValue)
-			{
-				attributes.put(attribute, null);
-			}
-			else if (VALUELESS_ATTRIBUTE_REMOVE == replacementValue)
+			attributes.put(attribute, null);
+		}
+		else if (VALUELESS_ATTRIBUTE_REMOVE == replacementValue)
+		{
+			attributes.remove(attribute);
+		}
+		else
+		{
+			final String value = toStringOrNull(attributes.get(attribute));
+			final Serializable newValue = newValue(value, toStringOrNull(replacementValue));
+			if (newValue == VALUELESS_ATTRIBUTE_REMOVE)
 			{
 				attributes.remove(attribute);
 			}
-			else
+			else if (newValue != null)
 			{
-				final String value = toStringOrNull(attributes.get(attribute));
-				final Serializable newValue = newValue(value, toStringOrNull(replacementValue));
-				if (newValue == VALUELESS_ATTRIBUTE_REMOVE)
-				{
-					attributes.remove(attribute);
-				}
-				else if (newValue != null)
-				{
-					attributes.put(attribute, newValue);
-				}
+				attributes.put(attribute, newValue);
 			}
 		}
 	}
@@ -199,7 +189,7 @@ public class AttributeModifier extends Behavior implements IClusterable
 	@Override
 	public String toString()
 	{
-		return "[AttributeModifier attribute=" + attribute + ", replaceModel=" + replaceModel + "]";
+		return new StringBuilder().append("[AttributeModifier attribute=").append(attribute).append(", replaceModel=").append(replaceModel).append("]").toString();
 	}
 
 	/**
@@ -377,5 +367,16 @@ public class AttributeModifier extends Behavior implements IClusterable
 		Args.notEmpty(attributeName, "attributeName");
 
 		return replace(attributeName, Model.of(VALUELESS_ATTRIBUTE_REMOVE));
+	}
+
+	/**
+	 * Special attribute value markers.
+	 */
+	public enum MarkerValue {
+		/** Marker value to have an attribute without a value added. */
+		VALUELESS_ATTRIBUTE_ADD,
+
+		/** Marker value to have an attribute without a value removed. */
+		VALUELESS_ATTRIBUTE_REMOVE
 	}
 }

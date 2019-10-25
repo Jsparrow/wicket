@@ -35,8 +35,8 @@ import org.apache.wicket.response.StringResponse;
 class TestHeaderResponse implements IHeaderResponse
 {
 	private StringResponse response = new StringResponse();
-	private Set<Object> rendered = new HashSet<Object>();
-	private List<HeaderItem> items = new ArrayList<HeaderItem>();
+	private Set<Object> rendered = new HashSet<>();
+	private List<HeaderItem> items = new ArrayList<>();
 	private boolean closed = false;
 
 	/**
@@ -50,8 +50,9 @@ class TestHeaderResponse implements IHeaderResponse
 	@Override
 	public void render(HeaderItem item)
 	{
-		if (item != NoHeaderItem.get())
+		if (item != NoHeaderItem.get()) {
 			items.add(item);
+		}
 	}
 
 	@Override

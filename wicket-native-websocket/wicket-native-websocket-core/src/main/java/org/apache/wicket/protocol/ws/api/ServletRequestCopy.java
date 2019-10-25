@@ -385,13 +385,13 @@ public class ServletRequestCopy implements HttpServletRequest
 	}
 
 	@Override
-	public AsyncContext startAsync() throws IllegalStateException
+	public AsyncContext startAsync()
 	{
 		return null;
 	}
 
 	@Override
-	public AsyncContext startAsync(ServletRequest servletRequest, ServletResponse servletResponse) throws IllegalStateException
+	public AsyncContext startAsync(ServletRequest servletRequest, ServletResponse servletResponse)
 	{
 		return null;
 	}

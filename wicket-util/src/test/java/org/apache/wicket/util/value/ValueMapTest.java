@@ -24,6 +24,8 @@ import java.time.Duration;
 import java.time.Instant;
 
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jcompagner
@@ -31,6 +33,8 @@ import org.junit.jupiter.api.Test;
  */
 public class ValueMapTest
 {
+	private static final Logger logger = LoggerFactory.getLogger(ValueMapTest.class);
+
 	/**
 	 * @throws Exception
 	 */
@@ -110,18 +114,6 @@ public class ValueMapTest
 	}
 
 	/**
-	 * Enumeration for testing
-	 */
-	public enum TestEnum {
-		/**	 */
-		one,
-		/**	 */
-		two,
-		/**	 */
-		three
-	}
-
-	/**
 	 * Test getting enums from value map
 	 */
 	@Test
@@ -151,6 +143,7 @@ public class ValueMapTest
 		}
 		catch (IllegalArgumentException ignored)
 		{
+			logger.error(ignored.getMessage(), ignored);
 
 		}
 
@@ -261,5 +254,17 @@ public class ValueMapTest
 		assertEquals("1", a[0]);
 		assertEquals("2", a[1]);
 		assertEquals("3", a[2]);
+	}
+
+	/**
+	 * Enumeration for testing
+	 */
+	public enum TestEnum {
+		/**	 */
+		one,
+		/**	 */
+		two,
+		/**	 */
+		three
 	}
 }

@@ -75,7 +75,7 @@ class BookmarkablePageLinkTest extends WicketTestCase
 	@Test
 	void customParametersWithSpecialCharacters()
 	{
-		BookmarkablePageLink<MockPageWithLink> link = new BookmarkablePageLink<MockPageWithLink>(
+		BookmarkablePageLink<MockPageWithLink> link = new BookmarkablePageLink<>(
 			"link", MockPageWithLink.class);
 		link.getPageParameters().set("urlEscapeNeeded", "someone's ^b%a&d pa\"rameter");
 

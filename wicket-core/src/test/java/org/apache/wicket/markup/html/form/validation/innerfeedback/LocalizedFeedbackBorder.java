@@ -44,14 +44,7 @@ class LocalizedFeedbackBorder extends FormComponentFeedbackBorder
 				final IFeedbackMessageFilter filter = feedback.getFilter();
 
 				boolean error = new FeedbackCollector(getPage()).collect(
-					new IFeedbackMessageFilter()
-					{
-						@Override
-						public boolean accept(FeedbackMessage message)
-						{
-							return filter.accept(message) && message.isError();
-						}
-					}).size() > 0;
+					(FeedbackMessage message) -> filter.accept(message) && message.isError()).size() > 0;
 				return "border: 1px solid " + (error ? "red" : "green");
 			}
 		}));

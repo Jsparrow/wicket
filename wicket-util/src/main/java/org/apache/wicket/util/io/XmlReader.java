@@ -146,7 +146,7 @@ public final class XmlReader extends Reader
 
 		// Extract the encoding
 		String encoding = matcher.group(2);
-		if ((encoding == null) || (encoding.length() == 0))
+		if ((encoding == null) || (encoding.isEmpty()))
 		{
 			encoding = matcher.group(3);
 		}
@@ -236,6 +236,6 @@ public final class XmlReader extends Reader
 	@Override
 	public String toString()
 	{
-		return inputStream.toString() + " (" + encoding + ")";
+		return new StringBuilder().append(inputStream.toString()).append(" (").append(encoding).append(")").toString();
 	}
 }

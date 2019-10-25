@@ -24,23 +24,6 @@ package org.apache.wicket.http2.markup.head;
  */
 public class PushItemHeaderValue
 {
-	/**
-	 * The header operation to be used
-	 *
-	 * @author Tobias Soloschenko
-	 *
-	 */
-	public enum HeaderOperation {
-		/**
-		 * Header value is going to be set
-		 */
-		SET,
-		/**
-		 * Header value is going to be add
-		 */
-		ADD
-	}
-
 	private String value;
 
 	private HeaderOperation operation;
@@ -97,5 +80,22 @@ public class PushItemHeaderValue
 	public void setOperation(HeaderOperation operation)
 	{
 		this.operation = operation;
+	}
+
+	/**
+	 * The header operation to be used
+	 *
+	 * @author Tobias Soloschenko
+	 *
+	 */
+	public enum HeaderOperation {
+		/**
+		 * Header value is going to be set
+		 */
+		SET,
+		/**
+		 * Header value is going to be add
+		 */
+		ADD
 	}
 }

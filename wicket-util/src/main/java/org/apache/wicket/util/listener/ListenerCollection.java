@@ -75,10 +75,7 @@ public abstract class ListenerCollection<T> implements Serializable, Iterable<T>
 	 */
 	protected void notify(final INotifier<T> notifier)
 	{
-		for (T listener : listeners)
-		{
-			notifier.notify(listener);
-		}
+		listeners.forEach(notifier::notify);
 	}
 
 	/**
@@ -89,8 +86,7 @@ public abstract class ListenerCollection<T> implements Serializable, Iterable<T>
 	 */
 	protected void notifyIgnoringExceptions(final INotifier<T> notifier)
 	{
-		for (T listener : listeners)
-		{
+		listeners.forEach(listener -> {
 			try
 			{
 				notifier.notify(listener);
@@ -99,7 +95,7 @@ public abstract class ListenerCollection<T> implements Serializable, Iterable<T>
 			{
 				logger.error("Error invoking listener: " + listener, e);
 			}
-		}
+		});
 	}
 
 	/**
@@ -110,20 +106,14 @@ public abstract class ListenerCollection<T> implements Serializable, Iterable<T>
 	 */
 	protected void reversedNotifyIgnoringExceptions(final INotifier<T> notifier)
 	{
-		reversedNotify(new INotifier<T>()
-		{
-			@Override
-			public void notify(T listener)
+		reversedNotify((T listener) -> {
+			try
 			{
-				try
-				{
-					notifier.notify(listener);
-				}
-				catch (Exception e)
-				{
-					logger.error("Error invoking listener: " + listener, e);
-				}
-
+				notifier.notify(listener);
+			}
+			catch (Exception e)
+			{
+				logger.error("Error invoking listener: " + listener, e);
 			}
 
 		});
@@ -177,6 +167,17 @@ public abstract class ListenerCollection<T> implements Serializable, Iterable<T>
 	}
 
 	/**
+	 * Returns an iterator that can iterate the listeners.
+	 * 
+	 * @return an iterator that can iterate the listeners.
+	 */
+	@Override
+	public Iterator<T> iterator()
+	{
+		return listeners.iterator();
+	}
+
+	/**
 	 * Used to notify a listener. Usually this method simply forwards the {@link #notify(Object)} to
 	 * the proper method on the listener.
 	 * 
@@ -186,16 +187,5 @@ public abstract class ListenerCollection<T> implements Serializable, Iterable<T>
 	protected static interface INotifier<T>
 	{
 		void notify(T listener);
-	}
-
-	/**
-	 * Returns an iterator that can iterate the listeners.
-	 * 
-	 * @return an iterator that can iterate the listeners.
-	 */
-	@Override
-	public Iterator<T> iterator()
-	{
-		return listeners.iterator();
 	}
 }

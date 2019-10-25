@@ -38,8 +38,6 @@ public class UrlDecoder
 {
 	private static final Logger LOG = LoggerFactory.getLogger(UrlDecoder.class);
 
-	private final boolean decodePlus;
-
 	/**
 	 * Encoder used to decode name or value components of a query string.<br/>
 	 * <br/>
@@ -55,6 +53,8 @@ public class UrlDecoder
 	 * For example: http://org.acme/foo/thispart/orthispart?butnot=thispart
 	 */
 	public static final UrlDecoder PATH_INSTANCE = new UrlDecoder(false);
+
+	private final boolean decodePlus;
 
 	/**
 	 * Create decoder
@@ -99,7 +99,7 @@ public class UrlDecoder
 		StringBuilder sb = new StringBuilder(numChars > 500 ? numChars / 2 : numChars);
 		int i = 0;
 
-		if (enc.length() == 0)
+		if (enc.isEmpty())
 		{
 			throw new RuntimeException(new UnsupportedEncodingException(
 				"URLDecoder: empty string enc parameter"));

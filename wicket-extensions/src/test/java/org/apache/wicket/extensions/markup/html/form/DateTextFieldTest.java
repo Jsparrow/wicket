@@ -63,13 +63,9 @@ public class DateTextFieldTest extends WicketTestCase
 	{
 		TestPage testPage = new TestPage("unsupportedType");
 
-		Exception e = assertThrows(MarkupException.class, () -> {
-			tester.startPage(testPage);
-		});
+		Exception e = assertThrows(MarkupException.class, () -> tester.startPage(testPage));
 
-		assertEquals("Component [text] (path = [0:form:text]) must be applied to a tag" +
-			" with [type] attribute matching any of [text, date, datetime, datetime-local, month, time, week], " +
-			"not [unsupportedType]", e.getMessage());
+		assertEquals(new StringBuilder().append("Component [text] (path = [0:form:text]) must be applied to a tag").append(" with [type] attribute matching any of [text, date, datetime, datetime-local, month, time, week], ").append("not [unsupportedType]").toString(), e.getMessage());
 	}
 
 	/** */

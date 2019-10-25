@@ -54,6 +54,6 @@ public class CollectionModel<T> extends GenericBaseModel<Collection<T>>
 	@Override
 	protected Collection<T> createSerializableVersionOf(Collection<T> object)
 	{
-		return new ArrayList<T>(object);
+		return new ArrayList<>(object);
 	}
 }

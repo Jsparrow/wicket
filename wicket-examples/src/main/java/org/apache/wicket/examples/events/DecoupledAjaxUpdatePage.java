@@ -115,11 +115,11 @@ public class DecoupledAjaxUpdatePage extends BasePage
 			super.onEvent(event);
 
 			// check if this is a counter update event and if so repaint self
-			if (event.getPayload() instanceof CounterUpdate)
-			{
-				CounterUpdate update = (CounterUpdate)event.getPayload();
-				update.getTarget().add(this);
+			if (!(event.getPayload() instanceof CounterUpdate)) {
+				return;
 			}
+			CounterUpdate update = (CounterUpdate)event.getPayload();
+			update.getTarget().add(this);
 		}
 
 	}

@@ -62,7 +62,7 @@ public final class BytesTest
 	 * @throws StringValueConversionException
 	 */
 	@Test
-	public void allOperationsCurrentLocale() throws StringValueConversionException
+	public void allOperationsCurrentLocale()
 	{
 		assertTrue(Bytes.bytes(1024).equals(Bytes.kilobytes(1)));
 		assertTrue(Bytes.bytes(1024 * 1024).equals(Bytes.megabytes(1)));
@@ -82,7 +82,7 @@ public final class BytesTest
 	 * @throws StringValueConversionException
 	 */
 	@Test
-	public void stringOperationsDotLocale() throws StringValueConversionException
+	public void stringOperationsDotLocale()
 	{
 		Locale.setDefault(Locale.UK);
 		assertTrue("1GB".equals(Bytes.gigabytes(1).toString()));
@@ -98,7 +98,7 @@ public final class BytesTest
 	 * @throws StringValueConversionException
 	 */
 	@Test
-	public void stringOperationsCommaLocale() throws StringValueConversionException
+	public void stringOperationsCommaLocale()
 	{
 		Locale.setDefault(Locale.GERMANY);
 		assertTrue("1GB".equals(Bytes.gigabytes(1).toString()));
@@ -114,7 +114,7 @@ public final class BytesTest
 	 * @throws StringValueConversionException
 	 */
 	@Test
-	public void allOperationsExplicitLocale() throws StringValueConversionException
+	public void allOperationsExplicitLocale()
 	{
 		assertTrue("1GB".equals(Bytes.gigabytes(1).toString()));
 		assertTrue("1,5GB".equals(Bytes.gigabytes(1.5).toString(Locale.GERMAN)));

@@ -37,56 +37,7 @@ public class PageWindowManager implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 
-	/**
-	 * Contains information about a page inside the file.
-	 * 
-	 * @author Matej Knopp
-	 */
-	public static class FileWindow implements IPersistedPage, Serializable
-	{
-		private static final long serialVersionUID = 1L;
-
-		/** id of data or -1 if the window is empty */
-		private int id;
-
-		private String type;
-
-		/** offset in the file where the serialized page data begins */
-		private int filePartOffset;
-
-		/** size of serialized page data */
-		private int filePartSize;
-
-		@Override
-		public int getPageId()
-		{
-			return id;
-		}
-
-		@Override
-		public String getPageType()
-		{
-			return type;
-		}
-		
-		@Override
-		public Bytes getPageSize()
-		{
-			return Bytes.bytes(filePartSize);
-		}
-
-		public int getFilePartOffset()
-		{
-			return filePartOffset;
-		}
-		
-		public int getFilePartSize()
-		{
-			return filePartSize;
-		}
-	}
-
-	private final List<FileWindow> windows = new ArrayList<FileWindow>();
+	private final List<FileWindow> windows = new ArrayList<>();
 
 	/**
 	 * map from page id to list of pagewindow indices (referring to the windows list) - to improve
@@ -112,22 +63,34 @@ public class PageWindowManager implements Serializable
 	private final long maxSize;
 
 	/**
+	 * Creates a new PageWindowManager.
+	 * 
+	 * @param maxSize
+	 *            maximum page size. After this size is exceeded, the pages will be saved starting
+	 *            at the beginning of file
+	 */
+	public PageWindowManager(long maxSize)
+	{
+		this.maxSize = maxSize;
+	}
+
+	/**
 	 * 
 	 * @param pageId
 	 * @param windowIndex
 	 */
 	private void putWindowIndex(int pageId, int windowIndex)
 	{
-		if (idToWindowIndex != null && pageId != -1 && windowIndex != -1)
-		{
-			Integer oldPageId = windowIndexToPageId.remove(windowIndex);
-			if (oldPageId != null)
-			{
-				idToWindowIndex.remove(oldPageId);
-			}
-			idToWindowIndex.put(pageId, windowIndex);
-			windowIndexToPageId.put(windowIndex, pageId);
+		if (!(idToWindowIndex != null && pageId != -1 && windowIndex != -1)) {
+			return;
 		}
+		Integer oldPageId = windowIndexToPageId.remove(windowIndex);
+		if (oldPageId != null)
+		{
+			idToWindowIndex.remove(oldPageId);
+		}
+		idToWindowIndex.put(pageId, windowIndex);
+		windowIndexToPageId.put(windowIndex, pageId);
 	}
 
 	/**
@@ -149,9 +112,9 @@ public class PageWindowManager implements Serializable
 	private void rebuildIndices()
 	{
 		idToWindowIndex = null;
-		idToWindowIndex = new IntHashMap<Integer>();
+		idToWindowIndex = new IntHashMap<>();
 		windowIndexToPageId = null;
-		windowIndexToPageId = new IntHashMap<Integer>();
+		windowIndexToPageId = new IntHashMap<>();
 		for (int i = 0; i < windows.size(); ++i)
 		{
 			FileWindow window = windows.get(i);
@@ -204,12 +167,11 @@ public class PageWindowManager implements Serializable
 	 */
 	private int getWindowFileOffset(int index)
 	{
-		if (index > 0)
-		{
-			FileWindow window = windows.get(index - 1);
-			return window.filePartOffset + window.filePartSize;
+		if (index <= 0) {
+			return 0;
 		}
-		return 0;
+		FileWindow window = windows.get(index - 1);
+		return window.filePartOffset + window.filePartSize;
 	}
 
 	/**
@@ -254,16 +216,15 @@ public class PageWindowManager implements Serializable
 	 */
 	private void mergeWindowWithNext(int index)
 	{
-		if (index < windows.size() - 1)
-		{
-			FileWindow window = windows.get(index);
-			FileWindow next = windows.get(index + 1);
-			window.filePartSize += next.filePartSize;
-
-			windows.remove(index + 1);
-			idToWindowIndex = null; // reset index
-			windowIndexToPageId = null;
+		if (!(index < windows.size() - 1)) {
+			return;
 		}
+		FileWindow window = windows.get(index);
+		FileWindow next = windows.get(index + 1);
+		window.filePartSize += next.filePartSize;
+		windows.remove(index + 1);
+		idToWindowIndex = null; // reset index
+		windowIndexToPageId = null;
 	}
 
 	/**
@@ -410,23 +371,23 @@ public class PageWindowManager implements Serializable
 	public synchronized void removePage(int pageId)
 	{
 		int index = getWindowIndex(pageId);
-		if (index != -1)
+		if (!(index != -1)) {
+			return;
+		}
+		FileWindow window = windows.get(index);
+		removeWindowIndex(pageId);
+		if (index == windows.size() - 1)
 		{
-			FileWindow window = windows.get(index);
-			removeWindowIndex(pageId);
-			if (index == windows.size() - 1)
+			windows.remove(index);
+			totalSize -= window.filePartSize;
+			if (indexPointer == index)
 			{
-				windows.remove(index);
-				totalSize -= window.filePartSize;
-				if (indexPointer == index)
-				{
-					--indexPointer;
-				}
+				--indexPointer;
 			}
-			else
-			{
-				window.id = -1;
-			}
+		}
+		else
+		{
+			window.id = -1;
 		}
 	}
 
@@ -437,7 +398,7 @@ public class PageWindowManager implements Serializable
 	 */
 	public synchronized List<FileWindow> getFileWindows()
 	{
-		List<FileWindow> result = new ArrayList<FileWindow>();
+		List<FileWindow> result = new ArrayList<>();
 
 		// start from current index to 0
 		int currentIndex = indexPointer;
@@ -471,18 +432,6 @@ public class PageWindowManager implements Serializable
 	}
 
 	/**
-	 * Creates a new PageWindowManager.
-	 * 
-	 * @param maxSize
-	 *            maximum page size. After this size is exceeded, the pages will be saved starting
-	 *            at the beginning of file
-	 */
-	public PageWindowManager(long maxSize)
-	{
-		this.maxSize = maxSize;
-	}
-
-	/**
 	 * Returns the size of all saved pages
 	 * 
 	 * @return total size
@@ -490,5 +439,54 @@ public class PageWindowManager implements Serializable
 	public synchronized int getTotalSize()
 	{
 		return totalSize;
+	}
+
+	/**
+	 * Contains information about a page inside the file.
+	 * 
+	 * @author Matej Knopp
+	 */
+	public static class FileWindow implements IPersistedPage, Serializable
+	{
+		private static final long serialVersionUID = 1L;
+
+		/** id of data or -1 if the window is empty */
+		private int id;
+
+		private String type;
+
+		/** offset in the file where the serialized page data begins */
+		private int filePartOffset;
+
+		/** size of serialized page data */
+		private int filePartSize;
+
+		@Override
+		public int getPageId()
+		{
+			return id;
+		}
+
+		@Override
+		public String getPageType()
+		{
+			return type;
+		}
+		
+		@Override
+		public Bytes getPageSize()
+		{
+			return Bytes.bytes(filePartSize);
+		}
+
+		public int getFilePartOffset()
+		{
+			return filePartOffset;
+		}
+		
+		public int getFilePartSize()
+		{
+			return filePartSize;
+		}
 	}
 }

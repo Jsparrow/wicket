@@ -85,10 +85,10 @@ class FormTesterSubmitLinkTest extends WicketTestCase
 
 			TestPage()
 			{
-				Form<Void> form = new Form<Void>("form");
+				Form<Void> form = new Form<>("form");
 				add(form);
 
-				RadioGroup<String> group = new RadioGroup<String>("group",
+				RadioGroup<String> group = new RadioGroup<>("group",
 					new PropertyModel<String>(this, "value"));
 				form.add(group);
 

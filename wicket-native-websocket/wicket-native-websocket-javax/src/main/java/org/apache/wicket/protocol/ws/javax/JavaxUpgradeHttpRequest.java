@@ -83,12 +83,11 @@ public class JavaxUpgradeHttpRequest implements HttpServletRequest
 		Map<String, List<String>> parameters = session.getRequestParameterMap();
 		if (parameters != null)
 		{
-			for (Map.Entry<String, List<String>> entry : parameters.entrySet())
-			{
+			parameters.entrySet().forEach(entry -> {
 				String name = entry.getKey();
 				List<String> value = entry.getValue();
 				parametersMap.put(name, value.toArray(new String[0]));
-			}
+			});
 		}
 	}
 
@@ -551,13 +550,13 @@ public class JavaxUpgradeHttpRequest implements HttpServletRequest
 	}
 
 	@Override
-	public AsyncContext startAsync() throws IllegalStateException
+	public AsyncContext startAsync()
 	{
 		return null;
 	}
 
 	@Override
-	public AsyncContext startAsync(ServletRequest servletRequest, ServletResponse servletResponse) throws IllegalStateException
+	public AsyncContext startAsync(ServletRequest servletRequest, ServletResponse servletResponse)
 	{
 		return null;
 	}

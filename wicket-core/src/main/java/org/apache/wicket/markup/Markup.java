@@ -49,6 +49,28 @@ public class Markup extends AbstractMarkupFragment
 	private final MarkupResourceStream markupResourceStream;
 
 	/**
+	 * Constructor
+	 * 
+	 * @param markupResourceStream
+	 *            The associated Markup
+	 */
+	public Markup(final MarkupResourceStream markupResourceStream)
+	{
+		Args.notNull(markupResourceStream, "markupResourceStream");
+
+		this.markupResourceStream = markupResourceStream;
+		markupElements = new ArrayList<>();
+	}
+
+	/**
+	 * Private Constructor for NO_MARKUP only
+	 */
+	private Markup()
+	{
+		markupResourceStream = null;
+	}
+
+	/**
 	 * Take the markup string, parse it and return the Markup (list of MarkupElements).
 	 * <p>
 	 * Limitation: Please note that MarkupFactory is NOT used and thus no caching is used (which
@@ -85,36 +107,10 @@ public class Markup extends AbstractMarkupFragment
 			markupParser.setWicketNamespace(wicketNamespace);
 			return markupParser.parse();
 		}
-		catch (IOException ex)
+		catch (ResourceStreamNotFoundException | IOException ex)
 		{
 			throw new RuntimeException(ex);
 		}
-		catch (ResourceStreamNotFoundException ex)
-		{
-			throw new RuntimeException(ex);
-		}
-	}
-
-	/**
-	 * Private Constructor for NO_MARKUP only
-	 */
-	private Markup()
-	{
-		markupResourceStream = null;
-	}
-
-	/**
-	 * Constructor
-	 * 
-	 * @param markupResourceStream
-	 *            The associated Markup
-	 */
-	public Markup(final MarkupResourceStream markupResourceStream)
-	{
-		Args.notNull(markupResourceStream, "markupResourceStream");
-
-		this.markupResourceStream = markupResourceStream;
-		markupElements = new ArrayList<>();
 	}
 
 	@Override
@@ -140,8 +136,7 @@ public class Markup extends AbstractMarkupFragment
 
 		if ((index < 0) || (index >= size()))
 		{
-			throw new IndexOutOfBoundsException("'index' must be smaller than size(). Index:" +
-				index + "; size:" + size());
+			throw new IndexOutOfBoundsException(new StringBuilder().append("'index' must be smaller than size(). Index:").append(index).append("; size:").append(size()).toString());
 		}
 
 		markupElements.set(index, elem);
@@ -168,7 +163,7 @@ public class Markup extends AbstractMarkupFragment
 	 * 
 	 * @param markupElement
 	 */
-	final public void addMarkupElement(final MarkupElement markupElement)
+	public final void addMarkupElement(final MarkupElement markupElement)
 	{
 		markupElements.add(markupElement);
 	}
@@ -179,7 +174,7 @@ public class Markup extends AbstractMarkupFragment
 	 * @param pos
 	 * @param markupElement
 	 */
-	final public void addMarkupElement(final int pos, final MarkupElement markupElement)
+	public final void addMarkupElement(final int pos, final MarkupElement markupElement)
 	{
 		markupElements.add(pos, markupElement);
 	}
@@ -187,16 +182,10 @@ public class Markup extends AbstractMarkupFragment
 	/**
 	 * Make all tags immutable and the list of elements unmodifiable.
 	 */
-	final public void makeImmutable()
+	public final void makeImmutable()
 	{
-		for (MarkupElement markupElement : markupElements)
-		{
-			if (markupElement instanceof ComponentTag)
-			{
-				// Make the tag immutable
-				((ComponentTag)markupElement).makeImmutable();
-			}
-		}
+		// Make the tag immutable
+		markupElements.stream().filter(markupElement -> markupElement instanceof ComponentTag).forEach(markupElement -> ((ComponentTag) markupElement).makeImmutable());
 
 		markupElements = Collections.unmodifiableList(markupElements);
 	}
@@ -238,10 +227,7 @@ public class Markup extends AbstractMarkupFragment
 
 		if (markupElements != null)
 		{
-			for (MarkupElement markupElement : markupElements)
-			{
-				buf.append(markupElement);
-			}
+			markupElements.forEach(buf::append);
 		}
 
 		return buf.toString();

@@ -28,20 +28,6 @@ import org.apache.wicket.util.collections.MostRecentlyUsedMap;
 class StoredResponsesMap extends MostRecentlyUsedMap<String, Object>
 {
 	private static final long serialVersionUID = 1L;
-
-	/**
-	 * The actual object that is stored as a value of the map. It wraps the buffered response and
-	 * assigns it a creation time.
-	 */
-	private static class Value
-	{
-		/** the original response to store */
-		private BufferedWebResponse response;
-
-		/** the time when this response is stored */
-		private Instant creationTime;
-	}
-
 	/**
 	 * The duration of time before a {@link Value} is considered as expired
 	 */
@@ -87,8 +73,7 @@ class StoredResponsesMap extends MostRecentlyUsedMap<String, Object>
 	{
 		if (!(bufferedResponse instanceof BufferedWebResponse))
 		{
-			throw new IllegalArgumentException(StoredResponsesMap.class.getSimpleName() +
-				" can store only instances of " + BufferedWebResponse.class.getSimpleName());
+			throw new IllegalArgumentException(new StringBuilder().append(StoredResponsesMap.class.getSimpleName()).append(" can store only instances of ").append(BufferedWebResponse.class.getSimpleName()).toString());
 		}
 
 		Value value = new Value();
@@ -145,5 +130,18 @@ class StoredResponsesMap extends MostRecentlyUsedMap<String, Object>
 	public void putAll(Map<? extends String, ?> m)
 	{
 		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 * The actual object that is stored as a value of the map. It wraps the buffered response and
+	 * assigns it a creation time.
+	 */
+	private static class Value
+	{
+		/** the original response to store */
+		private BufferedWebResponse response;
+
+		/** the time when this response is stored */
+		private Instant creationTime;
 	}
 }

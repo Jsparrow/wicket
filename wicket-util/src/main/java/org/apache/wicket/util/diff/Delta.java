@@ -58,6 +58,8 @@
 package org.apache.wicket.util.diff;
 
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Holds a "delta" difference between to revisions of a text.
@@ -78,9 +80,7 @@ import java.util.List;
 public abstract class Delta extends ToString
 {
 
-	protected Chunk original;
-
-	protected Chunk revised;
+	private static final Logger logger = LoggerFactory.getLogger(Delta.class);
 
 	static Class<?>[][] DeltaClass;
 
@@ -96,7 +96,30 @@ public abstract class Delta extends ToString
 		}
 		catch (Exception ignored)
 		{
+			logger.error(ignored.getMessage(), ignored);
 		}
+	}
+
+	protected Chunk original;
+
+	protected Chunk revised;
+
+	/**
+	 * Creates an uninitialized delta.
+	 */
+	protected Delta()
+	{
+	}
+
+	/**
+	 * Creates a delta object with the given chunks from the original and revised texts.
+	 * 
+	 * @param orig
+	 * @param rev
+	 */
+	protected Delta(final Chunk orig, final Chunk rev)
+	{
+		init(orig, rev);
 	}
 
 	/**
@@ -119,28 +142,11 @@ public abstract class Delta extends ToString
 		}
 		catch (Exception e)
 		{
+			logger.error(e.getMessage(), e);
 			return null;
 		}
 		result.init(orig, rev);
 		return result;
-	}
-
-	/**
-	 * Creates an uninitialized delta.
-	 */
-	protected Delta()
-	{
-	}
-
-	/**
-	 * Creates a delta object with the given chunks from the original and revised texts.
-	 * 
-	 * @param orig
-	 * @param rev
-	 */
-	protected Delta(final Chunk orig, final Chunk rev)
-	{
-		init(orig, rev);
 	}
 
 	/**

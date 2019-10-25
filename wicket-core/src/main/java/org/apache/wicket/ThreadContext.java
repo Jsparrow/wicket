@@ -25,13 +25,20 @@ import org.apache.wicket.request.cycle.RequestCycle;
  */
 public class ThreadContext
 {
+	private static final ThreadLocal<ThreadContext> threadLocal = new ThreadLocal<>();
+
 	private Application application;
 
 	private RequestCycle requestCycle;
 
 	private Session session;
 
-	private static final ThreadLocal<ThreadContext> threadLocal = new ThreadLocal<ThreadContext>();
+	/**
+	 * Construct.
+	 */
+	private ThreadContext()
+	{
+	}
 
 	/**
 	 * INTERNAL METHOD
@@ -159,12 +166,5 @@ public class ThreadContext
 		{
 			threadLocal.set(threadContext);
 		}
-	}
-
-	/**
-	 * Construct.
-	 */
-	private ThreadContext()
-	{
 	}
 }

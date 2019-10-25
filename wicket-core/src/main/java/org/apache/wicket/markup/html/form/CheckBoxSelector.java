@@ -131,9 +131,7 @@ public class CheckBoxSelector extends AbstractCheckSelector
 	{
 		List<CheckBox> checkBoxes = new ArrayList<>();
 
-		container.<CheckBox, Void> visitChildren(CheckBox.class, (child, visit) -> {
-			checkBoxes.add(child);
-		});
+		container.<CheckBox, Void> visitChildren(CheckBox.class, (child, visit) -> checkBoxes.add(child));
 
 		return checkBoxes;
 	}

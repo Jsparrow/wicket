@@ -67,24 +67,6 @@ public class ResourceReferenceRegistry
 	private int autoAddedCapacity = 1000;
 
 	/**
-	 * A simple implementation of {@link IResourceReferenceFactory} that creates
-	 * {@link PackageResourceReference}
-	 */
-	public static class DefaultResourceReferenceFactory implements IResourceReferenceFactory
-	{
-		@Override
-		public ResourceReference create(Key key)
-		{
-			ResourceReference result = null;
-			if (PackageResource.exists(key))
-			{
-				result = new PackageResourceReference(key);
-			}
-			return result;
-		}
-	}
-
-	/**
 	 * The factory to use when a ResourceReference is not previously
 	 * registered and a new instance should be create
 	 */
@@ -428,7 +410,7 @@ public class ResourceReferenceRegistry
 
 			if (autoAddedQueue == null)
 			{
-				autoAddedQueue = new ConcurrentLinkedQueue<Key>();
+				autoAddedQueue = new ConcurrentLinkedQueue<>();
 			}
 			else
 			{
@@ -492,5 +474,23 @@ public class ResourceReferenceRegistry
 	public void setResourceReferenceFactory(IResourceReferenceFactory resourceReferenceFactory)
 	{
 		this.resourceReferenceFactory = resourceReferenceFactory;
+	}
+
+	/**
+	 * A simple implementation of {@link IResourceReferenceFactory} that creates
+	 * {@link PackageResourceReference}
+	 */
+	public static class DefaultResourceReferenceFactory implements IResourceReferenceFactory
+	{
+		@Override
+		public ResourceReference create(Key key)
+		{
+			ResourceReference result = null;
+			if (PackageResource.exists(key))
+			{
+				result = new PackageResourceReference(key);
+			}
+			return result;
+		}
 	}
 }

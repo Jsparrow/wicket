@@ -165,20 +165,20 @@ public class PageProvider implements IPageProvider, IClusterable
 	}
 
 	@Override
-	public IRequestablePage getPageInstance() throws PageExpiredException
+	public IRequestablePage getPageInstance()
 	{
 		IRequestablePage page = getProvision().getPage();
 		
 		if (page == null && wasExpired()) 
 		{
-			throw new PageExpiredException("Page with id '" + pageId + "' has expired.");
+			throw new PageExpiredException(new StringBuilder().append("Page with id '").append(pageId).append("' has expired.").toString());
 		}
 		
 		return page;
 	}
 
 	@Override
-	public PageParameters getPageParameters() throws PageExpiredException
+	public PageParameters getPageParameters()
 	{
 		if (pageParameters != null)
 		{
@@ -235,7 +235,7 @@ public class PageProvider implements IPageProvider, IClusterable
 	}
 
 	@Override
-	public Class<? extends IRequestablePage> getPageClass() throws PageExpiredException
+	public Class<? extends IRequestablePage> getPageClass()
 	{
 		if (pageClass != null)
 		{
@@ -273,11 +273,11 @@ public class PageProvider implements IPageProvider, IClusterable
 	@Override
 	public void detach()
 	{
-		if (provision != null)
-		{
-			provision.detach();
-			provision = null;
+		if (provision == null) {
+			return;
 		}
+		provision.detach();
+		provision = null;
 	}
 
 	/**
@@ -335,8 +335,8 @@ public class PageProvider implements IPageProvider, IClusterable
 	@Override
 	public String toString()
 	{
-		return "PageProvider{" + "renderCount=" + renderCount + ", pageId=" + pageId
-			+ ", pageClass=" + pageClass + ", pageParameters=" + pageParameters + '}';
+		return new StringBuilder().append("PageProvider{").append("renderCount=").append(renderCount).append(", pageId=").append(pageId).append(", pageClass=").append(pageClass)
+				.append(", pageParameters=").append(pageParameters).append('}').toString();
 	}
 
 	/**
@@ -404,8 +404,9 @@ public class PageProvider implements IPageProvider, IClusterable
 
 					page = stored;
 
-					if (renderCount != null && page.getRenderCount() != renderCount)
+					if (renderCount != null && page.getRenderCount() != renderCount) {
 						throw new StalePageException(page);
+					}
 				}
 
 				failedToFindStoredPage = page == null;

@@ -41,7 +41,7 @@ public class MultiLineLabelContent extends Content
 			@Override
 			public String getObject()
 			{
-				return model.getObject().getId() + " " + LOREM_IPSUM;
+				return new StringBuilder().append(model.getObject().getId()).append(" ").append(LOREM_IPSUM).toString();
 			}
 		});
 	}

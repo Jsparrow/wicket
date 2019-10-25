@@ -26,6 +26,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.wicket.util.WicketTestTag;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Test for https://issues.apache.org/jira/browse/WICKET-6169
@@ -33,6 +35,8 @@ import org.junit.jupiter.api.Test;
 @Tag(WicketTestTag.SLOW)
 class RequestLoggerLiveSessionsTest
 {
+	private static final Logger logger = LoggerFactory.getLogger(RequestLoggerLiveSessionsTest.class);
+
 	private final RequestLogger requestLogger = new RequestLogger();
 	
 	private final ArrayList<String> sessionIds = new ArrayList<>();
@@ -54,7 +58,7 @@ class RequestLoggerLiveSessionsTest
 			}
 			catch (NullPointerException e)
 			{
-				e.printStackTrace();
+				logger.error(e.getMessage(), e);
 				nullPointerExceptionThrown.set(true);
 				break;
 			}
@@ -70,8 +74,10 @@ class RequestLoggerLiveSessionsTest
 	
 	private class SessionCreateThread extends Thread
 	{
+		private final Logger logger1 = LoggerFactory.getLogger(SessionCreateThread.class);
 		private final Random random = new Random();
 		
+		@Override
 		public void run()
 		{
 			while (!isInterrupted())
@@ -90,6 +96,7 @@ class RequestLoggerLiveSessionsTest
 					Thread.sleep(random.nextInt(20));
 				}
 					catch (InterruptedException e) {
+						logger1.error(e.getMessage(), e);
 				}
 			}
 		}
@@ -97,8 +104,10 @@ class RequestLoggerLiveSessionsTest
 
 	private class SessionDestroyThread extends Thread
 	{
+		private final Logger logger1 = LoggerFactory.getLogger(SessionDestroyThread.class);
 		private final Random random = new Random();
 		
+		@Override
 		public void run()
 		{
 			while (!isInterrupted())
@@ -117,6 +126,7 @@ class RequestLoggerLiveSessionsTest
 					Thread.sleep(random.nextInt(20));
 				}
 					catch (InterruptedException e) {
+						logger1.error(e.getMessage(), e);
 				}
 			}
 		}

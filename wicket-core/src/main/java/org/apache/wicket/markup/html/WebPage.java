@@ -157,7 +157,7 @@ public class WebPage extends Page
 		final String contentType;
 		if (validEncoding)
 		{
-			contentType = getMarkupType().getMimeType() + "; charset=" + encoding;
+			contentType = new StringBuilder().append(getMarkupType().getMimeType()).append("; charset=").append(encoding).toString();
 		}
 		else
 		{
@@ -196,14 +196,10 @@ public class WebPage extends Page
 	@Override
 	protected void onAfterRender()
 	{
+		// check headers only when page was completely rendered
 		// only in development mode validate the headers
-		if (getApplication().usesDevelopmentConfig())
-		{
-			// check headers only when page was completely rendered
-			if (wasRendered(this))
-			{
-				validateHeaders();
-			}
+		if (getApplication().usesDevelopmentConfig() && wasRendered(this)) {
+			validateHeaders();
 		}
 
 		super.onAfterRender();
@@ -217,59 +213,53 @@ public class WebPage extends Page
 	{
 		// search for HtmlHeaderContainer in the first level of children or deeper
 		// if there are transparent resolvers used
-		HtmlHeaderContainer header = visitChildren(new IVisitor<Component, HtmlHeaderContainer>()
-		{
-			@Override
-			public void component(final Component component, final IVisit<HtmlHeaderContainer> visit)
+		HtmlHeaderContainer header = visitChildren((final Component component, final IVisit<HtmlHeaderContainer> visit) -> {
+			if (component instanceof HtmlHeaderContainer)
 			{
-				if (component instanceof HtmlHeaderContainer)
-				{
-					visit.stop((HtmlHeaderContainer)component);
-				}
-				else if (component instanceof TransparentWebMarkupContainer == false)
-				{
-					visit.dontGoDeeper();
-				}
+				visit.stop((HtmlHeaderContainer)component);
+			}
+			else if (component instanceof TransparentWebMarkupContainer == false)
+			{
+				visit.dontGoDeeper();
 			}
 		});
 
-		if (header == null)
+		if (header != null) {
+			return;
+		}
+		// the markup must at least contain a <body> tag for wicket to automatically
+		// create a HtmlHeaderContainer. Log an error if no header container
+		// was created but any of the components or behaviors want to contribute
+		// something to the header.
+		header = new HtmlHeaderContainer(HtmlHeaderSectionHandler.HEADER_ID);
+		add(header);
+		RequestCycle requestCycle = getRequestCycle();
+		Response orgResponse = requestCycle.getResponse();
+		try
 		{
-			// the markup must at least contain a <body> tag for wicket to automatically
-			// create a HtmlHeaderContainer. Log an error if no header container
-			// was created but any of the components or behaviors want to contribute
-			// something to the header.
-			header = new HtmlHeaderContainer(HtmlHeaderSectionHandler.HEADER_ID);
-			add(header);
+			StringResponse tempResponse = new StringResponse();
+			requestCycle.setResponse(tempResponse);
 
-			RequestCycle requestCycle = getRequestCycle();
-			Response orgResponse = requestCycle.getResponse();
-			try
-			{
-				StringResponse tempResponse = new StringResponse();
-				requestCycle.setResponse(tempResponse);
+			// Render all header sections of all components on the page
+			AbstractHeaderRenderStrategy.get().renderHeader(header, null, getPage());
 
-				// Render all header sections of all components on the page
-				AbstractHeaderRenderStrategy.get().renderHeader(header, null, getPage());
-
-				IHeaderResponse headerResponse = header.getHeaderResponse();
-				headerResponse.close();
-				CharSequence collectedHeaderOutput = tempResponse.getBuffer();
-				if (collectedHeaderOutput.length() > 0)
-				{
-					reportMissingHead(collectedHeaderOutput);
-				}
-			}
-			catch (Exception e)
+			IHeaderResponse headerResponse = header.getHeaderResponse();
+			headerResponse.close();
+			CharSequence collectedHeaderOutput = tempResponse.getBuffer();
+			if (collectedHeaderOutput.length() > 0)
 			{
-				// just swallow this exception, there isn't much we can do about.
-				log.error("header/body check throws exception", e);
+				reportMissingHead(collectedHeaderOutput);
 			}
-			finally
-			{
-				this.remove(header);
-				requestCycle.setResponse(orgResponse);
-			}
+		}
+		catch (Exception e)
+		{
+			// just swallow this exception, there isn't much we can do about.
+			log.error("header/body check throws exception", e);
+		}
+		finally
+		{
+			this.remove(header);
+			requestCycle.setResponse(orgResponse);
 		}
 	}
 
@@ -284,9 +274,7 @@ public class WebPage extends Page
 	protected void reportMissingHead(final CharSequence collectedHeaderOutput)
 	{
 		log.error("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-		log.error("You probably forgot to add a <body> or <head> tag to your markup since no Header Container was \n" +
-				"found but components were found which want to write to the <head> section.\n" +
-				collectedHeaderOutput);
+		log.error(new StringBuilder().append("You probably forgot to add a <body> or <head> tag to your markup since no Header Container was \n").append("found but components were found which want to write to the <head> section.\n").append(collectedHeaderOutput).toString());
 		log.error("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
 	}
 

@@ -121,7 +121,7 @@ public class SpringBeanLocator implements IProxyTargetLocator
 		Args.notNull(beanType, "beanType");
 
 		this.beanName = beanName;
-		beanTypeCache = new WeakReference<Class<?>>(beanType);
+		beanTypeCache = new WeakReference<>(beanType);
 		beanTypeName = beanType.getName();
 		springContextLocator = locator;
 		
@@ -182,9 +182,8 @@ public class SpringBeanLocator implements IProxyTargetLocator
 				clazz = WicketObjects.resolveClass(beanTypeName));
 			if (clazz == null)
 			{
-				throw new RuntimeException("SpringBeanLocator could not find class [" +
-					beanTypeName + "] needed to locate the [" +
-					((beanName != null) ? (beanName) : ("bean name not specified")) + "] bean");
+				throw new RuntimeException(new StringBuilder().append("SpringBeanLocator could not find class [").append(beanTypeName).append("] needed to locate the [").append((beanName != null) ? (beanName) : ("bean name not specified")).append("] bean")
+						.toString());
 			}
 		}
 		return clazz;
@@ -273,13 +272,11 @@ public class SpringBeanLocator implements IProxyTargetLocator
 			}
 
 			throw new IllegalStateException(
-				"Concrete bean could not be received from the application context for class: " +
-					clazz.getName() + ".");
+				new StringBuilder().append("Concrete bean could not be received from the application context for class: ").append(clazz.getName()).append(".").toString());
 		}
 		catch (NoSuchBeanDefinitionException e)
 		{
-			throw new IllegalStateException("bean with name [" + name + "] and class [" +
-				clazz.getName() + "] not found", e);
+			throw new IllegalStateException(new StringBuilder().append("bean with name [").append(name).append("] and class [").append(clazz.getName()).append("] not found").toString(), e);
 		}
 	}
 
@@ -387,13 +384,12 @@ public class SpringBeanLocator implements IProxyTargetLocator
 	@Override
 	public boolean equals(final Object obj)
 	{
-		if (obj instanceof SpringBeanLocator)
-		{
-			SpringBeanLocator other = (SpringBeanLocator)obj;
-			return beanTypeName.equals(other.beanTypeName) &&
-				Objects.equal(beanName, other.beanName);
+		if (!(obj instanceof SpringBeanLocator)) {
+			return false;
 		}
-		return false;
+		SpringBeanLocator other = (SpringBeanLocator)obj;
+		return beanTypeName.equals(other.beanTypeName) &&
+			Objects.equal(beanName, other.beanName);
 	}
 
 	@Override
@@ -402,7 +398,7 @@ public class SpringBeanLocator implements IProxyTargetLocator
 		int hashcode = beanTypeName.hashCode();
 		if (getBeanName() != null)
 		{
-			hashcode = hashcode + (127 * beanName.hashCode());
+			hashcode += (127 * beanName.hashCode());
 		}
 		return hashcode;
 	}

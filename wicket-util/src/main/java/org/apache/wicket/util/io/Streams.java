@@ -37,6 +37,13 @@ import org.apache.wicket.util.lang.Args;
 public final class Streams
 {
 	/**
+	 * Private to prevent instantiation.
+	 */
+	private Streams()
+	{
+	}
+
+	/**
 	 * Writes the input stream to the output stream. Input is done without a Reader object, meaning
 	 * that the input is copied in its raw form. After it is copied it will close the streams.
 	 * 
@@ -202,12 +209,5 @@ public final class Streams
 		}
 
 		return buffer.toString();
-	}
-
-	/**
-	 * Private to prevent instantiation.
-	 */
-	private Streams()
-	{
 	}
 }

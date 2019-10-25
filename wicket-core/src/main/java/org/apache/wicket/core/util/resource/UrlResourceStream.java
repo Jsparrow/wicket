@@ -65,31 +65,6 @@ public class UrlResourceStream extends AbstractResourceStream
 	private Instant lastModified;
 
 	/**
-	 * Meta data class for the stream attributes
-	 */
-	private static class StreamData
-	{
-		private URLConnection connection;
-
-		/**
-		 * The streams read from this connection.
-		 * Some URLConnection implementations return the same instance of InputStream
-		 * every time URLConnection#getInputStream() is called. Other return a new instance
-		 * of InputStream.
-		 * Here we keep a list of all returned ones and close them in UrlResourceStream#close().
-		 * Even it is the same instance several times we will try to close it quietly several times.
-		 */
-		private List<InputStream> inputStreams;
-
-		/** Length of stream. */
-		private long contentLength;
-
-		/** Content type for stream. */
-		private String contentType;
-
-	}
-
-	/**
 	 * Construct.
 	 *
 	 * @param url
@@ -152,17 +127,15 @@ public class UrlResourceStream extends AbstractResourceStream
 	{
 		StreamData data = getData(false);
 
-		if (data != null)
-		{
-			Connections.closeQuietly(data.connection);
-			if (data.inputStreams != null)
-			{
-				for (InputStream is : data.inputStreams) {
-					IOUtils.closeQuietly(is);
-				}
-			}
-			streamData = null;
+		if (data == null) {
+			return;
 		}
+		Connections.closeQuietly(data.connection);
+		if (data.inputStreams != null)
+		{
+			data.inputStreams.forEach(IOUtils::closeQuietly);
+		}
+		streamData = null;
 	}
 
 	/**
@@ -184,7 +157,7 @@ public class UrlResourceStream extends AbstractResourceStream
 		}
 		catch (IOException e)
 		{
-			throw new ResourceStreamNotFoundException("Resource " + url + " could not be opened", e);
+			throw new ResourceStreamNotFoundException(new StringBuilder().append("Resource ").append(url).append(" could not be opened").toString(), e);
 		}
 	}
 
@@ -229,14 +202,14 @@ public class UrlResourceStream extends AbstractResourceStream
 	{
 		StreamData data = getData(false);
 
-		if (data != null)
-		{
-			URLConnection connection = url.openConnection();
-			try {
-				data.contentLength = connection.getContentLength();
-			} finally {
-				Connections.close(connection);
-			}
+		if (data == null) {
+			return;
+		}
+		URLConnection connection = url.openConnection();
+		try {
+			data.contentLength = connection.getContentLength();
+		} finally {
+			Connections.close(connection);
 		}
 	}
 
@@ -272,5 +245,30 @@ public class UrlResourceStream extends AbstractResourceStream
 	public String locationAsString()
 	{
 		return url.toExternalForm();
+	}
+
+	/**
+	 * Meta data class for the stream attributes
+	 */
+	private static class StreamData
+	{
+		private URLConnection connection;
+
+		/**
+		 * The streams read from this connection.
+		 * Some URLConnection implementations return the same instance of InputStream
+		 * every time URLConnection#getInputStream() is called. Other return a new instance
+		 * of InputStream.
+		 * Here we keep a list of all returned ones and close them in UrlResourceStream#close().
+		 * Even it is the same instance several times we will try to close it quietly several times.
+		 */
+		private List<InputStream> inputStreams;
+
+		/** Length of stream. */
+		private long contentLength;
+
+		/** Content type for stream. */
+		private String contentType;
+
 	}
 }

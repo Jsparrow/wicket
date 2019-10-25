@@ -44,8 +44,9 @@ public class WithoutCPWithoutFPTest extends WicketWebTestCase
 		{
 			String basedir = System.getProperty("basedir");
 			String path = "";
-			if (basedir != null)
+			if (basedir != null) {
 				path = basedir + "/";
+			}
 			path += "src/main/testwebapp2";
 			setWebappLocation(path);
 		}

@@ -41,7 +41,7 @@ public class CompoundValidator<T> extends Behavior implements IValidator<T>
 {
 	private static final long serialVersionUID = 1L;
 
-	private final List<IValidator<T>> validators = new ArrayList<IValidator<T>>(2);
+	private final List<IValidator<T>> validators = new ArrayList<>(2);
 
 	/**
 	 * Constructor.
@@ -91,121 +91,73 @@ public class CompoundValidator<T> extends Behavior implements IValidator<T>
 	@Override
 	public void beforeRender(Component component)
 	{
-		for (IValidator<T> validator : validators) {
-			if (validator instanceof Behavior) {
-				((Behavior)validator).beforeRender(component);
-			}
-		}
+		validators.stream().filter(validator -> validator instanceof Behavior).forEach(validator -> ((Behavior) validator).beforeRender(component));
 	}
 
 	@Override
 	public void afterRender(Component component)
 	{
-		for (IValidator<T> validator : validators) {
-			if (validator instanceof Behavior) {
-				((Behavior)validator).afterRender(component);
-			}
-		}
+		validators.stream().filter(validator -> validator instanceof Behavior).forEach(validator -> ((Behavior) validator).afterRender(component));
 	}
 
 	@Override
 	public void bind(Component component)
 	{
-		for (IValidator<T> validator : validators) {
-			if (validator instanceof Behavior) {
-				((Behavior)validator).bind(component);
-			}
-		}
+		validators.stream().filter(validator -> validator instanceof Behavior).forEach(validator -> ((Behavior) validator).bind(component));
 	}
 
 	@Override
 	public void unbind(Component component)
 	{
-		for (IValidator<T> validator : validators) {
-			if (validator instanceof Behavior) {
-				((Behavior)validator).unbind(component);
-			}
-		}
+		validators.stream().filter(validator -> validator instanceof Behavior).forEach(validator -> ((Behavior) validator).unbind(component));
 	}
 	
 	@Override
 	public void detach(Component component)
 	{
-		for (IValidator<T> validator : validators) {
-			if (validator instanceof Behavior) {
-				((Behavior)validator).detach(component);
-			}
-		}
+		validators.stream().filter(validator -> validator instanceof Behavior).forEach(validator -> ((Behavior) validator).detach(component));
 	}
 
 	@Override
 	public void onException(Component component, RuntimeException exception)
 	{
-		for (IValidator<T> validator : validators) {
-			if (validator instanceof Behavior) {
-				((Behavior)validator).onException(component, exception);
-			}
-		}
+		validators.stream().filter(validator -> validator instanceof Behavior).forEach(validator -> ((Behavior) validator).onException(component, exception));
 	}
 
 	@Override
 	public boolean getStatelessHint(Component component)
 	{
-		for (IValidator<T> validator : validators) {
-			if (validator instanceof Behavior && ((Behavior)validator).getStatelessHint(component) == false) {
-				return false;
-			}
-		}
-		return super.getStatelessHint(component);
+		return validators.stream().filter(validator -> validator instanceof Behavior && ((Behavior)validator).getStatelessHint(component) == false).findFirst().map(validator -> false)
+				.orElse(super.getStatelessHint(component));
 	}
 
 	@Override
 	public void onComponentTag(Component component, ComponentTag tag)
 	{
-		for (IValidator<T> validator : validators) {
-			if (validator instanceof Behavior) {
-				((Behavior)validator).onComponentTag(component, tag);
-			}
-		}
+		validators.stream().filter(validator -> validator instanceof Behavior).forEach(validator -> ((Behavior) validator).onComponentTag(component, tag));
 	}
 
 	@Override
 	public void renderHead(Component component, IHeaderResponse response)
 	{
-		for (IValidator<T> validator : validators) {
-			if (validator instanceof Behavior) {
-				((Behavior)validator).renderHead(component, response);
-			}
-		}
+		validators.stream().filter(validator -> validator instanceof Behavior).forEach(validator -> ((Behavior) validator).renderHead(component, response));
 	}
 
 	@Override
 	public void onConfigure(Component component)
 	{
-		for (IValidator<T> validator : validators) {
-			if (validator instanceof Behavior) {
-				((Behavior)validator).onConfigure(component);
-			}
-		}
+		validators.stream().filter(validator -> validator instanceof Behavior).forEach(validator -> ((Behavior) validator).onConfigure(component));
 	}
 
 	@Override
 	public void onEvent(Component component, IEvent<?> event)
 	{
-		for (IValidator<T> validator : validators) {
-			if (validator instanceof Behavior) {
-				((Behavior)validator).onEvent(component, event);
-			}
-		}
+		validators.stream().filter(validator -> validator instanceof Behavior).forEach(validator -> ((Behavior) validator).onEvent(component, event));
 	}
 
 	@Override
 	public void onRemove(Component component)
 	{
-		for (IValidator<T> validator : validators) {
-			if (validator instanceof Behavior) {
-				((Behavior)validator).onRemove(component);
-			}
-		}
+		validators.stream().filter(validator -> validator instanceof Behavior).forEach(validator -> ((Behavior) validator).onRemove(component));
 	}
 }

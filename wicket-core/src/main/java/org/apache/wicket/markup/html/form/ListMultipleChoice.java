@@ -204,15 +204,14 @@ public class ListMultipleChoice<T> extends AbstractChoice<Collection<T>, T>
 		if (selectedValues != null)
 		{
 			final List<? extends T> choices = getChoices();
-			for (T object : selectedValues)
-			{
+			selectedValues.forEach(object -> {
 				if (buffer.length() > 0)
 				{
 					buffer.append(VALUE_SEPARATOR);
 				}
 				int index = choices.indexOf(object);
 				buffer.append(getChoiceRenderer().getIdValue(object, index));
-			}
+			});
 		}
 
 		return buffer.toString();
@@ -260,7 +259,7 @@ public class ListMultipleChoice<T> extends AbstractChoice<Collection<T>, T>
 	 * @see org.apache.wicket.markup.html.form.FormComponent#convertValue(String[])
 	 */
 	@Override
-	protected Collection<T> convertValue(String[] ids) throws ConversionException
+	protected Collection<T> convertValue(String[] ids)
 	{
 		if (ids != null && ids.length > 0 && !Strings.isEmpty(ids[0]))
 		{
@@ -318,7 +317,7 @@ public class ListMultipleChoice<T> extends AbstractChoice<Collection<T>, T>
 	{
 		final List<? extends T> choices = getChoices();
 
-		final Map<String, T> choiceIds2choiceValues = new HashMap<String, T>(choices.size(), 1);
+		final Map<String, T> choiceIds2choiceValues = new HashMap<>(choices.size(), 1);
 
 		for (int index = 0; index < choices.size(); index++)
 		{
@@ -331,33 +330,26 @@ public class ListMultipleChoice<T> extends AbstractChoice<Collection<T>, T>
 
 	private void addRetainedDisabled(ArrayList<T> selectedValues)
 	{
-		if (isRetainDisabledSelected())
+		if (!isRetainDisabledSelected()) {
+			return;
+		}
+		Collection<T> unchangedModel = getModelObject();
+		String selected;
 		{
-			Collection<T> unchangedModel = getModelObject();
-			String selected;
-			{
-				StringBuilder builder = new StringBuilder();
-				for (T t : unchangedModel)
-				{
-					builder.append(t);
-					builder.append(';');
-				}
-				selected = builder.toString();
-			}
-			List<? extends T> choices = getChoices();
-			for (int i = 0; i < choices.size(); i++)
-			{
-				final T choice = choices.get(i);
-				if (isDisabled(choice, i, selected))
-				{
-					if (unchangedModel.contains(choice))
-					{
-						if (!selectedValues.contains(choice))
-						{
-							selectedValues.add(choice);
-						}
-					}
-				}
+			StringBuilder builder = new StringBuilder();
+			unchangedModel.forEach(t -> {
+				builder.append(t);
+				builder.append(';');
+			});
+			selected = builder.toString();
+		}
+		List<? extends T> choices = getChoices();
+		for (int i = 0; i < choices.size(); i++)
+		{
+			final T choice = choices.get(i);
+			boolean condition = isDisabled(choice, i, selected) && unchangedModel.contains(choice) && !selectedValues.contains(choice);
+			if (condition) {
+				selectedValues.add(choice);
 			}
 		}
 	}

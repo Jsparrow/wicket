@@ -42,32 +42,6 @@ import org.apache.wicket.util.visit.IVisitor;
 public class WicketTesterHelper
 {
 	/**
-	 * <code>ComponentData</code> class.
-	 *
-	 * @author Ingram Chen
-	 * @since 1.2.6
-	 */
-	public static class ComponentData implements IClusterable
-	{
-		private static final long serialVersionUID = 1L;
-
-		/** Component path. */
-		public String path;
-
-		/** Component type. */
-		public String type;
-
-		/** Component value. */
-		public String value;
-
-		/** Component visibility */
-		public boolean isVisible;
-
-		/** Whether Component is Enabled */
-		public boolean isEnabled;
-	}
-
-	/**
 	 * Gets recursively all <code>Component</code>s of a given <code>Page</code>, extracts the
 	 * information relevant to us, and adds them to a <code>List</code>.
 	 *
@@ -146,8 +120,8 @@ public class WicketTesterHelper
 	public static void failWithVerboseMessage(final Collection<?> expects,
 		final Collection<?> actuals)
 	{
-		fail("\nexpect (" + expects.size() + "):\n" + asLined(expects) + "\nbut was (" +
-			actuals.size() + "):\n" + asLined(actuals));
+		fail(new StringBuilder().append("\nexpect (").append(expects.size()).append("):\n").append(asLined(expects)).append("\nbut was (").append(actuals.size())
+				.append("):\n").append(asLined(actuals)).toString());
 	}
 
 	/**
@@ -207,21 +181,17 @@ public class WicketTesterHelper
 		String[] eventNames = Strings.split(event, ' ');
 		for (String eventName : eventNames)
 		{
-			for (Behavior behavior : component.getBehaviors())
-			{
-				if (behavior instanceof AjaxEventBehavior)
+			component.getBehaviors().stream().filter(behavior -> behavior instanceof AjaxEventBehavior).forEach(behavior -> {
+				String behaviorEvent = ((AjaxEventBehavior)behavior).getEvent();
+				String[] behaviorEventNames = Strings.split(behaviorEvent, ' ');
+				for (String behaviorEventName : behaviorEventNames)
 				{
-					String behaviorEvent = ((AjaxEventBehavior)behavior).getEvent();
-					String[] behaviorEventNames = Strings.split(behaviorEvent, ' ');
-					for (String behaviorEventName : behaviorEventNames)
+					if (eventName.equalsIgnoreCase(behaviorEventName))
 					{
-						if (eventName.equalsIgnoreCase(behaviorEventName))
-						{
-							behaviors.add((AjaxEventBehavior)behavior);
-						}
+						behaviors.add((AjaxEventBehavior)behavior);
 					}
 				}
-			}
+			});
 		}
 		return behaviors;
 	}
@@ -238,6 +208,32 @@ public class WicketTesterHelper
 			return behavior;
 		}
 		return null;
+	}
+
+	/**
+	 * <code>ComponentData</code> class.
+	 *
+	 * @author Ingram Chen
+	 * @since 1.2.6
+	 */
+	public static class ComponentData implements IClusterable
+	{
+		private static final long serialVersionUID = 1L;
+
+		/** Component path. */
+		public String path;
+
+		/** Component type. */
+		public String type;
+
+		/** Component value. */
+		public String value;
+
+		/** Component visibility */
+		public boolean isVisible;
+
+		/** Whether Component is Enabled */
+		public boolean isEnabled;
 	}
 
 }
